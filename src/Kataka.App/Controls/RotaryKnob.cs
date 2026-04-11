@@ -24,6 +24,9 @@ public class RotaryKnob : Control
     public static readonly StyledProperty<double> ScaleProperty =
         AvaloniaProperty.Register<RotaryKnob, double>(nameof(Scale), 1.0);
 
+    public static readonly StyledProperty<double> LabelFontSizeProperty =
+        AvaloniaProperty.Register<RotaryKnob, double>(nameof(LabelFontSize), -1.0);
+
     private static readonly SolidColorBrush FaceBrush = new(Color.Parse("#2c2f35"));
     private static readonly SolidColorBrush BezelBrush = new(Color.Parse("#0f1114"));
     private static readonly SolidColorBrush TickBrush = new(Color.Parse("#4a4f57"));
@@ -36,7 +39,7 @@ public class RotaryKnob : Control
 
     static RotaryKnob()
     {
-        AffectsRender<RotaryKnob>(LabelProperty, MinimumProperty, MaximumProperty, ValueProperty, ScaleProperty);
+        AffectsRender<RotaryKnob>(LabelProperty, MinimumProperty, MaximumProperty, ValueProperty, ScaleProperty, LabelFontSizeProperty);
         AffectsMeasure<RotaryKnob>(ScaleProperty);
         FocusableProperty.OverrideDefaultValue<RotaryKnob>(true);
     }
@@ -71,6 +74,12 @@ public class RotaryKnob : Control
         set => SetValue(ScaleProperty, Math.Max(0.1, value));
     }
 
+    public double LabelFontSize
+    {
+        get => GetValue(LabelFontSizeProperty);
+        set => SetValue(LabelFontSizeProperty, value);
+    }
+
     protected override Size MeasureOverride(Size availableSize)
     {
         var s = Scale;
@@ -83,7 +92,8 @@ public class RotaryKnob : Control
 
         var s = Scale;
         var bounds = Bounds.Deflate(4 * s);
-        var labelText = CreateText(Label.ToUpperInvariant(), 12 * s, FontWeight.Bold, LabelBrush);
+        var resolvedLabelSize = LabelFontSize > 0 ? LabelFontSize : 12 * s;
+        var labelText = CreateText(Label.ToUpperInvariant(), resolvedLabelSize, FontWeight.Bold, LabelBrush);
         var labelOrigin = new Point((bounds.Width - labelText.Width) / 2, bounds.Top);
         context.DrawText(labelText, labelOrigin);
 
