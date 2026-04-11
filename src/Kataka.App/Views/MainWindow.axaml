@@ -420,7 +420,7 @@
 
                                                     <!-- ── Panel effect pedal card ── -->
                                                     <Border IsVisible="{Binding IsPanelEffect}"
-                                                            Width="190" CornerRadius="8"
+                                                            MinWidth="160" CornerRadius="8"
                                                             VerticalAlignment="Top">
                                                         <Border.Background>
                                                             <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
@@ -447,49 +447,41 @@
                                                                               ItemsSource="{Binding PanelEffect.TypeOptions}"
                                                                               SelectedItem="{Binding PanelEffect.SelectedTypeOption}" />
                                                                 </StackPanel>
-                                                                <!-- Level slider -->
-                                                                <StackPanel Spacing="4" IsVisible="{Binding PanelEffect.HasLevel}">
-                                                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                                                        <TextBlock Text="LEVEL" FontSize="10" FontWeight="SemiBold"
-                                                                                   Foreground="{StaticResource KatanaSubtleTextBrush}"
-                                                                                   VerticalAlignment="Center" />
-                                                                        <TextBlock Text="{Binding PanelEffect.Level}" FontSize="10"
-                                                                                   Foreground="{StaticResource KatanaSubtleTextBrush}"
-                                                                                   VerticalAlignment="Center" />
-                                                                    </StackPanel>
-                                                                    <Slider Minimum="0" Maximum="100"
-                                                                            Value="{Binding PanelEffect.Level}"
-                                                                            HorizontalAlignment="Stretch" />
-                                                                </StackPanel>
-                                                                <!-- Detail parameters -->
+                                                                <!-- Level knob -->
+                                                                <controls:RotaryKnob Label="LEVEL"
+                                                                                     Minimum="0" Maximum="100"
+                                                                                     Value="{Binding PanelEffect.Level}"
+                                                                                     IsVisible="{Binding PanelEffect.HasLevel}"
+                                                                                     HorizontalAlignment="Center" />
+                                                                <!-- Detail parameter knobs (continuous) and toggles (boolean) -->
                                                                 <ItemsControl ItemsSource="{Binding PanelEffect.DetailParams}"
                                                                               IsVisible="{Binding PanelEffect.HasDetailParams}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <WrapPanel Orientation="Horizontal"
+                                                                                       HorizontalAlignment="Center" />
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
                                                                     <ItemsControl.ItemTemplate>
                                                                         <DataTemplate>
-                                                                            <StackPanel Spacing="4" Margin="0,4,0,0">
-                                                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                                                    <TextBlock Text="{Binding Label}" FontSize="10"
-                                                                                               FontWeight="SemiBold"
-                                                                                               Foreground="{StaticResource KatanaSubtleTextBrush}"
-                                                                                               VerticalAlignment="Center" />
-                                                                                    <TextBlock Text="{Binding Value}" FontSize="10"
-                                                                                               Foreground="{StaticResource KatanaSubtleTextBrush}"
-                                                                                               VerticalAlignment="Center"
-                                                                                               IsVisible="{Binding !IsToggle}" />
-                                                                                </StackPanel>
-                                                                                <!-- Slider for continuous params -->
-                                                                                <Slider Minimum="{Binding Minimum}"
-                                                                                        Maximum="{Binding Maximum}"
-                                                                                        Value="{Binding Value}"
-                                                                                        HorizontalAlignment="Stretch"
-                                                                                        IsVisible="{Binding !IsToggle}" />
-                                                                                <!-- Toggle for boolean params -->
-                                                                                <ToggleButton Classes="effect-button"
-                                                                                              HorizontalAlignment="Stretch"
-                                                                                              Content="{Binding Label}"
-                                                                                              IsChecked="{Binding IsOn}"
-                                                                                              IsVisible="{Binding IsToggle}" />
-                                                                            </StackPanel>
+                                                                            <Panel>
+                                                                                <!-- Rotary knob for continuous params -->
+                                                                                <controls:RotaryKnob Label="{Binding Label}"
+                                                                                                     Minimum="{Binding Minimum}"
+                                                                                                     Maximum="{Binding Maximum}"
+                                                                                                     Value="{Binding Value}"
+                                                                                                     IsVisible="{Binding !IsToggle}" />
+                                                                                <!-- Toggle button for boolean params -->
+                                                                                <Border IsVisible="{Binding IsToggle}"
+                                                                                        Width="116" Height="156"
+                                                                                        Padding="8">
+                                                                                    <ToggleButton Classes="effect-button"
+                                                                                                  HorizontalAlignment="Stretch"
+                                                                                                  VerticalAlignment="Center"
+                                                                                                  Content="{Binding Label}"
+                                                                                                  IsChecked="{Binding IsOn}" />
+                                                                                </Border>
+                                                                            </Panel>
                                                                         </DataTemplate>
                                                                     </ItemsControl.ItemTemplate>
                                                                 </ItemsControl>
