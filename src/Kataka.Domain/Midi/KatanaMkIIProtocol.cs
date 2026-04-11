@@ -14,7 +14,7 @@ public static class KatanaMkIIProtocol
     public static SysExMessage CreateParameterReadRequest(KatanaParameterDefinition parameter)
     {
         ArgumentNullException.ThrowIfNull(parameter);
-        return RolandSysExBuilder.BuildDataRequest1(DeviceId, ModelId, parameter.Address, SingleByteSize);
+        return CreateDataReadRequest(parameter.Address, 1);
     }
 
     public static SysExMessage CreateParameterWriteRequest(KatanaParameterDefinition parameter, byte value)
@@ -29,7 +29,47 @@ public static class KatanaMkIIProtocol
                 $"{parameter.DisplayName} must be between {parameter.Minimum} and {parameter.Maximum}.");
         }
 
-        return RolandSysExBuilder.BuildDataSet1(DeviceId, ModelId, parameter.Address, [value]);
+        return CreateDataWriteRequest(parameter.Address, [value]);
+    }
+
+    public static SysExMessage CreateDataReadRequest(IReadOnlyList<byte> address, int length)
+    {
+        ArgumentNullException.ThrowIfNull(address);
+
+        if (address.Count != 4)
+        {
+            throw new ArgumentException("Katana parameter addresses must contain exactly 4 bytes.", nameof(address));
+        }
+
+        if (length <= 0 || length > 0x7F)
+        {
+            throw new ArgumentOutOfRangeException(nameof(length), length, "Requested read length must be in the 1..127 byte range.");
+        }
+
+        return RolandSysExBuilder.BuildDataRequest1(DeviceId, ModelId, address, [0x00, 0x00, 0x00, (byte)length]);
+    }
+
+    public static SysExMessage CreateDataWriteRequest(IReadOnlyList<byte> address, IReadOnlyList<byte> data)
+    {
+        ArgumentNullException.ThrowIfNull(address);
+        ArgumentNullException.ThrowIfNull(data);
+
+        if (address.Count != 4)
+        {
+            throw new ArgumentException("Katana parameter addresses must contain exactly 4 bytes.", nameof(address));
+        }
+
+        if (data.Count == 0)
+        {
+            throw new ArgumentException("Katana data writes must contain at least one payload byte.", nameof(data));
+        }
+
+        if (data.Any(value => value > 0x7F))
+        {
+            throw new ArgumentOutOfRangeException(nameof(data), "Katana SysEx data bytes must be in the 0..127 range.");
+        }
+
+        return RolandSysExBuilder.BuildDataSet1(DeviceId, ModelId, address, data);
     }
 
     public static bool TryParseParameterReply(

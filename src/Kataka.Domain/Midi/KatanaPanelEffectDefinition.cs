@@ -6,7 +6,8 @@ public sealed class KatanaPanelEffectDefinition
         string key,
         string displayName,
         KatanaParameterDefinition switchParameter,
-        KatanaParameterDefinition? variationParameter = null)
+        KatanaParameterDefinition? variationParameter = null,
+        KatanaParameterDefinition? typeParameter = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
@@ -16,6 +17,7 @@ public sealed class KatanaPanelEffectDefinition
         DisplayName = displayName;
         SwitchParameter = switchParameter;
         VariationParameter = variationParameter;
+        TypeParameter = typeParameter;
     }
 
     public string Key { get; }
@@ -25,4 +27,6 @@ public sealed class KatanaPanelEffectDefinition
     public KatanaParameterDefinition SwitchParameter { get; }
 
     public KatanaParameterDefinition? VariationParameter { get; }
+
+    public KatanaParameterDefinition? TypeParameter { get; }
 }

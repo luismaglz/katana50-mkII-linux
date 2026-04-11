@@ -8,8 +8,107 @@
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
-  
+
+    <Application.Resources>
+        <SolidColorBrush x:Key="KatanaPanelBrush">#17191d</SolidColorBrush>
+        <SolidColorBrush x:Key="KatanaSectionBrush">#20242a</SolidColorBrush>
+        <SolidColorBrush x:Key="KatanaSectionAltBrush">#252a31</SolidColorBrush>
+        <SolidColorBrush x:Key="KatanaTrimBrush">#4f5661</SolidColorBrush>
+        <SolidColorBrush x:Key="KatanaAccentBrush">#ffb741</SolidColorBrush>
+        <SolidColorBrush x:Key="KatanaAccentMutedBrush">#7a5d23</SolidColorBrush>
+        <SolidColorBrush x:Key="KatanaTextBrush">#f2eee3</SolidColorBrush>
+        <SolidColorBrush x:Key="KatanaSubtleTextBrush">#b9b3a7</SolidColorBrush>
+        <SolidColorBrush x:Key="KatanaDangerBrush">#ff7b6b</SolidColorBrush>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
+
+        <Style Selector="Window">
+            <Setter Property="Background" Value="#111317" />
+            <Setter Property="Foreground" Value="{StaticResource KatanaTextBrush}" />
+        </Style>
+
+        <Style Selector="Border.transport-shell">
+            <Setter Property="Background" Value="#1a1d22" />
+            <Setter Property="BorderBrush" Value="{StaticResource KatanaTrimBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="16" />
+        </Style>
+
+        <Style Selector="Border.amp-shell">
+            <Setter Property="Background" Value="{StaticResource KatanaPanelBrush}" />
+            <Setter Property="BorderBrush" Value="#60656e" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="24" />
+        </Style>
+
+        <Style Selector="Border.panel-section">
+            <Setter Property="Background" Value="{StaticResource KatanaSectionBrush}" />
+            <Setter Property="BorderBrush" Value="#3f454e" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="18" />
+        </Style>
+
+        <Style Selector="Border.panel-section.alt">
+            <Setter Property="Background" Value="{StaticResource KatanaSectionAltBrush}" />
+        </Style>
+
+        <Style Selector="Button.transport-button">
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="Background" Value="#2b3037" />
+            <Setter Property="BorderBrush" Value="#585f69" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{StaticResource KatanaTextBrush}" />
+        </Style>
+
+        <Style Selector="Button.transport-button.accent">
+            <Setter Property="Background" Value="{StaticResource KatanaAccentBrush}" />
+            <Setter Property="BorderBrush" Value="#f7cf6d" />
+            <Setter Property="Foreground" Value="#131416" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style Selector="ComboBox.midi-port-picker">
+            <Setter Property="MinWidth" Value="230" />
+        </Style>
+
+        <Style Selector="ToggleButton.channel-button">
+            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="Background" Value="#2a2e35" />
+            <Setter Property="BorderBrush" Value="#5a6068" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{StaticResource KatanaTextBrush}" />
+            <Setter Property="MinWidth" Value="88" />
+        </Style>
+
+        <Style Selector="ToggleButton.channel-button:checked">
+            <Setter Property="Background" Value="{StaticResource KatanaAccentBrush}" />
+            <Setter Property="BorderBrush" Value="#f7cf6d" />
+            <Setter Property="Foreground" Value="#111317" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+
+        <Style Selector="ToggleButton.effect-button">
+            <Setter Property="Padding" Value="18,12" />
+            <Setter Property="Background" Value="#272b31" />
+            <Setter Property="BorderBrush" Value="#575c63" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{StaticResource KatanaTextBrush}" />
+            <Setter Property="MinWidth" Value="96" />
+        </Style>
+
+        <Style Selector="ToggleButton.effect-button:checked">
+            <Setter Property="Background" Value="#ffc95d" />
+            <Setter Property="BorderBrush" Value="#ffe293" />
+            <Setter Property="Foreground" Value="#111317" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style Selector="TextBox.diagnostic-log">
+            <Setter Property="Background" Value="#0d0f12" />
+            <Setter Property="BorderBrush" Value="#454b54" />
+            <Setter Property="Foreground" Value="#d7dfeb" />
+        </Style>
     </Application.Styles>
 </Application>
