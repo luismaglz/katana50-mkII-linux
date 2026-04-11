@@ -240,6 +240,9 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(SelectedIsPedalFx));
         OnPropertyChanged(nameof(SelectedHasDetail));
         OnPropertyChanged(nameof(SelectedDetailTitle));
+
+        foreach (var item in PedalboardItems)
+            item.IsSelected = string.Equals(item.Key, value, StringComparison.Ordinal);
     }
 
     public PanelEffectViewModel? SelectedPanelEffectDetail =>

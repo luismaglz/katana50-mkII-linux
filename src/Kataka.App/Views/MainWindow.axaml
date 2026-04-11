@@ -440,7 +440,8 @@
                                                             MinWidth="110"
                                                             MaxWidth="130"
                                                             Margin="0,0,0,0"
-                                                            BorderThickness="0">
+                                                            Classes="stompbox-card"
+                                                            Classes.selected="{Binding IsSelected}">
                                                         <Border.Background>
                                                             <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
                                                                 <GradientStop Offset="0" Color="#2e3138" />

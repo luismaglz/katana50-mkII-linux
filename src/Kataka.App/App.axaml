@@ -110,5 +110,14 @@
             <Setter Property="BorderBrush" Value="#454b54" />
             <Setter Property="Foreground" Value="#d7dfeb" />
         </Style>
+
+        <!-- Stompbox card selected highlight -->
+        <Style Selector="Border.stompbox-card">
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+        <Style Selector="Border.stompbox-card.selected">
+            <Setter Property="BorderBrush" Value="#d4c87a" />
+        </Style>
     </Application.Styles>
 </Application>

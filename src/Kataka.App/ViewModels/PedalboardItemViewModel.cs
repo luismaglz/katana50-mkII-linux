@@ -1,8 +1,13 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace Kataka.App.ViewModels;
 
-public sealed class PedalboardItemViewModel
+public sealed partial class PedalboardItemViewModel : ObservableObject
 {
     public string Key { get; init; } = string.Empty;
+
+    [ObservableProperty]
+    private bool isSelected;
 
     public string DisplayName { get; init; } = string.Empty;
 
