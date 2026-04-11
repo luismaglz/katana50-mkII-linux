@@ -55,6 +55,6 @@ The first slice should prove the architecture against real hardware on Linux:
 
 ## Current next test point
 
-Run the app, click **Scan MIDI ports**, click **Connect**, then click **Request identity**. The expected identity reply already observed from the shell on this machine is:
+Run the app, click **Scan MIDI ports**, click **Connect**, then click **Request identity**. The same identity request path is now wired through the app's Linux `amidi` transport. The expected identity reply already observed from the shell on this machine is:
 
 `F0 7E 00 06 02 41 33 03 00 00 05 00 00 00 F7`
