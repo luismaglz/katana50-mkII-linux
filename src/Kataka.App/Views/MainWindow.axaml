@@ -1,0 +1,104 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Kataka.App.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Kataka.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Kataka - MIDI Detection">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,*,Auto,*" ColumnDefinitions="*,*" Margin="24" RowSpacing="12" ColumnSpacing="16">
+        <TextBlock Grid.Row="0"
+                   Grid.ColumnSpan="2"
+                   Text="Kataka quick test"
+                   FontSize="24"
+                   FontWeight="Bold" />
+
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="12">
+            <Button Content="Scan MIDI ports"
+                    Command="{Binding ScanCommand}"/>
+            <TextBlock VerticalAlignment="Center" Text="{Binding StatusMessage}" />
+        </StackPanel>
+
+        <Border Grid.Row="2"
+                Grid.ColumnSpan="2"
+                Padding="12"
+                CornerRadius="8"
+                Background="{DynamicResource SystemControlBackgroundAccentBrush}">
+            <TextBlock Text="{Binding DetectionMessage}" TextWrapping="Wrap" />
+        </Border>
+
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="12">
+            <StackPanel Width="280" Spacing="6">
+                <TextBlock Text="Selected MIDI input port" />
+                <ComboBox ItemsSource="{Binding InputPorts}"
+                          SelectedItem="{Binding SelectedInputPort}" />
+            </StackPanel>
+
+            <StackPanel Width="280" Spacing="6">
+                <TextBlock Text="Selected MIDI output port" />
+                <ComboBox ItemsSource="{Binding OutputPorts}"
+                          SelectedItem="{Binding SelectedOutputPort}" />
+            </StackPanel>
+
+            <StackPanel VerticalAlignment="Bottom" Orientation="Horizontal" Spacing="8">
+                <Button Content="Connect"
+                        Command="{Binding ConnectCommand}" />
+                <Button Content="Disconnect"
+                        Command="{Binding DisconnectCommand}" />
+                <Button Content="Request identity"
+                        Command="{Binding RequestIdentityCommand}" />
+            </StackPanel>
+        </StackPanel>
+
+        <Border Grid.Row="4"
+                Grid.ColumnSpan="2"
+                Padding="12"
+                CornerRadius="8"
+                BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                BorderThickness="1">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Identity reply"
+                           FontWeight="Bold" />
+                <TextBlock Text="{Binding IdentityReply}"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <GroupBox Grid.Row="5" Header="MIDI input ports">
+            <ListBox ItemsSource="{Binding InputPorts}" />
+        </GroupBox>
+
+        <GroupBox Grid.Row="5" Grid.Column="1" Header="MIDI output ports">
+            <ListBox ItemsSource="{Binding OutputPorts}" />
+        </GroupBox>
+
+        <TextBlock Grid.Row="6"
+                   Grid.ColumnSpan="2"
+                   Text="Current quick-test rule: detect Katana by matching MIDI input/output port names containing 'Katana', open the selected MIDI pair, then request a standard MIDI identity reply."
+                   Opacity="0.75"
+                    TextWrapping="Wrap" />
+
+        <TextBlock Grid.Row="7"
+                   Grid.ColumnSpan="2"
+                   Text="Diagnostic log"
+                   FontWeight="Bold" />
+
+        <TextBox Grid.Row="8"
+                 Grid.ColumnSpan="2"
+                 MinHeight="180"
+                 IsReadOnly="True"
+                 Text="{Binding DiagnosticLog}"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True" />
+    </Grid>
+
+</Window>
