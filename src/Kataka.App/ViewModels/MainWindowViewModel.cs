@@ -837,6 +837,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 Detail = "Guitar",
                 IsActive = true,
                 IsEndpoint = true,
+                Family = "io",
             },
         };
 
@@ -854,6 +855,7 @@ public partial class MainWindowViewModel : ViewModelBase
             IsActive = true,
             IsAmp = true,
             IsConnectedFromPrevious = items.Count > 0,
+            Family = "amp",
         });
 
         if (string.Equals(PedalFx.SelectedPositionOption, "Post Amp", StringComparison.Ordinal))
@@ -870,6 +872,7 @@ public partial class MainWindowViewModel : ViewModelBase
             IsActive = true,
             IsEndpoint = true,
             IsConnectedFromPrevious = items.Count > 0,
+            Family = "io",
         });
 
         PedalboardItems.Clear();
@@ -899,6 +902,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 IsActive = effect.IsEnabled,
                 IsConnectedFromPrevious = items.Count > 0,
                 CanToggle = true,
+                Family = effect.Definition.Key,
             });
         }
     }
@@ -913,6 +917,7 @@ public partial class MainWindowViewModel : ViewModelBase
             IsActive = PedalFx.IsEnabled,
             IsConnectedFromPrevious = isConnectedFromPrevious,
             CanToggle = true,
+            Family = "pedal",
         };
     }
 
