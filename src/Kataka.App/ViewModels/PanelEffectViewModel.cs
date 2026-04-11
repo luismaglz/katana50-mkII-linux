@@ -40,6 +40,9 @@ public partial class PanelEffectViewModel : ViewModelBase
         }
 
         SelectedTypeOption = TypeOptions.FirstOrDefault() ?? "N/A";
+
+        foreach (var param in definition.DetailParameters)
+            DetailParams.Add(new EffectDetailParamViewModel(param));
     }
 
     public KatanaPanelEffectDefinition Definition { get; }
@@ -64,6 +67,9 @@ public partial class PanelEffectViewModel : ViewModelBase
 
     public bool HasLevel => Definition.LevelParameter is not null;
     public bool HasTypeOptions => TypeOptions.Count > 0;
+    public bool HasDetailParams => DetailParams.Count > 0;
+
+    public ObservableCollection<EffectDetailParamViewModel> DetailParams { get; } = [];
 
     public IBrush VariationBrush => Variation switch
     {
