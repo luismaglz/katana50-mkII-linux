@@ -168,6 +168,10 @@ public static class KatanaMkIIParameterCatalog
 
     public static IReadOnlyList<byte> DelayTimeAddress { get; } = [0x60, 0x00, 0x05, 0x02];
 
+    /// <summary>Signal chain pattern (PRM_CHAIN_PTN). Values 0–6 map to CHAIN 1 / CHAIN 2-1 / CHAIN 3-1 / CHAIN 4-1 / CHAIN 2-2 / CHAIN 3-2 / CHAIN 4-2.</summary>
+    public static KatanaParameterDefinition ChainPattern { get; } =
+        new("chain-pattern", "Chain Pattern", [0x60, 0x00, 0x06, 0x20], maximum: 6);
+
     /// <summary>Trigger address for saving current temp state to a patch slot (data = [0x00, slot_0based]).</summary>
     public static IReadOnlyList<byte> PatchWriteAddress { get; } = [0x7F, 0x00, 0x01, 0x04];
 

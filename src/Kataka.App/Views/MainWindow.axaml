@@ -233,8 +233,20 @@
                             </StackPanel>
                         </Grid>
 
-                        <!-- ROW 1: PEDALBOARD CHAIN (minimap) -->
-                        <views:PedalboardChainView Grid.Row="1" />
+                        <!-- ROW 1: PEDALBOARD CHAIN (minimap) with chain selector -->
+                        <Grid Grid.Row="1" ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <StackPanel Spacing="4" VerticalAlignment="Center">
+                                <TextBlock Text="CHAIN"
+                                           FontSize="10"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                <ComboBox Classes="midi-port-picker"
+                                          MinWidth="130"
+                                          ItemsSource="{x:Static vm:MainWindowViewModel.ChainPatternNames}"
+                                          SelectedIndex="{Binding SelectedChainPattern}" />
+                            </StackPanel>
+                            <views:PedalboardChainView Grid.Column="1" />
+                        </Grid>
                         <!-- ROW 2: FULL PEDALBOARD (all controls visible) -->
                         <views:PedalboardView Grid.Row="2" />
 
