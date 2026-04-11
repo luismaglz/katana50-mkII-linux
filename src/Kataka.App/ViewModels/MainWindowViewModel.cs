@@ -161,6 +161,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public partial string? SelectedOutputPort { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanWritePatch))]
     public partial bool IsConnected { get; set; }
 
     [ObservableProperty]
@@ -206,7 +207,12 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     public partial string DelayTapStatus { get; set; } = "Delay time has not been read yet.";
 
+    [ObservableProperty]
+    public partial int? DelayTimeMs { get; set; }
+
     public bool IsPatchLevelAvailable => PatchLevelMappingVerified;
+
+    public bool CanWritePatch => IsConnected;
 
     [ObservableProperty]
     public partial bool ActiveReadSync { get; set; } = true;
@@ -395,11 +401,13 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 var confirmedDelayTime = DecodeDelayTime(
                     await katanaSession.ReadBlockAsync(KatanaMkIIParameterCatalog.DelayTimeAddress, 2));
+                DelayTimeMs = confirmedDelayTime;
                 DelayTapStatus = $"Delay time tapped to {confirmedDelayTime} ms.";
                 AppendLog($"Delay time confirmed at {confirmedDelayTime} ms.");
             }
             else
             {
+                DelayTimeMs = tappedDelayTime;
                 DelayTapStatus = $"Delay time tapped to {tappedDelayTime} ms.";
             }
 
@@ -416,6 +424,34 @@ public partial class MainWindowViewModel : ViewModelBase
         finally
         {
             ResumeActiveReadSync("tap delay write finished");
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanWritePatch))]
+    private async Task WritePatchAsync()
+    {
+        if (!katanaSession.IsConnected)
+        {
+            StatusMessage = "Connect to a MIDI port before writing a patch.";
+            return;
+        }
+
+        try
+        {
+            AppendLog("Sending WRITE PATCH command to Katana.");
+            // Slot 0 = write to current temp buffer / active patch location (patch 0)
+            await katanaSession.WriteBlockAsync(
+                KatanaMkIIParameterCatalog.PatchWriteAddress,
+                [0x00, 0x00]);
+            StatusMessage = "Patch written to Katana.";
+            AppendLog("WRITE PATCH command sent.");
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = "Patch write failed.";
+            AppendLog("Patch write command failed.");
+            AppendLog(ex.ToString());
+            Console.Error.WriteLine(ex);
         }
     }
 
@@ -1672,17 +1708,20 @@ public partial class MainWindowViewModel : ViewModelBase
             var delayTime = DecodeDelayTime(await katanaSession.ReadBlockAsync(KatanaMkIIParameterCatalog.DelayTimeAddress, 2));
             if (delayTime <= 0)
             {
+                DelayTimeMs = null;
                 DelayTapStatus = "Delay time is not currently readable for the active effect state.";
                 AppendLog("Delay time reply did not contain a usable millisecond value.");
                 return false;
             }
 
+            DelayTimeMs = delayTime;
             DelayTapStatus = $"Delay time loaded: {delayTime} ms.";
             AppendLog($"Delay time reply: {delayTime} ms.");
             return true;
         }
         catch (Exception ex)
         {
+            DelayTimeMs = null;
             DelayTapStatus = "Delay time refresh failed.";
             AppendLog("Delay time read failed.");
             AppendLog(ex.ToString());
