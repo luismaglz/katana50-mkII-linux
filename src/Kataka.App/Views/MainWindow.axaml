@@ -15,7 +15,7 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto,*" ColumnDefinitions="*,*" Margin="24" RowSpacing="12" ColumnSpacing="16">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto,*" ColumnDefinitions="*,*" Margin="24" RowSpacing="12" ColumnSpacing="16">
         <TextBlock Grid.Row="0"
                    Grid.ColumnSpan="2"
                    Text="Kataka editor core"
@@ -113,26 +113,71 @@
             </StackPanel>
         </Border>
 
-        <GroupBox Grid.Row="6" Header="MIDI input ports">
+        <Border Grid.Row="6"
+                Grid.ColumnSpan="2"
+                Padding="12"
+                CornerRadius="8"
+                BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                BorderThickness="1">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Panel controls"
+                           FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <StackPanel Width="180" Spacing="4">
+                        <TextBlock Text="Channel" />
+                        <ComboBox ItemsSource="{Binding PanelChannels}"
+                                  SelectedItem="{Binding SelectedPanelChannel}" />
+                    </StackPanel>
+                    <StackPanel VerticalAlignment="Bottom" Orientation="Horizontal" Spacing="8">
+                        <Button Content="Read panel controls"
+                                Command="{Binding ReadPanelControlsCommand}" />
+                        <Button Content="Write panel controls"
+                                Command="{Binding WritePanelControlsCommand}" />
+                    </StackPanel>
+                </StackPanel>
+                <TextBlock Text="{Binding PanelControlsStatus}"
+                           TextWrapping="Wrap" />
+                <ItemsControl ItemsSource="{Binding PanelEffects}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:PanelEffectViewModel">
+                            <Grid ColumnDefinitions="120,70,120" ColumnSpacing="12" Margin="0,2,0,2">
+                                <TextBlock Grid.Column="0"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding DisplayName}" />
+                                <CheckBox Grid.Column="1"
+                                          VerticalAlignment="Center"
+                                          Content="Enabled"
+                                          IsChecked="{Binding IsEnabled}" />
+                                <TextBlock Grid.Column="2"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding Variation}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <GroupBox Grid.Row="7" Header="MIDI input ports">
             <ListBox ItemsSource="{Binding InputPorts}" />
         </GroupBox>
 
-        <GroupBox Grid.Row="6" Grid.Column="1" Header="MIDI output ports">
+        <GroupBox Grid.Row="7" Grid.Column="1" Header="MIDI output ports">
             <ListBox ItemsSource="{Binding OutputPorts}" />
         </GroupBox>
 
-        <TextBlock Grid.Row="7"
+        <TextBlock Grid.Row="8"
                    Grid.ColumnSpan="2"
-                   Text="Current editor-core rule: detect Katana by matching MIDI input/output port names containing 'Katana', open the selected MIDI pair, request a standard MIDI identity reply, then read and write gain, volume, bass, middle, treble, and presence with read-back confirmation."
+                   Text="Current editor-core rule: detect Katana by matching MIDI input/output port names containing 'Katana', open the selected MIDI pair, request a standard MIDI identity reply, then read and write amp controls plus panel channel/effect states with read-back confirmation."
                     Opacity="0.75"
                      TextWrapping="Wrap" />
 
-        <TextBlock Grid.Row="8"
+        <TextBlock Grid.Row="9"
                    Grid.ColumnSpan="2"
                    Text="Diagnostic log"
                    FontWeight="Bold" />
 
-        <TextBox Grid.Row="9"
+        <TextBox Grid.Row="10"
                   Grid.ColumnSpan="2"
                   MinHeight="180"
                   IsReadOnly="True"

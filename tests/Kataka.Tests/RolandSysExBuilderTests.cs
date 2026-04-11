@@ -71,4 +71,17 @@ public sealed class RolandSysExBuilderTests
             control => Assert.Equal("Treble", control.DisplayName),
             control => Assert.Equal("Presence", control.DisplayName));
     }
+
+    [Fact]
+    public void KatanaMkIIParameterCatalog_ExposesPanelEffects()
+    {
+        Assert.Collection(
+            KatanaMkIIParameterCatalog.PanelEffects,
+            effect => Assert.Equal("Booster", effect.DisplayName),
+            effect => Assert.Equal("Mod", effect.DisplayName),
+            effect => Assert.Equal("FX", effect.DisplayName),
+            effect => Assert.Equal("Delay", effect.DisplayName),
+            effect => Assert.Equal("Delay 2", effect.DisplayName),
+            effect => Assert.Equal("Reverb", effect.DisplayName));
+    }
 }

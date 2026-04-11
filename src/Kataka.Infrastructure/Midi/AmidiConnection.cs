@@ -60,6 +60,21 @@ internal sealed class AmidiConnection(string inputPortId, string outputPortId) :
         }
     }
 
+    public Task SendProgramChangeAsync(byte program, CancellationToken cancellationToken = default)
+    {
+        EnsureSevenBit(program, nameof(program));
+        EnsureSinglePort();
+        return RunAmidiAsync($"-p {Quote(OutputPortId)} -S {Quote($"{0xC0:X2} {program:X2}")}", cancellationToken);
+    }
+
+    public Task SendControlChangeAsync(byte control, byte value, CancellationToken cancellationToken = default)
+    {
+        EnsureSevenBit(control, nameof(control));
+        EnsureSevenBit(value, nameof(value));
+        EnsureSinglePort();
+        return RunAmidiAsync($"-p {Quote(OutputPortId)} -S {Quote($"{0xB0:X2} {control:X2} {value:X2}")}", cancellationToken);
+    }
+
     private static async Task RunAmidiAsync(string arguments, CancellationToken cancellationToken)
     {
         var startInfo = new ProcessStartInfo
@@ -104,6 +119,14 @@ internal sealed class AmidiConnection(string inputPortId, string outputPortId) :
     private static string Quote(string value)
     {
         return $"\"{value.Replace("\"", "\\\"", StringComparison.Ordinal)}\"";
+    }
+
+    private static void EnsureSevenBit(byte value, string paramName)
+    {
+        if (value > 0x7F)
+        {
+            throw new ArgumentOutOfRangeException(paramName, value, "MIDI data bytes must be in the 0..127 range.");
+        }
     }
 
     private static List<byte[]> SplitSysExMessages(byte[] bytes)

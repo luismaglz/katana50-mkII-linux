@@ -14,6 +14,10 @@ public interface IKatanaSession : IAsyncDisposable
 
     Task<SysExMessage> RequestIdentityAsync(CancellationToken cancellationToken = default);
 
+    Task<KatanaPanelChannel?> ReadCurrentPanelChannelAsync(CancellationToken cancellationToken = default);
+
+    Task SelectPanelChannelAsync(KatanaPanelChannel channel, CancellationToken cancellationToken = default);
+
     Task<byte> ReadParameterAsync(KatanaParameterDefinition parameter, CancellationToken cancellationToken = default);
 
     Task<byte> WriteParameterAsync(KatanaParameterDefinition parameter, byte value, CancellationToken cancellationToken = default);

@@ -52,11 +52,19 @@ The first slice should prove the architecture against real hardware on Linux:
 | Connection vertical slice | Done | Quick-test UI now scans, auto-selects Katana-style ports, opens the selected MIDI pair, and exposes a Request identity action |
 | First Katana parameter slice | Done | Added Katana amp-volume read/write in the quick-test UI on MIDI 1 using the confirmed `60 00 06 52` address, with read-back after writes |
 | Editor core milestone | Done | Extracted a reusable Katana session layer and added a compact amp editor for gain, volume, bass, middle, treble, and presence using verified MIDI 1 addresses |
+| Panel controls milestone | Done | Added channel selection plus panel effect toggle/variation reads for Booster, Mod, FX, Delay, Delay 2, and Reverb on MIDI 1 |
 | Fixture tests | Done | Protocol helper tests are in place and passing |
 | Hardware smoke test | Done | On this Linux machine the app enumerated KATANA MIDI 1/2/3 via `amidi`, auto-selected the ports, and Connect succeeded |
 
 ## Current next test point
 
-Run the app, click **Scan MIDI ports**, leave the auto-selected `KATANA MIDI 1` pair in place, click **Connect**, then click **Request identity**. After that, click **Read amp controls** and confirm that gain, volume, bass, middle, treble, and presence populate. Move one or two sliders by a small amount, click **Write amp controls**, and confirm the values read back correctly. This is the intended UI-side testing pause for the editor core milestone. The expected identity reply already observed from the shell on this machine is:
+Run the app, click **Scan MIDI ports**, leave the auto-selected `KATANA MIDI 1` pair in place, click **Connect**, then click **Request identity**. After that:
+
+1. Click **Read amp controls** and confirm gain, volume, bass, middle, treble, and presence populate.
+2. Click **Read panel controls** and confirm the current channel plus Booster/Mod/FX/Delay/Delay 2/Reverb states and variation colors populate.
+3. Change one or two amp sliders and click **Write amp controls**.
+4. Change the selected panel channel or toggle one or two panel effects and click **Write panel controls**.
+
+This is the intended UI-side testing pause for the panel-controls milestone. The expected identity reply already observed from the shell on this machine is:
 
 `F0 7E 00 06 02 41 33 03 00 00 05 00 00 00 F7`

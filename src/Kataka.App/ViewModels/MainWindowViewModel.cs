@@ -29,6 +29,11 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             AmpControls.Add(new AmpControlViewModel(parameter));
         }
+
+        foreach (var effect in KatanaMkIIParameterCatalog.PanelEffects)
+        {
+            PanelEffects.Add(new PanelEffectViewModel(effect));
+        }
     }
 
     public ObservableCollection<string> InputPorts { get; } = [];
@@ -64,8 +69,25 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<AmpControlViewModel> AmpControls { get; } = [];
 
+    public ObservableCollection<PanelEffectViewModel> PanelEffects { get; } = [];
+
+    public ObservableCollection<string> PanelChannels { get; } =
+    [
+        "Panel",
+        "CH A1",
+        "CH A2",
+        "CH B1",
+        "CH B2",
+    ];
+
     [ObservableProperty]
     public partial string AmpEditorStatus { get; set; } = "Amp editor values have not been read yet.";
+
+    [ObservableProperty]
+    public partial string PanelControlsStatus { get; set; } = "Panel controls have not been read yet.";
+
+    [ObservableProperty]
+    public partial string SelectedPanelChannel { get; set; } = "Panel";
 
     [RelayCommand]
     private async Task ScanAsync()
@@ -319,6 +341,87 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private async Task ReadPanelControlsAsync()
+    {
+        if (!katanaSession.IsConnected)
+        {
+            StatusMessage = "Connect to a MIDI port before reading panel controls.";
+            return;
+        }
+
+        try
+        {
+            AppendLog("Reading Katana panel controls.");
+
+            var currentChannel = await katanaSession.ReadCurrentPanelChannelAsync();
+            if (currentChannel is not null)
+            {
+                SelectedPanelChannel = ToPanelChannelDisplay(currentChannel.Value);
+                AppendLog($"Current panel channel: {SelectedPanelChannel}");
+            }
+
+            foreach (var effect in PanelEffects)
+            {
+                effect.IsEnabled = await katanaSession.ReadParameterAsync(effect.Definition.SwitchParameter) != 0;
+                effect.Variation = effect.Definition.VariationParameter is null
+                    ? "N/A"
+                    : ToVariationDisplay(await katanaSession.ReadParameterAsync(effect.Definition.VariationParameter));
+                AppendLog($"{effect.DisplayName}: {(effect.IsEnabled ? "On" : "Off")} / {effect.Variation}");
+            }
+
+            StatusMessage = "Panel controls read successfully.";
+            PanelControlsStatus = "Panel channel, effect toggles, and variation colors were loaded.";
+        }
+        catch (Exception ex)
+        {
+            PanelControlsStatus = "Panel control read failed.";
+            StatusMessage = ex.Message;
+            AppendLog("Panel control read failed.");
+            AppendLog(ex.ToString());
+            Console.Error.WriteLine(ex);
+        }
+    }
+
+    [RelayCommand]
+    private async Task WritePanelControlsAsync()
+    {
+        if (!katanaSession.IsConnected)
+        {
+            StatusMessage = "Connect to a MIDI port before writing panel controls.";
+            return;
+        }
+
+        try
+        {
+            AppendLog("Writing Katana panel controls.");
+
+            var channel = ParsePanelChannelDisplay(SelectedPanelChannel);
+            await katanaSession.SelectPanelChannelAsync(channel);
+            AppendLog($"Selected panel channel: {SelectedPanelChannel}");
+
+            foreach (var effect in PanelEffects)
+            {
+                var confirmedValue = await katanaSession.WriteParameterAsync(
+                    effect.Definition.SwitchParameter,
+                    effect.IsEnabled ? (byte)1 : (byte)0);
+                effect.IsEnabled = confirmedValue != 0;
+                AppendLog($"{effect.DisplayName} confirmed {(effect.IsEnabled ? "On" : "Off")}.");
+            }
+
+            StatusMessage = "Panel controls updated successfully.";
+            PanelControlsStatus = "Panel channel and effect toggles were written and confirmed.";
+        }
+        catch (Exception ex)
+        {
+            PanelControlsStatus = "Panel control write failed.";
+            StatusMessage = ex.Message;
+            AppendLog("Panel control write failed.");
+            AppendLog(ex.ToString());
+            Console.Error.WriteLine(ex);
+        }
+    }
+
     private void AppendLog(string message)
     {
         var line = $"[{DateTimeOffset.Now:HH:mm:ss}] {message}";
@@ -326,5 +429,41 @@ public partial class MainWindowViewModel : ViewModelBase
             ? line
             : $"{DiagnosticLog}{Environment.NewLine}{line}";
         Console.WriteLine(line);
+    }
+
+    private static string ToVariationDisplay(byte value)
+    {
+        return value switch
+        {
+            0 => "Green",
+            1 => "Red",
+            2 => "Yellow",
+            _ => $"Value {value}",
+        };
+    }
+
+    private static string ToPanelChannelDisplay(KatanaPanelChannel channel)
+    {
+        return channel switch
+        {
+            KatanaPanelChannel.Panel => "Panel",
+            KatanaPanelChannel.ChA1 => "CH A1",
+            KatanaPanelChannel.ChA2 => "CH A2",
+            KatanaPanelChannel.ChB1 => "CH B1",
+            KatanaPanelChannel.ChB2 => "CH B2",
+            _ => "Panel",
+        };
+    }
+
+    private static KatanaPanelChannel ParsePanelChannelDisplay(string channel)
+    {
+        return channel switch
+        {
+            "CH A1" => KatanaPanelChannel.ChA1,
+            "CH A2" => KatanaPanelChannel.ChA2,
+            "CH B1" => KatanaPanelChannel.ChB1,
+            "CH B2" => KatanaPanelChannel.ChB2,
+            _ => KatanaPanelChannel.Panel,
+        };
     }
 }
