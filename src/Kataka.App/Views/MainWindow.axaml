@@ -131,6 +131,31 @@
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
+
+                                    <WrapPanel Orientation="Horizontal" ItemSpacing="18" LineSpacing="18">
+                                        <StackPanel Spacing="4" Width="140">
+                                            <TextBlock Text="AMP TYPE"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="11"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                            <ComboBox Classes="midi-port-picker"
+                                                      HorizontalAlignment="Stretch"
+                                                      ItemsSource="{x:Static vm:MainWindowViewModel.AmpTypeOptions}"
+                                                      SelectedItem="{Binding SelectedAmpType}" />
+                                        </StackPanel>
+                                        <StackPanel Spacing="4" Width="160">
+                                            <TextBlock Text="CABINET RESONANCE"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="11"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                            <ComboBox Classes="midi-port-picker"
+                                                      HorizontalAlignment="Stretch"
+                                                      ItemsSource="{x:Static vm:MainWindowViewModel.CabinetResonanceOptions}"
+                                                      SelectedItem="{Binding SelectedCabinetResonance}" />
+                                        </StackPanel>
+                                    </WrapPanel>
                                 </StackPanel>
                             </Border>
 
@@ -527,7 +552,7 @@
                                 <ItemsControl ItemsSource="{Binding PanelEffects}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <WrapPanel Orientation="Horizontal" ItemWidth="170" ItemHeight="132" />
+                                            <WrapPanel Orientation="Horizontal" ItemWidth="170" ItemHeight="165" />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
@@ -564,6 +589,25 @@
                                                                   HorizontalAlignment="Stretch"
                                                                   ItemsSource="{Binding TypeOptions}"
                                                                   SelectedItem="{Binding SelectedTypeOption}" />
+                                                    </StackPanel>
+                                                    <StackPanel Spacing="4" IsVisible="{Binding HasLevel}">
+                                                        <StackPanel Orientation="Horizontal"
+                                                                    HorizontalAlignment="Center"
+                                                                    Spacing="4">
+                                                            <TextBlock Text="LEVEL"
+                                                                       FontSize="11"
+                                                                       FontWeight="SemiBold"
+                                                                       VerticalAlignment="Center"
+                                                                       Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                                            <TextBlock Text="{Binding Level}"
+                                                                       FontSize="11"
+                                                                       VerticalAlignment="Center"
+                                                                       Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                                        </StackPanel>
+                                                        <Slider Minimum="0"
+                                                                Maximum="100"
+                                                                Value="{Binding Level}"
+                                                                HorizontalAlignment="Stretch" />
                                                     </StackPanel>
                                                 </StackPanel>
                                             </Border>

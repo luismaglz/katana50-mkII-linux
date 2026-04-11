@@ -81,6 +81,31 @@ public static class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition ReverbVariation { get; } =
         new("panel-reverb-variation", "Reverb Variation", [0x60, 0x00, 0x06, 0x3D], maximum: 2);
 
+    // KNOB_POS level controls (0x60000657-65b) — front-panel knob positions for each effect.
+    // Raw byte 0x00 means "knob not yet moved" (amp source value −1); treated here as 0.
+    public static KatanaParameterDefinition BoostLevel { get; } =
+        new("panel-boost-level", "Boost Level", [0x60, 0x00, 0x06, 0x57]);
+
+    public static KatanaParameterDefinition ModLevel { get; } =
+        new("panel-mod-level", "Mod Level", [0x60, 0x00, 0x06, 0x58]);
+
+    public static KatanaParameterDefinition FxLevel { get; } =
+        new("panel-fx-level", "FX Level", [0x60, 0x00, 0x06, 0x59]);
+
+    public static KatanaParameterDefinition DelayLevel { get; } =
+        new("panel-delay-level", "Delay Level", [0x60, 0x00, 0x06, 0x5A]);
+
+    public static KatanaParameterDefinition ReverbLevel { get; } =
+        new("panel-reverb-level", "Reverb Level", [0x60, 0x00, 0x06, 0x5B]);
+
+    // Amp type on the front panel (KNOB_POS_TYPE, 0-4: ACOUSTIC/CLEAN/CRUNCH/LEAD/BROWN).
+    public static KatanaParameterDefinition AmpType { get; } =
+        new("amp-type", "Amp Type", [0x60, 0x00, 0x06, 0x50], maximum: 4);
+
+    // Cabinet resonance (0-2: LOW / MIDDLE / HIGH).
+    public static KatanaParameterDefinition CabinetResonance { get; } =
+        new("amp-cabinet-resonance", "Cabinet", [0x60, 0x00, 0x06, 0x43], maximum: 2);
+
     public static KatanaParameterDefinition PedalFxSwitch { get; } =
         new("pedal-fx-switch", "Pedal FX", [0x60, 0x00, 0x05, 0x50], maximum: 1);
 
@@ -145,12 +170,12 @@ public static class KatanaMkIIParameterCatalog
 
     public static IReadOnlyList<KatanaPanelEffectDefinition> PanelEffects { get; } =
     [
-        new("booster", "Booster", BoosterSwitch, variationParameter: BoosterVariation, typeParameter: BoosterType),
-        new("mod", "Mod", ModSwitch, variationParameter: ModVariation, typeParameter: ModType),
-        new("fx", "FX", FxSwitch, variationParameter: FxVariation, typeParameter: FxType),
-        new("delay", "Delay", DelaySwitch, variationParameter: DelayVariation, typeParameter: DelayType),
+        new("booster", "Booster", BoosterSwitch, variationParameter: BoosterVariation, typeParameter: BoosterType, levelParameter: BoostLevel),
+        new("mod", "Mod", ModSwitch, variationParameter: ModVariation, typeParameter: ModType, levelParameter: ModLevel),
+        new("fx", "FX", FxSwitch, variationParameter: FxVariation, typeParameter: FxType, levelParameter: FxLevel),
+        new("delay", "Delay", DelaySwitch, variationParameter: DelayVariation, typeParameter: DelayType, levelParameter: DelayLevel),
         new("delay2", "Delay 2", Delay2Switch, typeParameter: Delay2Type),
-        new("reverb", "Reverb", ReverbSwitch, variationParameter: ReverbVariation, typeParameter: ReverbType),
+        new("reverb", "Reverb", ReverbSwitch, variationParameter: ReverbVariation, typeParameter: ReverbType, levelParameter: ReverbLevel),
     ];
 
     public static KatanaPedalFxDefinition PedalFx { get; } =
