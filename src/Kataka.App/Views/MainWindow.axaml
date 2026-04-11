@@ -223,170 +223,8 @@
                             </StackPanel>
                         </Grid>
 
-                        <!-- ROW 1: EFFECT DETAIL (context-sensitive, driven by chain selection) -->
+                        <!-- ROW 1: PEDALBOARD CHAIN (minimap) (clickable stompboxes) -->
                         <Border Grid.Row="1" Classes="panel-section alt" Padding="18">
-                            <StackPanel Spacing="14">
-                                <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding SelectedDetailTitle}"
-                                               FontSize="18"
-                                               FontWeight="Bold"
-                                               LetterSpacing="1.5"
-                                               VerticalAlignment="Center" />
-                                    <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
-                                        <Button Classes="transport-button"
-                                                Content="Read pedal"
-                                                Command="{Binding ReadPedalControlsCommand}" />
-                                        <Button Classes="transport-button accent"
-                                                Content="Push pedal"
-                                                Command="{Binding WritePedalControlsCommand}" />
-                                    </WrapPanel>
-                                </StackPanel>
-
-                                <!-- Placeholder when nothing is selected -->
-                                <TextBlock IsVisible="{Binding !SelectedHasDetail}"
-                                           Text="Click any stompbox in the chain below to edit its settings here."
-                                           Foreground="{StaticResource KatanaSubtleTextBrush}"
-                                           TextWrapping="Wrap" />
-
-                                <!-- Panel effect detail (narrow pedal card, centered) -->
-                                <Border IsVisible="{Binding SelectedPanelEffectDetail, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                        HorizontalAlignment="Center"
-                                        Width="280"
-                                        CornerRadius="8"
-                                        Padding="0"
-                                        BorderThickness="0">
-                                    <Border.Background>
-                                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-                                            <GradientStop Offset="0" Color="#2e3138" />
-                                            <GradientStop Offset="1" Color="#1c1f24" />
-                                        </LinearGradientBrush>
-                                    </Border.Background>
-                                    <StackPanel Spacing="0" DataContext="{Binding SelectedPanelEffectDetail}">
-                                        <!-- Top accent bar -->
-                                        <Border Height="8" CornerRadius="8,8,0,0"
-                                                Background="{Binding VariationBrush}" />
-                                        <StackPanel Spacing="16" Margin="20,16,20,20">
-                                            <!-- Name + LED row -->
-                                            <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
-                                                <Border Width="18" Height="18" CornerRadius="9"
-                                                        Background="{Binding VariationBrush}"
-                                                        BorderBrush="#111" BorderThickness="2"
-                                                        BoxShadow="0 0 6 2 #60000000" />
-                                                <TextBlock Text="{Binding DisplayName}"
-                                                           FontWeight="Bold" FontSize="16"
-                                                           LetterSpacing="1.2" Foreground="#e8e0d0"
-                                                           VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding VariationCaption}"
-                                                           FontSize="11" Foreground="#9090a0"
-                                                           VerticalAlignment="Center" />
-                                            </StackPanel>
-
-                                            <!-- ON / OFF toggle -->
-                                            <ToggleButton Classes="effect-button"
-                                                          HorizontalAlignment="Center"
-                                                          Content="ON / OFF"
-                                                          IsChecked="{Binding IsEnabled}" />
-
-                                            <!-- Type selector -->
-                                            <StackPanel Spacing="6">
-                                                <TextBlock Text="TYPE" FontSize="11" FontWeight="SemiBold"
-                                                           Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                                <ComboBox Classes="midi-port-picker"
-                                                          HorizontalAlignment="Stretch"
-                                                          ItemsSource="{Binding TypeOptions}"
-                                                          SelectedItem="{Binding SelectedTypeOption}" />
-                                            </StackPanel>
-
-                                            <!-- Level slider -->
-                                            <StackPanel Spacing="6" IsVisible="{Binding HasLevel}">
-                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                    <TextBlock Text="LEVEL" FontSize="11" FontWeight="SemiBold"
-                                                               Foreground="{StaticResource KatanaSubtleTextBrush}"
-                                                               VerticalAlignment="Center" />
-                                                    <TextBlock Text="{Binding Level}" FontSize="11"
-                                                               Foreground="{StaticResource KatanaSubtleTextBrush}"
-                                                               VerticalAlignment="Center" />
-                                                </StackPanel>
-                                                <Slider Minimum="0" Maximum="100"
-                                                        Value="{Binding Level}"
-                                                        HorizontalAlignment="Stretch" />
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Pedal FX detail -->
-                                <Border IsVisible="{Binding SelectedIsPedalFx}"
-                                        HorizontalAlignment="Center"
-                                        Width="360"
-                                        CornerRadius="8"
-                                        Classes="panel-section" Padding="16">
-                                    <StackPanel Spacing="14">
-                                        <StackPanel Spacing="12">
-                                            <ToggleButton Classes="effect-button"
-                                                          HorizontalAlignment="Left"
-                                                          Content="PEDAL FX"
-                                                          IsChecked="{Binding PedalFx.IsEnabled}" />
-                                            <StackPanel Spacing="6">
-                                                <TextBlock Text="PEDAL TYPE" FontSize="11" FontWeight="SemiBold"
-                                                           Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                                <ComboBox Classes="midi-port-picker" HorizontalAlignment="Left" Width="220"
-                                                          ItemsSource="{Binding PedalFx.TypeOptions}"
-                                                          SelectedItem="{Binding PedalFx.SelectedTypeOption}" />
-                                            </StackPanel>
-                                            <StackPanel Spacing="6">
-                                                <TextBlock Text="CHAIN POSITION" FontSize="11" FontWeight="SemiBold"
-                                                           Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                                <ComboBox Classes="midi-port-picker" HorizontalAlignment="Left" Width="220"
-                                                          ItemsSource="{Binding PedalFx.PositionOptions}"
-                                                          SelectedItem="{Binding PedalFx.SelectedPositionOption}" />
-                                            </StackPanel>
-                                            <controls:RotaryKnob Label="Foot Volume" Minimum="0" Maximum="100"
-                                                                 Value="{Binding PedalFx.FootVolume}" />
-                                        </StackPanel>
-                                        <TextBlock Text="Select a type to show its subtype controls."
-                                                   TextWrapping="Wrap" FontSize="11"
-                                                   Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                        <StackPanel IsVisible="{Binding PedalFx.IsWahMode}" Spacing="12">
-                                            <StackPanel Spacing="6">
-                                                <TextBlock Text="WAH TYPE" FontSize="11" FontWeight="SemiBold"
-                                                           Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                                <ComboBox Classes="midi-port-picker" HorizontalAlignment="Left" Width="220"
-                                                          ItemsSource="{Binding PedalFx.WahTypeOptions}"
-                                                          SelectedItem="{Binding PedalFx.SelectedWahTypeOption}" />
-                                            </StackPanel>
-                                            <WrapPanel Orientation="Horizontal" ItemSpacing="12" LineSpacing="12">
-                                                <controls:RotaryKnob Label="Wah Pos" Minimum="0" Maximum="100" Value="{Binding PedalFx.PedalPosition}" />
-                                                <controls:RotaryKnob Label="Wah Min" Minimum="0" Maximum="100" Value="{Binding PedalFx.PedalMinimum}" />
-                                                <controls:RotaryKnob Label="Wah Max" Minimum="0" Maximum="100" Value="{Binding PedalFx.PedalMaximum}" />
-                                                <controls:RotaryKnob Label="Wah Level" Minimum="0" Maximum="100" Value="{Binding PedalFx.EffectLevel}" />
-                                                <controls:RotaryKnob Label="Wah Mix" Minimum="0" Maximum="100" Value="{Binding PedalFx.DirectMix}" />
-                                            </WrapPanel>
-                                        </StackPanel>
-                                        <StackPanel IsVisible="{Binding PedalFx.IsBendMode}" Spacing="12">
-                                            <WrapPanel Orientation="Horizontal" ItemSpacing="12" LineSpacing="12">
-                                                <controls:RotaryKnob Label="Pitch" Minimum="-24" Maximum="24" Value="{Binding PedalFx.BendPitch}" />
-                                                <controls:RotaryKnob Label="Pedal Pos" Minimum="0" Maximum="100" Value="{Binding PedalFx.BendPosition}" />
-                                                <controls:RotaryKnob Label="Effect Level" Minimum="0" Maximum="100" Value="{Binding PedalFx.BendEffectLevel}" />
-                                                <controls:RotaryKnob Label="Direct Mix" Minimum="0" Maximum="100" Value="{Binding PedalFx.BendDirectMix}" />
-                                            </WrapPanel>
-                                        </StackPanel>
-                                        <StackPanel IsVisible="{Binding PedalFx.IsEvh95Mode}" Spacing="12">
-                                            <WrapPanel Orientation="Horizontal" ItemSpacing="12" LineSpacing="12">
-                                                <controls:RotaryKnob Label="Pedal Pos" Minimum="0" Maximum="100" Value="{Binding PedalFx.Evh95Position}" />
-                                                <controls:RotaryKnob Label="Pedal Min" Minimum="0" Maximum="100" Value="{Binding PedalFx.Evh95Minimum}" />
-                                                <controls:RotaryKnob Label="Pedal Max" Minimum="0" Maximum="100" Value="{Binding PedalFx.Evh95Maximum}" />
-                                                <controls:RotaryKnob Label="Effect Level" Minimum="0" Maximum="100" Value="{Binding PedalFx.Evh95EffectLevel}" />
-                                                <controls:RotaryKnob Label="Direct Mix" Minimum="0" Maximum="100" Value="{Binding PedalFx.Evh95DirectMix}" />
-                                            </WrapPanel>
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Border>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- ROW 2: PEDALBOARD CHAIN (clickable stompboxes) -->
-                        <Border Grid.Row="2" Classes="panel-section alt" Padding="18">
                             <StackPanel Spacing="14">
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="PEDALBOARD CHAIN"
@@ -521,6 +359,158 @@
                                 </ScrollViewer>
                             </StackPanel>
                         </Border>
+                        <!-- ROW 2: FULL PEDALBOARD (all controls visible) -->
+                        <Border Grid.Row="2" Classes="panel-section alt" Padding="18">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="PEDALBOARD"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           LetterSpacing="1.5" />
+
+                                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Disabled">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Stretch">
+
+                                        <!-- Panel effects (one card per effect) -->
+                                        <ItemsControl ItemsSource="{Binding PanelEffects}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal" Spacing="10" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:PanelEffectViewModel">
+                                                    <Border Width="190" CornerRadius="8" Padding="0">
+                                                        <Border.Background>
+                                                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                                                <GradientStop Offset="0" Color="#2e3138" />
+                                                                <GradientStop Offset="1" Color="#1c1f24" />
+                                                            </LinearGradientBrush>
+                                                        </Border.Background>
+                                                        <StackPanel Spacing="0">
+                                                            <!-- Accent bar (variation color) -->
+                                                            <Border Height="6" CornerRadius="8,8,0,0"
+                                                                    Background="{Binding VariationBrush}" />
+                                                            <!-- Controls -->
+                                                            <StackPanel Spacing="10" Margin="12,10,12,14">
+                                                                <!-- On/Off toggle -->
+                                                                <ToggleButton Classes="effect-button"
+                                                                              HorizontalAlignment="Stretch"
+                                                                              Content="{Binding DisplayName}"
+                                                                              IsChecked="{Binding IsEnabled}" />
+                                                                <!-- Type selector -->
+                                                                <StackPanel Spacing="4">
+                                                                    <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
+                                                                               Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                                                    <ComboBox Classes="midi-port-picker"
+                                                                              HorizontalAlignment="Stretch"
+                                                                              ItemsSource="{Binding TypeOptions}"
+                                                                              SelectedItem="{Binding SelectedTypeOption}" />
+                                                                </StackPanel>
+                                                                <!-- Level slider -->
+                                                                <StackPanel Spacing="4" IsVisible="{Binding HasLevel}">
+                                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                                        <TextBlock Text="LEVEL" FontSize="10" FontWeight="SemiBold"
+                                                                                   Foreground="{StaticResource KatanaSubtleTextBrush}"
+                                                                                   VerticalAlignment="Center" />
+                                                                        <TextBlock Text="{Binding Level}" FontSize="10"
+                                                                                   Foreground="{StaticResource KatanaSubtleTextBrush}"
+                                                                                   VerticalAlignment="Center" />
+                                                                    </StackPanel>
+                                                                    <Slider Minimum="0" Maximum="100"
+                                                                            Value="{Binding Level}"
+                                                                            HorizontalAlignment="Stretch" />
+                                                                </StackPanel>
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <!-- Pedal FX card (always shown last) -->
+                                        <Border Width="220" CornerRadius="8" Padding="0">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                                    <GradientStop Offset="0" Color="#2e3138" />
+                                                    <GradientStop Offset="1" Color="#1c1f24" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <StackPanel Spacing="0">
+                                                <!-- Orange accent bar for Pedal FX -->
+                                                <Border Height="6" CornerRadius="8,8,0,0" Background="#e85c1a" />
+                                                <StackPanel Spacing="10" Margin="12,10,12,14">
+                                                    <!-- On/Off toggle -->
+                                                    <ToggleButton Classes="effect-button"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  Content="PEDAL FX"
+                                                                  IsChecked="{Binding PedalFx.IsEnabled}" />
+                                                    <!-- Pedal Type -->
+                                                    <StackPanel Spacing="4">
+                                                        <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                                        <ComboBox Classes="midi-port-picker"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  ItemsSource="{Binding PedalFx.TypeOptions}"
+                                                                  SelectedItem="{Binding PedalFx.SelectedTypeOption}" />
+                                                    </StackPanel>
+                                                    <!-- Chain Position -->
+                                                    <StackPanel Spacing="4">
+                                                        <TextBlock Text="POSITION" FontSize="10" FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                                        <ComboBox Classes="midi-port-picker"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  ItemsSource="{Binding PedalFx.PositionOptions}"
+                                                                  SelectedItem="{Binding PedalFx.SelectedPositionOption}" />
+                                                    </StackPanel>
+                                                    <!-- Foot Volume -->
+                                                    <StackPanel Spacing="4">
+                                                        <TextBlock Text="FOOT VOLUME" FontSize="10" FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                                        <Slider Minimum="0" Maximum="100"
+                                                                Value="{Binding PedalFx.FootVolume}"
+                                                                HorizontalAlignment="Stretch" />
+                                                    </StackPanel>
+                                                    <!-- Wah sub-controls -->
+                                                    <StackPanel IsVisible="{Binding PedalFx.IsWahMode}" Spacing="8">
+                                                        <StackPanel Spacing="4">
+                                                            <TextBlock Text="WAH TYPE" FontSize="10" FontWeight="SemiBold"
+                                                                       Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                                            <ComboBox Classes="midi-port-picker"
+                                                                      HorizontalAlignment="Stretch"
+                                                                      ItemsSource="{Binding PedalFx.WahTypeOptions}"
+                                                                      SelectedItem="{Binding PedalFx.SelectedWahTypeOption}" />
+                                                        </StackPanel>
+                                                        <controls:RotaryKnob Label="Position" Minimum="0" Maximum="100" Value="{Binding PedalFx.PedalPosition}" />
+                                                        <controls:RotaryKnob Label="Min" Minimum="0" Maximum="100" Value="{Binding PedalFx.PedalMinimum}" />
+                                                        <controls:RotaryKnob Label="Max" Minimum="0" Maximum="100" Value="{Binding PedalFx.PedalMaximum}" />
+                                                        <controls:RotaryKnob Label="Level" Minimum="0" Maximum="100" Value="{Binding PedalFx.EffectLevel}" />
+                                                        <controls:RotaryKnob Label="Mix" Minimum="0" Maximum="100" Value="{Binding PedalFx.DirectMix}" />
+                                                    </StackPanel>
+                                                    <!-- Bend sub-controls -->
+                                                    <StackPanel IsVisible="{Binding PedalFx.IsBendMode}" Spacing="8">
+                                                        <controls:RotaryKnob Label="Pitch" Minimum="-24" Maximum="24" Value="{Binding PedalFx.BendPitch}" />
+                                                        <controls:RotaryKnob Label="Position" Minimum="0" Maximum="100" Value="{Binding PedalFx.BendPosition}" />
+                                                        <controls:RotaryKnob Label="Level" Minimum="0" Maximum="100" Value="{Binding PedalFx.BendEffectLevel}" />
+                                                        <controls:RotaryKnob Label="Mix" Minimum="0" Maximum="100" Value="{Binding PedalFx.BendDirectMix}" />
+                                                    </StackPanel>
+                                                    <!-- EVH95 sub-controls -->
+                                                    <StackPanel IsVisible="{Binding PedalFx.IsEvh95Mode}" Spacing="8">
+                                                        <controls:RotaryKnob Label="Position" Minimum="0" Maximum="100" Value="{Binding PedalFx.Evh95Position}" />
+                                                        <controls:RotaryKnob Label="Min" Minimum="0" Maximum="100" Value="{Binding PedalFx.Evh95Minimum}" />
+                                                        <controls:RotaryKnob Label="Max" Minimum="0" Maximum="100" Value="{Binding PedalFx.Evh95Maximum}" />
+                                                        <controls:RotaryKnob Label="Level" Minimum="0" Maximum="100" Value="{Binding PedalFx.Evh95EffectLevel}" />
+                                                        <controls:RotaryKnob Label="Mix" Minimum="0" Maximum="100" Value="{Binding PedalFx.Evh95DirectMix}" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </StackPanel>
+                        </Border>
+
                     </Grid>
                 </Border>
             </ScrollViewer>
