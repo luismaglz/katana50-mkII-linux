@@ -51,11 +51,12 @@ The first slice should prove the architecture against real hardware on Linux:
 | SysEx core port | Done | Generic Roland/Boss checksum, identity, and frame builder helpers added |
 | Connection vertical slice | Done | Quick-test UI now scans, auto-selects Katana-style ports, opens the selected MIDI pair, and exposes a Request identity action |
 | First Katana parameter slice | Done | Added Katana amp-volume read/write in the quick-test UI on MIDI 1 using the confirmed `60 00 06 52` address, with read-back after writes |
+| Editor core milestone | Done | Extracted a reusable Katana session layer and added a compact amp editor for gain, volume, bass, middle, treble, and presence using verified MIDI 1 addresses |
 | Fixture tests | Done | Protocol helper tests are in place and passing |
 | Hardware smoke test | Done | On this Linux machine the app enumerated KATANA MIDI 1/2/3 via `amidi`, auto-selected the ports, and Connect succeeded |
 
 ## Current next test point
 
-Run the app, click **Scan MIDI ports**, leave the auto-selected `KATANA MIDI 1` pair in place, click **Connect**, then click **Request identity**. After that, click **Read amp volume**, move the slider a small amount, and click **Write amp volume**. The app now reads back the Katana amp volume after each write so we can verify the MKII parameter path instead of trusting a blind send. The expected identity reply already observed from the shell on this machine is:
+Run the app, click **Scan MIDI ports**, leave the auto-selected `KATANA MIDI 1` pair in place, click **Connect**, then click **Request identity**. After that, click **Read amp controls** and confirm that gain, volume, bass, middle, treble, and presence populate. Move one or two sliders by a small amount, click **Write amp controls**, and confirm the values read back correctly. This is the intended UI-side testing pause for the editor core milestone. The expected identity reply already observed from the shell on this machine is:
 
 `F0 7E 00 06 02 41 33 03 00 00 05 00 00 00 F7`

@@ -5,27 +5,30 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Kataka.Application.Midi;
+using Kataka.Application.Katana;
 using Kataka.Domain.Midi;
-using Kataka.Infrastructure.Midi;
 
 namespace Kataka.App.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private readonly IMidiTransport midiTransport;
-    private IMidiConnection? activeConnection;
+    private readonly IKatanaSession katanaSession;
     private readonly Dictionary<string, string> inputPortIds = [];
     private readonly Dictionary<string, string> outputPortIds = [];
 
     public MainWindowViewModel()
-        : this(DefaultMidiTransport.Create())
+        : this(new KatanaSession(Kataka.Infrastructure.Midi.DefaultMidiTransport.Create()))
     {
     }
 
-    public MainWindowViewModel(IMidiTransport midiTransport)
+    public MainWindowViewModel(IKatanaSession katanaSession)
     {
-        this.midiTransport = midiTransport;
+        this.katanaSession = katanaSession;
+
+        foreach (var parameter in KatanaMkIIParameterCatalog.AmpEditorControls)
+        {
+            AmpControls.Add(new AmpControlViewModel(parameter));
+        }
     }
 
     public ObservableCollection<string> InputPorts { get; } = [];
@@ -59,21 +62,16 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     public partial string IdentityReply { get; set; } = "Identity request has not been run yet.";
 
-    [ObservableProperty]
-    public partial int AmpVolume { get; set; } = 50;
+    public ObservableCollection<AmpControlViewModel> AmpControls { get; } = [];
 
     [ObservableProperty]
-    public partial string AmpVolumeStatus { get; set; } = "Amp volume has not been read yet.";
+    public partial string AmpEditorStatus { get; set; } = "Amp editor values have not been read yet.";
 
     [RelayCommand]
     private async Task ScanAsync()
     {
-        if (activeConnection is not null)
-        {
-            await activeConnection.DisposeAsync();
-            activeConnection = null;
-            IsConnected = false;
-        }
+        await katanaSession.DisconnectAsync();
+        IsConnected = false;
 
         IsScanning = true;
         StatusMessage = "Scanning MIDI ports...";
@@ -89,7 +87,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         try
         {
-            var ports = await midiTransport.ListPortsAsync();
+            var ports = await katanaSession.ListPortsAsync();
             AppendLog($"Port scan returned {ports.Count} total port(s).");
 
             foreach (var port in ports.Where(port => port.Direction == MidiPortDirection.Input).OrderBy(port => port.Name))
@@ -165,7 +163,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 throw new InvalidOperationException($"Output port '{SelectedOutputPort}' is not available.");
             }
 
-            activeConnection = await midiTransport.OpenAsync(inputPortId, outputPortId);
+            await katanaSession.ConnectAsync(inputPortId, outputPortId);
             IsConnected = true;
 
             var looksLikeKatana =
@@ -192,14 +190,13 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private async Task DisconnectAsync()
     {
-        if (activeConnection is null)
+        if (!katanaSession.IsConnected)
         {
             StatusMessage = "No MIDI connection is currently open.";
             return;
         }
 
-        await activeConnection.DisposeAsync();
-        activeConnection = null;
+        await katanaSession.DisconnectAsync();
         IsConnected = false;
         StatusMessage = "Disconnected from the selected MIDI ports.";
         DetectionMessage = "Connection closed.";
@@ -209,7 +206,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private async Task RequestIdentityAsync()
     {
-        if (activeConnection is null)
+        if (!katanaSession.IsConnected)
         {
             StatusMessage = "Connect to a MIDI port before requesting identity.";
             return;
@@ -218,9 +215,7 @@ public partial class MainWindowViewModel : ViewModelBase
         try
         {
             AppendLog("Sending universal device identity request.");
-            var reply = await activeConnection.RequestAsync(
-                UniversalDeviceIdentity.CreateIdentityRequest(),
-                TimeSpan.FromSeconds(1.5));
+            var reply = await katanaSession.RequestIdentityAsync();
 
             IdentityReply = reply.ToHexString();
             DetectionMessage = UniversalDeviceIdentity.IsIdentityReply(reply)
@@ -241,87 +236,87 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task ReadAmpVolumeAsync()
+    private async Task ReadAmpControlsAsync()
     {
-        if (activeConnection is null)
+        if (!katanaSession.IsConnected)
         {
-            StatusMessage = "Connect to a MIDI port before reading amp volume.";
+            StatusMessage = "Connect to a MIDI port before reading amp controls.";
             return;
         }
 
         try
         {
-            AppendLog("Requesting current Katana amp volume.");
-            var volume = await ReadAmpVolumeAsync(activeConnection);
-            StatusMessage = "Amp volume read successfully.";
-            AmpVolumeStatus = $"Amp volume is currently {volume}.";
+            AppendLog("Reading Katana amp editor controls.");
+
+            foreach (var control in AmpControls)
+            {
+                var value = await katanaSession.ReadParameterAsync(control.Parameter);
+                control.Value = value;
+                AppendLog($"{control.DisplayName} reply: {value}");
+            }
+
+            StatusMessage = "Amp editor controls read successfully.";
+            AmpEditorStatus = "Amp editor values were loaded from the Katana.";
         }
         catch (Exception ex)
         {
-            AmpVolumeStatus = "Amp volume read failed.";
+            AmpEditorStatus = "Amp editor read failed.";
             StatusMessage = ex.Message;
-            AppendLog("Amp volume read failed.");
+            AppendLog("Amp editor read failed.");
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
         }
     }
 
     [RelayCommand]
-    private async Task SetAmpVolumeAsync()
+    private async Task WriteAmpControlsAsync()
     {
-        if (activeConnection is null)
+        if (!katanaSession.IsConnected)
         {
-            StatusMessage = "Connect to a MIDI port before writing amp volume.";
+            StatusMessage = "Connect to a MIDI port before writing amp controls.";
             return;
         }
 
         try
         {
-            var requestedVolume = Math.Clamp(AmpVolume, 0, 100);
-            if (requestedVolume != AmpVolume)
+            AppendLog("Writing Katana amp editor controls.");
+            var mismatches = new List<string>();
+
+            foreach (var control in AmpControls)
             {
-                AmpVolume = requestedVolume;
-                AppendLog($"Clamped requested amp volume to {requestedVolume}.");
+                var requestedValue = Math.Clamp(control.Value, control.Minimum, control.Maximum);
+                if (requestedValue != control.Value)
+                {
+                    control.Value = requestedValue;
+                    AppendLog($"Clamped {control.DisplayName} to {requestedValue}.");
+                }
+
+                AppendLog($"Writing {control.DisplayName} = {requestedValue}.");
+                var confirmedValue = await katanaSession.WriteParameterAsync(control.Parameter, (byte)requestedValue);
+                control.Value = confirmedValue;
+                AppendLog($"{control.DisplayName} confirmed at {confirmedValue}.");
+
+                if (confirmedValue != requestedValue)
+                {
+                    mismatches.Add($"{control.DisplayName} ({requestedValue}->{confirmedValue})");
+                }
             }
 
-            AppendLog($"Sending Katana amp volume write for value {requestedVolume}.");
-            await activeConnection.SendAsync(KatanaMkIIProtocol.CreateAmpVolumeWriteRequest((byte)requestedVolume));
-
-            AppendLog("Reading amp volume back after write.");
-            var confirmedVolume = await ReadAmpVolumeAsync(activeConnection);
-
-            StatusMessage = confirmedVolume == requestedVolume
-                ? "Amp volume updated successfully."
-                : "Amp volume write completed, but the read-back value differed.";
-            AmpVolumeStatus = confirmedVolume == requestedVolume
-                ? $"Amp volume confirmed at {confirmedVolume}."
-                : $"Requested amp volume {requestedVolume}, but the amp reported {confirmedVolume}.";
+            StatusMessage = mismatches.Count == 0
+                ? "Amp editor controls updated successfully."
+                : "Amp editor write completed, but some read-back values differed.";
+            AmpEditorStatus = mismatches.Count == 0
+                ? "Amp editor values were written and confirmed."
+                : $"Read-back mismatches: {string.Join(", ", mismatches)}";
         }
         catch (Exception ex)
         {
-            AmpVolumeStatus = "Amp volume write failed.";
+            AmpEditorStatus = "Amp editor write failed.";
             StatusMessage = ex.Message;
-            AppendLog("Amp volume write failed.");
+            AppendLog("Amp editor write failed.");
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
         }
-    }
-
-    private async Task<int> ReadAmpVolumeAsync(IMidiConnection connection)
-    {
-        var reply = await connection.RequestAsync(
-            KatanaMkIIProtocol.CreateAmpVolumeReadRequest(),
-            TimeSpan.FromSeconds(1.5));
-
-        AppendLog($"Amp volume reply: {reply.ToHexString()}");
-
-        if (!KatanaMkIIProtocol.TryParseAmpVolumeReply(reply, out var volume))
-        {
-            throw new InvalidOperationException("Amp volume reply did not match the expected Katana MKII format.");
-        }
-
-        AmpVolume = volume;
-        return volume;
     }
 
     private void AppendLog(string message)

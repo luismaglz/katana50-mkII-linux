@@ -31,7 +31,7 @@ public sealed class RolandSysExBuilderTests
     [Fact]
     public void KatanaMkIIAmpVolumeReadRequest_UsesExpectedAddressAndChecksum()
     {
-        var request = KatanaMkIIProtocol.CreateAmpVolumeReadRequest();
+        var request = KatanaMkIIProtocol.CreateParameterReadRequest(KatanaMkIIParameterCatalog.AmpVolume);
 
         Assert.Equal(
             [0xF0, 0x41, 0x00, 0x00, 0x00, 0x00, 0x33, 0x11, 0x60, 0x00, 0x06, 0x52, 0x00, 0x00, 0x00, 0x01, 0x47, 0xF7],
@@ -43,9 +43,32 @@ public sealed class RolandSysExBuilderTests
     {
         var reply = new SysExMessage([0xF0, 0x41, 0x00, 0x00, 0x00, 0x00, 0x33, 0x12, 0x60, 0x00, 0x06, 0x52, 0x32, 0x16, 0xF7]);
 
-        var parsed = KatanaMkIIProtocol.TryParseAmpVolumeReply(reply, out var volume);
+        var parsed = KatanaMkIIProtocol.TryParseParameterReply(KatanaMkIIParameterCatalog.AmpVolume, reply, out var volume);
 
         Assert.True(parsed);
         Assert.Equal(50, volume);
+    }
+
+    [Fact]
+    public void KatanaMkIIAmpGainReadRequest_UsesExpectedAddressAndChecksum()
+    {
+        var request = KatanaMkIIProtocol.CreateParameterReadRequest(KatanaMkIIParameterCatalog.AmpGain);
+
+        Assert.Equal(
+            [0xF0, 0x41, 0x00, 0x00, 0x00, 0x00, 0x33, 0x11, 0x60, 0x00, 0x06, 0x51, 0x00, 0x00, 0x00, 0x01, 0x48, 0xF7],
+            request.Bytes);
+    }
+
+    [Fact]
+    public void KatanaMkIIParameterCatalog_ExposesAmpEditorControls()
+    {
+        Assert.Collection(
+            KatanaMkIIParameterCatalog.AmpEditorControls,
+            control => Assert.Equal("Gain", control.DisplayName),
+            control => Assert.Equal("Volume", control.DisplayName),
+            control => Assert.Equal("Bass", control.DisplayName),
+            control => Assert.Equal("Middle", control.DisplayName),
+            control => Assert.Equal("Treble", control.DisplayName),
+            control => Assert.Equal("Presence", control.DisplayName));
     }
 }

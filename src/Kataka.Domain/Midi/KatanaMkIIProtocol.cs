@@ -6,27 +6,38 @@ public static class KatanaMkIIProtocol
 {
     private static readonly byte[] ModelId = [0x00, 0x00, 0x00, 0x33];
     private static readonly byte[] SingleByteSize = [0x00, 0x00, 0x00, 0x01];
-    private static readonly byte[] AmpVolumeAddress = [0x60, 0x00, 0x06, 0x52];
 
     private const byte RolandManufacturerId = 0x41;
     private const byte DeviceId = 0x00;
     private const byte DataSetCommand = 0x12;
 
-    public static SysExMessage CreateAmpVolumeReadRequest() =>
-        RolandSysExBuilder.BuildDataRequest1(DeviceId, ModelId, AmpVolumeAddress, SingleByteSize);
-
-    public static SysExMessage CreateAmpVolumeWriteRequest(byte value)
+    public static SysExMessage CreateParameterReadRequest(KatanaParameterDefinition parameter)
     {
-        if (value > 100)
-        {
-            throw new ArgumentOutOfRangeException(nameof(value), value, "Katana amp volume must be between 0 and 100.");
-        }
-
-        return RolandSysExBuilder.BuildDataSet1(DeviceId, ModelId, AmpVolumeAddress, [value]);
+        ArgumentNullException.ThrowIfNull(parameter);
+        return RolandSysExBuilder.BuildDataRequest1(DeviceId, ModelId, parameter.Address, SingleByteSize);
     }
 
-    public static bool TryParseAmpVolumeReply(SysExMessage message, out byte value)
+    public static SysExMessage CreateParameterWriteRequest(KatanaParameterDefinition parameter, byte value)
     {
+        ArgumentNullException.ThrowIfNull(parameter);
+
+        if (value < parameter.Minimum || value > parameter.Maximum)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(value),
+                value,
+                $"{parameter.DisplayName} must be between {parameter.Minimum} and {parameter.Maximum}.");
+        }
+
+        return RolandSysExBuilder.BuildDataSet1(DeviceId, ModelId, parameter.Address, [value]);
+    }
+
+    public static bool TryParseParameterReply(
+        KatanaParameterDefinition parameter,
+        SysExMessage message,
+        out byte value)
+    {
+        ArgumentNullException.ThrowIfNull(parameter);
         ArgumentNullException.ThrowIfNull(message);
 
         value = 0;
@@ -49,14 +60,14 @@ public static class KatanaMkIIProtocol
             return false;
         }
 
-        if (!bytes.Skip(8).Take(4).SequenceEqual(AmpVolumeAddress))
+        if (!bytes.Skip(8).Take(4).SequenceEqual(parameter.Address))
         {
             return false;
         }
 
         var data = bytes.Skip(12).Take(1).ToArray();
         var checksum = bytes[^2];
-        if (RolandChecksum.Calculate(AmpVolumeAddress.Concat(data).ToArray()) != checksum)
+        if (RolandChecksum.Calculate(parameter.Address.Concat(data).ToArray()) != checksum)
         {
             return false;
         }

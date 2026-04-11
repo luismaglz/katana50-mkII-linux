@@ -4,6 +4,7 @@ using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
+using Kataka.Application.Katana;
 using Kataka.Infrastructure.Midi;
 using Kataka.App.ViewModels;
 using Kataka.App.Views;
@@ -23,7 +24,7 @@ public partial class App : Avalonia.Application
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(DefaultMidiTransport.Create()),
+                DataContext = new MainWindowViewModel(new KatanaSession(DefaultMidiTransport.Create())),
             };
         }
 

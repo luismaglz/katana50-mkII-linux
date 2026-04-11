@@ -7,7 +7,7 @@
         x:Class="Kataka.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Kataka - Katana Quick Test">
+        Title="Kataka - Editor Core">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -18,7 +18,7 @@
     <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto,*" ColumnDefinitions="*,*" Margin="24" RowSpacing="12" ColumnSpacing="16">
         <TextBlock Grid.Row="0"
                    Grid.ColumnSpan="2"
-                   Text="Kataka quick test"
+                   Text="Kataka editor core"
                    FontSize="24"
                    FontWeight="Bold" />
 
@@ -80,23 +80,36 @@
                 BorderBrush="{DynamicResource ThemeBorderMidBrush}"
                 BorderThickness="1">
             <StackPanel Spacing="8">
-                <TextBlock Text="Amp volume"
+                <TextBlock Text="Amp editor"
                            FontWeight="Bold" />
-                <StackPanel Orientation="Horizontal" Spacing="12">
-                    <Slider Width="280"
-                            Minimum="0"
-                            Maximum="100"
-                            TickFrequency="5"
-                            Value="{Binding AmpVolume}" />
-                    <TextBlock VerticalAlignment="Center"
-                               Text="{Binding AmpVolume}" />
-                    <Button Content="Read amp volume"
-                            Command="{Binding ReadAmpVolumeCommand}" />
-                    <Button Content="Write amp volume"
-                            Command="{Binding SetAmpVolumeCommand}" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Content="Read amp controls"
+                            Command="{Binding ReadAmpControlsCommand}" />
+                    <Button Content="Write amp controls"
+                            Command="{Binding WriteAmpControlsCommand}" />
                 </StackPanel>
-                <TextBlock Text="{Binding AmpVolumeStatus}"
+                <TextBlock Text="{Binding AmpEditorStatus}"
                            TextWrapping="Wrap" />
+                <ItemsControl ItemsSource="{Binding AmpControls}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:AmpControlViewModel">
+                            <Grid ColumnDefinitions="120,*,40" ColumnSpacing="12" Margin="0,2,0,2">
+                                <TextBlock Grid.Column="0"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding DisplayName}" />
+                                <Slider Grid.Column="1"
+                                        Minimum="{Binding Minimum}"
+                                        Maximum="{Binding Maximum}"
+                                        TickFrequency="5"
+                                        Value="{Binding Value}" />
+                                <TextBlock Grid.Column="2"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Right"
+                                           Text="{Binding Value}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </StackPanel>
         </Border>
 
@@ -110,7 +123,7 @@
 
         <TextBlock Grid.Row="7"
                    Grid.ColumnSpan="2"
-                   Text="Current quick-test rule: detect Katana by matching MIDI input/output port names containing 'Katana', open the selected MIDI pair, request a standard MIDI identity reply, then read and write the Katana amp volume with a read-back confirmation."
+                   Text="Current editor-core rule: detect Katana by matching MIDI input/output port names containing 'Katana', open the selected MIDI pair, request a standard MIDI identity reply, then read and write gain, volume, bass, middle, treble, and presence with read-back confirmation."
                     Opacity="0.75"
                      TextWrapping="Wrap" />
 
