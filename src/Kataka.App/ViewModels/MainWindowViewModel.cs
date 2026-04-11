@@ -269,10 +269,10 @@ public partial class MainWindowViewModel : ViewModelBase
         try
         {
             AppendLog("Reading Katana amp editor controls.");
-
+            var values = await katanaSession.ReadParametersAsync(AmpControls.Select(control => control.Parameter).ToArray());
             foreach (var control in AmpControls)
             {
-                var value = await katanaSession.ReadParameterAsync(control.Parameter);
+                var value = values[control.Parameter.Key];
                 control.Value = value;
                 AppendLog($"{control.DisplayName} reply: {value}");
             }
@@ -361,12 +361,20 @@ public partial class MainWindowViewModel : ViewModelBase
                 AppendLog($"Current panel channel: {SelectedPanelChannel}");
             }
 
+            var parameterList = PanelEffects
+                .Select(effect => effect.Definition.SwitchParameter)
+                .Concat(PanelEffects
+                    .Where(effect => effect.Definition.VariationParameter is not null)
+                    .Select(effect => effect.Definition.VariationParameter!))
+                .ToArray();
+            var values = await katanaSession.ReadParametersAsync(parameterList);
+
             foreach (var effect in PanelEffects)
             {
-                effect.IsEnabled = await katanaSession.ReadParameterAsync(effect.Definition.SwitchParameter) != 0;
+                effect.IsEnabled = values[effect.Definition.SwitchParameter.Key] != 0;
                 effect.Variation = effect.Definition.VariationParameter is null
                     ? "N/A"
-                    : ToVariationDisplay(await katanaSession.ReadParameterAsync(effect.Definition.VariationParameter));
+                    : ToVariationDisplay(values[effect.Definition.VariationParameter.Key]);
                 AppendLog($"{effect.DisplayName}: {(effect.IsEnabled ? "On" : "Off")} / {effect.Variation}");
             }
 

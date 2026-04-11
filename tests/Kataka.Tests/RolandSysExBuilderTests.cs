@@ -84,4 +84,15 @@ public sealed class RolandSysExBuilderTests
             effect => Assert.Equal("Delay 2", effect.DisplayName),
             effect => Assert.Equal("Reverb", effect.DisplayName));
     }
+
+    [Fact]
+    public void KatanaMkIIParameterBlockReply_ParsesMultiBytePayload()
+    {
+        var reply = new SysExMessage([0xF0, 0x41, 0x00, 0x00, 0x00, 0x00, 0x33, 0x12, 0x60, 0x00, 0x06, 0x51, 0x4E, 0x38, 0x43, 0xF7]);
+
+        var parsed = KatanaMkIIProtocol.TryParseParameterBlockReply([0x60, 0x00, 0x06, 0x51], 2, reply, out var data);
+
+        Assert.True(parsed);
+        Assert.Equal([0x4E, 0x38], data);
+    }
 }

@@ -20,5 +20,9 @@ public interface IKatanaSession : IAsyncDisposable
 
     Task<byte> ReadParameterAsync(KatanaParameterDefinition parameter, CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyDictionary<string, byte>> ReadParametersAsync(
+        IReadOnlyList<KatanaParameterDefinition> parameters,
+        CancellationToken cancellationToken = default);
+
     Task<byte> WriteParameterAsync(KatanaParameterDefinition parameter, byte value, CancellationToken cancellationToken = default);
 }

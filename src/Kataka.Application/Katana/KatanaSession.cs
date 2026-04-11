@@ -63,18 +63,39 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     {
         ArgumentNullException.ThrowIfNull(parameter);
 
-        var reply = await RequireConnection().RequestAsync(
-            KatanaMkIIProtocol.CreateParameterReadRequest(parameter),
-            DefaultRequestTimeout,
-            cancellationToken);
+        var values = await ReadParametersAsync([parameter], cancellationToken);
+        return values[parameter.Key];
+    }
 
-        if (!KatanaMkIIProtocol.TryParseParameterReply(parameter, reply, out var value))
+    public async Task<IReadOnlyDictionary<string, byte>> ReadParametersAsync(
+        IReadOnlyList<KatanaParameterDefinition> parameters,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(parameters);
+
+        var result = new Dictionary<string, byte>(StringComparer.Ordinal);
+        foreach (var group in CreateReadGroups(parameters))
         {
-            throw new InvalidOperationException(
-                $"{parameter.DisplayName} reply did not match the expected Katana MKII format.");
+            var startAddress = group.StartAddress;
+            var size = new byte[] { 0x00, 0x00, 0x00, (byte)group.Length };
+            var reply = await RequireConnection().RequestAsync(
+                RolandSysExBuilder.BuildDataRequest1(0x00, [0x00, 0x00, 0x00, 0x33], startAddress, size),
+                DefaultRequestTimeout,
+                cancellationToken);
+
+            if (!KatanaMkIIProtocol.TryParseParameterBlockReply(startAddress, group.Length, reply, out var data))
+            {
+                throw new InvalidOperationException("A batched Katana parameter reply did not match the expected MKII format.");
+            }
+
+            foreach (var parameter in group.Parameters)
+            {
+                var offset = parameter.Address[3] - startAddress[3];
+                result[parameter.Key] = data[offset];
+            }
         }
 
-        return value;
+        return result;
     }
 
     public async Task<byte> WriteParameterAsync(
@@ -99,6 +120,31 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     private IMidiConnection RequireConnection()
     {
         return activeConnection ?? throw new InvalidOperationException("No Katana MIDI connection is currently open.");
+    }
+
+    private static IReadOnlyList<ParameterReadGroup> CreateReadGroups(IReadOnlyList<KatanaParameterDefinition> parameters)
+    {
+        var ordered = parameters
+            .DistinctBy(parameter => parameter.Key)
+            .OrderBy(parameter => parameter.Address[0])
+            .ThenBy(parameter => parameter.Address[1])
+            .ThenBy(parameter => parameter.Address[2])
+            .ThenBy(parameter => parameter.Address[3])
+            .ToList();
+
+        var groups = new List<ParameterReadGroup>();
+        foreach (var parameter in ordered)
+        {
+            if (groups.Count == 0 || !groups[^1].CanInclude(parameter))
+            {
+                groups.Add(new ParameterReadGroup(parameter));
+                continue;
+            }
+
+            groups[^1].Add(parameter);
+        }
+
+        return groups;
     }
 
     private static bool TryParseCurrentPanelChannel(SysExMessage message, out KatanaPanelChannel channel)
@@ -147,5 +193,44 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
             KatanaPanelChannel.ChB2 => 6,
             _ => throw new ArgumentOutOfRangeException(nameof(channel), channel, "Unsupported Katana panel channel."),
         };
+    }
+
+    private sealed class ParameterReadGroup
+    {
+        private const int MaximumSpanLength = 8;
+        private readonly List<KatanaParameterDefinition> parameters = [];
+        private readonly byte[] prefix = new byte[3];
+        private byte startOffset;
+        private byte endOffset;
+
+        public ParameterReadGroup(KatanaParameterDefinition parameter)
+        {
+            prefix[0] = parameter.Address[0];
+            prefix[1] = parameter.Address[1];
+            prefix[2] = parameter.Address[2];
+            startOffset = parameter.Address[3];
+            endOffset = parameter.Address[3];
+            parameters.Add(parameter);
+        }
+
+        public IReadOnlyList<KatanaParameterDefinition> Parameters => parameters;
+
+        public int Length => endOffset - startOffset + 1;
+
+        public byte[] StartAddress => [prefix[0], prefix[1], prefix[2], startOffset];
+
+        public bool CanInclude(KatanaParameterDefinition parameter)
+        {
+            return parameter.Address[0] == prefix[0] &&
+                   parameter.Address[1] == prefix[1] &&
+                   parameter.Address[2] == prefix[2] &&
+                   parameter.Address[3] - startOffset + 1 <= MaximumSpanLength;
+        }
+
+        public void Add(KatanaParameterDefinition parameter)
+        {
+            parameters.Add(parameter);
+            endOffset = parameter.Address[3];
+        }
     }
 }

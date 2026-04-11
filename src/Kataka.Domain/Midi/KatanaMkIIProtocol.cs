@@ -38,11 +38,33 @@ public static class KatanaMkIIProtocol
         out byte value)
     {
         ArgumentNullException.ThrowIfNull(parameter);
+        value = 0;
+        if (!TryParseParameterBlockReply(parameter.Address, 1, message, out var data))
+        {
+            return false;
+        }
+
+        value = data[0];
+        return true;
+    }
+
+    public static bool TryParseParameterBlockReply(
+        IReadOnlyList<byte> address,
+        int expectedLength,
+        SysExMessage message,
+        out byte[] data)
+    {
+        ArgumentNullException.ThrowIfNull(address);
         ArgumentNullException.ThrowIfNull(message);
 
-        value = 0;
+        data = [];
+        if (address.Count != 4 || expectedLength <= 0)
+        {
+            return false;
+        }
+
         var bytes = message.Bytes;
-        if (bytes.Count != 15)
+        if (bytes.Count != 14 + expectedLength)
         {
             return false;
         }
@@ -60,19 +82,19 @@ public static class KatanaMkIIProtocol
             return false;
         }
 
-        if (!bytes.Skip(8).Take(4).SequenceEqual(parameter.Address))
+        if (!bytes.Skip(8).Take(4).SequenceEqual(address))
         {
             return false;
         }
 
-        var data = bytes.Skip(12).Take(1).ToArray();
+        data = bytes.Skip(12).Take(expectedLength).ToArray();
         var checksum = bytes[^2];
-        if (RolandChecksum.Calculate(parameter.Address.Concat(data).ToArray()) != checksum)
+        if (RolandChecksum.Calculate(address.Concat(data).ToArray()) != checksum)
         {
+            data = [];
             return false;
         }
 
-        value = data[0];
         return true;
     }
 }
