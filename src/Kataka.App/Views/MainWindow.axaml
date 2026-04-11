@@ -317,6 +317,9 @@
 
                                 <!-- Pedal FX detail -->
                                 <Border IsVisible="{Binding SelectedIsPedalFx}"
+                                        HorizontalAlignment="Center"
+                                        Width="360"
+                                        CornerRadius="8"
                                         Classes="panel-section" Padding="16">
                                     <StackPanel Spacing="14">
                                         <StackPanel Spacing="12">
