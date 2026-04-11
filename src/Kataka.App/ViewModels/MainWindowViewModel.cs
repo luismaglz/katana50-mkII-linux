@@ -22,6 +22,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly Dictionary<string, string> outputPortIds = [];
     private readonly Dictionary<string, AmpControlViewModel> ampControlsByKey = [];
     private readonly Dictionary<string, PanelEffectViewModel> panelEffectsByKey = [];
+    private readonly Dictionary<string, PanelEffectViewModel> panelEffectsByDefinitionKey = [];
     private readonly Dictionary<string, byte> pendingAmpWrites = [];
     private readonly Dictionary<string, bool> pendingPanelEffectWrites = [];
     private readonly Dictionary<string, byte> pendingPanelTypeWrites = [];
@@ -107,6 +108,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
             PanelEffects.Add(effectViewModel);
             panelEffectsByKey[effect.SwitchParameter.Key] = effectViewModel;
+            panelEffectsByDefinitionKey[effect.Key] = effectViewModel;
         }
 
         foreach (var channel in PanelChannels)
@@ -227,6 +229,36 @@ public partial class MainWindowViewModel : ViewModelBase
         if (idx < 0) return;
         pendingCabinetResonanceWrite = (byte)idx;
         AppendLog($"Queued panel sync: Cabinet Resonance -> {value}.");
+    }
+
+    [ObservableProperty]
+    public partial string? SelectedPedalboardKey { get; set; }
+
+    partial void OnSelectedPedalboardKeyChanged(string? value)
+    {
+        OnPropertyChanged(nameof(SelectedPanelEffectDetail));
+        OnPropertyChanged(nameof(SelectedIsPedalFx));
+        OnPropertyChanged(nameof(SelectedHasDetail));
+        OnPropertyChanged(nameof(SelectedDetailTitle));
+    }
+
+    public PanelEffectViewModel? SelectedPanelEffectDetail =>
+        SelectedPedalboardKey is not null &&
+        panelEffectsByDefinitionKey.TryGetValue(SelectedPedalboardKey, out var vm) ? vm : null;
+
+    public bool SelectedIsPedalFx =>
+        string.Equals(SelectedPedalboardKey, "pedal-fx", StringComparison.Ordinal);
+
+    public bool SelectedHasDetail => SelectedPanelEffectDetail is not null || SelectedIsPedalFx;
+
+    public string SelectedDetailTitle =>
+        SelectedPanelEffectDetail?.DisplayName ??
+        (SelectedIsPedalFx ? "Pedal FX" : "Select a pedal in the chain below to edit its settings");
+
+    [RelayCommand]
+    private void SelectPedalboardItem(string? key)
+    {
+        SelectedPedalboardKey = string.Equals(key, SelectedPedalboardKey, StringComparison.Ordinal) ? null : key;
     }
 
     partial void OnSelectedPanelChannelChanged(string value)
