@@ -168,14 +168,85 @@ public static class KatanaMkIIParameterCatalog
 
     public static IReadOnlyList<byte> DelayTimeAddress { get; } = [0x60, 0x00, 0x05, 0x02];
 
+    // ── Booster DSP params (same for all booster types) ─────────────────────────
+    public static KatanaParameterDefinition BoosterDrive { get; } =
+        new("booster-drive", "Drive", [0x60, 0x00, 0x00, 0x12], maximum: 120);
+
+    public static KatanaParameterDefinition BoosterTone { get; } =
+        new("booster-tone", "Tone", [0x60, 0x00, 0x00, 0x13]);
+
+    public static KatanaParameterDefinition BoosterBottom { get; } =
+        new("booster-bottom", "Bottom", [0x60, 0x00, 0x00, 0x14]);
+
+    public static KatanaParameterDefinition BoosterSoloSw { get; } =
+        new("booster-solo-sw", "Solo", [0x60, 0x00, 0x00, 0x15], maximum: 1);
+
+    public static KatanaParameterDefinition BoosterSoloLevel { get; } =
+        new("booster-solo-level", "Solo Lvl", [0x60, 0x00, 0x00, 0x16]);
+
+    public static KatanaParameterDefinition BoosterEffectLevel { get; } =
+        new("booster-effect-level", "E.Level", [0x60, 0x00, 0x00, 0x17]);
+
+    public static KatanaParameterDefinition BoosterDirectMix { get; } =
+        new("booster-direct-mix", "D.Mix", [0x60, 0x00, 0x00, 0x18]);
+
+    // ── Delay DSP params (shared core; SINGLE/ANALOG/TAPE/REVERSE/MODULATE) ─────
+    public static KatanaParameterDefinition DelayFeedback { get; } =
+        new("delay-feedback", "Feedback", [0x60, 0x00, 0x05, 0x04]);
+
+    public static KatanaParameterDefinition DelayHighCut { get; } =
+        new("delay-high-cut", "High Cut", [0x60, 0x00, 0x05, 0x05], maximum: 17);
+
+    public static KatanaParameterDefinition DelayEffectLevel { get; } =
+        new("delay-effect-level", "E.Level", [0x60, 0x00, 0x05, 0x06]);
+
+    public static KatanaParameterDefinition DelayDirectMix { get; } =
+        new("delay-direct-mix", "D.Mix", [0x60, 0x00, 0x05, 0x07]);
+
+    // ── Delay 2 DSP params ───────────────────────────────────────────────────────
+    public static KatanaParameterDefinition Delay2Feedback { get; } =
+        new("delay2-feedback", "Feedback", [0x60, 0x00, 0x05, 0x24]);
+
+    public static KatanaParameterDefinition Delay2HighCut { get; } =
+        new("delay2-high-cut", "High Cut", [0x60, 0x00, 0x05, 0x25], maximum: 17);
+
+    public static KatanaParameterDefinition Delay2EffectLevel { get; } =
+        new("delay2-effect-level", "E.Level", [0x60, 0x00, 0x05, 0x26]);
+
+    public static KatanaParameterDefinition Delay2DirectMix { get; } =
+        new("delay2-direct-mix", "D.Mix", [0x60, 0x00, 0x05, 0x27]);
+
+    // ── Reverb DSP params (shared for all reverb types) ─────────────────────────
+    public static KatanaParameterDefinition ReverbTime { get; } =
+        new("reverb-time", "Time", [0x60, 0x00, 0x05, 0x42]);
+
+    public static KatanaParameterDefinition ReverbPreDelay { get; } =
+        new("reverb-pre-delay", "Pre Delay", [0x60, 0x00, 0x05, 0x43]);
+
+    public static KatanaParameterDefinition ReverbHighCut { get; } =
+        new("reverb-high-cut", "High Cut", [0x60, 0x00, 0x05, 0x45], maximum: 17);
+
+    public static KatanaParameterDefinition ReverbHighDensity { get; } =
+        new("reverb-high-density", "Hi Density", [0x60, 0x00, 0x05, 0x46], maximum: 1);
+
+    public static KatanaParameterDefinition ReverbEffectLevel { get; } =
+        new("reverb-effect-level", "E.Level", [0x60, 0x00, 0x05, 0x48]);
+
+    public static KatanaParameterDefinition ReverbDirectMix { get; } =
+        new("reverb-direct-mix", "D.Mix", [0x60, 0x00, 0x05, 0x49]);
+
     public static IReadOnlyList<KatanaPanelEffectDefinition> PanelEffects { get; } =
     [
-        new("booster", "Booster", BoosterSwitch, variationParameter: BoosterVariation, typeParameter: BoosterType, levelParameter: BoostLevel),
+        new("booster", "Booster", BoosterSwitch, variationParameter: BoosterVariation, typeParameter: BoosterType, levelParameter: BoostLevel,
+            detailParameters: [BoosterDrive, BoosterTone, BoosterBottom, BoosterSoloSw, BoosterSoloLevel, BoosterEffectLevel, BoosterDirectMix]),
         new("mod", "Mod", ModSwitch, variationParameter: ModVariation, typeParameter: ModType, levelParameter: ModLevel),
         new("fx", "FX", FxSwitch, variationParameter: FxVariation, typeParameter: FxType, levelParameter: FxLevel),
-        new("delay", "Delay", DelaySwitch, variationParameter: DelayVariation, typeParameter: DelayType, levelParameter: DelayLevel),
-        new("delay2", "Delay 2", Delay2Switch, typeParameter: Delay2Type),
-        new("reverb", "Reverb", ReverbSwitch, variationParameter: ReverbVariation, typeParameter: ReverbType, levelParameter: ReverbLevel),
+        new("delay", "Delay", DelaySwitch, variationParameter: DelayVariation, typeParameter: DelayType, levelParameter: DelayLevel,
+            detailParameters: [DelayFeedback, DelayHighCut, DelayEffectLevel, DelayDirectMix]),
+        new("delay2", "Delay 2", Delay2Switch, typeParameter: Delay2Type,
+            detailParameters: [Delay2Feedback, Delay2HighCut, Delay2EffectLevel, Delay2DirectMix]),
+        new("reverb", "Reverb", ReverbSwitch, variationParameter: ReverbVariation, typeParameter: ReverbType, levelParameter: ReverbLevel,
+            detailParameters: [ReverbTime, ReverbPreDelay, ReverbHighCut, ReverbHighDensity, ReverbEffectLevel, ReverbDirectMix]),
     ];
 
     public static KatanaPedalFxDefinition PedalFx { get; } =

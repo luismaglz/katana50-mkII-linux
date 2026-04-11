@@ -8,7 +8,8 @@ public sealed class KatanaPanelEffectDefinition
         KatanaParameterDefinition switchParameter,
         KatanaParameterDefinition? variationParameter = null,
         KatanaParameterDefinition? typeParameter = null,
-        KatanaParameterDefinition? levelParameter = null)
+        KatanaParameterDefinition? levelParameter = null,
+        IReadOnlyList<KatanaParameterDefinition>? detailParameters = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
@@ -20,6 +21,7 @@ public sealed class KatanaPanelEffectDefinition
         VariationParameter = variationParameter;
         TypeParameter = typeParameter;
         LevelParameter = levelParameter;
+        DetailParameters = detailParameters ?? [];
     }
 
     public string Key { get; }
@@ -33,4 +35,10 @@ public sealed class KatanaPanelEffectDefinition
     public KatanaParameterDefinition? TypeParameter { get; }
 
     public KatanaParameterDefinition? LevelParameter { get; }
+
+    /// <summary>
+    /// Per-effect DSP parameters (Drive, Tone, Feedback, Time, etc.) polled and written
+    /// in addition to the top-level switch/type/level parameters.
+    /// </summary>
+    public IReadOnlyList<KatanaParameterDefinition> DetailParameters { get; }
 }
