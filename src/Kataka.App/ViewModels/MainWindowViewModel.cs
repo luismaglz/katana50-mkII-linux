@@ -993,6 +993,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 IsConnectedFromPrevious = items.Count > 0,
                 CanToggle = true,
                 Family = effect.Definition.Key,
+                PanelEffect = effect,
             });
         }
     }

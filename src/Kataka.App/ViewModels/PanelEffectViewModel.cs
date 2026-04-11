@@ -63,6 +63,7 @@ public partial class PanelEffectViewModel : ViewModelBase
     public partial int Level { get; set; } = 0;
 
     public bool HasLevel => Definition.LevelParameter is not null;
+    public bool HasTypeOptions => TypeOptions.Count > 0;
 
     public IBrush VariationBrush => Variation switch
     {
