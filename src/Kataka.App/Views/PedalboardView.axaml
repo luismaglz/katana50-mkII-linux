@@ -12,7 +12,7 @@
 
             <ScrollViewer HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Disabled">
-                <ItemsControl ItemsSource="{Binding PedalboardItems}">
+                <ItemsControl ItemsSource="{Binding Pedalboard.PedalboardItems}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Horizontal" Spacing="0" VerticalAlignment="Top" />
@@ -76,19 +76,29 @@
                                 </Border>
 
                                 <!-- ── Booster pedal ── -->
-                                <views:BoosterPedalView IsVisible="{Binding IsBooster}" />
+                                <Panel IsVisible="{Binding IsBooster}">
+                                    <views:BoosterPedalView DataContext="{Binding BoosterPedal}" />
+                                </Panel>
 
                                 <!-- ── Mod pedal ── -->
-                                <views:ModPedalView IsVisible="{Binding IsMod}" />
+                                <Panel IsVisible="{Binding IsMod}">
+                                    <views:ModPedalView DataContext="{Binding ModPedal}" />
+                                </Panel>
 
                                 <!-- ── FX pedal ── -->
-                                <views:FxPedalView IsVisible="{Binding IsFx}" />
+                                <Panel IsVisible="{Binding IsFx}">
+                                    <views:FxPedalView DataContext="{Binding FxPedal}" />
+                                </Panel>
 
                                 <!-- ── Delay pedal (covers delay + delay2) ── -->
-                                <views:DelayPedalView IsVisible="{Binding IsDelay}" />
+                                <Panel IsVisible="{Binding IsDelay}">
+                                    <views:DelayPedalView DataContext="{Binding DelayPedal}" />
+                                </Panel>
 
                                 <!-- ── Reverb pedal ── -->
-                                <views:ReverbPedalView IsVisible="{Binding IsReverb}" />
+                                <Panel IsVisible="{Binding IsReverb}">
+                                    <views:ReverbPedalView DataContext="{Binding ReverbPedal}" />
+                                </Panel>
 
                                 <!-- ── Pedal FX card ── -->
                                 <Border IsVisible="{Binding IsPedalFx}"

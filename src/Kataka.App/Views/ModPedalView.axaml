@@ -3,7 +3,7 @@
              xmlns:vm="using:Kataka.App.ViewModels"
              xmlns:controls="using:Kataka.App.Controls"
              x:Class="Kataka.App.Views.ModPedalView"
-             x:DataType="vm:PedalboardItemViewModel">
+             x:DataType="vm:ModPedalViewModel">
 
     <Border MinWidth="160" CornerRadius="8" VerticalAlignment="Top">
         <Border.Background>
@@ -19,33 +19,33 @@
                 <!-- On/Off toggle -->
                 <ToggleButton Classes="effect-button"
                               HorizontalAlignment="Stretch"
-                              Content="{Binding PanelEffect.DisplayName}"
-                              IsChecked="{Binding PanelEffect.IsEnabled}" />
+                              Content="{Binding DisplayName}"
+                              IsChecked="{Binding IsEnabled}" />
                 <!-- Type selector -->
-                <StackPanel Spacing="4" IsVisible="{Binding PanelEffect.HasTypeOptions}">
+                <StackPanel Spacing="4" IsVisible="{Binding HasTypeOptions}">
                     <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
                                Foreground="#267a44" />
                     <ComboBox Classes="midi-port-picker"
                               HorizontalAlignment="Stretch"
-                              ItemsSource="{Binding PanelEffect.TypeOptions}"
-                              SelectedItem="{Binding PanelEffect.SelectedTypeOption}" />
+                              ItemsSource="{Binding TypeOptions}"
+                              SelectedItem="{Binding SelectedTypeOption}" />
                 </StackPanel>
                 <!-- Variation color -->
                 <StackPanel Spacing="4">
                     <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
                                Foreground="#267a44" />
                     <Border Height="16" CornerRadius="4"
-                            Background="{Binding PanelEffect.VariationBrush}" />
+                            Background="{Binding VariationBrush}" />
                 </StackPanel>
                 <!-- Level knob -->
                 <controls:RotaryKnob Scale="0.6" Label="LEVEL"
                                      Minimum="0" Maximum="100"
-                                     Value="{Binding PanelEffect.Level}"
-                                     IsVisible="{Binding PanelEffect.HasLevel}"
+                                     Value="{Binding Level}"
+                                     IsVisible="{Binding HasLevel}"
                                      HorizontalAlignment="Center" />
                 <!-- Detail parameter knobs -->
-                <ItemsControl ItemsSource="{Binding PanelEffect.DetailParams}"
-                              IsVisible="{Binding PanelEffect.HasDetailParams}">
+                <ItemsControl ItemsSource="{Binding DetailParams}"
+                              IsVisible="{Binding HasDetailParams}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />

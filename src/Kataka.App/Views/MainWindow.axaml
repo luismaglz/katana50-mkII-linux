@@ -242,8 +242,8 @@
                                            Foreground="{StaticResource KatanaSubtleTextBrush}" />
                                 <ComboBox Classes="midi-port-picker"
                                           MinWidth="130"
-                                          ItemsSource="{x:Static vm:MainWindowViewModel.ChainPatternNames}"
-                                          SelectedIndex="{Binding SelectedChainPattern}" />
+                                          ItemsSource="{x:Static vm:PedalboardViewModel.ChainPatternNames}"
+                                          SelectedIndex="{Binding Pedalboard.SelectedChainPattern}" />
                             </StackPanel>
                             <views:PedalboardChainView Grid.Column="1" />
                         </Grid>

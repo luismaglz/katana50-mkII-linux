@@ -21,8 +21,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly Dictionary<string, string> inputPortIds = [];
     private readonly Dictionary<string, string> outputPortIds = [];
     private readonly Dictionary<string, AmpControlViewModel> ampControlsByKey = [];
-    private readonly Dictionary<string, PanelEffectViewModel> panelEffectsByKey = [];
-    private readonly Dictionary<string, PanelEffectViewModel> panelEffectsByDefinitionKey = [];
+    private readonly Dictionary<string, PedalViewModel> panelEffectsByKey = [];
+    private readonly Dictionary<string, PedalViewModel> panelEffectsByDefinitionKey = [];
     private readonly Dictionary<string, byte> pendingAmpWrites = [];
     private readonly Dictionary<string, bool> pendingPanelEffectWrites = [];
     private readonly Dictionary<string, byte> pendingPanelTypeWrites = [];
@@ -90,23 +90,31 @@ public partial class MainWindowViewModel : ViewModelBase
 
         foreach (var effect in KatanaMkIIParameterCatalog.PanelEffects)
         {
-            var effectViewModel = new PanelEffectViewModel(effect);
+            var effectViewModel = effect.Key switch
+            {
+                "booster" => (PedalViewModel)new BoosterPedalViewModel(effect),
+                "mod"     => new ModPedalViewModel(effect),
+                "fx"      => new FxPedalViewModel(effect),
+                "delay"   => new DelayPedalViewModel(effect),
+                "reverb"  => new ReverbPedalViewModel(effect),
+                _         => new PedalViewModel(effect),
+            };
             effectViewModel.PropertyChanged += (_, args) =>
             {
-                if (args.PropertyName == nameof(PanelEffectViewModel.IsEnabled))
+                if (args.PropertyName == nameof(PedalViewModel.IsEnabled))
                 {
                     TrackPanelEffectChange(effectViewModel);
                 }
-                else if (args.PropertyName == nameof(PanelEffectViewModel.SelectedTypeOption))
+                else if (args.PropertyName == nameof(PedalViewModel.SelectedTypeOption))
                 {
                     TrackPanelEffectTypeChange(effectViewModel);
                 }
-                else if (args.PropertyName == nameof(PanelEffectViewModel.Level))
+                else if (args.PropertyName == nameof(PedalViewModel.Level))
                 {
                     TrackPanelEffectLevelChange(effectViewModel);
                 }
 
-                RefreshPedalboard();
+                Pedalboard.Refresh();
             };
 
             PanelEffects.Add(effectViewModel);
@@ -128,14 +136,24 @@ public partial class MainWindowViewModel : ViewModelBase
             PanelChannelOptions.Add(new PanelChannelOptionViewModel(channel));
         }
 
+        Pedalboard = new PedalboardViewModel(panelEffectsByDefinitionKey, PedalFx, () => SelectedPanelChannel);
+        Pedalboard.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName != nameof(PedalboardViewModel.SelectedChainPattern)) return;
+            if (suppressChangeTracking || !ActiveWriteSync || !IsConnected) return;
+            var value = Pedalboard.SelectedChainPattern;
+            if (value < 0 || value >= PedalboardViewModel.ChainPatternNames.Length) return;
+            pendingChainPatternWrite = (byte)value;
+            AppendLog($"Queued panel sync: Chain Pattern -> {PedalboardViewModel.ChainPatternNames[value]}.");
+        };
+
         PedalFx.PropertyChanged += (_, args) =>
         {
             TrackPedalChange(args.PropertyName);
-            RefreshPedalboard();
         };
 
         UpdatePanelChannelSelection();
-        RefreshPedalboard();
+        Pedalboard.Refresh();
         UpdateWriteSyncTimer();
         UpdateReadSyncTimer();
     }
@@ -174,13 +192,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<AmpControlViewModel> AmpControls { get; } = [];
 
-    public ObservableCollection<PanelEffectViewModel> PanelEffects { get; } = [];
+    public ObservableCollection<PedalViewModel> PanelEffects { get; } = [];
 
     public ObservableCollection<PanelChannelOptionViewModel> PanelChannelOptions { get; } = [];
 
     public PedalFxViewModel PedalFx { get; } = new();
 
-    public ObservableCollection<PedalboardItemViewModel> PedalboardItems { get; } = [];
+    public PedalboardViewModel Pedalboard { get; private set; } = null!;
 
     public ObservableCollection<string> PanelChannels { get; } =
     [
@@ -224,31 +242,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public static string[] AmpTypeOptions { get; } = ["ACOUSTIC", "CLEAN", "CRUNCH", "LEAD", "BROWN"];
     public static string[] CabinetResonanceOptions { get; } = ["LOW", "MIDDLE", "HIGH"];
-    public static string[] ChainPatternNames { get; } = ["CHAIN 1", "CHAIN 2-1", "CHAIN 3-1", "CHAIN 4-1", "CHAIN 2-2", "CHAIN 3-2", "CHAIN 4-2"];
-
-    // Effect key order before the amp for each chain pattern value (0–6).
-    private static readonly string[][] ChainBeforeAmp =
-    [
-        ["booster"],
-        ["booster", "mod"],
-        ["booster", "mod", "fx"],
-        ["booster", "mod", "fx", "delay", "delay2"],
-        ["mod", "booster"],
-        ["mod", "booster", "fx"],
-        ["mod", "booster", "fx", "delay", "delay2"],
-    ];
-
-    // Effect key order after the amp for each chain pattern value (0–6).
-    private static readonly string[][] ChainAfterAmp =
-    [
-        ["mod", "fx", "delay", "delay2", "reverb"],
-        ["fx", "delay", "delay2", "reverb"],
-        ["delay", "delay2", "reverb"],
-        ["reverb"],
-        ["fx", "delay", "delay2", "reverb"],
-        ["delay", "delay2", "reverb"],
-        ["reverb"],
-    ];
 
     [ObservableProperty]
     public partial string SelectedAmpType { get; set; } = "CLEAN";
@@ -274,55 +267,10 @@ public partial class MainWindowViewModel : ViewModelBase
         AppendLog($"Queued panel sync: Cabinet Resonance -> {value}.");
     }
 
-    [ObservableProperty]
-    public partial int SelectedChainPattern { get; set; } = 2;
-
-    partial void OnSelectedChainPatternChanged(int value)
-    {
-        RefreshPedalboard();
-        if (suppressChangeTracking || !ActiveWriteSync || !IsConnected) return;
-        if (value < 0 || value >= ChainPatternNames.Length) return;
-        pendingChainPatternWrite = (byte)value;
-        AppendLog($"Queued panel sync: Chain Pattern -> {ChainPatternNames[value]}.");
-    }
-
-    [ObservableProperty]
-    public partial string? SelectedPedalboardKey { get; set; }
-
-    partial void OnSelectedPedalboardKeyChanged(string? value)
-    {
-        OnPropertyChanged(nameof(SelectedPanelEffectDetail));
-        OnPropertyChanged(nameof(SelectedIsPedalFx));
-        OnPropertyChanged(nameof(SelectedHasDetail));
-        OnPropertyChanged(nameof(SelectedDetailTitle));
-
-        foreach (var item in PedalboardItems)
-            item.IsSelected = string.Equals(item.Key, value, StringComparison.Ordinal);
-    }
-
-    public PanelEffectViewModel? SelectedPanelEffectDetail =>
-        SelectedPedalboardKey is not null &&
-        panelEffectsByDefinitionKey.TryGetValue(SelectedPedalboardKey, out var vm) ? vm : null;
-
-    public bool SelectedIsPedalFx =>
-        string.Equals(SelectedPedalboardKey, "pedal-fx", StringComparison.Ordinal);
-
-    public bool SelectedHasDetail => SelectedPanelEffectDetail is not null || SelectedIsPedalFx;
-
-    public string SelectedDetailTitle =>
-        SelectedPanelEffectDetail?.DisplayName ??
-        (SelectedIsPedalFx ? "Pedal FX" : "Select a pedal in the chain below to edit its settings");
-
-    [RelayCommand]
-    private void SelectPedalboardItem(string? key)
-    {
-        SelectedPedalboardKey = string.Equals(key, SelectedPedalboardKey, StringComparison.Ordinal) ? null : key;
-    }
-
     partial void OnSelectedPanelChannelChanged(string value)
     {
         UpdatePanelChannelSelection();
-        RefreshPedalboard();
+        Pedalboard.Refresh();
 
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected)
         {
@@ -378,31 +326,6 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             SelectedPanelChannel = channel;
         }
-    }
-
-    [RelayCommand]
-    private void TogglePedalboardItem(string? key)
-    {
-        if (string.IsNullOrWhiteSpace(key))
-        {
-            return;
-        }
-
-        if (string.Equals(key, "pedal-fx", StringComparison.Ordinal))
-        {
-            PedalFx.IsEnabled = !PedalFx.IsEnabled;
-            RefreshPedalboard();
-            return;
-        }
-
-        var effect = PanelEffects.FirstOrDefault(item => string.Equals(item.Definition.Key, key, StringComparison.Ordinal));
-        if (effect is null)
-        {
-            return;
-        }
-
-        effect.IsEnabled = !effect.IsEnabled;
-        RefreshPedalboard();
     }
 
     [RelayCommand]
@@ -1009,101 +932,6 @@ public partial class MainWindowViewModel : ViewModelBase
             .Select(key => PedalFx.GetParameter(key).DisplayName));
     }
 
-    private void RefreshPedalboard()
-    {
-        if (isShuttingDown) return;
-        var items = new List<PedalboardItemViewModel>
-        {
-            new()
-            {
-                Key = "input",
-                DisplayName = "INPUT",
-                Detail = "Guitar",
-                IsActive = true,
-                IsEndpoint = true,
-                Family = "io",
-            },
-        };
-
-        var chainIdx = Math.Clamp(SelectedChainPattern, 0, ChainBeforeAmp.Length - 1);
-        AddPanelEffectsByKeys(items, ChainBeforeAmp[chainIdx]);
-        if (string.Equals(PedalFx.SelectedPositionOption, "Input", StringComparison.Ordinal))
-        {
-            items.Add(CreatePedalFxBoardItem(items.Count > 0));
-        }
-
-        items.Add(new PedalboardItemViewModel
-        {
-            Key = "amp",
-            DisplayName = "AMP",
-            Detail = SelectedPanelChannel,
-            IsActive = true,
-            IsAmp = true,
-            IsConnectedFromPrevious = items.Count > 0,
-            Family = "amp",
-        });
-
-        if (string.Equals(PedalFx.SelectedPositionOption, "Post Amp", StringComparison.Ordinal))
-        {
-            items.Add(CreatePedalFxBoardItem(items.Count > 0));
-        }
-
-        AddPanelEffectsByKeys(items, ChainAfterAmp[chainIdx]);
-        items.Add(new PedalboardItemViewModel
-        {
-            Key = "output",
-            DisplayName = "OUTPUT",
-            Detail = "Speaker / Rec Out",
-            IsActive = true,
-            IsEndpoint = true,
-            IsConnectedFromPrevious = items.Count > 0,
-            Family = "io",
-        });
-
-        PedalboardItems.Clear();
-        foreach (var item in items)
-        {
-            PedalboardItems.Add(item);
-        }
-    }
-
-    private void AddPanelEffectsByKeys(List<PedalboardItemViewModel> items, string[] keys)
-    {
-        foreach (var key in keys)
-        {
-            if (!panelEffectsByDefinitionKey.TryGetValue(key, out var effect))
-                continue;
-
-            items.Add(new PedalboardItemViewModel
-            {
-                Key = effect.Definition.Key,
-                DisplayName = effect.DisplayName.ToUpperInvariant(),
-                Detail = effect.Definition.TypeParameter is null
-                    ? effect.VariationCaption
-                    : $"{effect.TypeCaption} / {effect.VariationCaption}",
-                IsActive = effect.IsEnabled,
-                IsConnectedFromPrevious = items.Count > 0,
-                CanToggle = true,
-                Family = effect.Definition.Key,
-                PanelEffect = effect,
-            });
-        }
-    }
-
-    private PedalboardItemViewModel CreatePedalFxBoardItem(bool isConnectedFromPrevious)
-    {
-        return new PedalboardItemViewModel
-        {
-            Key = "pedal-fx",
-            DisplayName = "PEDAL FX",
-            Detail = $"{PedalFx.SelectedTypeOption} / {PedalFx.SelectedPositionOption}",
-            IsActive = PedalFx.IsEnabled,
-            IsConnectedFromPrevious = isConnectedFromPrevious,
-            CanToggle = true,
-            Family = "pedal",
-        };
-    }
-
     private void UpdatePanelChannelSelection()
     {
         foreach (var option in PanelChannelOptions)
@@ -1126,7 +954,7 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateWriteSyncTimer();
     }
 
-    private void TrackPanelEffectChange(PanelEffectViewModel effect)
+    private void TrackPanelEffectChange(PedalViewModel effect)
     {
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected)
         {
@@ -1139,7 +967,7 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateWriteSyncTimer();
     }
 
-    private void TrackPanelEffectTypeChange(PanelEffectViewModel effect)
+    private void TrackPanelEffectTypeChange(PedalViewModel effect)
     {
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected || effect.Definition.TypeParameter is null)
         {
@@ -1157,7 +985,7 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateWriteSyncTimer();
     }
 
-    private void TrackPanelEffectLevelChange(PanelEffectViewModel effect)
+    private void TrackPanelEffectLevelChange(PedalViewModel effect)
     {
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected || effect.Definition.LevelParameter is null)
         {
@@ -1480,7 +1308,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (chainPatternWrite.HasValue)
         {
-            var name = chainPatternWrite.Value < ChainPatternNames.Length ? ChainPatternNames[chainPatternWrite.Value] : chainPatternWrite.Value.ToString();
+            var name = chainPatternWrite.Value < PedalboardViewModel.ChainPatternNames.Length ? PedalboardViewModel.ChainPatternNames[chainPatternWrite.Value] : chainPatternWrite.Value.ToString();
             AppendLog($"Writing queued chain pattern: {name}.");
             await katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.ChainPattern.Address, [chainPatternWrite.Value]);
         }
@@ -1944,11 +1772,11 @@ public partial class MainWindowViewModel : ViewModelBase
                     SelectedCabinetResonance = CabinetResonanceOptions[cabValue];
                 }
                 if (values.TryGetValue(KatanaMkIIParameterCatalog.ChainPattern.Key, out var chainValue) &&
-                    chainValue < ChainPatternNames.Length)
+                    chainValue < PedalboardViewModel.ChainPatternNames.Length)
                 {
-                    SelectedChainPattern = chainValue;
+                    Pedalboard.SelectedChainPattern = chainValue;
                 }
-                AppendLog($"Amp Type: {SelectedAmpType} / Cabinet Resonance: {SelectedCabinetResonance} / Chain: {ChainPatternNames[SelectedChainPattern]}");
+                AppendLog($"Amp Type: {SelectedAmpType} / Cabinet Resonance: {SelectedCabinetResonance} / Chain: {PedalboardViewModel.ChainPatternNames[Pedalboard.SelectedChainPattern]}");
             }
             finally
             {
