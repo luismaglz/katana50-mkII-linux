@@ -417,6 +417,33 @@ Implement in layers:
 
 ---
 
+---
+
+## Signal Chain Patterns (PRM_CHAIN_PTN)
+
+**MIDI address:** `0x60 0x00 0x06 0x20` — values 0–6, default = 2
+
+The chain pattern controls the routing order of effects relative to the preamp block. Reverb is always last in every pattern. Pedal FX position is independently configurable on top of the selected chain pattern; EQ1, EQ2, and S/R loop positions are also independently configurable.
+
+| Value | Name | Signal Order (input → output) |
+|-------|------|-------------------------------|
+| 0 | CHAIN 1 | PDL → **OD** → *AMP* → MOD → FX → Delay → Delay 2 → Rev |
+| 1 | CHAIN 2-1 | PDL → **OD** → MOD → *AMP* → FX → Delay → Delay 2 → Rev |
+| 2 | CHAIN 3-1 *(default)* | PDL → **OD** → MOD → FX → *AMP* → Delay → Delay 2 → Rev |
+| 3 | CHAIN 4-1 | PDL → **OD** → MOD → FX → Delay → Delay 2 → *AMP* → Rev |
+| 4 | CHAIN 2-2 | PDL → MOD → **OD** → *AMP* → FX → Delay → Delay 2 → Rev |
+| 5 | CHAIN 3-2 | PDL → MOD → **OD** → FX → *AMP* → Delay → Delay 2 → Rev |
+| 6 | CHAIN 4-2 | PDL → MOD → **OD** → FX → Delay → Delay 2 → *AMP* → Rev |
+
+**Naming convention:**
+- The number (1–4) = how many effect blocks come **before the amp**
+- Suffix **-1** = Booster/OD (OD) comes before MOD
+- Suffix **-2** = MOD comes before Booster/OD
+
+**Source:** `floorBoard.cpp` in the Katana MK2 FloorBoard community app — `chain_1_Set` through `chain_7_Set` functions; byte-to-name mapping comment at line 1047.
+
+---
+
 ## Reference Sources
 
 | Source | Location | Use |
