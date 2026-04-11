@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kataka.App.ViewModels"
+             xmlns:controls="using:Kataka.App.Controls"
+             x:Class="Kataka.App.Views.FxPedalView"
+             x:DataType="vm:PedalboardItemViewModel">
+
+    <Border MinWidth="160" CornerRadius="8" VerticalAlignment="Top">
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                <GradientStop Offset="0" Color="#2e3138" />
+                <GradientStop Offset="1" Color="#1c1f24" />
+            </LinearGradientBrush>
+        </Border.Background>
+        <StackPanel Spacing="0">
+            <!-- FX accent bar: teal/cyan -->
+            <Border Height="6" CornerRadius="8,8,0,0" Background="#1abfbf" />
+            <StackPanel Spacing="10" Margin="12,10,12,14">
+                <!-- On/Off toggle -->
+                <ToggleButton Classes="effect-button"
+                              HorizontalAlignment="Stretch"
+                              Content="{Binding PanelEffect.DisplayName}"
+                              IsChecked="{Binding PanelEffect.IsEnabled}" />
+                <!-- Type selector -->
+                <StackPanel Spacing="4" IsVisible="{Binding PanelEffect.HasTypeOptions}">
+                    <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
+                               Foreground="#0d7a7a" />
+                    <ComboBox Classes="midi-port-picker"
+                              HorizontalAlignment="Stretch"
+                              ItemsSource="{Binding PanelEffect.TypeOptions}"
+                              SelectedItem="{Binding PanelEffect.SelectedTypeOption}" />
+                </StackPanel>
+                <!-- Variation color -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
+                               Foreground="#0d7a7a" />
+                    <Border Height="16" CornerRadius="4"
+                            Background="{Binding PanelEffect.VariationBrush}" />
+                </StackPanel>
+                <!-- Level knob -->
+                <controls:RotaryKnob Scale="0.6" Label="LEVEL"
+                                     Minimum="0" Maximum="100"
+                                     Value="{Binding PanelEffect.Level}"
+                                     IsVisible="{Binding PanelEffect.HasLevel}"
+                                     HorizontalAlignment="Center" />
+                <!-- Detail parameter knobs -->
+                <ItemsControl ItemsSource="{Binding PanelEffect.DetailParams}"
+                              IsVisible="{Binding PanelEffect.HasDetailParams}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:EffectDetailParamViewModel">
+                            <Panel>
+                                <controls:RotaryKnob Scale="0.6" Label="{Binding Label}"
+                                                     Minimum="{Binding Minimum}"
+                                                     Maximum="{Binding Maximum}"
+                                                     Value="{Binding Value}"
+                                                     IsVisible="{Binding !IsToggle}" />
+                                <Border IsVisible="{Binding IsToggle}"
+                                        Width="70" Height="94" Padding="8">
+                                    <ToggleButton Classes="effect-button"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Center"
+                                                  Content="{Binding Label}"
+                                                  IsChecked="{Binding IsOn}" />
+                                </Border>
+                            </Panel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>
