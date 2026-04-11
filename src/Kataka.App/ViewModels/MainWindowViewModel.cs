@@ -245,22 +245,22 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (activeConnection is null)
         {
-            StatusMessage = "Connect to a MIDI port before reading the volume pedal level.";
+            StatusMessage = "Connect to a MIDI port before reading amp volume.";
             return;
         }
 
         try
         {
-            AppendLog("Requesting current Katana volume pedal level.");
-            var volume = await ReadVolumePedalAsync(activeConnection);
-            StatusMessage = "Volume pedal level read successfully.";
-            AmpVolumeStatus = $"Volume pedal level is currently {volume}.";
+            AppendLog("Requesting current Katana amp volume.");
+            var volume = await ReadAmpVolumeAsync(activeConnection);
+            StatusMessage = "Amp volume read successfully.";
+            AmpVolumeStatus = $"Amp volume is currently {volume}.";
         }
         catch (Exception ex)
         {
-            AmpVolumeStatus = "Volume pedal read failed.";
+            AmpVolumeStatus = "Amp volume read failed.";
             StatusMessage = ex.Message;
-            AppendLog("Volume pedal read failed.");
+            AppendLog("Amp volume read failed.");
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
         }
@@ -271,7 +271,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (activeConnection is null)
         {
-            StatusMessage = "Connect to a MIDI port before writing the volume pedal level.";
+            StatusMessage = "Connect to a MIDI port before writing amp volume.";
             return;
         }
 
@@ -281,43 +281,43 @@ public partial class MainWindowViewModel : ViewModelBase
             if (requestedVolume != AmpVolume)
             {
                 AmpVolume = requestedVolume;
-                AppendLog($"Clamped requested volume pedal level to {requestedVolume}.");
+                AppendLog($"Clamped requested amp volume to {requestedVolume}.");
             }
 
-            AppendLog($"Sending Katana volume pedal write for value {requestedVolume}.");
-            await activeConnection.SendAsync(KatanaMkIIProtocol.CreateVolumePedalWriteRequest((byte)requestedVolume));
+            AppendLog($"Sending Katana amp volume write for value {requestedVolume}.");
+            await activeConnection.SendAsync(KatanaMkIIProtocol.CreateAmpVolumeWriteRequest((byte)requestedVolume));
 
-            AppendLog("Reading volume pedal level back after write.");
-            var confirmedVolume = await ReadVolumePedalAsync(activeConnection);
+            AppendLog("Reading amp volume back after write.");
+            var confirmedVolume = await ReadAmpVolumeAsync(activeConnection);
 
             StatusMessage = confirmedVolume == requestedVolume
-                ? "Volume pedal level updated successfully."
-                : "Volume pedal write completed, but the read-back value differed.";
+                ? "Amp volume updated successfully."
+                : "Amp volume write completed, but the read-back value differed.";
             AmpVolumeStatus = confirmedVolume == requestedVolume
-                ? $"Volume pedal level confirmed at {confirmedVolume}."
-                : $"Requested volume pedal level {requestedVolume}, but the amp reported {confirmedVolume}.";
+                ? $"Amp volume confirmed at {confirmedVolume}."
+                : $"Requested amp volume {requestedVolume}, but the amp reported {confirmedVolume}.";
         }
         catch (Exception ex)
         {
-            AmpVolumeStatus = "Volume pedal write failed.";
+            AmpVolumeStatus = "Amp volume write failed.";
             StatusMessage = ex.Message;
-            AppendLog("Volume pedal write failed.");
+            AppendLog("Amp volume write failed.");
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
         }
     }
 
-    private async Task<int> ReadVolumePedalAsync(IMidiConnection connection)
+    private async Task<int> ReadAmpVolumeAsync(IMidiConnection connection)
     {
         var reply = await connection.RequestAsync(
-            KatanaMkIIProtocol.CreateVolumePedalReadRequest(),
+            KatanaMkIIProtocol.CreateAmpVolumeReadRequest(),
             TimeSpan.FromSeconds(1.5));
 
-        AppendLog($"Volume pedal reply: {reply.ToHexString()}");
+        AppendLog($"Amp volume reply: {reply.ToHexString()}");
 
-        if (!KatanaMkIIProtocol.TryParseVolumePedalReply(reply, out var volume))
+        if (!KatanaMkIIProtocol.TryParseAmpVolumeReply(reply, out var volume))
         {
-            throw new InvalidOperationException("Volume pedal reply did not match the expected Katana MKII format.");
+            throw new InvalidOperationException("Amp volume reply did not match the expected Katana MKII format.");
         }
 
         AmpVolume = volume;

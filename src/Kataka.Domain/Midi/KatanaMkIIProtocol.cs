@@ -6,26 +6,26 @@ public static class KatanaMkIIProtocol
 {
     private static readonly byte[] ModelId = [0x00, 0x00, 0x00, 0x33];
     private static readonly byte[] SingleByteSize = [0x00, 0x00, 0x00, 0x01];
-    private static readonly byte[] VolumePedalAddress = [0x60, 0x00, 0x06, 0x33];
+    private static readonly byte[] AmpVolumeAddress = [0x60, 0x00, 0x06, 0x52];
 
     private const byte RolandManufacturerId = 0x41;
     private const byte DeviceId = 0x00;
     private const byte DataSetCommand = 0x12;
 
-    public static SysExMessage CreateVolumePedalReadRequest() =>
-        RolandSysExBuilder.BuildDataRequest1(DeviceId, ModelId, VolumePedalAddress, SingleByteSize);
+    public static SysExMessage CreateAmpVolumeReadRequest() =>
+        RolandSysExBuilder.BuildDataRequest1(DeviceId, ModelId, AmpVolumeAddress, SingleByteSize);
 
-    public static SysExMessage CreateVolumePedalWriteRequest(byte value)
+    public static SysExMessage CreateAmpVolumeWriteRequest(byte value)
     {
         if (value > 100)
         {
-            throw new ArgumentOutOfRangeException(nameof(value), value, "Katana volume pedal level must be between 0 and 100.");
+            throw new ArgumentOutOfRangeException(nameof(value), value, "Katana amp volume must be between 0 and 100.");
         }
 
-        return RolandSysExBuilder.BuildDataSet1(DeviceId, ModelId, VolumePedalAddress, [value]);
+        return RolandSysExBuilder.BuildDataSet1(DeviceId, ModelId, AmpVolumeAddress, [value]);
     }
 
-    public static bool TryParseVolumePedalReply(SysExMessage message, out byte value)
+    public static bool TryParseAmpVolumeReply(SysExMessage message, out byte value)
     {
         ArgumentNullException.ThrowIfNull(message);
 
@@ -49,14 +49,14 @@ public static class KatanaMkIIProtocol
             return false;
         }
 
-        if (!bytes.Skip(8).Take(4).SequenceEqual(VolumePedalAddress))
+        if (!bytes.Skip(8).Take(4).SequenceEqual(AmpVolumeAddress))
         {
             return false;
         }
 
         var data = bytes.Skip(12).Take(1).ToArray();
         var checksum = bytes[^2];
-        if (RolandChecksum.Calculate(VolumePedalAddress.Concat(data).ToArray()) != checksum)
+        if (RolandChecksum.Calculate(AmpVolumeAddress.Concat(data).ToArray()) != checksum)
         {
             return false;
         }
