@@ -7,7 +7,7 @@
         x:Class="Kataka.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Kataka - MIDI Detection">
+        Title="Kataka - Katana Quick Test">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -15,7 +15,7 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,*,Auto,*" ColumnDefinitions="*,*" Margin="24" RowSpacing="12" ColumnSpacing="16">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto,*" ColumnDefinitions="*,*" Margin="24" RowSpacing="12" ColumnSpacing="16">
         <TextBlock Grid.Row="0"
                    Grid.ColumnSpan="2"
                    Text="Kataka quick test"
@@ -73,32 +73,59 @@
             </StackPanel>
         </Border>
 
-        <GroupBox Grid.Row="5" Header="MIDI input ports">
+        <Border Grid.Row="5"
+                Grid.ColumnSpan="2"
+                Padding="12"
+                CornerRadius="8"
+                BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                BorderThickness="1">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Current amp volume"
+                           FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Slider Width="280"
+                            Minimum="0"
+                            Maximum="100"
+                            TickFrequency="5"
+                            Value="{Binding AmpVolume}" />
+                    <TextBlock VerticalAlignment="Center"
+                               Text="{Binding AmpVolume}" />
+                    <Button Content="Read amp volume"
+                            Command="{Binding ReadAmpVolumeCommand}" />
+                    <Button Content="Write amp volume"
+                            Command="{Binding SetAmpVolumeCommand}" />
+                </StackPanel>
+                <TextBlock Text="{Binding AmpVolumeStatus}"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <GroupBox Grid.Row="6" Header="MIDI input ports">
             <ListBox ItemsSource="{Binding InputPorts}" />
         </GroupBox>
 
-        <GroupBox Grid.Row="5" Grid.Column="1" Header="MIDI output ports">
+        <GroupBox Grid.Row="6" Grid.Column="1" Header="MIDI output ports">
             <ListBox ItemsSource="{Binding OutputPorts}" />
         </GroupBox>
 
-        <TextBlock Grid.Row="6"
-                   Grid.ColumnSpan="2"
-                   Text="Current quick-test rule: detect Katana by matching MIDI input/output port names containing 'Katana', open the selected MIDI pair, then request a standard MIDI identity reply."
-                   Opacity="0.75"
-                    TextWrapping="Wrap" />
-
         <TextBlock Grid.Row="7"
+                   Grid.ColumnSpan="2"
+                   Text="Current quick-test rule: detect Katana by matching MIDI input/output port names containing 'Katana', open the selected MIDI pair, request a standard MIDI identity reply, then read and write current amp volume with a read-back confirmation."
+                    Opacity="0.75"
+                     TextWrapping="Wrap" />
+
+        <TextBlock Grid.Row="8"
                    Grid.ColumnSpan="2"
                    Text="Diagnostic log"
                    FontWeight="Bold" />
 
-        <TextBox Grid.Row="8"
-                 Grid.ColumnSpan="2"
-                 MinHeight="180"
-                 IsReadOnly="True"
-                 Text="{Binding DiagnosticLog}"
-                 TextWrapping="Wrap"
-                 AcceptsReturn="True" />
+        <TextBox Grid.Row="9"
+                  Grid.ColumnSpan="2"
+                  MinHeight="180"
+                  IsReadOnly="True"
+                  Text="{Binding DiagnosticLog}"
+                  TextWrapping="Wrap"
+                  AcceptsReturn="True" />
     </Grid>
 
 </Window>

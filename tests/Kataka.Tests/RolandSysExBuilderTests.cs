@@ -27,4 +27,25 @@ public sealed class RolandSysExBuilderTests
         Assert.Equal([0xF0, 0x7E, 0x00, 0x06, 0x01, 0xF7], request.Bytes);
         Assert.True(UniversalDeviceIdentity.IsIdentityReply(reply));
     }
+
+    [Fact]
+    public void KatanaMkIIAmpVolumeReadRequest_UsesExpectedAddressAndChecksum()
+    {
+        var request = KatanaMkIIProtocol.CreateCurrentAmpVolumeReadRequest();
+
+        Assert.Equal(
+            [0xF0, 0x41, 0x00, 0x00, 0x00, 0x00, 0x33, 0x11, 0x00, 0x00, 0x04, 0x23, 0x00, 0x00, 0x00, 0x01, 0x58, 0xF7],
+            request.Bytes);
+    }
+
+    [Fact]
+    public void KatanaMkIIAmpVolumeReply_ParsesSingleByteValue()
+    {
+        var reply = new SysExMessage([0xF0, 0x41, 0x00, 0x00, 0x00, 0x00, 0x33, 0x12, 0x00, 0x00, 0x04, 0x23, 0x32, 0x27, 0xF7]);
+
+        var parsed = KatanaMkIIProtocol.TryParseCurrentAmpVolumeReply(reply, out var volume);
+
+        Assert.True(parsed);
+        Assert.Equal(50, volume);
+    }
 }

@@ -59,6 +59,12 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     public partial string IdentityReply { get; set; } = "Identity request has not been run yet.";
 
+    [ObservableProperty]
+    public partial int AmpVolume { get; set; } = 50;
+
+    [ObservableProperty]
+    public partial string AmpVolumeStatus { get; set; } = "Amp volume has not been read yet.";
+
     [RelayCommand]
     private async Task ScanAsync()
     {
@@ -232,6 +238,90 @@ public partial class MainWindowViewModel : ViewModelBase
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
         }
+    }
+
+    [RelayCommand]
+    private async Task ReadAmpVolumeAsync()
+    {
+        if (activeConnection is null)
+        {
+            StatusMessage = "Connect to a MIDI port before reading amp volume.";
+            return;
+        }
+
+        try
+        {
+            AppendLog("Requesting current Katana amp volume.");
+            var volume = await ReadCurrentAmpVolumeAsync(activeConnection);
+            StatusMessage = "Amp volume read successfully.";
+            AmpVolumeStatus = $"Amp volume is currently {volume}.";
+        }
+        catch (Exception ex)
+        {
+            AmpVolumeStatus = "Amp volume read failed.";
+            StatusMessage = ex.Message;
+            AppendLog("Amp volume read failed.");
+            AppendLog(ex.ToString());
+            Console.Error.WriteLine(ex);
+        }
+    }
+
+    [RelayCommand]
+    private async Task SetAmpVolumeAsync()
+    {
+        if (activeConnection is null)
+        {
+            StatusMessage = "Connect to a MIDI port before writing amp volume.";
+            return;
+        }
+
+        try
+        {
+            var requestedVolume = Math.Clamp(AmpVolume, 0, 100);
+            if (requestedVolume != AmpVolume)
+            {
+                AmpVolume = requestedVolume;
+                AppendLog($"Clamped requested amp volume to {requestedVolume}.");
+            }
+
+            AppendLog($"Sending Katana amp volume write for value {requestedVolume}.");
+            await activeConnection.SendAsync(KatanaMkIIProtocol.CreateCurrentAmpVolumeWriteRequest((byte)requestedVolume));
+
+            AppendLog("Reading amp volume back after write.");
+            var confirmedVolume = await ReadCurrentAmpVolumeAsync(activeConnection);
+
+            StatusMessage = confirmedVolume == requestedVolume
+                ? "Amp volume updated successfully."
+                : "Amp volume write completed, but the read-back value differed.";
+            AmpVolumeStatus = confirmedVolume == requestedVolume
+                ? $"Amp volume confirmed at {confirmedVolume}."
+                : $"Requested amp volume {requestedVolume}, but the amp reported {confirmedVolume}.";
+        }
+        catch (Exception ex)
+        {
+            AmpVolumeStatus = "Amp volume write failed.";
+            StatusMessage = ex.Message;
+            AppendLog("Amp volume write failed.");
+            AppendLog(ex.ToString());
+            Console.Error.WriteLine(ex);
+        }
+    }
+
+    private async Task<int> ReadCurrentAmpVolumeAsync(IMidiConnection connection)
+    {
+        var reply = await connection.RequestAsync(
+            KatanaMkIIProtocol.CreateCurrentAmpVolumeReadRequest(),
+            TimeSpan.FromSeconds(1.5));
+
+        AppendLog($"Amp volume reply: {reply.ToHexString()}");
+
+        if (!KatanaMkIIProtocol.TryParseCurrentAmpVolumeReply(reply, out var volume))
+        {
+            throw new InvalidOperationException("Amp volume reply did not match the expected Katana MKII format.");
+        }
+
+        AmpVolume = volume;
+        return volume;
     }
 
     private void AppendLog(string message)
