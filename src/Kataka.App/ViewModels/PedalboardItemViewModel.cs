@@ -28,9 +28,16 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
     public PanelEffectViewModel? PanelEffect { get; init; }
 
     // Computed type helpers for conditional rendering.
-    public bool IsPedalFx => string.Equals(Key, "pedal-fx", StringComparison.Ordinal);
+    public bool IsPedalFx    => string.Equals(Key, "pedal-fx", StringComparison.Ordinal);
     public bool IsPanelEffect => PanelEffect is not null;
     public bool IsRegularPedal => !IsEndpoint && !IsAmp;
+
+    // Per-family flags for binding IsVisible in pedal-type-specific views.
+    public bool IsBooster => Family is "booster";
+    public bool IsMod     => Family is "mod";
+    public bool IsFx      => Family is "fx";
+    public bool IsDelay   => Family is "delay" or "delay2";
+    public bool IsReverb  => Family is "reverb";
 
     // Visual family: "boost", "mod", "fx", "delay", "reverb", "pedal", "amp", "io"
     public string Family { get; init; } = "io";
