@@ -24,8 +24,8 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
 
     public bool CanToggle { get; init; }
 
-    // For effect items in the chain, points to the live PanelEffectViewModel with controls.
-    public PanelEffectViewModel? PanelEffect { get; init; }
+    // For effect items in the chain, points to the live PedalViewModel with controls.
+    public PedalViewModel? PanelEffect { get; init; }
 
     // Computed type helpers for conditional rendering.
     public bool IsPedalFx    => string.Equals(Key, "pedal-fx", StringComparison.Ordinal);
@@ -38,6 +38,13 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
     public bool IsFx      => Family is "fx";
     public bool IsDelay   => Family is "delay" or "delay2";
     public bool IsReverb  => Family is "reverb";
+
+    // Typed ViewModel accessors — each pedal view's DataContext is bound to its specific type.
+    public BoosterPedalViewModel? BoosterPedal => PanelEffect as BoosterPedalViewModel;
+    public ModPedalViewModel?     ModPedal     => PanelEffect as ModPedalViewModel;
+    public FxPedalViewModel?      FxPedal      => PanelEffect as FxPedalViewModel;
+    public DelayPedalViewModel?   DelayPedal   => PanelEffect as DelayPedalViewModel;
+    public ReverbPedalViewModel?  ReverbPedal  => PanelEffect as ReverbPedalViewModel;
 
     // Visual family: "boost", "mod", "fx", "delay", "reverb", "pedal", "amp", "io"
     public string Family { get; init; } = "io";

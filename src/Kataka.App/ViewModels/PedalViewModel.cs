@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Kataka.App.ViewModels;
 
-public partial class PanelEffectViewModel : ViewModelBase
+public partial class PedalViewModel : ViewModelBase
 {
     private static readonly IBrush OffVariationBrush = new SolidColorBrush(Color.Parse("#35383f"));
     private static readonly IBrush GreenVariationBrush = new SolidColorBrush(Color.Parse("#91ff92"));
@@ -18,7 +18,7 @@ public partial class PanelEffectViewModel : ViewModelBase
     // Bidirectional map: display string → wire byte value.
     private readonly Dictionary<string, byte> _typeValueByOption = [];
 
-    public PanelEffectViewModel(KatanaPanelEffectDefinition definition)
+    public PedalViewModel(KatanaPanelEffectDefinition definition)
     {
         Definition = definition;
 

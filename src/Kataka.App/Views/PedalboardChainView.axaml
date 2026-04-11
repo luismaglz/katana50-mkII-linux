@@ -15,7 +15,7 @@
 
             <ScrollViewer HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Disabled">
-                <ItemsControl ItemsSource="{Binding PedalboardItems}">
+                <ItemsControl ItemsSource="{Binding Pedalboard.PedalboardItems}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" />
@@ -76,7 +76,7 @@
                                 <!-- Regular pedal stompbox card -->
                                 <Button IsVisible="{Binding IsRegularPedal}"
                                         Padding="0" Background="Transparent" BorderThickness="0"
-                                        Command="{Binding $parent[UserControl].((vm:MainWindowViewModel)DataContext).SelectPedalboardItemCommand}"
+                                        Command="{Binding $parent[UserControl].((vm:MainWindowViewModel)DataContext).Pedalboard.SelectPedalboardItemCommand}"
                                         CommandParameter="{Binding Key}">
                                     <Border CornerRadius="6" Padding="0"
                                             MinWidth="110" MaxWidth="130"
@@ -109,7 +109,7 @@
                                                               HorizontalAlignment="Center"
                                                               Content="ON / OFF"
                                                               IsChecked="{Binding IsActive, Mode=OneWay}"
-                                                              Command="{Binding $parent[UserControl].((vm:MainWindowViewModel)DataContext).TogglePedalboardItemCommand}"
+                                                              Command="{Binding $parent[UserControl].((vm:MainWindowViewModel)DataContext).Pedalboard.TogglePedalboardItemCommand}"
                                                               CommandParameter="{Binding Key}"
                                                               FontSize="10" Padding="8,4" />
                                             </StackPanel>
