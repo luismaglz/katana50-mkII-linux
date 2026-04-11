@@ -46,7 +46,13 @@ internal sealed class AmidiConnection(string inputPortId, string outputPortId) :
                 throw new TimeoutException("No SysEx reply was received before the timeout elapsed.");
             }
 
-            return new SysExMessage(responseBytes);
+            var messages = SplitSysExMessages(responseBytes);
+            if (messages.Count == 0)
+            {
+                throw new InvalidOperationException("amidi returned data, but no complete SysEx frame could be extracted.");
+            }
+
+            return new SysExMessage(messages[^1]);
         }
         finally
         {
@@ -98,5 +104,36 @@ internal sealed class AmidiConnection(string inputPortId, string outputPortId) :
     private static string Quote(string value)
     {
         return $"\"{value.Replace("\"", "\\\"", StringComparison.Ordinal)}\"";
+    }
+
+    private static List<byte[]> SplitSysExMessages(byte[] bytes)
+    {
+        var messages = new List<byte[]>();
+
+        for (var index = 0; index < bytes.Length; index++)
+        {
+            if (bytes[index] != 0xF0)
+            {
+                continue;
+            }
+
+            var start = index;
+            while (index < bytes.Length && bytes[index] != 0xF7)
+            {
+                index++;
+            }
+
+            if (index >= bytes.Length)
+            {
+                break;
+            }
+
+            var length = index - start + 1;
+            var message = new byte[length];
+            Array.Copy(bytes, start, message, 0, length);
+            messages.Add(message);
+        }
+
+        return messages;
     }
 }

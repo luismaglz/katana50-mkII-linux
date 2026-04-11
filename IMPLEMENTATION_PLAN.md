@@ -50,12 +50,12 @@ The first slice should prove the architecture against real hardware on Linux:
 | DryWetMIDI adapter | Done | Kept as a non-Linux backend option; Linux no longer depends on its missing native library |
 | SysEx core port | Done | Generic Roland/Boss checksum, identity, and frame builder helpers added |
 | Connection vertical slice | Done | Quick-test UI now scans, auto-selects Katana-style ports, opens the selected MIDI pair, and exposes a Request identity action |
-| First Katana parameter slice | Done | Added current amp volume read/write in the quick-test UI using the Katana MKII current-panel address, with read-back after writes |
+| First Katana parameter slice | Done | Added Katana volume pedal read/write in the quick-test UI on MIDI 1 using the working `60 00 06 33` address, with read-back after writes |
 | Fixture tests | Done | Protocol helper tests are in place and passing |
 | Hardware smoke test | Done | On this Linux machine the app enumerated KATANA MIDI 1/2/3 via `amidi`, auto-selected the ports, and Connect succeeded |
 
 ## Current next test point
 
-Run the app, click **Scan MIDI ports**, click **Connect**, then click **Request identity**. After that, click **Read amp volume**, move the slider, and click **Write amp volume**. The app now reads back the current amp volume after each write so we can verify the Katana MKII parameter path instead of trusting a blind send. The expected identity reply already observed from the shell on this machine is:
+Run the app, click **Scan MIDI ports**, leave the auto-selected `KATANA MIDI 1` pair in place, click **Connect**, then click **Request identity**. After that, click **Read volume pedal**, move the slider a small amount, and click **Write volume pedal**. The app now reads back the Katana volume pedal level after each write so we can verify the MKII parameter path instead of trusting a blind send. The expected identity reply already observed from the shell on this machine is:
 
 `F0 7E 00 06 02 41 33 03 00 00 05 00 00 00 F7`

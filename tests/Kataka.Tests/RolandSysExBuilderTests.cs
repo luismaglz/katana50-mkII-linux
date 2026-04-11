@@ -29,21 +29,21 @@ public sealed class RolandSysExBuilderTests
     }
 
     [Fact]
-    public void KatanaMkIIAmpVolumeReadRequest_UsesExpectedAddressAndChecksum()
+    public void KatanaMkIIVolumePedalReadRequest_UsesExpectedAddressAndChecksum()
     {
-        var request = KatanaMkIIProtocol.CreateCurrentAmpVolumeReadRequest();
+        var request = KatanaMkIIProtocol.CreateVolumePedalReadRequest();
 
         Assert.Equal(
-            [0xF0, 0x41, 0x00, 0x00, 0x00, 0x00, 0x33, 0x11, 0x00, 0x00, 0x04, 0x23, 0x00, 0x00, 0x00, 0x01, 0x58, 0xF7],
+            [0xF0, 0x41, 0x00, 0x00, 0x00, 0x00, 0x33, 0x11, 0x60, 0x00, 0x06, 0x33, 0x00, 0x00, 0x00, 0x01, 0x66, 0xF7],
             request.Bytes);
     }
 
     [Fact]
-    public void KatanaMkIIAmpVolumeReply_ParsesSingleByteValue()
+    public void KatanaMkIIVolumePedalReply_ParsesSingleByteValue()
     {
-        var reply = new SysExMessage([0xF0, 0x41, 0x00, 0x00, 0x00, 0x00, 0x33, 0x12, 0x00, 0x00, 0x04, 0x23, 0x32, 0x27, 0xF7]);
+        var reply = new SysExMessage([0xF0, 0x41, 0x00, 0x00, 0x00, 0x00, 0x33, 0x12, 0x60, 0x00, 0x06, 0x33, 0x32, 0x35, 0xF7]);
 
-        var parsed = KatanaMkIIProtocol.TryParseCurrentAmpVolumeReply(reply, out var volume);
+        var parsed = KatanaMkIIProtocol.TryParseVolumePedalReply(reply, out var volume);
 
         Assert.True(parsed);
         Assert.Equal(50, volume);

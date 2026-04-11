@@ -80,7 +80,7 @@
                 BorderBrush="{DynamicResource ThemeBorderMidBrush}"
                 BorderThickness="1">
             <StackPanel Spacing="8">
-                <TextBlock Text="Current amp volume"
+                <TextBlock Text="Volume pedal level"
                            FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="12">
                     <Slider Width="280"
@@ -90,9 +90,9 @@
                             Value="{Binding AmpVolume}" />
                     <TextBlock VerticalAlignment="Center"
                                Text="{Binding AmpVolume}" />
-                    <Button Content="Read amp volume"
+                    <Button Content="Read volume pedal"
                             Command="{Binding ReadAmpVolumeCommand}" />
-                    <Button Content="Write amp volume"
+                    <Button Content="Write volume pedal"
                             Command="{Binding SetAmpVolumeCommand}" />
                 </StackPanel>
                 <TextBlock Text="{Binding AmpVolumeStatus}"
@@ -110,7 +110,7 @@
 
         <TextBlock Grid.Row="7"
                    Grid.ColumnSpan="2"
-                   Text="Current quick-test rule: detect Katana by matching MIDI input/output port names containing 'Katana', open the selected MIDI pair, request a standard MIDI identity reply, then read and write current amp volume with a read-back confirmation."
+                   Text="Current quick-test rule: detect Katana by matching MIDI input/output port names containing 'Katana', open the selected MIDI pair, request a standard MIDI identity reply, then read and write the Katana volume pedal level with a read-back confirmation."
                     Opacity="0.75"
                      TextWrapping="Wrap" />
 
