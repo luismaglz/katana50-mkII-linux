@@ -57,6 +57,13 @@ public partial class PanelEffectViewModel : ViewModelBase
     [ObservableProperty]
     public partial string SelectedTypeOption { get; set; } = "N/A";
 
+    // Level knob value (0-100). 0 means "not set / tracking" when the level
+    // parameter minimum is effectively −1 on the amp firmware.
+    [ObservableProperty]
+    public partial int Level { get; set; } = 0;
+
+    public bool HasLevel => Definition.LevelParameter is not null;
+
     public IBrush VariationBrush => Variation switch
     {
         "Green" => GreenVariationBrush,
