@@ -38,6 +38,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private bool suppressChangeTracking;
     private int activeReadSyncPhase;
     private bool suspendActiveReadSync;
+    private bool isShuttingDown;
     private string? pendingPanelChannel;
 
     public MainWindowViewModel()
@@ -970,6 +971,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void RefreshPedalboard()
     {
+        if (isShuttingDown) return;
         var items = new List<PedalboardItemViewModel>
         {
             new()
@@ -1181,9 +1183,17 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+    /// <summary>Call when the main window is closing to stop all background timers immediately.</summary>
+    public void Shutdown()
+    {
+        isShuttingDown = true;
+        writeSyncTimer.Stop();
+        readSyncTimer.Stop();
+    }
+
     private async Task FlushPendingWritesAsync()
     {
-        if (!ActiveWriteSync || !IsConnected)
+        if (isShuttingDown || !ActiveWriteSync || !IsConnected)
         {
             return;
         }
@@ -1298,7 +1308,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task RunActiveReadSyncCycleAsync()
     {
-        if (!ShouldRunActiveReadSync())
+        if (isShuttingDown || !ShouldRunActiveReadSync())
         {
             return;
         }
