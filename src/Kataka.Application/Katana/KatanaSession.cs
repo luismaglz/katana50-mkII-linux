@@ -112,6 +112,39 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         return await ReadParameterAsync(parameter, cancellationToken);
     }
 
+    public async Task<byte[]> ReadBlockAsync(
+        IReadOnlyList<byte> address,
+        int length,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(address);
+
+        var reply = await RequireConnection().RequestAsync(
+            KatanaMkIIProtocol.CreateDataReadRequest(address, length),
+            DefaultRequestTimeout,
+            cancellationToken);
+
+        if (!KatanaMkIIProtocol.TryParseParameterBlockReply(address, length, reply, out var data))
+        {
+            throw new InvalidOperationException("A Katana data block reply did not match the expected MKII format.");
+        }
+
+        return data;
+    }
+
+    public Task WriteBlockAsync(
+        IReadOnlyList<byte> address,
+        IReadOnlyList<byte> data,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(address);
+        ArgumentNullException.ThrowIfNull(data);
+
+        return RequireConnection().SendAsync(
+            KatanaMkIIProtocol.CreateDataWriteRequest(address, data),
+            cancellationToken);
+    }
+
     public async ValueTask DisposeAsync()
     {
         await DisconnectAsync();
