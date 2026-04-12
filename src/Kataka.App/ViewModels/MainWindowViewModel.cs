@@ -128,7 +128,7 @@ public partial class MainWindowViewModel : ViewModelBase
             PanelChannelOptions.Add(new PanelChannelOptionViewModel(channel));
         }
 
-        Pedalboard = new PedalboardViewModel(panelEffectsByDefinitionKey, PedalFx, () => SelectedPanelChannel);
+        Pedalboard = new PedalboardViewModel(panelEffectsByDefinitionKey, () => SelectedPanelChannel);
         Pedalboard.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName != nameof(PedalboardViewModel.SelectedChainPattern)) return;

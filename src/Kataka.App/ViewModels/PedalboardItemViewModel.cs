@@ -1,20 +1,14 @@
 using System;
-using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Kataka.App.ViewModels;
 
-public sealed partial class PedalboardItemViewModel : ObservableObject
+public sealed class PedalboardItemViewModel
 {
     public string Key { get; init; } = string.Empty;
-
-    [ObservableProperty]
-    private bool isSelected;
 
     public string DisplayName { get; init; } = string.Empty;
 
     public string Detail { get; init; } = string.Empty;
-
-    public bool IsActive { get; init; }
 
     public bool IsEndpoint { get; init; }
 
@@ -22,15 +16,8 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
 
     public bool IsConnectedFromPrevious { get; init; }
 
-    public bool CanToggle { get; init; }
-
     // For effect items in the chain, points to the live PedalViewModel with controls.
     public IBasePedal? PanelEffect { get; init; }
-
-    // Computed type helpers for conditional rendering.
-    public bool IsPedalFx    => string.Equals(Key, "pedal-fx", StringComparison.Ordinal);
-    public bool IsPanelEffect => PanelEffect is not null;
-    public bool IsRegularPedal => !IsEndpoint && !IsAmp;
 
     // Per-family flags for binding IsVisible in pedal-type-specific views.
     public bool IsBooster => Family is "booster";
@@ -46,10 +33,10 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
     public DelayPedalViewModel?   DelayPedal   => PanelEffect as DelayPedalViewModel;
     public ReverbPedalViewModel?  ReverbPedal  => PanelEffect as ReverbPedalViewModel;
 
-    // Visual family: "boost", "mod", "fx", "delay", "reverb", "pedal", "amp", "io"
+    // Visual family: "boost", "mod", "fx", "delay", "delay2", "reverb", "amp", "io"
     public string Family { get; init; } = "io";
 
-    // Card accent color based on family (hex strings for Avalonia SolidColorBrush).
+    // Card accent color based on family.
     public string FamilyAccentColor => Family switch
     {
         "booster" => "#e8960a",  // amber
@@ -58,11 +45,7 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
         "delay"   => "#30cfc0",  // cyan
         "delay2"  => "#30cfc0",
         "reverb"  => "#a86fcb",  // purple
-        "pedal"   => "#e85c1a",  // orange
         "amp"     => "#c0392b",  // red
         _         => "#607080",  // slate for input/output
     };
-
-    // LED glow color when active.
-    public string LedColor => IsActive ? FamilyAccentColor : "#35383f";
 }
