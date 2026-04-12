@@ -55,18 +55,22 @@
                 <!-- Row 1: Feedback, HiCut, E.Level, D.Mix -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <controls:RotaryKnob Scale="0.6" Label="FEEDBACK"
+                                         Description="Adjusts the volume returned to the input. Higher values increase the number of delay repeats."
                                          Minimum="0" Maximum="100"
                                          Value="{Binding Feedback}"
                                          LabelFontSize="12" />
                     <controls:RotaryKnob Scale="0.6" Label="HI CUT"
+                                         Description="Sets the frequency at which the high cut filter takes effect. At maximum (FLAT), the filter has no effect."
                                          Minimum="0" Maximum="14"
                                          Value="{Binding HighCut}"
                                          LabelFontSize="12" />
                     <controls:RotaryKnob Scale="0.6" Label="E.LEVEL"
+                                         Description="Adjusts the volume of the delay (effect) sound."
                                          Minimum="0" Maximum="120"
                                          Value="{Binding EffectLevel}"
                                          LabelFontSize="12" />
                     <controls:RotaryKnob Scale="0.6" Label="D.MIX"
+                                         Description="Adjusts the volume of the direct (dry) sound."
                                          Minimum="0" Maximum="100"
                                          Value="{Binding DirectMix}"
                                          LabelFontSize="12" />
@@ -75,14 +79,17 @@
                 <!-- Row 2: TapTime, ModRate, ModDepth -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <controls:RotaryKnob Scale="0.6" Label="TAP TIME"
+                                         Description="Adjusts the delay time of the right channel relative to the left channel (100%). Only active when TYPE is PAN."
                                          Minimum="0" Maximum="100"
                                          Value="{Binding TapTime}"
                                          LabelFontSize="12" />
                     <controls:RotaryKnob Scale="0.6" Label="MOD RATE"
+                                         Description="Adjusts the modulation rate of the delay sound. Only active when TYPE is MODULATE or SDE-3000."
                                          Minimum="0" Maximum="100"
                                          Value="{Binding ModRate}"
                                          LabelFontSize="12" />
                     <controls:RotaryKnob Scale="0.6" Label="MOD DEPTH"
+                                         Description="Adjusts the modulation depth of the delay sound. Only active when TYPE is MODULATE or SDE-3000."
                                          Minimum="0" Maximum="100"
                                          Value="{Binding ModDepth}"
                                          LabelFontSize="12" />
