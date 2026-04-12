@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kataka.App.ViewModels"
+             x:Class="Kataka.App.Controls.PedalHeaderControl"
+             x:DataType="vm:PedalViewModel">
+
+    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+
+        <!-- LED indicator -->
+        <Panel Width="12" Height="12" VerticalAlignment="Center">
+            <Border Width="12" Height="12" CornerRadius="6"
+                    Background="#00e676"
+                    IsVisible="{Binding IsEnabled}" />
+            <Border Width="12" Height="12" CornerRadius="6"
+                    Background="#333"
+                    IsVisible="{Binding !IsEnabled}" />
+        </Panel>
+
+        <!-- Name + ON/OFF toggle -->
+        <ToggleButton Grid.Column="1"
+                      Classes="effect-button"
+                      HorizontalAlignment="Stretch"
+                      Content="{Binding DisplayName}"
+                      IsChecked="{Binding IsEnabled}" />
+
+    </Grid>
+</UserControl>
