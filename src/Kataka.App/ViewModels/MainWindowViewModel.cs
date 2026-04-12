@@ -21,8 +21,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly Dictionary<string, string> inputPortIds = [];
     private readonly Dictionary<string, string> outputPortIds = [];
     private readonly Dictionary<string, AmpControlViewModel> ampControlsByKey = [];
-    private readonly Dictionary<string, PedalViewModel> panelEffectsByKey = [];
-    private readonly Dictionary<string, PedalViewModel> panelEffectsByDefinitionKey = [];
+    private readonly Dictionary<string, IBasePedal> panelEffectsByKey = [];
+    private readonly Dictionary<string, IBasePedal> panelEffectsByDefinitionKey = [];
     private readonly Dictionary<string, byte> pendingAmpWrites = [];
     private readonly Dictionary<string, bool> pendingPanelEffectWrites = [];
     private readonly Dictionary<string, byte> pendingPanelTypeWrites = [];
@@ -88,28 +88,27 @@ public partial class MainWindowViewModel : ViewModelBase
             ampControlsByKey[parameter.Key] = control;
         }
 
-        foreach (var effect in KatanaMkIIParameterCatalog.PanelEffects)
+        foreach (var effectViewModel in new IBasePedal[]
         {
-            var effectViewModel = effect.Key switch
-            {
-                "booster" => (PedalViewModel)new BoosterPedalViewModel(effect),
-                "mod"     => new ModPedalViewModel(effect),
-                "fx"      => new FxPedalViewModel(effect),
-                "delay"   => new DelayPedalViewModel(effect),
-                "reverb"  => new ReverbPedalViewModel(effect),
-                _         => new PedalViewModel(effect),
-            };
+            new BoosterPedalViewModel(),
+            new ModPedalViewModel(),
+            new FxPedalViewModel(),
+            new DelayPedalViewModel(),
+            new Delay2PedalViewModel(),
+            new ReverbPedalViewModel(),
+        })
+        {
             effectViewModel.PropertyChanged += (_, args) =>
             {
-                if (args.PropertyName == nameof(PedalViewModel.IsEnabled))
+                if (args.PropertyName == nameof(IBasePedal.IsEnabled))
                 {
                     TrackPanelEffectChange(effectViewModel);
                 }
-                else if (args.PropertyName == nameof(PedalViewModel.SelectedTypeOption))
+                else if (args.PropertyName == nameof(IBasePedal.SelectedTypeOption))
                 {
                     TrackPanelEffectTypeChange(effectViewModel);
                 }
-                else if (args.PropertyName == nameof(PedalViewModel.Level))
+                else if (args.PropertyName == nameof(IBasePedal.Level))
                 {
                     TrackPanelEffectLevelChange(effectViewModel);
                 }
@@ -118,17 +117,10 @@ public partial class MainWindowViewModel : ViewModelBase
             };
 
             PanelEffects.Add(effectViewModel);
-            panelEffectsByKey[effect.SwitchParameter.Key] = effectViewModel;
-            panelEffectsByDefinitionKey[effect.Key] = effectViewModel;
+            panelEffectsByKey[effectViewModel.Definition.SwitchParameter.Key] = effectViewModel;
+            panelEffectsByDefinitionKey[effectViewModel.Definition.Key] = effectViewModel;
 
-            foreach (var detailParam in effectViewModel.DetailParams)
-            {
-                detailParam.PropertyChanged += (_, args) =>
-                {
-                    if (args.PropertyName == nameof(EffectDetailParamViewModel.Value))
-                        TrackDetailParamChange(detailParam);
-                };
-            }
+            effectViewModel.ParameterChanged += (_, args) => TrackDetailParamChange(args.Key, args.Value);
         }
 
         foreach (var channel in PanelChannels)
@@ -192,7 +184,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<AmpControlViewModel> AmpControls { get; } = [];
 
-    public ObservableCollection<PedalViewModel> PanelEffects { get; } = [];
+    public ObservableCollection<IBasePedal> PanelEffects { get; } = [];
 
     public ObservableCollection<PanelChannelOptionViewModel> PanelChannelOptions { get; } = [];
 
@@ -954,7 +946,7 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateWriteSyncTimer();
     }
 
-    private void TrackPanelEffectChange(PedalViewModel effect)
+    private void TrackPanelEffectChange(IBasePedal effect)
     {
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected)
         {
@@ -967,7 +959,7 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateWriteSyncTimer();
     }
 
-    private void TrackPanelEffectTypeChange(PedalViewModel effect)
+    private void TrackPanelEffectTypeChange(IBasePedal effect)
     {
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected || effect.Definition.TypeParameter is null)
         {
@@ -985,7 +977,7 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateWriteSyncTimer();
     }
 
-    private void TrackPanelEffectLevelChange(PedalViewModel effect)
+    private void TrackPanelEffectLevelChange(IBasePedal effect)
     {
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected || effect.Definition.LevelParameter is null)
         {
@@ -998,15 +990,15 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateWriteSyncTimer();
     }
 
-    private void TrackDetailParamChange(EffectDetailParamViewModel param)
+    private void TrackDetailParamChange(string key, int value)
     {
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected)
         {
             return;
         }
 
-        pendingDetailParamWrites[param.Definition.Key] = (byte)Math.Clamp(param.Value, param.Minimum, param.Maximum);
-        AppendLog($"Queued detail param sync: {param.Label} -> {param.Value}.");
+        pendingDetailParamWrites[key] = (byte)Math.Clamp(value, 0, 127);
+        AppendLog($"Queued detail param sync: {key} -> {value}.");
         PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
     }
@@ -1359,14 +1351,15 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        // Build a lookup: definition key -> EffectDetailParamViewModel
-        var allDetailParams = PanelEffects
-            .SelectMany(e => e.DetailParams)
-            .ToDictionary(p => p.Definition.Key, StringComparer.Ordinal);
+        // Build a lookup: definition key -> KatanaParameterDefinition from all sync parameters
+        var allDefinitions = PanelEffects
+            .SelectMany(e => e.GetSyncParameters())
+            .GroupBy(p => p.Key, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
 
         var orderedParameters = detailWrites.Keys
-            .Where(allDetailParams.ContainsKey)
-            .Select(k => allDetailParams[k].Definition)
+            .Where(allDefinitions.ContainsKey)
+            .Select(k => allDefinitions[k])
             .OrderBy(p => p.Address[0])
             .ThenBy(p => p.Address[1])
             .ThenBy(p => p.Address[2])
@@ -1719,17 +1712,7 @@ public partial class MainWindowViewModel : ViewModelBase
             }
 
             var parameterList = PanelEffects
-                .Select(effect => effect.Definition.SwitchParameter)
-                .Concat(PanelEffects
-                    .Where(effect => effect.Definition.VariationParameter is not null)
-                    .Select(effect => effect.Definition.VariationParameter!))
-                .Concat(PanelEffects
-                    .Where(effect => effect.Definition.TypeParameter is not null)
-                    .Select(effect => effect.Definition.TypeParameter!))
-                .Concat(PanelEffects
-                    .Where(effect => effect.Definition.LevelParameter is not null)
-                    .Select(effect => effect.Definition.LevelParameter!))
-                .Concat(PanelEffects.SelectMany(e => e.DetailParams).Select(p => p.Definition))
+                .SelectMany(e => e.GetSyncParameters())
                 .Append(KatanaMkIIParameterCatalog.AmpType)
                 .Append(KatanaMkIIParameterCatalog.CabinetResonance)
                 .Append(KatanaMkIIParameterCatalog.ChainPattern)
@@ -1739,25 +1722,10 @@ public partial class MainWindowViewModel : ViewModelBase
             suppressChangeTracking = true;
             try
             {
+                var intValues = values.ToDictionary(kvp => kvp.Key, kvp => (int)kvp.Value, StringComparer.Ordinal);
                 foreach (var effect in PanelEffects)
                 {
-                    effect.IsEnabled = values[effect.Definition.SwitchParameter.Key] != 0;
-                    effect.Variation = effect.Definition.VariationParameter is null
-                        ? "N/A"
-                        : ToVariationDisplay(values[effect.Definition.VariationParameter.Key]);
-                    effect.SelectedTypeOption = effect.Definition.TypeParameter is null
-                        ? "N/A"
-                        : effect.ToTypeOption(values[effect.Definition.TypeParameter.Key]);
-                    if (effect.HasLevel && effect.Definition.LevelParameter is not null &&
-                        values.TryGetValue(effect.Definition.LevelParameter.Key, out var levelValue))
-                    {
-                        effect.Level = levelValue;
-                    }
-                    foreach (var detailParam in effect.DetailParams)
-                    {
-                        if (values.TryGetValue(detailParam.Definition.Key, out var detailValue))
-                            detailParam.Value = Math.Clamp(detailValue, detailParam.Minimum, detailParam.Maximum);
-                    }
+                    effect.ApplyAmpValues(intValues);
                     AppendLog($"{effect.DisplayName}: {(effect.IsEnabled ? "On" : "Off")} / {effect.Variation} / {effect.TypeCaption}");
                 }
 

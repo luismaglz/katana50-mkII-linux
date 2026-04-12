@@ -26,7 +26,7 @@
                 <!-- On/Off toggle + LED -->
                 <controls:PedalHeaderControl />
                 <!-- Type selector -->
-                <StackPanel Spacing="4" IsVisible="{Binding HasTypeOptions}">
+                <StackPanel Spacing="4">
                     <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
                                Foreground="#907030" />
                     <ComboBox Classes="midi-port-picker"
@@ -45,36 +45,35 @@
                 <controls:RotaryKnob Scale="0.6" Label="LEVEL"
                                      Minimum="0" Maximum="100"
                                      Value="{Binding Level}"
-                                     IsVisible="{Binding HasLevel}"
                                      HorizontalAlignment="Center" />
-                <!-- Detail parameter knobs -->
-                <ItemsControl ItemsSource="{Binding DetailParams}"
-                              IsVisible="{Binding HasDetailParams}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:EffectDetailParamViewModel">
-                            <Panel>
-                                <controls:RotaryKnob Scale="0.6" Label="{Binding Label}"
-                                                     Minimum="{Binding Minimum}"
-                                                     Maximum="{Binding Maximum}"
-                                                     Value="{Binding Value}"
-                                                     IsVisible="{Binding !IsToggle}" />
-                                <Border IsVisible="{Binding IsToggle}"
-                                        Width="70" Height="94" Padding="8">
-                                    <ToggleButton Classes="effect-button"
-                                                  HorizontalAlignment="Stretch"
-                                                  VerticalAlignment="Center"
-                                                  Content="{Binding Label}"
-                                                  IsChecked="{Binding IsOn}" />
-                                </Border>
-                            </Panel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <!-- Booster controls -->
+                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <controls:RotaryKnob Scale="0.6" Label="DRIVE"
+                                         Minimum="0" Maximum="120"
+                                         Value="{Binding Drive}" />
+                    <controls:RotaryKnob Scale="0.6" Label="TONE"
+                                         Minimum="0" Maximum="127"
+                                         Value="{Binding Tone}" />
+                    <controls:RotaryKnob Scale="0.6" Label="BOTTOM"
+                                         Minimum="0" Maximum="127"
+                                         Value="{Binding Bottom}" />
+                    <controls:RotaryKnob Scale="0.6" Label="E.LEVEL"
+                                         Minimum="0" Maximum="127"
+                                         Value="{Binding EffectLevel}" />
+                    <Border Width="70" Height="94" Padding="8">
+                        <ToggleButton Classes="effect-button"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Center"
+                                      Content="SOLO"
+                                      IsChecked="{Binding SoloSw}" />
+                    </Border>
+                    <controls:RotaryKnob Scale="0.6" Label="SOLO LVL"
+                                         Minimum="0" Maximum="127"
+                                         Value="{Binding SoloLevel}" />
+                    <controls:RotaryKnob Scale="0.6" Label="D.MIX"
+                                         Minimum="0" Maximum="127"
+                                         Value="{Binding DirectMix}" />
+                </WrapPanel>
             </StackPanel>
         </StackPanel>
     </Border>
