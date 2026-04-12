@@ -2,14 +2,13 @@ namespace Kataka.Domain.Midi;
 
 /// <summary>
 /// Type name lookup tables for Katana MK2 effect type parameters.
-/// Based on the Katana MK2 FloorBoard source (stompbox_*.cpp) and BTS manual.
+/// Source: BOSS TONE STUDIO for KATANA MkII app (layout.div select-box option lists).
 /// Keys are wire byte values; values are human-readable display names.
 /// Byte values not present in a table fall back to "Type N" formatting.
 /// </summary>
 public static class KatanaTypeNameTables
 {
-    // Source: stompbox_od.cpp stack field ordering + BTS manual booster section.
-    // Max 22, skip { 7 }. Default = 10 (TURBO OD).
+    // Source: BTS booster-type-select-box. Sequential, no skips. Max 22.
     public static IReadOnlyDictionary<byte, string> BoosterTypes { get; } =
         new Dictionary<byte, string>
         {
@@ -18,105 +17,89 @@ public static class KatanaTypeNameTables
             [2]  = "MID BOOST",
             [3]  = "CRUNCH OD",
             [4]  = "BLUES DRIVE",
-            [5]  = "NATURAL OD",
-            [6]  = "OD-1",
-            // 7 skipped
-            [8]  = "OD-2",
+            [5]  = "OVERDRIVE",
+            [6]  = "NATURAL OD",
+            [7]  = "WARM OD",
+            [8]  = "TURBO OD",
             [9]  = "T-SCREAM",
-            [10] = "TURBO OD",
-            [11] = "BLUESMAN OD",
-            [12] = "HARMONIOUS OD",
-            [13] = "LEAD DS",
-            [14] = "METAL DS",
-            [15] = "DIST ST",
-            [16] = "MID DIST",
-            [17] = "\'60S FUZZ",
-            [18] = "OCTAVE FUZZ",
-            [19] = "MUFF FUZZ",
-            [20] = "OCT FUZZ",
-            [21] = "BASS DS",
-            [22] = "GUITAR SYNTH",
+            [10] = "DISTORTION",
+            [11] = "FAT DS",
+            [12] = "DST+",
+            [13] = "GUV DS",
+            [14] = "RAT",
+            [15] = "METAL ZONE",
+            [16] = "METAL DS",
+            [17] = "'60S FUZZ",
+            [18] = "MUFF FUZZ",
+            [19] = "OCT FUZZ",
+            [20] = "HM-2",
+            [21] = "METAL CORE",
+            [22] = "CENTA OD",
         };
 
-    // Source: stompbox_fx1.cpp // comments in stack field order.
-    // Max 39, skips { 5, 8, 11, 13, 17, 24, 30, 32, 33, 34 }. Default = 29 (ROTARY).
-    // Note: exact mapping of types 16, 19-22, 27 was not determinable from source
-    // alone; these fall through to "Type N" fallback until hardware-verified.
+    // Source: BTS modfx-fx-type-select-box (shared for Mod and FX). Sequential, no skips. Max 30.
     public static IReadOnlyDictionary<byte, string> ModFxTypes { get; } =
         new Dictionary<byte, string>
         {
-            [0]  = "T-Wah",
-            [1]  = "Auto Wah",
-            [2]  = "Sub Wah",
-            [3]  = "Compressor",
-            [4]  = "Limiter",
-            // 5 skipped
-            [6]  = "Graphic EQ",
-            [7]  = "Parametric EQ",
-            // 8 skipped
-            [9]  = "Guitar Sim",
-            [10] = "Slow Gear",
-            // 11 skipped
-            [12] = "Wave Synth",
-            // 13 skipped
-            [14] = "Octaver",
-            [15] = "Pitch Shifter",
-            // 16 = unknown — hardware-verify
-            // 17 skipped
-            [18] = "Harmonizer",
-            // 19-22 = unknown — hardware-verify
-            [23] = "Acoustic Guitar Processor",
-            // 24 skipped
-            [25] = "Phaser",
-            [26] = "Flanger",
-            // 27 = unknown — hardware-verify
-            [28] = "Tremolo",
-            [29] = "Rotary",
-            // 30 skipped
-            [31] = "Uni-V",
-            // 32, 33, 34 skipped
-            [35] = "Slicer",
-            [36] = "Vibrato",
-            [37] = "Ring Modulator",
-            [38] = "Humanizer",
-            [39] = "2CE",
+            [0]  = "CHORUS",
+            [1]  = "FLANGER",
+            [2]  = "PHASER",
+            [3]  = "UNI-V",
+            [4]  = "TREMOLO",
+            [5]  = "VIBRATO",
+            [6]  = "ROTARY",
+            [7]  = "RING MOD",
+            [8]  = "SLOW GEAR",
+            [9]  = "SLICER",
+            [10] = "COMP",
+            [11] = "LIMITER",
+            [12] = "T.WAH",
+            [13] = "AUTO WAH",
+            [14] = "PEDAL WAH",
+            [15] = "GRAPHIC EQ",
+            [16] = "PARAMETRIC EQ",
+            [17] = "GUITAR SIM",
+            [18] = "AC.GUITAR SIM",
+            [19] = "AC.PROCESSOR",
+            [20] = "WAVE SYNTH",
+            [21] = "OCTAVE",
+            [22] = "HEAVY OCTAVE",
+            [23] = "PITCH SHIFTER",
+            [24] = "HARMONIST",
+            [25] = "HUMANIZER",
+            [26] = "PHASER 90E",
+            [27] = "FLANGER 117E",
+            [28] = "WAH 95E",
+            [29] = "DC-30",
+            [30] = "PEDAL BEND",
         };
 
-    // Source: stompbox_dd.cpp // comments in stack field order.
-    // Max 10, no skips.
+    // Source: BTS delay-delay1-type-select-box. Sequential, no skips. Max 7.
     public static IReadOnlyDictionary<byte, string> DelayTypes { get; } =
         new Dictionary<byte, string>
         {
-            [0]  = "SINGLE",
-            [1]  = "PAN",
-            [2]  = "STEREO",
-            [3]  = "DUAL SERIES",
-            [4]  = "DUAL PARALLEL",
-            [5]  = "DUAL L/R",
-            [6]  = "REVERSE",
-            [7]  = "ANALOG",
-            [8]  = "TAPE",
-            [9]  = "MODULATE",
-            [10] = "SDE-3000",
+            [0] = "DIGITAL",
+            [1] = "PAN",
+            [2] = "STEREO",
+            [3] = "ANALOG",
+            [4] = "TAPE ECHO",
+            [5] = "REVERSE",
+            [6] = "MODULATE",
+            [7] = "SDE-3000",
         };
 
-    // Source: BTS manual reverb section + stompbox_rv.cpp structure.
-    // Max 6, no skips. Default = 4 (PLATE).
+    // Source: BTS reverb-type-select-box. Sequential, no skips. Max 4.
     public static IReadOnlyDictionary<byte, string> ReverbTypes { get; } =
         new Dictionary<byte, string>
         {
-            [0] = "AMBIENCE",
+            [0] = "PLATE",
             [1] = "ROOM",
-            [2] = "HALL 1",
-            [3] = "HALL 2",
-            [4] = "PLATE",
-            [5] = "SPRING",
-            [6] = "MODULATE",
+            [2] = "HALL",
+            [3] = "SPRING",
+            [4] = "MODULATE",
         };
 
-    // Source: BTS manual pedal wah section (AllParams.cpp: Strings::PedalWahTypes).
-    // Max 5, no skips. Used for Pedal FX Wah subtype and Mod/FX Sub Wah sub-control.
-    // Note: ordering is best-effort; verify on hardware.
+    // Source: BTS pedalwah-type-select-box. Sequential, no skips. Max 5.
     public static IReadOnlyDictionary<byte, string> PedalWahTypes { get; } =
         new Dictionary<byte, string>
         {
@@ -128,13 +111,13 @@ public static class KatanaTypeNameTables
             [5] = "RESO WAH",
         };
 
-    // Source: AllParams.cpp Strings::WahFxTypes for PRM_PEDAL_FX_TYPE (max 2, no skips).
+    // Source: BTS pedalfx-type-select-box first three entries (pedal expression types). Max 2.
     public static IReadOnlyDictionary<byte, string> PedalFxTypes { get; } =
         new Dictionary<byte, string>
         {
-            [0] = "WAH",
+            [0] = "PEDAL WAH",
             [1] = "PEDAL BEND",
-            [2] = "EVH WAH95",
+            [2] = "WAH 95E",
         };
 
     /// <summary>Returns the type name lookup table for a parameter key, or null if none.</summary>

@@ -34,37 +34,37 @@ public static class KatanaMkIIParameterCatalog
         new("panel-booster-switch", "Booster", [0x60, 0x00, 0x00, 0x10], maximum: 1);
 
     public static KatanaParameterDefinition BoosterType { get; } =
-        new("panel-booster-type", "Booster Type", [0x60, 0x00, 0x00, 0x11], maximum: 22, skippedValues: [0x07]);
+        new("panel-booster-type", "Booster Type", [0x60, 0x00, 0x00, 0x11], maximum: 22);
 
     public static KatanaParameterDefinition ModSwitch { get; } =
         new("panel-mod-switch", "Mod", [0x60, 0x00, 0x01, 0x00], maximum: 1);
 
     public static KatanaParameterDefinition ModType { get; } =
-        new("panel-mod-type", "Mod Type", [0x60, 0x00, 0x01, 0x01], maximum: 39, skippedValues: [0x05, 0x08, 0x0B, 0x0D, 0x11, 0x18, 0x1E, 0x20, 0x21, 0x22]);
+        new("panel-mod-type", "Mod Type", [0x60, 0x00, 0x01, 0x01], maximum: 30);
 
     public static KatanaParameterDefinition FxSwitch { get; } =
         new("panel-fx-switch", "FX", [0x60, 0x00, 0x03, 0x00], maximum: 1);
 
     public static KatanaParameterDefinition FxType { get; } =
-        new("panel-fx-type", "FX Type", [0x60, 0x00, 0x03, 0x01], maximum: 39, skippedValues: [0x05, 0x08, 0x0B, 0x0D, 0x11, 0x18, 0x1E, 0x20, 0x21, 0x22]);
+        new("panel-fx-type", "FX Type", [0x60, 0x00, 0x03, 0x01], maximum: 30);
 
     public static KatanaParameterDefinition DelaySwitch { get; } =
         new("panel-delay-switch", "Delay", [0x60, 0x00, 0x05, 0x00], maximum: 1);
 
     public static KatanaParameterDefinition DelayType { get; } =
-        new("panel-delay-type", "Delay Type", [0x60, 0x00, 0x05, 0x01], maximum: 10);
+        new("panel-delay-type", "Delay Type", [0x60, 0x00, 0x05, 0x01], maximum: 7);
 
     public static KatanaParameterDefinition Delay2Switch { get; } =
         new("panel-delay2-switch", "Delay 2", [0x60, 0x00, 0x05, 0x20], maximum: 1);
 
     public static KatanaParameterDefinition Delay2Type { get; } =
-        new("panel-delay2-type", "Delay 2 Type", [0x60, 0x00, 0x05, 0x21], maximum: 10);
+        new("panel-delay2-type", "Delay 2 Type", [0x60, 0x00, 0x05, 0x21], maximum: 7);
 
     public static KatanaParameterDefinition ReverbSwitch { get; } =
         new("panel-reverb-switch", "Reverb", [0x60, 0x00, 0x05, 0x40], maximum: 1);
 
     public static KatanaParameterDefinition ReverbType { get; } =
-        new("panel-reverb-type", "Reverb Type", [0x60, 0x00, 0x05, 0x41], maximum: 6);
+        new("panel-reverb-type", "Reverb Type", [0x60, 0x00, 0x05, 0x41], maximum: 4);
 
     public static KatanaParameterDefinition BoosterVariation { get; } =
         new("panel-booster-variation", "Booster Variation", [0x60, 0x00, 0x06, 0x39], maximum: 2);
