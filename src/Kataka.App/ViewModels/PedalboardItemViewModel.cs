@@ -44,7 +44,6 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
     public BoosterPedalViewModel? BoosterPedal => PanelEffect as BoosterPedalViewModel;
     public ModFxPedalViewModel?   ModFxPedal   => PanelEffect as ModFxPedalViewModel;
     public DelayPedalViewModel?   DelayPedal   => PanelEffect as DelayPedalViewModel;
-    public Delay2PedalViewModel?  Delay2Pedal  => PanelEffect as Delay2PedalViewModel;
     public ReverbPedalViewModel?  ReverbPedal  => PanelEffect as ReverbPedalViewModel;
 
     // Visual family: "boost", "mod", "fx", "delay", "reverb", "pedal", "amp", "io"
