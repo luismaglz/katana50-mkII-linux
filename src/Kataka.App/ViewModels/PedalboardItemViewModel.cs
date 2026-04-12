@@ -42,8 +42,7 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
 
     // Typed ViewModel accessors — each pedal view's DataContext is bound to its specific type.
     public BoosterPedalViewModel? BoosterPedal => PanelEffect as BoosterPedalViewModel;
-    public ModPedalViewModel?     ModPedal     => PanelEffect as ModPedalViewModel;
-    public FxPedalViewModel?      FxPedal      => PanelEffect as FxPedalViewModel;
+    public ModFxPedalViewModel?   ModFxPedal   => PanelEffect as ModFxPedalViewModel;
     public DelayPedalViewModel?   DelayPedal   => PanelEffect as DelayPedalViewModel;
     public Delay2PedalViewModel?  Delay2Pedal  => PanelEffect as Delay2PedalViewModel;
     public ReverbPedalViewModel?  ReverbPedal  => PanelEffect as ReverbPedalViewModel;

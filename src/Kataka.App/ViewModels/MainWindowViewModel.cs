@@ -91,8 +91,8 @@ public partial class MainWindowViewModel : ViewModelBase
         foreach (var effectViewModel in new IBasePedal[]
         {
             new BoosterPedalViewModel(),
-            new ModPedalViewModel(),
-            new FxPedalViewModel(),
+            new ModFxPedalViewModel("mod"),
+            new ModFxPedalViewModel("fx"),
             new DelayPedalViewModel(),
             new Delay2PedalViewModel(),
             new ReverbPedalViewModel(),

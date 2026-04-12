@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace Kataka.App.Views;
 
-public partial class ModPedalView : UserControl
+public partial class ModFxPedalView : UserControl
 {
-    public ModPedalView()
+    public ModFxPedalView()
     {
         InitializeComponent();
     }

@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kataka.App.ViewModels"
+             xmlns:controls="using:Kataka.App.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="Kataka.App.Views.ModsFx.ChorusView"
+             x:DataType="vm:ModFxPedalViewModel">
+
+    <StackPanel Spacing="8">
+        <!-- Low channel -->
+        <TextBlock Text="LOW" FontSize="10" FontWeight="SemiBold" Foreground="#3dbf6c" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <controls:RotaryKnob Scale="0.55" Label="RATE"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding ChorusLowRate}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.55" Label="DEPTH"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding ChorusLowDepth}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.55" Label="PRE DLY"
+                                 Minimum="0" Maximum="80"
+                                 Value="{Binding ChorusLowPreDelay}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.55" Label="LEVEL"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding ChorusLowLevel}"
+                                 LabelFontSize="11" />
+        </StackPanel>
+
+        <!-- High channel -->
+        <TextBlock Text="HIGH" FontSize="10" FontWeight="SemiBold" Foreground="#3dbf6c" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <controls:RotaryKnob Scale="0.55" Label="RATE"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding ChorusHighRate}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.55" Label="DEPTH"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding ChorusHighDepth}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.55" Label="PRE DLY"
+                                 Minimum="0" Maximum="80"
+                                 Value="{Binding ChorusHighPreDelay}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.55" Label="LEVEL"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding ChorusHighLevel}"
+                                 LabelFontSize="11" />
+        </StackPanel>
+
+        <!-- Shared controls -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <controls:RotaryKnob Scale="0.55" Label="XOVER FREQ"
+                                 Minimum="0" Maximum="16"
+                                 Value="{Binding ChorusXoverFreq}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.55" Label="DIRECT MIX"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding ChorusDirectMix}"
+                                 LabelFontSize="11" />
+        </StackPanel>
+    </StackPanel>
+
+</UserControl>

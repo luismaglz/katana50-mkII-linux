@@ -101,12 +101,12 @@
 
                                 <!-- ── Mod pedal ── -->
                                 <Panel IsVisible="{Binding IsMod}">
-                                    <views:ModPedalView DataContext="{Binding ModPedal}" />
+                                    <views:ModFxPedalView DataContext="{Binding ModFxPedal}" />
                                 </Panel>
 
                                 <!-- ── FX pedal ── -->
                                 <Panel IsVisible="{Binding IsFx}">
-                                    <views:FxPedalView DataContext="{Binding FxPedal}" />
+                                    <views:ModFxPedalView DataContext="{Binding ModFxPedal}" />
                                 </Panel>
 
                                 <!-- ── Delay pedal (covers delay + delay2) ── -->

@@ -1,6 +1,6 @@
 namespace Kataka.Domain.Midi;
 
-public static class KatanaMkIIParameterCatalog
+public static partial class KatanaMkIIParameterCatalog
 {
     public static KatanaParameterDefinition AmpGain { get; } =
         new("amp-gain", "Gain", [0x60, 0x00, 0x06, 0x51]);
