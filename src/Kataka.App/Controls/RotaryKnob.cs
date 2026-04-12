@@ -97,9 +97,9 @@ public class RotaryKnob : Control
         var labelOrigin = new Point((bounds.Width - labelText.Width) / 2, bounds.Top);
         context.DrawText(labelText, labelOrigin);
 
-        var diameter = Math.Min(bounds.Width - 12 * s, bounds.Height - labelText.Height - 48 * s);
+        var diameter = Math.Min(bounds.Width - 12 * s, bounds.Height - labelText.Height - 56 * s);
         var radius = diameter / 2;
-        var center = new Point(bounds.Width / 2, labelText.Height + 12 * s + radius);
+        var center = new Point(bounds.Width / 2, labelText.Height + 20 * s + radius);
 
         DrawTicks(context, center, radius + 4 * s, s);
         context.DrawEllipse(BezelBrush, new Pen(new SolidColorBrush(Color.Parse("#0a0c0e")), 2 * s), center, radius + 8 * s, radius + 8 * s);
