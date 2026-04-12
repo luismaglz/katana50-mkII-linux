@@ -29,6 +29,11 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly Dictionary<string, byte> pendingPanelLevelWrites = [];
     private readonly Dictionary<string, byte> pendingPedalWrites = [];
     private readonly Dictionary<string, byte> pendingDetailParamWrites = [];
+
+    // Lookup built once at connect time: maps 4-byte address key (e.g. "60-00-06-50") to an
+    // action that updates the matching VM property. Used to apply unsolicited DT1 push notifications
+    // from the amp without needing to know which parameter changed ahead of time.
+    private Dictionary<string, Action<byte>> pushHandlerLookup = [];
     private byte? pendingAmpTypeWrite;
     private byte? pendingCabinetResonanceWrite;
     private byte? pendingChainPatternWrite;
@@ -511,6 +516,11 @@ public partial class MainWindowViewModel : ViewModelBase
             await katanaSession.ConnectAsync(inputPortId, outputPortId);
             IsConnected = true;
 
+            // Subscribe to amp push notifications so live parameter changes (user turning knobs, etc.)
+            // update the UI without a poll round-trip. Build the address→action lookup first.
+            BuildPushHandlerLookup();
+            katanaSession.PushNotificationReceived += OnAmpPushNotification;
+
             var looksLikeKatana =
                 SelectedInputPort.Contains("katana", StringComparison.OrdinalIgnoreCase) &&
                 SelectedOutputPort.Contains("katana", StringComparison.OrdinalIgnoreCase);
@@ -559,6 +569,10 @@ public partial class MainWindowViewModel : ViewModelBase
             StatusMessage = "No MIDI connection is currently open.";
             return;
         }
+
+        // Unsubscribe from push notifications before disconnecting.
+        katanaSession.PushNotificationReceived -= OnAmpPushNotification;
+        pushHandlerLookup.Clear();
 
         await katanaSession.DisconnectAsync();
         IsConnected = false;
@@ -1525,6 +1539,88 @@ public partial class MainWindowViewModel : ViewModelBase
         try { apply(); }
         finally { suppressChangeTracking = false; }
     }
+
+    /// <summary>
+    /// Builds a flat dictionary mapping each known parameter's address key to the VM action
+    /// that should be called when the amp pushes a new value for that parameter.
+    /// Called once after connect so subscriptions to PushNotificationReceived work immediately.
+    /// </summary>
+    private void BuildPushHandlerLookup()
+    {
+        pushHandlerLookup = new Dictionary<string, Action<byte>>(StringComparer.Ordinal);
+
+        // Amp editor controls (gain, volume, bass, middle, treble, presence).
+        foreach (var control in AmpControls)
+        {
+            var captured = control;
+            pushHandlerLookup[AddressToKey(captured.Parameter.Address)] = value => captured.Value = value;
+        }
+
+        // All panel effects: delegate value mapping to each pedal's own ApplyAmpValues method
+        // so it can interpret the raw byte according to its type tables, variation, etc.
+        foreach (var effect in PanelEffects)
+        {
+            foreach (var param in effect.GetSyncParameters())
+            {
+                var capturedEffect = effect;
+                var capturedKey = param.Key;
+                pushHandlerLookup[AddressToKey(param.Address)] = value =>
+                    capturedEffect.ApplyAmpValues(new Dictionary<string, int>(StringComparer.Ordinal)
+                    {
+                        [capturedKey] = value,
+                    });
+            }
+        }
+
+        // Standalone panel parameters.
+        pushHandlerLookup[AddressToKey(KatanaMkIIParameterCatalog.AmpType.Address)] = value =>
+        {
+            if (value < AmpTypeOptions.Length) SelectedAmpType = AmpTypeOptions[value];
+        };
+        pushHandlerLookup[AddressToKey(KatanaMkIIParameterCatalog.CabinetResonance.Address)] = value =>
+        {
+            if (value < CabinetResonanceOptions.Length) SelectedCabinetResonance = CabinetResonanceOptions[value];
+        };
+        pushHandlerLookup[AddressToKey(KatanaMkIIParameterCatalog.ChainPattern.Address)] = value =>
+        {
+            if (value < PedalboardViewModel.ChainPatternNames.Length) Pedalboard.SelectedChainPattern = value;
+        };
+    }
+
+    /// <summary>
+    /// Handles an unsolicited DT1 push from the amp (e.g., user turned a knob on the device).
+    /// Only single-byte DT1 messages are handled; block pushes are ignored for now.
+    /// Marshals to the UI thread since the callback fires on the MIDI background thread.
+    /// </summary>
+    private void OnAmpPushNotification(object? sender, SysExMessage message)
+    {
+        var bytes = message.Bytes;
+
+        // Only handle single-byte DT1 (15 bytes total: 13-byte Roland header + 1 data + checksum + F7).
+        // Multi-byte block pushes (e.g. full patch dumps) are not yet handled.
+        if (bytes.Count != 15 || bytes[7] != 0x12)
+        {
+            return;
+        }
+
+        var addressKey = AddressToKey([bytes[8], bytes[9], bytes[10], bytes[11]]);
+        var value = bytes[12];
+
+        if (!pushHandlerLookup.TryGetValue(addressKey, out var action))
+        {
+            return;
+        }
+
+        // Marshal to the UI thread — this callback fires on the ALSA background thread.
+        Dispatcher.UIThread.Post(() => ApplyDeviceState(() => action(value)));
+    }
+
+    /// <summary>
+    /// Formats a 4-byte address as a hex key string (e.g. "60-00-06-50") for dictionary lookup.
+    /// Matches the format used by DryWetMidiConnection's reply correlator.
+    /// </summary>
+    private static string AddressToKey(IReadOnlyList<byte> address) =>
+        $"{address[0]:X2}-{address[1]:X2}-{address[2]:X2}-{address[3]:X2}";
 
     private static byte[] EncodeDelayTime(int milliseconds)
     {

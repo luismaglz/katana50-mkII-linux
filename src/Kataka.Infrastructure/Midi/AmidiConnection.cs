@@ -11,6 +11,10 @@ internal sealed class AmidiConnection(string inputPortId, string outputPortId) :
 
     public string OutputPortId { get; } = outputPortId;
 
+    // AmidiConnection is subprocess-per-request; it cannot receive unsolicited push notifications.
+    // This event is never raised — push notifications require the persistent DryWetMidiConnection.
+    public event EventHandler<SysExMessage>? PushNotificationReceived { add { } remove { } }
+
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     public Task SendAsync(SysExMessage message, CancellationToken cancellationToken = default)

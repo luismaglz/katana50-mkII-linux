@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,9 @@ namespace Kataka.App.ViewModels.Design;
 internal sealed class NullKatanaSession : IKatanaSession
 {
     public bool IsConnected => false;
+
+    // Design-time stub — push notifications are never raised without a real MIDI connection.
+    public event EventHandler<SysExMessage>? PushNotificationReceived { add { } remove { } }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 

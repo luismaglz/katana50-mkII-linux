@@ -8,6 +8,12 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     private static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(2);
     private static readonly int MidiBytesPerSecond = 3125;           // MIDI 1.0 wire speed at 31250 baud
     private static readonly TimeSpan DeviceInterval = TimeSpan.FromMilliseconds(20); // BTS ProductSetting.interval
+
+    // Special address for the Boss editor communication mode flag.
+    // Writing 0x01 tells the amp to start sending unsolicited DT1 push notifications for all parameter changes.
+    // Writing 0x00 tells the amp to stop. See BTS address_const.js: EDITOR_COMMUNICATION_MODE = 0x7f000001.
+    private static readonly byte[] EditorCommunicationModeAddress = [0x7F, 0x00, 0x00, 0x01];
+
     private static readonly byte[] CurrentChannelAddress = [0x00, 0x01, 0x00, 0x00];
     private static readonly byte[] CurrentChannelSize = [0x00, 0x00, 0x00, 0x02];
     private readonly IMidiTransport midiTransport = midiTransport;
@@ -15,6 +21,9 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     private DateTimeOffset _nextSendAllowedAt = DateTimeOffset.MinValue;
 
     public bool IsConnected => activeConnection is not null;
+
+    /// <inheritdoc />
+    public event EventHandler<SysExMessage>? PushNotificationReceived;
 
     public Task<IReadOnlyList<MidiPortDescriptor>> ListPortsAsync(CancellationToken cancellationToken = default) =>
         midiTransport.ListPortsAsync(cancellationToken);
@@ -26,6 +35,13 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 
         await DisconnectAsync();
         activeConnection = await midiTransport.OpenAsync(inputPortId, outputPortId, cancellationToken);
+
+        // Forward push notifications from the connection to session subscribers.
+        activeConnection.PushNotificationReceived += OnConnectionPushNotification;
+
+        // Tell the amp to start sending unsolicited DT1 messages whenever any parameter changes.
+        // This mirrors the BTS startCommunication() handshake (EDITOR_COMMUNICATION_MODE = 1).
+        await WriteEditorCommunicationModeAsync(enable: true, cancellationToken);
     }
 
     public async Task DisconnectAsync()
@@ -33,6 +49,19 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         if (activeConnection is null)
         {
             return;
+        }
+
+        // Unsubscribe before disposing to prevent callbacks on a dead connection.
+        activeConnection.PushNotificationReceived -= OnConnectionPushNotification;
+
+        // Tell the amp to stop sending push notifications before closing the port.
+        try
+        {
+            await WriteEditorCommunicationModeAsync(enable: false, CancellationToken.None);
+        }
+        catch
+        {
+            // Best-effort — the port may already be closing.
         }
 
         await activeConnection.DisposeAsync();
@@ -158,6 +187,28 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     private IMidiConnection RequireConnection()
     {
         return activeConnection ?? throw new InvalidOperationException("No Katana MIDI connection is currently open.");
+    }
+
+    /// <summary>
+    /// Forwards unsolicited DT1 push messages from the active connection to session subscribers.
+    /// </summary>
+    private void OnConnectionPushNotification(object? sender, SysExMessage message)
+    {
+        PushNotificationReceived?.Invoke(this, message);
+    }
+
+    /// <summary>
+    /// Writes the EDITOR_COMMUNICATION_MODE flag to the amp.
+    /// When enabled (value 1), the amp sends unsolicited DT1 messages for all live parameter changes.
+    /// When disabled (value 0), the amp stops sending push notifications.
+    /// </summary>
+    private async Task WriteEditorCommunicationModeAsync(bool enable, CancellationToken cancellationToken)
+    {
+        var message = KatanaMkIIProtocol.CreateDataWriteRequest(
+            EditorCommunicationModeAddress,
+            [enable ? (byte)0x01 : (byte)0x00]);
+        await EnforcePacingAsync(message.Bytes.Count, cancellationToken);
+        await RequireConnection().SendAsync(message, cancellationToken);
     }
 
     /// <summary>

@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Kataka.Application.Midi;
 
 namespace Kataka.Infrastructure.Midi;
@@ -7,11 +6,9 @@ public static class DefaultMidiTransport
 {
     public static IMidiTransport Create()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && AmidiTransport.IsSupported())
-        {
-            return new AmidiTransport();
-        }
-
+        // Always use DryWetMidiTransport — it keeps the MIDI ports open persistently,
+        // enabling event-driven replies and amp push notifications.
+        // AmidiTransport (subprocess-per-request) is preserved for debugging but is no longer the default.
         return new DryWetMidiTransport();
     }
 }
