@@ -5,11 +5,14 @@ namespace Kataka.Application.Katana;
 
 public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 {
-    private static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(1.5);
+    private static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(15);
+    private static readonly int MidiBytesPerSecond = 3125;           // MIDI 1.0 wire speed at 31250 baud
+    private static readonly TimeSpan DeviceInterval = TimeSpan.FromMilliseconds(20); // BTS ProductSetting.interval
     private static readonly byte[] CurrentChannelAddress = [0x00, 0x01, 0x00, 0x00];
     private static readonly byte[] CurrentChannelSize = [0x00, 0x00, 0x00, 0x02];
     private readonly IMidiTransport midiTransport = midiTransport;
     private IMidiConnection? activeConnection;
+    private DateTimeOffset _nextSendAllowedAt = DateTimeOffset.MinValue;
 
     public bool IsConnected => activeConnection is not null;
 
@@ -36,15 +39,18 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         activeConnection = null;
     }
 
-    public Task<SysExMessage> RequestIdentityAsync(CancellationToken cancellationToken = default) =>
-        RequireConnection().RequestAsync(UniversalDeviceIdentity.CreateIdentityRequest(), DefaultRequestTimeout, cancellationToken);
+    public async Task<SysExMessage> RequestIdentityAsync(CancellationToken cancellationToken = default)
+    {
+        var message = UniversalDeviceIdentity.CreateIdentityRequest();
+        await EnforcePacingAsync(message.Bytes.Count, cancellationToken);
+        return await RequireConnection().RequestAsync(message, DefaultRequestTimeout, cancellationToken);
+    }
 
     public async Task<KatanaPanelChannel?> ReadCurrentPanelChannelAsync(CancellationToken cancellationToken = default)
     {
-        var reply = await RequireConnection().RequestAsync(
-            RolandSysExBuilder.BuildDataRequest1(0x00, [0x00, 0x00, 0x00, 0x33], CurrentChannelAddress, CurrentChannelSize),
-            DefaultRequestTimeout,
-            cancellationToken);
+        var request = RolandSysExBuilder.BuildDataRequest1(0x00, [0x00, 0x00, 0x00, 0x33], CurrentChannelAddress, CurrentChannelSize);
+        await EnforcePacingAsync(request.Bytes.Count, cancellationToken);
+        var reply = await RequireConnection().RequestAsync(request, DefaultRequestTimeout, cancellationToken);
 
         if (!TryParseCurrentPanelChannel(reply, out var channel))
         {
@@ -56,6 +62,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 
     public async Task SelectPanelChannelAsync(KatanaPanelChannel channel, CancellationToken cancellationToken = default)
     {
+        await EnforcePacingAsync(2, cancellationToken); // MIDI program change = 2 bytes
         await RequireConnection().SendProgramChangeAsync(ToProgramChange(channel), cancellationToken);
     }
 
@@ -78,10 +85,9 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         {
             var startAddress = group.StartAddress;
             var size = new byte[] { 0x00, 0x00, 0x00, (byte)group.Length };
-            var reply = await RequireConnection().RequestAsync(
-                RolandSysExBuilder.BuildDataRequest1(0x00, [0x00, 0x00, 0x00, 0x33], startAddress, size),
-                DefaultRequestTimeout,
-                cancellationToken);
+            var request = RolandSysExBuilder.BuildDataRequest1(0x00, [0x00, 0x00, 0x00, 0x33], startAddress, size);
+            await EnforcePacingAsync(request.Bytes.Count, cancellationToken);
+            var reply = await RequireConnection().RequestAsync(request, DefaultRequestTimeout, cancellationToken);
 
             if (!KatanaMkIIProtocol.TryParseParameterBlockReply(startAddress, group.Length, reply, out var data))
             {
@@ -105,9 +111,9 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     {
         ArgumentNullException.ThrowIfNull(parameter);
 
-        await RequireConnection().SendAsync(
-            KatanaMkIIProtocol.CreateParameterWriteRequest(parameter, value),
-            cancellationToken);
+        var writeMessage = KatanaMkIIProtocol.CreateParameterWriteRequest(parameter, value);
+        await EnforcePacingAsync(writeMessage.Bytes.Count, cancellationToken);
+        await RequireConnection().SendAsync(writeMessage, cancellationToken);
 
         return await ReadParameterAsync(parameter, cancellationToken);
     }
@@ -119,10 +125,9 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     {
         ArgumentNullException.ThrowIfNull(address);
 
-        var reply = await RequireConnection().RequestAsync(
-            KatanaMkIIProtocol.CreateDataReadRequest(address, length),
-            DefaultRequestTimeout,
-            cancellationToken);
+        var request = KatanaMkIIProtocol.CreateDataReadRequest(address, length);
+        await EnforcePacingAsync(request.Bytes.Count, cancellationToken);
+        var reply = await RequireConnection().RequestAsync(request, DefaultRequestTimeout, cancellationToken);
 
         if (!KatanaMkIIProtocol.TryParseParameterBlockReply(address, length, reply, out var data))
         {
@@ -132,7 +137,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         return data;
     }
 
-    public Task WriteBlockAsync(
+    public async Task WriteBlockAsync(
         IReadOnlyList<byte> address,
         IReadOnlyList<byte> data,
         CancellationToken cancellationToken = default)
@@ -140,9 +145,9 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         ArgumentNullException.ThrowIfNull(address);
         ArgumentNullException.ThrowIfNull(data);
 
-        return RequireConnection().SendAsync(
-            KatanaMkIIProtocol.CreateDataWriteRequest(address, data),
-            cancellationToken);
+        var message = KatanaMkIIProtocol.CreateDataWriteRequest(address, data);
+        await EnforcePacingAsync(message.Bytes.Count, cancellationToken);
+        await RequireConnection().SendAsync(message, cancellationToken);
     }
 
     public async ValueTask DisposeAsync()
@@ -153,6 +158,19 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     private IMidiConnection RequireConnection()
     {
         return activeConnection ?? throw new InvalidOperationException("No Katana MIDI connection is currently open.");
+    }
+
+    /// <summary>
+    /// Enforces BTS-style byte-rate inter-message pacing before every MIDI send or request.
+    /// Formula: delay = ceil(msgBytes * 1000 / 3125) + 20ms (Boss ProductSetting.interval).
+    /// </summary>
+    private async Task EnforcePacingAsync(int messageBytes, CancellationToken ct = default)
+    {
+        var delay = _nextSendAllowedAt - DateTimeOffset.UtcNow;
+        if (delay > TimeSpan.Zero)
+            await Task.Delay(delay, ct);
+        var byteRateMs = (int)Math.Ceiling(messageBytes * 1000.0 / MidiBytesPerSecond);
+        _nextSendAllowedAt = DateTimeOffset.UtcNow + TimeSpan.FromMilliseconds(byteRateMs) + DeviceInterval;
     }
 
     private static IReadOnlyList<ParameterReadGroup> CreateReadGroups(IReadOnlyList<KatanaParameterDefinition> parameters)
@@ -230,7 +248,9 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 
     private sealed class ParameterReadGroup
     {
-        private const int MaximumSpanLength = 8;
+        // BTS uses SYSEX_MAXLEN=128; 32 is conservative and hardware-safe.
+        // With span=32, variation colors (0x39-3D) + ChainPattern (0x20) batch into 1 read.
+        private const int MaximumSpanLength = 32;
         private readonly List<KatanaParameterDefinition> parameters = [];
         private readonly byte[] prefix = new byte[3];
         private byte startOffset;
