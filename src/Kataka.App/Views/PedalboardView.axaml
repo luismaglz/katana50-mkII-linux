@@ -114,6 +114,11 @@
                                     <views:DelayPedalView DataContext="{Binding DelayPedal}" />
                                 </Panel>
 
+                                <!-- ── Delay 2 pedal (same view, different slot) ── -->
+                                <Panel IsVisible="{Binding IsDelay2}">
+                                    <views:DelayPedalView DataContext="{Binding DelayPedal}" />
+                                </Panel>
+
                                 <!-- ── Reverb pedal ── -->
                                 <Panel IsVisible="{Binding IsReverb}">
                                     <views:ReverbPedalView DataContext="{Binding ReverbPedal}" />

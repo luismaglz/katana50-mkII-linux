@@ -88,7 +88,7 @@ public static class KatanaTypeNameTables
             [7] = "SDE-3000",
         };
 
-    // Source: BTS reverb-type-select-box. Sequential, no skips. Max 4.
+    // Source: BTS reverb-type-select-box. Sequential, no skips. Max 6.
     public static IReadOnlyDictionary<byte, string> ReverbTypes { get; } =
         new Dictionary<byte, string>
         {
@@ -97,6 +97,8 @@ public static class KatanaTypeNameTables
             [2] = "HALL",
             [3] = "SPRING",
             [4] = "MODULATE",
+            [5] = "SFX",
+            [6] = "GATE",
         };
 
     // Source: BTS pedalwah-type-select-box. Sequential, no skips. Max 5.

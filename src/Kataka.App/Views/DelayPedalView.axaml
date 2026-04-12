@@ -6,8 +6,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignWidth="200"
-             d:DesignHeight="320"
+             d:DesignWidth="300"
+             d:DesignHeight="520"
              d:DataContext="{x:Static dvm:DesignDelayPedalViewModel.Instance}"
              x:Class="Kataka.App.Views.DelayPedalView"
              x:DataType="vm:DelayPedalViewModel">
@@ -20,48 +20,101 @@
             </LinearGradientBrush>
         </Border.Background>
         <StackPanel Spacing="0">
-            <!-- Delay accent bar: blue -->
-            <Border Height="6" CornerRadius="8,8,0,0" Background="#2979c9" />
+            <!-- Delay accent bar: cyan -->
+            <Border Height="6" CornerRadius="8,8,0,0" Background="#30cfc0" />
             <StackPanel Spacing="10" Margin="12,10,12,14">
                 <!-- On/Off toggle + LED -->
                 <controls:PedalHeaderControl />
+
                 <!-- Type selector -->
-                <StackPanel Spacing="4" IsVisible="{Binding HasTypeOptions}">
+                <StackPanel Spacing="4">
                     <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
-                               Foreground="#1a4e8a" />
+                               Foreground="#1e9988" />
                     <ComboBox Classes="midi-port-picker"
                               HorizontalAlignment="Stretch"
                               ItemsSource="{Binding TypeOptions}"
                               SelectedItem="{Binding SelectedTypeOption}" />
                 </StackPanel>
-                <!-- Variation color -->
-                <StackPanel Spacing="4">
+
+                <!-- Variation bar (only delay slot 1 has variation) -->
+                <StackPanel Spacing="4" IsVisible="{Binding HasVariation}">
                     <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
-                               Foreground="#1a4e8a" />
+                               Foreground="#1e9988" />
                     <Border Height="16" CornerRadius="4"
                             Background="{Binding VariationBrush}" />
                 </StackPanel>
+
                 <!-- Level knob -->
                 <controls:RotaryKnob Scale="0.6" Label="LEVEL"
                                      Minimum="0" Maximum="100"
                                      Value="{Binding Level}"
                                      IsVisible="{Binding HasLevel}"
-                                     HorizontalAlignment="Center" />
-                <!-- Delay controls -->
-                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                     HorizontalAlignment="Center"
+                                     LabelFontSize="12" />
+
+                <!-- Row 1: Feedback, HiCut, E.Level, D.Mix -->
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <controls:RotaryKnob Scale="0.6" Label="FEEDBACK"
-                                         Minimum="0" Maximum="127"
-                                         Value="{Binding Feedback}" />
+                                         Minimum="0" Maximum="100"
+                                         Value="{Binding Feedback}"
+                                         LabelFontSize="12" />
                     <controls:RotaryKnob Scale="0.6" Label="HI CUT"
-                                         Minimum="0" Maximum="17"
-                                         Value="{Binding HighCut}" />
+                                         Minimum="0" Maximum="14"
+                                         Value="{Binding HighCut}"
+                                         LabelFontSize="12" />
                     <controls:RotaryKnob Scale="0.6" Label="E.LEVEL"
-                                         Minimum="0" Maximum="127"
-                                         Value="{Binding EffectLevel}" />
+                                         Minimum="0" Maximum="120"
+                                         Value="{Binding EffectLevel}"
+                                         LabelFontSize="12" />
                     <controls:RotaryKnob Scale="0.6" Label="D.MIX"
-                                         Minimum="0" Maximum="127"
-                                         Value="{Binding DirectMix}" />
-                </WrapPanel>
+                                         Minimum="0" Maximum="100"
+                                         Value="{Binding DirectMix}"
+                                         LabelFontSize="12" />
+                </StackPanel>
+
+                <!-- Row 2: TapTime, ModRate, ModDepth -->
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <controls:RotaryKnob Scale="0.6" Label="TAP TIME"
+                                         Minimum="0" Maximum="100"
+                                         Value="{Binding TapTime}"
+                                         LabelFontSize="12" />
+                    <controls:RotaryKnob Scale="0.6" Label="MOD RATE"
+                                         Minimum="0" Maximum="100"
+                                         Value="{Binding ModRate}"
+                                         LabelFontSize="12" />
+                    <controls:RotaryKnob Scale="0.6" Label="MOD DEPTH"
+                                         Minimum="0" Maximum="100"
+                                         Value="{Binding ModDepth}"
+                                         LabelFontSize="12" />
+                </StackPanel>
+
+                <!-- Toggles row 1: Range, Filter, ModSw -->
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="8">
+                    <ToggleButton Classes="effect-button"
+                                  Content="17kHz"
+                                  Width="72"
+                                  IsChecked="{Binding RangeHigh}" />
+                    <ToggleButton Classes="effect-button"
+                                  Content="FILTER"
+                                  Width="72"
+                                  IsChecked="{Binding FilterOn}" />
+                    <ToggleButton Classes="effect-button"
+                                  Content="MOD SW"
+                                  Width="72"
+                                  IsChecked="{Binding ModSwOn}" />
+                </StackPanel>
+
+                <!-- Toggles row 2: FeedbackPhase (INV), DelayPhase (INV) -->
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="8">
+                    <ToggleButton Classes="effect-button"
+                                  Content="FB INV"
+                                  Width="110"
+                                  IsChecked="{Binding FeedbackPhaseInverse}" />
+                    <ToggleButton Classes="effect-button"
+                                  Content="DLY INV"
+                                  Width="110"
+                                  IsChecked="{Binding DelayPhaseInverse}" />
+                </StackPanel>
             </StackPanel>
         </StackPanel>
     </Border>

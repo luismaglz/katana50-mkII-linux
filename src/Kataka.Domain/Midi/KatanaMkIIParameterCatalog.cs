@@ -34,37 +34,40 @@ public static partial class KatanaMkIIParameterCatalog
         new("panel-booster-switch", "Booster", [0x60, 0x00, 0x00, 0x10], maximum: 1);
 
     public static KatanaParameterDefinition BoosterType { get; } =
-        new("panel-booster-type", "Booster Type", [0x60, 0x00, 0x00, 0x11], maximum: 22);
+        new("panel-booster-type", "Booster Type", [0x60, 0x00, 0x00, 0x11], maximum: 22,
+            skippedValues: [0x07]);
 
     public static KatanaParameterDefinition ModSwitch { get; } =
         new("panel-mod-switch", "Mod", [0x60, 0x00, 0x01, 0x00], maximum: 1);
 
     public static KatanaParameterDefinition ModType { get; } =
-        new("panel-mod-type", "Mod Type", [0x60, 0x00, 0x01, 0x01], maximum: 30);
+        new("panel-mod-type", "Mod Type", [0x60, 0x00, 0x01, 0x01], maximum: 39,
+            skippedValues: [0x05, 0x08, 0x0B, 0x0D, 0x11, 0x18, 0x1E, 0x20, 0x21, 0x22]);
 
     public static KatanaParameterDefinition FxSwitch { get; } =
         new("panel-fx-switch", "FX", [0x60, 0x00, 0x03, 0x00], maximum: 1);
 
     public static KatanaParameterDefinition FxType { get; } =
-        new("panel-fx-type", "FX Type", [0x60, 0x00, 0x03, 0x01], maximum: 30);
+        new("panel-fx-type", "FX Type", [0x60, 0x00, 0x03, 0x01], maximum: 39,
+            skippedValues: [0x05, 0x08, 0x0B, 0x0D, 0x11, 0x18, 0x1E, 0x20, 0x21, 0x22]);
 
     public static KatanaParameterDefinition DelaySwitch { get; } =
         new("panel-delay-switch", "Delay", [0x60, 0x00, 0x05, 0x00], maximum: 1);
 
     public static KatanaParameterDefinition DelayType { get; } =
-        new("panel-delay-type", "Delay Type", [0x60, 0x00, 0x05, 0x01], maximum: 7);
+        new("panel-delay-type", "Delay Type", [0x60, 0x00, 0x05, 0x01], maximum: 10);
 
     public static KatanaParameterDefinition Delay2Switch { get; } =
         new("panel-delay2-switch", "Delay 2", [0x60, 0x00, 0x05, 0x20], maximum: 1);
 
     public static KatanaParameterDefinition Delay2Type { get; } =
-        new("panel-delay2-type", "Delay 2 Type", [0x60, 0x00, 0x05, 0x21], maximum: 7);
+        new("panel-delay2-type", "Delay 2 Type", [0x60, 0x00, 0x05, 0x21], maximum: 10);
 
     public static KatanaParameterDefinition ReverbSwitch { get; } =
         new("panel-reverb-switch", "Reverb", [0x60, 0x00, 0x05, 0x40], maximum: 1);
 
     public static KatanaParameterDefinition ReverbType { get; } =
-        new("panel-reverb-type", "Reverb Type", [0x60, 0x00, 0x05, 0x41], maximum: 4);
+        new("panel-reverb-type", "Reverb Type", [0x60, 0x00, 0x05, 0x41], maximum: 6);
 
     public static KatanaParameterDefinition BoosterVariation { get; } =
         new("panel-booster-variation", "Booster Variation", [0x60, 0x00, 0x06, 0x39], maximum: 2);
@@ -197,31 +200,79 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition BoosterDirectMix { get; } =
         new("booster-direct-mix", "D.Mix", [0x60, 0x00, 0x00, 0x18]);
 
-    // ── Delay DSP params (shared core; SINGLE/ANALOG/TAPE/REVERSE/MODULATE) ─────
+    // ── Delay DSP params ─────────────────────────────────────────────────────────
     public static KatanaParameterDefinition DelayFeedback { get; } =
-        new("delay-feedback", "Feedback", [0x60, 0x00, 0x05, 0x04]);
+        new("delay-feedback", "Feedback", [0x60, 0x00, 0x05, 0x04], maximum: 100);
 
     public static KatanaParameterDefinition DelayHighCut { get; } =
-        new("delay-high-cut", "High Cut", [0x60, 0x00, 0x05, 0x05], maximum: 17);
+        new("delay-high-cut", "High Cut", [0x60, 0x00, 0x05, 0x05], maximum: 14);
 
     public static KatanaParameterDefinition DelayEffectLevel { get; } =
-        new("delay-effect-level", "E.Level", [0x60, 0x00, 0x05, 0x06]);
+        new("delay-effect-level", "E.Level", [0x60, 0x00, 0x05, 0x06], maximum: 120);
 
     public static KatanaParameterDefinition DelayDirectMix { get; } =
-        new("delay-direct-mix", "D.Mix", [0x60, 0x00, 0x05, 0x07]);
+        new("delay-direct-mix", "D.Mix", [0x60, 0x00, 0x05, 0x07], maximum: 100);
+
+    public static KatanaParameterDefinition DelayTapTime { get; } =
+        new("delay-tap-time", "Tap Time", [0x60, 0x00, 0x05, 0x08], maximum: 100);
+
+    public static KatanaParameterDefinition DelayModRate { get; } =
+        new("delay-mod-rate", "Mod Rate", [0x60, 0x00, 0x05, 0x13], maximum: 100);
+
+    public static KatanaParameterDefinition DelayModDepth { get; } =
+        new("delay-mod-depth", "Mod Depth", [0x60, 0x00, 0x05, 0x14], maximum: 100);
+
+    public static KatanaParameterDefinition DelayRange { get; } =
+        new("delay-range", "Range", [0x60, 0x00, 0x05, 0x15], maximum: 1);
+
+    public static KatanaParameterDefinition DelayFilter { get; } =
+        new("delay-filter", "Filter", [0x60, 0x00, 0x05, 0x16], maximum: 1);
+
+    public static KatanaParameterDefinition DelayFeedbackPhase { get; } =
+        new("delay-feedback-phase", "FB Phase", [0x60, 0x00, 0x05, 0x17], maximum: 1);
+
+    public static KatanaParameterDefinition DelayDelayPhase { get; } =
+        new("delay-delay-phase", "Dly Phase", [0x60, 0x00, 0x05, 0x18], maximum: 1);
+
+    public static KatanaParameterDefinition DelayModSw { get; } =
+        new("delay-mod-sw", "Mod SW", [0x60, 0x00, 0x05, 0x19], maximum: 1);
 
     // ── Delay 2 DSP params ───────────────────────────────────────────────────────
     public static KatanaParameterDefinition Delay2Feedback { get; } =
-        new("delay2-feedback", "Feedback", [0x60, 0x00, 0x05, 0x24]);
+        new("delay2-feedback", "Feedback", [0x60, 0x00, 0x05, 0x24], maximum: 100);
 
     public static KatanaParameterDefinition Delay2HighCut { get; } =
-        new("delay2-high-cut", "High Cut", [0x60, 0x00, 0x05, 0x25], maximum: 17);
+        new("delay2-high-cut", "High Cut", [0x60, 0x00, 0x05, 0x25], maximum: 14);
 
     public static KatanaParameterDefinition Delay2EffectLevel { get; } =
-        new("delay2-effect-level", "E.Level", [0x60, 0x00, 0x05, 0x26]);
+        new("delay2-effect-level", "E.Level", [0x60, 0x00, 0x05, 0x26], maximum: 120);
 
     public static KatanaParameterDefinition Delay2DirectMix { get; } =
-        new("delay2-direct-mix", "D.Mix", [0x60, 0x00, 0x05, 0x27]);
+        new("delay2-direct-mix", "D.Mix", [0x60, 0x00, 0x05, 0x27], maximum: 100);
+
+    public static KatanaParameterDefinition Delay2TapTime { get; } =
+        new("delay2-tap-time", "Tap Time", [0x60, 0x00, 0x05, 0x28], maximum: 100);
+
+    public static KatanaParameterDefinition Delay2ModRate { get; } =
+        new("delay2-mod-rate", "Mod Rate", [0x60, 0x00, 0x05, 0x33], maximum: 100);
+
+    public static KatanaParameterDefinition Delay2ModDepth { get; } =
+        new("delay2-mod-depth", "Mod Depth", [0x60, 0x00, 0x05, 0x34], maximum: 100);
+
+    public static KatanaParameterDefinition Delay2Range { get; } =
+        new("delay2-range", "Range", [0x60, 0x00, 0x05, 0x35], maximum: 1);
+
+    public static KatanaParameterDefinition Delay2Filter { get; } =
+        new("delay2-filter", "Filter", [0x60, 0x00, 0x05, 0x36], maximum: 1);
+
+    public static KatanaParameterDefinition Delay2FeedbackPhase { get; } =
+        new("delay2-feedback-phase", "FB Phase", [0x60, 0x00, 0x05, 0x37], maximum: 1);
+
+    public static KatanaParameterDefinition Delay2DelayPhase { get; } =
+        new("delay2-delay-phase", "Dly Phase", [0x60, 0x00, 0x05, 0x38], maximum: 1);
+
+    public static KatanaParameterDefinition Delay2ModSw { get; } =
+        new("delay2-mod-sw", "Mod SW", [0x60, 0x00, 0x05, 0x39], maximum: 1);
 
     // ── Reverb DSP params (shared for all reverb types) ─────────────────────────
     public static KatanaParameterDefinition ReverbTime { get; } =
@@ -249,9 +300,9 @@ public static partial class KatanaMkIIParameterCatalog
         new("mod", "Mod", ModSwitch, variationParameter: ModVariation, typeParameter: ModType, levelParameter: ModLevel),
         new("fx", "FX", FxSwitch, variationParameter: FxVariation, typeParameter: FxType, levelParameter: FxLevel),
         new("delay", "Delay", DelaySwitch, variationParameter: DelayVariation, typeParameter: DelayType, levelParameter: DelayLevel,
-            detailParameters: [DelayFeedback, DelayHighCut, DelayEffectLevel, DelayDirectMix]),
+            detailParameters: [DelayFeedback, DelayHighCut, DelayEffectLevel, DelayDirectMix, DelayTapTime, DelayModRate, DelayModDepth, DelayRange, DelayFilter, DelayFeedbackPhase, DelayDelayPhase, DelayModSw]),
         new("delay2", "Delay 2", Delay2Switch, typeParameter: Delay2Type,
-            detailParameters: [Delay2Feedback, Delay2HighCut, Delay2EffectLevel, Delay2DirectMix]),
+            detailParameters: [Delay2Feedback, Delay2HighCut, Delay2EffectLevel, Delay2DirectMix, Delay2TapTime, Delay2ModRate, Delay2ModDepth, Delay2Range, Delay2Filter, Delay2FeedbackPhase, Delay2DelayPhase, Delay2ModSw]),
         new("reverb", "Reverb", ReverbSwitch, variationParameter: ReverbVariation, typeParameter: ReverbType, levelParameter: ReverbLevel,
             detailParameters: [ReverbTime, ReverbPreDelay, ReverbHighCut, ReverbHighDensity, ReverbEffectLevel, ReverbDirectMix]),
     ];

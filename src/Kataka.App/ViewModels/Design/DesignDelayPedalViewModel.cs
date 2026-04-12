@@ -4,7 +4,7 @@ public sealed class DesignDelayPedalViewModel : DelayPedalViewModel
 {
     public static DesignDelayPedalViewModel Instance => new();
 
-    public DesignDelayPedalViewModel()
+    public DesignDelayPedalViewModel() : base("delay")
     {
         IsEnabled = true;
         Level = 60;

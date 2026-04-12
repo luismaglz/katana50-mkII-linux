@@ -93,8 +93,8 @@ public partial class MainWindowViewModel : ViewModelBase
             new BoosterPedalViewModel(),
             new ModFxPedalViewModel("mod"),
             new ModFxPedalViewModel("fx"),
-            new DelayPedalViewModel(),
-            new Delay2PedalViewModel(),
+            new DelayPedalViewModel("delay"),
+            new DelayPedalViewModel("delay2"),
             new ReverbPedalViewModel(),
         })
         {
