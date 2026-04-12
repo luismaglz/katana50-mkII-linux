@@ -3,6 +3,7 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
 
 namespace Kataka.App.Controls;
@@ -27,6 +28,9 @@ public class RotaryKnob : Control
     public static readonly StyledProperty<double> LabelFontSizeProperty =
         AvaloniaProperty.Register<RotaryKnob, double>(nameof(LabelFontSize), -1.0);
 
+    public static readonly StyledProperty<string?> DescriptionProperty =
+        AvaloniaProperty.Register<RotaryKnob, string?>(nameof(Description));
+
     private static readonly SolidColorBrush FaceBrush = new(Color.Parse("#2c2f35"));
     private static readonly SolidColorBrush BezelBrush = new(Color.Parse("#0f1114"));
     private static readonly SolidColorBrush TickBrush = new(Color.Parse("#4a4f57"));
@@ -42,6 +46,8 @@ public class RotaryKnob : Control
         AffectsRender<RotaryKnob>(LabelProperty, MinimumProperty, MaximumProperty, ValueProperty, ScaleProperty, LabelFontSizeProperty);
         AffectsMeasure<RotaryKnob>(ScaleProperty);
         FocusableProperty.OverrideDefaultValue<RotaryKnob>(true);
+        LabelProperty.Changed.AddClassHandler<RotaryKnob>((k, _) => k.UpdateTooltip());
+        DescriptionProperty.Changed.AddClassHandler<RotaryKnob>((k, _) => k.UpdateTooltip());
     }
 
     public string Label
@@ -78,6 +84,43 @@ public class RotaryKnob : Control
     {
         get => GetValue(LabelFontSizeProperty);
         set => SetValue(LabelFontSizeProperty, value);
+    }
+
+    public string? Description
+    {
+        get => GetValue(DescriptionProperty);
+        set => SetValue(DescriptionProperty, value);
+    }
+
+    private void UpdateTooltip()
+    {
+        var label = Label;
+        var desc = Description;
+
+        if (string.IsNullOrWhiteSpace(label) && string.IsNullOrWhiteSpace(desc))
+        {
+            ToolTip.SetTip(this, null);
+            return;
+        }
+
+        var panel = new StackPanel { Spacing = 4 };
+        if (!string.IsNullOrWhiteSpace(label))
+            panel.Children.Add(new TextBlock
+            {
+                Text = label,
+                FontSize = 13,
+                FontWeight = FontWeight.SemiBold
+            });
+        if (!string.IsNullOrWhiteSpace(desc))
+            panel.Children.Add(new TextBlock
+            {
+                Text = desc,
+                FontSize = 11,
+                MaxWidth = 260,
+                TextWrapping = TextWrapping.Wrap
+            });
+
+        ToolTip.SetTip(this, panel);
     }
 
     protected override Size MeasureOverride(Size availableSize)
