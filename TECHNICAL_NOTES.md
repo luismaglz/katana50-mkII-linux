@@ -444,6 +444,58 @@ The chain pattern controls the routing order of effects relative to the preamp b
 
 ---
 
+## Persistent MIDI Transport (DryWetMidi)
+
+### Why we replaced AmidiTransport
+
+The original `AmidiConnection` spawned a new `amidi` subprocess per request (`amidi -t X`), which records for the full X seconds regardless of when the device replies. This meant every single RQ1→DT1 round-trip cost 2 seconds, making the initial read (~13 requests) take ~30 seconds.
+
+The new `DryWetMidiConnection` (implemented 2025) opens the MIDI ports once and keeps them open for the session lifetime. A persistent background listener receives all DT1 replies event-driven, so each round-trip takes the actual device latency (~100–200ms).
+
+### BTS architecture we replicated
+
+Based on analysis of BTS (Boss Tone Studio) `midi_controller.js` and `readwrite_logic.js`:
+
+**Init sequence (subscribe first, read once):**
+1. Register the global DT1 listener before any device connects — listener always active
+2. On connect: send Identity Request → get DeviceID
+3. Write `EDITOR_COMMUNICATION_MODE = 1` (address `[0x7F, 0x00, 0x00, 0x01]`, value `0x01`) — the amp starts sending unsolicited DT1 push messages for all live parameter changes
+4. Perform a full initial read of all amp memory blocks (bulk RQ1s)
+5. All subsequent UI updates driven by amp push — no polling needed
+6. On disconnect: write `EDITOR_COMMUNICATION_MODE = 0`
+
+**Write/read concurrency (no locking):**
+- DT1 writes: fire-and-forget, no reply expected
+- RQ1 reads: send request, register `{address → TCS}` entry, await TCS completion
+- Inbound listener: if address matches a pending TCS → complete it (solicited reply); else → fire push event (unsolicited)
+- No mutexes; inbound listener never paused during writes
+
+**Roland DT1 reply structure:**
+```
+F0 41 DeviceID 00 00 00 33 12 A1 A2 A3 A4  DATA...  CKSUM F7
+                                ↑bytes 8..11 = address correlation key
+```
+The 4-byte address at bytes [8..11] is used as the key to match pending RQ1s to their DT1 replies.
+
+**DryWetMidi F0 convention:**
+- `NormalSysExEvent.Data` does NOT include the leading `0xF0` byte
+- When sending: strip `data[0]` (F0) → `new NormalSysExEvent(message.Bytes.Skip(1).ToArray())`
+- When receiving: prepend `0xF0` to reconstruct the full `SysExMessage`
+
+### State update pattern for push notifications
+
+When the amp sends an unsolicited DT1 (e.g., user turns a knob, presses a pedal switch):
+1. `DryWetMidiConnection.OnEventReceived` fires on the ALSA background thread
+2. Address not in `_pendingRequests` → fire `PushNotificationReceived` event
+3. `KatanaSession` re-raises to `MainWindowViewModel`
+4. `MainWindowViewModel.HandlePushNotification` looks up the address in a pre-built `Dictionary<address_key, Action<byte>>`
+5. Calls `ApplyDeviceState(() => action(value))` — sets the VM property with `suppressChangeTracking = true`
+6. Avalonia binding updates the UI automatically; the `PropertyChanged` handler is a no-op during `ApplyDeviceState` so no echo-write is queued back to the amp
+
+This is the same `ApplyDeviceState` guard already used by all initial-read methods.
+
+---
+
 ## Reference Sources
 
 | Source | Location | Use |

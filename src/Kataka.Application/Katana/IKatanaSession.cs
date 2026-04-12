@@ -6,6 +6,13 @@ public interface IKatanaSession : IAsyncDisposable
 {
     bool IsConnected { get; }
 
+    /// <summary>
+    /// Raised when the amp sends an unsolicited DT1 message (e.g., a knob was turned on the device).
+    /// Fired on the MIDI receive thread — subscribers must marshal to the UI thread if needed.
+    /// Only raised when the connection supports persistent listening (DryWetMidiConnection).
+    /// </summary>
+    event EventHandler<SysExMessage>? PushNotificationReceived;
+
     Task<IReadOnlyList<MidiPortDescriptor>> ListPortsAsync(CancellationToken cancellationToken = default);
 
     Task ConnectAsync(string inputPortId, string outputPortId, CancellationToken cancellationToken = default);
