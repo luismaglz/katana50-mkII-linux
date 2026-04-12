@@ -6,8 +6,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignWidth="200"
-             d:DesignHeight="320"
+             d:DesignWidth="300"
+             d:DesignHeight="440"
              d:DataContext="{x:Static dvm:DesignBoosterPedalViewModel.Instance}"
              x:Class="Kataka.App.Views.BoosterPedalView"
              x:DataType="vm:BoosterPedalViewModel">
@@ -35,45 +35,49 @@
                               SelectedItem="{Binding SelectedTypeOption}" />
                 </StackPanel>
                 <!-- Variation color -->
-                <StackPanel Spacing="4">
-                    <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
-                               Foreground="#907030" />
-                    <Border Height="16" CornerRadius="4"
-                            Background="{Binding VariationBrush}" />
-                </StackPanel>
-                <!-- Level knob -->
-                <controls:RotaryKnob Scale="0.6" Label="LEVEL"
-                                     Minimum="0" Maximum="100"
-                                     Value="{Binding Level}"
-                                     HorizontalAlignment="Center" />
-                <!-- Booster controls -->
-                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <controls:RotaryKnob Scale="0.6" Label="LEVEL"
+                                         Minimum="0" Maximum="100"
+                                         Value="{Binding Level}"
+                                         HorizontalAlignment="Center"
+                                         LabelFontSize="12"/>
                     <controls:RotaryKnob Scale="0.6" Label="DRIVE"
                                          Minimum="0" Maximum="120"
-                                         Value="{Binding Drive}" />
+                                         Value="{Binding Drive}"
+                                         LabelFontSize="12"/>
                     <controls:RotaryKnob Scale="0.6" Label="TONE"
                                          Minimum="0" Maximum="127"
-                                         Value="{Binding Tone}" />
-                    <controls:RotaryKnob Scale="0.6" Label="BOTTOM"
-                                         Minimum="0" Maximum="127"
-                                         Value="{Binding Bottom}" />
+                                         Value="{Binding Tone}"
+                                         LabelFontSize="12"/>
+
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <controls:RotaryKnob Scale="0.6" Label="E.LEVEL"
                                          Minimum="0" Maximum="127"
-                                         Value="{Binding EffectLevel}" />
-                    <Border Width="70" Height="94" Padding="8">
-                        <ToggleButton Classes="effect-button"
-                                      HorizontalAlignment="Stretch"
-                                      VerticalAlignment="Center"
-                                      Content="SOLO"
-                                      IsChecked="{Binding SoloSw}" />
-                    </Border>
-                    <controls:RotaryKnob Scale="0.6" Label="SOLO LVL"
+                                         Value="{Binding EffectLevel}"
+                                         LabelFontSize="12"/>
+                    <controls:RotaryKnob Scale="0.6" Label="BOTTOM"
                                          Minimum="0" Maximum="127"
-                                         Value="{Binding SoloLevel}" />
+                                         Value="{Binding Bottom}"
+                                         LabelFontSize="12"/>
                     <controls:RotaryKnob Scale="0.6" Label="D.MIX"
                                          Minimum="0" Maximum="127"
-                                         Value="{Binding DirectMix}" />
-                </WrapPanel>
+                                         Value="{Binding DirectMix}"
+                                         LabelFontSize="12"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="30">
+                    <ToggleButton Classes="effect-button"
+                                  HorizontalAlignment="Center"
+                                  HorizontalContentAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Content="SOLO"
+                                  Width="100"
+                                  IsChecked="{Binding SoloSw}" />
+                    <controls:RotaryKnob Scale="0.6" Label="SOLO LVL"
+                                         Minimum="0" Maximum="127"
+                                         Value="{Binding SoloLevel}"
+                                         LabelFontSize="12"/>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
     </Border>
