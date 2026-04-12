@@ -6,8 +6,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignWidth="200"
-             d:DesignHeight="320"
+             d:DesignWidth="300"
+             d:DesignHeight="520"
              d:DataContext="{x:Static dvm:DesignReverbPedalViewModel.Instance}"
              x:Class="Kataka.App.Views.ReverbPedalView"
              x:DataType="vm:ReverbPedalViewModel">
@@ -25,8 +25,9 @@
             <StackPanel Spacing="10" Margin="12,10,12,14">
                 <!-- On/Off toggle + LED -->
                 <controls:PedalHeaderControl />
+
                 <!-- Type selector -->
-                <StackPanel Spacing="4" IsVisible="{Binding HasTypeOptions}">
+                <StackPanel Spacing="4">
                     <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
                                Foreground="#5a2088" />
                     <ComboBox Classes="midi-port-picker"
@@ -34,44 +35,71 @@
                               ItemsSource="{Binding TypeOptions}"
                               SelectedItem="{Binding SelectedTypeOption}" />
                 </StackPanel>
-                <!-- Variation color -->
+
+                <!-- Variation bar -->
                 <StackPanel Spacing="4">
                     <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
                                Foreground="#5a2088" />
                     <Border Height="16" CornerRadius="4"
                             Background="{Binding VariationBrush}" />
                 </StackPanel>
+
                 <!-- Level knob -->
                 <controls:RotaryKnob Scale="0.6" Label="LEVEL"
+                                     Description="Adjusts the overall output level of the reverb pedal."
                                      Minimum="0" Maximum="100"
                                      Value="{Binding Level}"
                                      IsVisible="{Binding HasLevel}"
-                                     HorizontalAlignment="Center" />
-                <!-- Reverb controls -->
-                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                     HorizontalAlignment="Center"
+                                     LabelFontSize="12" />
+
+                <!-- Row 1: Time, PreDelay, E.Level, D.Mix -->
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <controls:RotaryKnob Scale="0.6" Label="TIME"
+                                         Description="Adjusts the length (duration) of the reverberation."
                                          Minimum="0" Maximum="127"
-                                         Value="{Binding Time}" />
+                                         Value="{Binding Time}"
+                                         LabelFontSize="12" />
                     <controls:RotaryKnob Scale="0.6" Label="PRE DELAY"
+                                         Description="Adjusts the time delay before the reverb sound appears (0–500 ms)."
                                          Minimum="0" Maximum="127"
-                                         Value="{Binding PreDelay}" />
-                    <controls:RotaryKnob Scale="0.6" Label="HI CUT"
-                                         Minimum="0" Maximum="17"
-                                         Value="{Binding HighCut}" />
-                    <Border Width="70" Height="94" Padding="8">
-                        <ToggleButton Classes="effect-button"
-                                      HorizontalAlignment="Stretch"
-                                      VerticalAlignment="Center"
-                                      Content="HI DENSITY"
-                                      IsChecked="{Binding HighDensity}" />
-                    </Border>
+                                         Value="{Binding PreDelay}"
+                                         LabelFontSize="12" />
                     <controls:RotaryKnob Scale="0.6" Label="E.LEVEL"
-                                         Minimum="0" Maximum="127"
-                                         Value="{Binding EffectLevel}" />
+                                         Description="Adjusts the volume of the reverb (effect) sound."
+                                         Minimum="0" Maximum="100"
+                                         Value="{Binding EffectLevel}"
+                                         LabelFontSize="12" />
                     <controls:RotaryKnob Scale="0.6" Label="D.MIX"
-                                         Minimum="0" Maximum="127"
-                                         Value="{Binding DirectMix}" />
-                </WrapPanel>
+                                         Description="Adjusts the volume of the direct (dry) sound."
+                                         Minimum="0" Maximum="100"
+                                         Value="{Binding DirectMix}"
+                                         LabelFontSize="12" />
+                </StackPanel>
+
+                <!-- Row 2: LowCut, HighCut, Density, Color -->
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <controls:RotaryKnob Scale="0.6" Label="LOW CUT"
+                                         Description="Sets the frequency at which the low cut filter takes effect. At minimum (FLAT), the filter has no effect."
+                                         Minimum="0" Maximum="17"
+                                         Value="{Binding LowCut}"
+                                         LabelFontSize="12" />
+                    <controls:RotaryKnob Scale="0.6" Label="HIGH CUT"
+                                         Description="Sets the frequency at which the high cut filter takes effect. At maximum (FLAT), the filter has no effect."
+                                         Minimum="0" Maximum="17"
+                                         Value="{Binding HighCut}"
+                                         LabelFontSize="12" />
+                    <controls:RotaryKnob Scale="0.6" Label="DENSITY"
+                                         Description="Adjusts the density of the reverb sound."
+                                         Minimum="0" Maximum="10"
+                                         Value="{Binding Density}"
+                                         LabelFontSize="12" />
+                    <controls:RotaryKnob Scale="0.6" Label="COLOR"
+                                         Description="Adjusts the unique tone character of the spring reverb. Only active when TYPE is SPRING."
+                                         Minimum="0" Maximum="100"
+                                         Value="{Binding Color}"
+                                         LabelFontSize="12" />
+                </StackPanel>
             </StackPanel>
         </StackPanel>
     </Border>

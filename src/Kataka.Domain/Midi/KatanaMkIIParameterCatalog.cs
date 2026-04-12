@@ -281,17 +281,23 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition ReverbPreDelay { get; } =
         new("reverb-pre-delay", "Pre Delay", [0x60, 0x00, 0x05, 0x43]);
 
+    public static KatanaParameterDefinition ReverbLowCut { get; } =
+        new("reverb-low-cut", "Low Cut", [0x60, 0x00, 0x05, 0x44], maximum: 17);
+
     public static KatanaParameterDefinition ReverbHighCut { get; } =
         new("reverb-high-cut", "High Cut", [0x60, 0x00, 0x05, 0x45], maximum: 17);
 
-    public static KatanaParameterDefinition ReverbHighDensity { get; } =
-        new("reverb-high-density", "Hi Density", [0x60, 0x00, 0x05, 0x46], maximum: 1);
+    public static KatanaParameterDefinition ReverbDensity { get; } =
+        new("reverb-density", "Density", [0x60, 0x00, 0x05, 0x46], maximum: 10);
+
+    public static KatanaParameterDefinition ReverbColor { get; } =
+        new("reverb-color", "Color", [0x60, 0x00, 0x05, 0x47], maximum: 100);
 
     public static KatanaParameterDefinition ReverbEffectLevel { get; } =
-        new("reverb-effect-level", "E.Level", [0x60, 0x00, 0x05, 0x48]);
+        new("reverb-effect-level", "E.Level", [0x60, 0x00, 0x05, 0x48], maximum: 100);
 
     public static KatanaParameterDefinition ReverbDirectMix { get; } =
-        new("reverb-direct-mix", "D.Mix", [0x60, 0x00, 0x05, 0x49]);
+        new("reverb-direct-mix", "D.Mix", [0x60, 0x00, 0x05, 0x49], maximum: 100);
 
     public static IReadOnlyList<KatanaPanelEffectDefinition> PanelEffects { get; } =
     [
@@ -304,7 +310,7 @@ public static partial class KatanaMkIIParameterCatalog
         new("delay2", "Delay 2", Delay2Switch, typeParameter: Delay2Type,
             detailParameters: [Delay2Feedback, Delay2HighCut, Delay2EffectLevel, Delay2DirectMix, Delay2TapTime, Delay2ModRate, Delay2ModDepth, Delay2Range, Delay2Filter, Delay2FeedbackPhase, Delay2DelayPhase, Delay2ModSw]),
         new("reverb", "Reverb", ReverbSwitch, variationParameter: ReverbVariation, typeParameter: ReverbType, levelParameter: ReverbLevel,
-            detailParameters: [ReverbTime, ReverbPreDelay, ReverbHighCut, ReverbHighDensity, ReverbEffectLevel, ReverbDirectMix]),
+            detailParameters: [ReverbTime, ReverbPreDelay, ReverbLowCut, ReverbHighCut, ReverbDensity, ReverbColor, ReverbEffectLevel, ReverbDirectMix]),
     ];
 
     public static KatanaPedalFxDefinition PedalFx { get; } =

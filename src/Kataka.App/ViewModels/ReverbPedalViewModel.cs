@@ -91,6 +91,17 @@ public partial class ReverbPedalViewModel : PedalViewModel
         }
     }
 
+    private int _lowCut;
+    public int LowCut
+    {
+        get => _lowCut;
+        set
+        {
+            if (!SetProperty(ref _lowCut, value)) return;
+            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbLowCut.Key, value);
+        }
+    }
+
     private int _highCut;
     public int HighCut
     {
@@ -102,14 +113,25 @@ public partial class ReverbPedalViewModel : PedalViewModel
         }
     }
 
-    private bool _highDensity;
-    public bool HighDensity
+    private int _density;
+    public int Density
     {
-        get => _highDensity;
+        get => _density;
         set
         {
-            if (!SetProperty(ref _highDensity, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbHighDensity.Key, value ? 1 : 0);
+            if (!SetProperty(ref _density, value)) return;
+            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbDensity.Key, value);
+        }
+    }
+
+    private int _color;
+    public int Color
+    {
+        get => _color;
+        set
+        {
+            if (!SetProperty(ref _color, value)) return;
+            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbColor.Key, value);
         }
     }
 
@@ -154,8 +176,10 @@ public partial class ReverbPedalViewModel : PedalViewModel
         if (Definition.VariationParameter is not null) list.Add(Definition.VariationParameter);
         list.Add(KatanaMkIIParameterCatalog.ReverbTime);
         list.Add(KatanaMkIIParameterCatalog.ReverbPreDelay);
+        list.Add(KatanaMkIIParameterCatalog.ReverbLowCut);
         list.Add(KatanaMkIIParameterCatalog.ReverbHighCut);
-        list.Add(KatanaMkIIParameterCatalog.ReverbHighDensity);
+        list.Add(KatanaMkIIParameterCatalog.ReverbDensity);
+        list.Add(KatanaMkIIParameterCatalog.ReverbColor);
         list.Add(KatanaMkIIParameterCatalog.ReverbEffectLevel);
         list.Add(KatanaMkIIParameterCatalog.ReverbDirectMix);
         return list;
@@ -171,11 +195,13 @@ public partial class ReverbPedalViewModel : PedalViewModel
             Variation = ToVariationString(variation);
         if (Definition.LevelParameter is not null && values.TryGetValue(Definition.LevelParameter.Key, out var level))
             Level = level;
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbTime.Key, out var time)) Time = Math.Clamp(time, 0, 127);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbPreDelay.Key, out var preDelay)) PreDelay = Math.Clamp(preDelay, 0, 127);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbHighCut.Key, out var highCut)) HighCut = Math.Clamp(highCut, 0, 17);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbHighDensity.Key, out var highDensity)) HighDensity = highDensity != 0;
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbEffectLevel.Key, out var effectLevel)) EffectLevel = Math.Clamp(effectLevel, 0, 127);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbDirectMix.Key, out var directMix)) DirectMix = Math.Clamp(directMix, 0, 127);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbTime.Key, out var time))             Time        = Math.Clamp(time, 0, 127);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbPreDelay.Key, out var preDelay))     PreDelay    = Math.Clamp(preDelay, 0, 127);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbLowCut.Key, out var lowCut))         LowCut      = Math.Clamp(lowCut, 0, 17);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbHighCut.Key, out var highCut))       HighCut     = Math.Clamp(highCut, 0, 17);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbDensity.Key, out var density))       Density     = Math.Clamp(density, 0, 10);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbColor.Key, out var color))           Color       = Math.Clamp(color, 0, 100);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbEffectLevel.Key, out var effLevel))  EffectLevel = Math.Clamp(effLevel, 0, 100);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbDirectMix.Key, out var directMix))   DirectMix   = Math.Clamp(directMix, 0, 100);
     }
 }

@@ -94,7 +94,7 @@ public static class KatanaTypeNameTables
         {
             [0] = "PLATE",
             [1] = "ROOM",
-            [2] = "HALL",
+            [2] = "HALL 1",
             [3] = "SPRING",
             [4] = "MODULATE",
             [5] = "SFX",
