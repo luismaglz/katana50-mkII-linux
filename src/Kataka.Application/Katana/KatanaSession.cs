@@ -5,7 +5,7 @@ namespace Kataka.Application.Katana;
 
 public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 {
-    private static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(2);
     private static readonly int MidiBytesPerSecond = 3125;           // MIDI 1.0 wire speed at 31250 baud
     private static readonly TimeSpan DeviceInterval = TimeSpan.FromMilliseconds(20); // BTS ProductSetting.interval
     private static readonly byte[] CurrentChannelAddress = [0x00, 0x01, 0x00, 0x00];
