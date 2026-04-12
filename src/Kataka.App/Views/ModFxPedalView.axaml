@@ -3,16 +3,17 @@
              xmlns:vm="using:Kataka.App.ViewModels"
              xmlns:dvm="using:Kataka.App.ViewModels.Design"
              xmlns:controls="using:Kataka.App.Controls"
+             xmlns:modsfx="using:Kataka.App.Views.ModsFx"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignWidth="200"
-             d:DesignHeight="320"
-             d:DataContext="{x:Static dvm:DesignModPedalViewModel.Instance}"
-             x:Class="Kataka.App.Views.ModPedalView"
-             x:DataType="vm:ModPedalViewModel">
+             d:DesignWidth="280"
+             d:DesignHeight="420"
+             d:DataContext="{x:Static dvm:DesignModFxPedalViewModel.Instance}"
+             x:Class="Kataka.App.Views.ModFxPedalView"
+             x:DataType="vm:ModFxPedalViewModel">
 
-    <Border MinWidth="160" CornerRadius="8" VerticalAlignment="Top">
+    <Border MinWidth="200" CornerRadius="8" VerticalAlignment="Top">
         <Border.Background>
             <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
                 <GradientStop Offset="0" Color="#2e3138" />
@@ -20,11 +21,13 @@
             </LinearGradientBrush>
         </Border.Background>
         <StackPanel Spacing="0">
-            <!-- Mod accent bar: green -->
+            <!-- Accent bar: green for mod, blue for fx — driven by FamilyAccentColor in parent but we use green default -->
             <Border Height="6" CornerRadius="8,8,0,0" Background="#3dbf6c" />
             <StackPanel Spacing="10" Margin="12,10,12,14">
+
                 <!-- On/Off toggle + LED -->
                 <controls:PedalHeaderControl />
+
                 <!-- Type selector -->
                 <StackPanel Spacing="4" IsVisible="{Binding HasTypeOptions}">
                     <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
@@ -34,6 +37,7 @@
                               ItemsSource="{Binding TypeOptions}"
                               SelectedItem="{Binding SelectedTypeOption}" />
                 </StackPanel>
+
                 <!-- Variation color -->
                 <StackPanel Spacing="4">
                     <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
@@ -41,13 +45,21 @@
                     <Border Height="16" CornerRadius="4"
                             Background="{Binding VariationBrush}" />
                 </StackPanel>
+
                 <!-- Level knob -->
                 <controls:RotaryKnob Scale="0.6" Label="LEVEL"
                                      Minimum="0" Maximum="100"
                                      Value="{Binding Level}"
                                      IsVisible="{Binding HasLevel}"
                                      HorizontalAlignment="Center" />
+
+                <!-- Type-specific body — one panel visible at a time -->
+                <modsfx:ChorusView  IsVisible="{Binding IsTypeChorus}" />
+                <modsfx:FlangerView IsVisible="{Binding IsTypeFlanger}" />
+                <modsfx:PhaserView  IsVisible="{Binding IsTypePhaser}" />
+
             </StackPanel>
         </StackPanel>
     </Border>
+
 </UserControl>
