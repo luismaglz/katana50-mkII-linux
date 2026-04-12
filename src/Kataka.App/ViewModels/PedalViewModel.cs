@@ -1,48 +1,21 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using Avalonia.Media;
-using Kataka.Domain.Midi;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using Avalonia.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Kataka.Domain.Midi;
 
 namespace Kataka.App.ViewModels;
 
-public partial class PedalViewModel : ViewModelBase
+public abstract partial class PedalViewModel : ViewModelBase, IBasePedal
 {
-    private static readonly IBrush OffVariationBrush = new SolidColorBrush(Color.Parse("#35383f"));
-    private static readonly IBrush GreenVariationBrush = new SolidColorBrush(Color.Parse("#91ff92"));
-    private static readonly IBrush RedVariationBrush = new SolidColorBrush(Color.Parse("#ff6f61"));
-    private static readonly IBrush YellowVariationBrush = new SolidColorBrush(Color.Parse("#ffd65c"));
+    protected static readonly IBrush OffVariationBrush = new SolidColorBrush(Color.Parse("#35383f"));
+    protected static readonly IBrush GreenVariationBrush = new SolidColorBrush(Color.Parse("#91ff92"));
+    protected static readonly IBrush RedVariationBrush = new SolidColorBrush(Color.Parse("#ff6f61"));
+    protected static readonly IBrush YellowVariationBrush = new SolidColorBrush(Color.Parse("#ffd65c"));
 
-    // Bidirectional map: display string → wire byte value.
-    private readonly Dictionary<string, byte> _typeValueByOption = [];
-
-    public PedalViewModel(KatanaPanelEffectDefinition definition)
+    protected PedalViewModel(KatanaPanelEffectDefinition definition)
     {
         Definition = definition;
-
-        if (definition.TypeParameter is null)
-        {
-            SelectedTypeOption = "N/A";
-            return;
-        }
-
-        var nameTable = KatanaTypeNameTables.GetTableForKey(definition.TypeParameter.Key);
-
-        foreach (var value in Enumerable.Range(definition.TypeParameter.Minimum, definition.TypeParameter.Maximum - definition.TypeParameter.Minimum + 1)
-                     .Select(index => (byte)index)
-                     .Where(value => !definition.TypeParameter.SkippedValues.Contains(value)))
-        {
-            var option = ToTypeOption(nameTable, value);
-            TypeOptions.Add(option);
-            _typeValueByOption[option] = value;
-        }
-
-        SelectedTypeOption = TypeOptions.FirstOrDefault() ?? "N/A";
-
-        foreach (var param in definition.DetailParameters)
-            DetailParams.Add(new EffectDetailParamViewModel(param));
     }
 
     public KatanaPanelEffectDefinition Definition { get; }
@@ -52,77 +25,57 @@ public partial class PedalViewModel : ViewModelBase
     [ObservableProperty]
     public partial bool IsEnabled { get; set; }
 
-    [ObservableProperty]
-    public partial string Variation { get; set; } = "Unknown";
+    /// <summary>When true, property setters must not raise ParameterChanged (amp is pushing values in).</summary>
+    protected bool SuppressingAmpApply { get; private set; }
 
-    public ObservableCollection<string> TypeOptions { get; } = [];
+    public event EventHandler<PedalParameterChangedEventArgs>? ParameterChanged;
 
-    [ObservableProperty]
-    public partial string SelectedTypeOption { get; set; } = "N/A";
-
-    // Level knob value (0-100). 0 means "not set / tracking" when the level
-    // parameter minimum is effectively −1 on the amp firmware.
-    [ObservableProperty]
-    public partial int Level { get; set; } = 0;
-
-    public bool HasLevel => Definition.LevelParameter is not null;
-    public bool HasTypeOptions => TypeOptions.Count > 0;
-    public bool HasDetailParams => DetailParams.Count > 0;
-
-    public ObservableCollection<EffectDetailParamViewModel> DetailParams { get; } = [];
-
-    public IBrush VariationBrush => Variation switch
+    protected void RaiseParameterChanged(string key, int value)
     {
-        "Green" => GreenVariationBrush,
-        "Red" => RedVariationBrush,
+        if (!SuppressingAmpApply)
+            ParameterChanged?.Invoke(this, new PedalParameterChangedEventArgs(key, value));
+    }
+
+    // ── IBasePedal domain members — each concrete pedal owns its type tables and config ──
+
+    public abstract string? SelectedTypeOption { get; set; }
+    public abstract bool TryGetTypeValue(string? option, out byte value);
+    public abstract string ToTypeOption(byte rawValue);
+    public abstract string TypeCaption { get; }
+    public abstract string Variation { get; set; }
+    public abstract int Level { get; set; }
+    public abstract bool HasLevel { get; }
+
+    public abstract IReadOnlyList<KatanaParameterDefinition> GetSyncParameters();
+
+    public void ApplyAmpValues(IReadOnlyDictionary<string, int> values)
+    {
+        SuppressingAmpApply = true;
+        try
+        {
+            ApplyAmpValuesCore(values);
+        }
+        finally
+        {
+            SuppressingAmpApply = false;
+        }
+    }
+
+    protected abstract void ApplyAmpValuesCore(IReadOnlyDictionary<string, int> values);
+
+    protected static IBrush GetVariationBrush(string variation) => variation switch
+    {
+        "Green"  => GreenVariationBrush,
+        "Red"    => RedVariationBrush,
         "Yellow" => YellowVariationBrush,
-        _ => OffVariationBrush,
+        _        => OffVariationBrush,
     };
 
-    public string VariationCaption => Variation == "N/A" ? "No variation" : Variation;
-
-    public string TypeCaption => SelectedTypeOption == "N/A" ? "No type" : SelectedTypeOption;
-
-    partial void OnVariationChanged(string value)
+    protected static string ToVariationString(int rawValue) => rawValue switch
     {
-        OnPropertyChanged(nameof(VariationBrush));
-        OnPropertyChanged(nameof(VariationCaption));
-    }
-
-    partial void OnSelectedTypeOptionChanged(string value)
-    {
-        OnPropertyChanged(nameof(TypeCaption));
-    }
-
-    /// <summary>
-    /// Returns the wire byte value for a type option string, or false if unknown.
-    /// Supports both named options (e.g., "PLATE") and legacy "Type N" format.
-    /// </summary>
-    public bool TryGetTypeValue(string option, [NotNullWhen(true)] out byte value)
-    {
-        if (_typeValueByOption.TryGetValue(option, out value))
-            return true;
-
-        // Fallback: parse legacy "Type N" format.
-        const string prefix = "Type ";
-        if (option.StartsWith(prefix, System.StringComparison.Ordinal) &&
-            byte.TryParse(option[prefix.Length..], out value))
-            return true;
-
-        value = 0;
-        return false;
-    }
-
-    /// <summary>Returns a display string for a wire byte value using the given name table.</summary>
-    public static string ToTypeOption(IReadOnlyDictionary<byte, string>? nameTable, byte value) =>
-        nameTable?.TryGetValue(value, out var name) == true ? name : $"Type {value}";
-
-    /// <summary>Returns an option string for a wire value using this effect's type name table.</summary>
-    public string ToTypeOption(byte value)
-    {
-        var nameTable = Definition.TypeParameter is not null
-            ? KatanaTypeNameTables.GetTableForKey(Definition.TypeParameter.Key)
-            : null;
-        return ToTypeOption(nameTable, value);
-    }
+        0 => "Green",
+        1 => "Red",
+        2 => "Yellow",
+        _ => "Unknown",
+    };
 }

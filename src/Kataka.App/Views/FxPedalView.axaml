@@ -47,34 +47,6 @@
                                      Value="{Binding Level}"
                                      IsVisible="{Binding HasLevel}"
                                      HorizontalAlignment="Center" />
-                <!-- Detail parameter knobs -->
-                <ItemsControl ItemsSource="{Binding DetailParams}"
-                              IsVisible="{Binding HasDetailParams}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:EffectDetailParamViewModel">
-                            <Panel>
-                                <controls:RotaryKnob Scale="0.6" Label="{Binding Label}"
-                                                     Minimum="{Binding Minimum}"
-                                                     Maximum="{Binding Maximum}"
-                                                     Value="{Binding Value}"
-                                                     IsVisible="{Binding !IsToggle}" />
-                                <Border IsVisible="{Binding IsToggle}"
-                                        Width="70" Height="94" Padding="8">
-                                    <ToggleButton Classes="effect-button"
-                                                  HorizontalAlignment="Stretch"
-                                                  VerticalAlignment="Center"
-                                                  Content="{Binding Label}"
-                                                  IsChecked="{Binding IsOn}" />
-                                </Border>
-                            </Panel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
             </StackPanel>
         </StackPanel>
     </Border>

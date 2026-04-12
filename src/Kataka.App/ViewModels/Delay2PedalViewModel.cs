@@ -6,16 +6,20 @@ using Kataka.Domain.Midi;
 
 namespace Kataka.App.ViewModels;
 
-public partial class DelayPedalViewModel : PedalViewModel
+/// <summary>
+/// ViewModel for the Delay 2 panel effect. Unlike the main Delay, Delay 2 has no variation
+/// (FXBOX_SEL) and no front-panel level knob — only switch, type, and DSP detail params.
+/// </summary>
+public partial class Delay2PedalViewModel : PedalViewModel
 {
     private static readonly KatanaPanelEffectDefinition OwnDefinition =
-        KatanaMkIIParameterCatalog.PanelEffects.First(e => e.Key == "delay");
+        KatanaMkIIParameterCatalog.PanelEffects.First(e => e.Key == "delay2");
 
     private static readonly IReadOnlyDictionary<byte, string> TypeTable = KatanaTypeNameTables.DelayTypes;
     private static readonly IReadOnlyDictionary<string, byte> ReverseTypeTable =
         TypeTable.ToDictionary(kvp => kvp.Value, kvp => kvp.Key, StringComparer.OrdinalIgnoreCase);
 
-    public DelayPedalViewModel() : base(OwnDefinition)
+    public Delay2PedalViewModel() : base(OwnDefinition)
     {
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
     }
@@ -24,7 +28,9 @@ public partial class DelayPedalViewModel : PedalViewModel
 
     public IReadOnlyList<string> TypeOptions { get; }
     public bool HasTypeOptions => TypeOptions.Count > 0;
-    public IBrush VariationBrush => GetVariationBrush(Variation);
+
+    // Delay 2 has no variation — brush is always the off/inactive color.
+    public IBrush VariationBrush => OffVariationBrush;
 
     // ── IBasePedal abstract overrides ────────────────────────────────────────────
 
@@ -41,33 +47,26 @@ public partial class DelayPedalViewModel : PedalViewModel
         }
     }
 
+    // Delay 2 has no variation parameter. Variation is always "N/A".
     private string _variation = "N/A";
     public override string Variation
     {
         get => _variation;
-        set
-        {
-            if (!SetProperty(ref _variation, value)) return;
-            OnPropertyChanged(nameof(VariationBrush));
-        }
+        set => SetProperty(ref _variation, value);
     }
 
+    // Delay 2 has no front-panel level knob (no LevelParameter in catalog).
     private int _level;
     public override int Level
     {
         get => _level;
-        set
-        {
-            if (!SetProperty(ref _level, value)) return;
-            if (SuppressingAmpApply || Definition.LevelParameter is null) return;
-            RaiseParameterChanged(Definition.LevelParameter.Key, value);
-        }
+        set => SetProperty(ref _level, value);
     }
 
     public override bool HasLevel => Definition.LevelParameter is not null;
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
-    // ── Delay-specific controls ────────────────────────────────────────────────────
+    // ── Delay 2-specific controls ──────────────────────────────────────────────────
 
     private int _feedback;
     public int Feedback
@@ -76,7 +75,7 @@ public partial class DelayPedalViewModel : PedalViewModel
         set
         {
             if (!SetProperty(ref _feedback, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.DelayFeedback.Key, value);
+            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.Delay2Feedback.Key, value);
         }
     }
 
@@ -87,7 +86,7 @@ public partial class DelayPedalViewModel : PedalViewModel
         set
         {
             if (!SetProperty(ref _highCut, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.DelayHighCut.Key, value);
+            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.Delay2HighCut.Key, value);
         }
     }
 
@@ -98,7 +97,7 @@ public partial class DelayPedalViewModel : PedalViewModel
         set
         {
             if (!SetProperty(ref _effectLevel, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.DelayEffectLevel.Key, value);
+            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.Delay2EffectLevel.Key, value);
         }
     }
 
@@ -109,7 +108,7 @@ public partial class DelayPedalViewModel : PedalViewModel
         set
         {
             if (!SetProperty(ref _directMix, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.DelayDirectMix.Key, value);
+            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.Delay2DirectMix.Key, value);
         }
     }
 
@@ -128,12 +127,10 @@ public partial class DelayPedalViewModel : PedalViewModel
     {
         var list = new List<KatanaParameterDefinition> { Definition.SwitchParameter };
         if (Definition.TypeParameter is not null) list.Add(Definition.TypeParameter);
-        if (Definition.LevelParameter is not null) list.Add(Definition.LevelParameter);
-        if (Definition.VariationParameter is not null) list.Add(Definition.VariationParameter);
-        list.Add(KatanaMkIIParameterCatalog.DelayFeedback);
-        list.Add(KatanaMkIIParameterCatalog.DelayHighCut);
-        list.Add(KatanaMkIIParameterCatalog.DelayEffectLevel);
-        list.Add(KatanaMkIIParameterCatalog.DelayDirectMix);
+        list.Add(KatanaMkIIParameterCatalog.Delay2Feedback);
+        list.Add(KatanaMkIIParameterCatalog.Delay2HighCut);
+        list.Add(KatanaMkIIParameterCatalog.Delay2EffectLevel);
+        list.Add(KatanaMkIIParameterCatalog.Delay2DirectMix);
         return list;
     }
 
@@ -143,13 +140,9 @@ public partial class DelayPedalViewModel : PedalViewModel
             IsEnabled = sw != 0;
         if (Definition.TypeParameter is not null && values.TryGetValue(Definition.TypeParameter.Key, out var typeVal))
             SelectedTypeOption = ToTypeOption((byte)typeVal);
-        if (Definition.VariationParameter is not null && values.TryGetValue(Definition.VariationParameter.Key, out var variation))
-            Variation = ToVariationString(variation);
-        if (Definition.LevelParameter is not null && values.TryGetValue(Definition.LevelParameter.Key, out var level))
-            Level = level;
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.DelayFeedback.Key, out var feedback)) Feedback = Math.Clamp(feedback, 0, 127);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.DelayHighCut.Key, out var highCut)) HighCut = Math.Clamp(highCut, 0, 17);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.DelayEffectLevel.Key, out var effectLevel)) EffectLevel = Math.Clamp(effectLevel, 0, 127);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.DelayDirectMix.Key, out var directMix)) DirectMix = Math.Clamp(directMix, 0, 127);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.Delay2Feedback.Key, out var feedback)) Feedback = Math.Clamp(feedback, 0, 127);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.Delay2HighCut.Key, out var highCut)) HighCut = Math.Clamp(highCut, 0, 17);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.Delay2EffectLevel.Key, out var effectLevel)) EffectLevel = Math.Clamp(effectLevel, 0, 127);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.Delay2DirectMix.Key, out var directMix)) DirectMix = Math.Clamp(directMix, 0, 127);
     }
 }

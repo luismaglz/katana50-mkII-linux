@@ -8,7 +8,7 @@ namespace Kataka.App.ViewModels;
 
 public partial class PedalboardViewModel : ViewModelBase
 {
-    private readonly IReadOnlyDictionary<string, PedalViewModel> _pedalsByKey;
+    private readonly IReadOnlyDictionary<string, IBasePedal> _pedalsByKey;
     private readonly PedalFxViewModel _pedalFx;
     private readonly Func<string> _getSelectedChannel;
 
@@ -38,7 +38,7 @@ public partial class PedalboardViewModel : ViewModelBase
     ];
 
     public PedalboardViewModel(
-        IReadOnlyDictionary<string, PedalViewModel> pedalsByKey,
+        IReadOnlyDictionary<string, IBasePedal> pedalsByKey,
         PedalFxViewModel pedalFx,
         Func<string> getSelectedChannel)
     {
@@ -71,7 +71,7 @@ public partial class PedalboardViewModel : ViewModelBase
             item.IsSelected = string.Equals(item.Key, value, StringComparison.Ordinal);
     }
 
-    public PedalViewModel? SelectedPedalDetail =>
+    public IBasePedal? SelectedPedalDetail =>
         SelectedPedalboardKey is not null &&
         _pedalsByKey.TryGetValue(SelectedPedalboardKey, out var vm) ? vm : null;
 
@@ -175,9 +175,7 @@ public partial class PedalboardViewModel : ViewModelBase
             {
                 Key = effect.Definition.Key,
                 DisplayName = effect.DisplayName.ToUpperInvariant(),
-                Detail = effect.Definition.TypeParameter is null
-                    ? effect.VariationCaption
-                    : $"{effect.TypeCaption} / {effect.VariationCaption}",
+                Detail = effect.DisplayName,
                 IsActive = effect.IsEnabled,
                 IsConnectedFromPrevious = items.Count > 0,
                 CanToggle = true,

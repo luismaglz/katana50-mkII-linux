@@ -448,12 +448,8 @@ The chain pattern controls the routing order of effects relative to the preamp b
 
 | Source | Location | Use |
 |--------|----------|-----|
-| Katana MK2 FloorBoard source | `/home/luisma/katana-git/Katana_Mk2_FxFloorBoard_source_code_20240515` | Primary address reference |
-| MKII parameter table | `/tmp/AllParams.cpp` (extracted) | Parameter type/range reference |
 | Boss Tone Studio (macOS) | `~/BOSS TONE STUDIO for KATANA MkII Installer/` | Transport pacing strategy, UX reference |
-| GT-8 FloorBoard (this repo) | `/home/luisma/katana-git/code/` | Framework/history; **not** a Katana address source |
 | BTS `address_map.js` | Inside BTS app bundle | FX type count reference (FX1_FXTYPE max=40) |
-| `lib-katana` (Go) | Sibling repo | Region structure, sparse patch storage boundaries |
 | `docs/data/tsl-map-1.0.0.csv` | Sibling docs repo | Broad Katana parameter/address catalog |
 | KATANA-Mk2 owner's manual | `/home/luisma/katana-git/kataka-csharp/KATANA-Mk2_eng02_W.pdf` | UX and hardware behavior reference |
 | BTS parameter reference | `/home/luisma/katana-git/kataka-csharp/BTS_KTN-Mk2_eng07_W.pdf` | Parameter ranges and effect names |
