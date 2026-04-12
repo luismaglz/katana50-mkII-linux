@@ -16,7 +16,7 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private static readonly TimeSpan TapResetThreshold = TimeSpan.FromSeconds(2.5);
     private static readonly TimeSpan WriteSyncDebounce = TimeSpan.FromMilliseconds(125);
-    private static readonly TimeSpan ReadSyncInterval = TimeSpan.FromSeconds(4);
+    private static readonly TimeSpan ReadSyncInterval = TimeSpan.FromSeconds(2);
     private readonly IKatanaSession katanaSession;
     private readonly Dictionary<string, string> inputPortIds = [];
     private readonly Dictionary<string, string> outputPortIds = [];
@@ -38,6 +38,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private DateTimeOffset? lastDelayTapAt;
     private bool suppressChangeTracking;
     private int activeReadSyncPhase;
+    private int flushRetryCount;
     private bool suspendActiveReadSync;
     private bool isShuttingDown;
     private string? pendingPanelChannel;
@@ -1126,6 +1127,8 @@ public partial class MainWindowViewModel : ViewModelBase
                 StatusMessage = "Queued changes synced to the Katana.";
                 AppendLog("Queued changes synced to the Katana.");
             }
+
+            flushRetryCount = 0;
         }
         catch (Exception ex)
         {
@@ -1155,10 +1158,13 @@ public partial class MainWindowViewModel : ViewModelBase
             }
 
             pendingPanelChannel ??= channelSnapshot;
+            flushRetryCount++;
+            var backoffMs = Math.Min(100 * (1 << flushRetryCount), 2000);
             StatusMessage = ex.Message;
-            AppendLog($"Queued write sync failed. Re-queued {DescribePendingWrites()}.");
+            AppendLog($"Queued write sync failed (retry {flushRetryCount}, backoff {backoffMs}ms). Re-queued {DescribePendingWrites()}.");
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
+            await Task.Delay(backoffMs);
         }
         finally
         {
@@ -1390,8 +1396,7 @@ public partial class MainWindowViewModel : ViewModelBase
             AppendLog($"Read sync refreshing amp values: {DescribeAmpKeys(ampWrites.Keys)}.");
             var values = await katanaSession.ReadParametersAsync(ampParameters);
 
-            suppressChangeTracking = true;
-            try
+            ApplyDeviceState(() =>
             {
                 foreach (var parameter in ampParameters)
                 {
@@ -1405,11 +1410,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
                     control.Value = values[parameter.Key];
                 }
-            }
-            finally
-            {
-                suppressChangeTracking = false;
-            }
+            });
         }
 
         if (panelWrites.Count > 0)
@@ -1421,8 +1422,7 @@ public partial class MainWindowViewModel : ViewModelBase
             AppendLog($"Read sync refreshing panel values: {DescribePanelKeys(panelWrites.Keys)}.");
             var values = await katanaSession.ReadParametersAsync(panelParameters);
 
-            suppressChangeTracking = true;
-            try
+            ApplyDeviceState(() =>
             {
                 foreach (var parameter in panelParameters)
                 {
@@ -1436,11 +1436,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
                     effect.IsEnabled = values[parameter.Key] != 0;
                 }
-            }
-            finally
-            {
-                suppressChangeTracking = false;
-            }
+            });
         }
 
         if (panelTypeWrites.Count > 0)
@@ -1452,8 +1448,7 @@ public partial class MainWindowViewModel : ViewModelBase
             AppendLog($"Read sync refreshing panel types: {string.Join(", ", typeParameters.Select(parameter => parameter.DisplayName))}.");
             var values = await katanaSession.ReadParametersAsync(typeParameters);
 
-            suppressChangeTracking = true;
-            try
+            ApplyDeviceState(() =>
             {
                 foreach (var parameter in typeParameters)
                 {
@@ -1469,11 +1464,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
                     effect.SelectedTypeOption = effect.ToTypeOption(values[parameter.Key]);
                 }
-            }
-            finally
-            {
-                suppressChangeTracking = false;
-            }
+            });
         }
 
         if (pedalWrites.Count > 0)
@@ -1485,8 +1476,7 @@ public partial class MainWindowViewModel : ViewModelBase
             AppendLog($"Read sync refreshing pedal values: {DescribePedalKeys(pedalWrites.Keys)}.");
             var values = await katanaSession.ReadParametersAsync(pedalParameters);
 
-            suppressChangeTracking = true;
-            try
+            ApplyDeviceState(() =>
             {
                 foreach (var parameter in pedalParameters)
                 {
@@ -1501,11 +1491,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
                     ApplyPedalValue(parameter.Key, values[parameter.Key]);
                 }
-            }
-            finally
-            {
-                suppressChangeTracking = false;
-            }
+            });
         }
 
         if (channelWrite is not null)
@@ -1520,15 +1506,7 @@ public partial class MainWindowViewModel : ViewModelBase
                     return;
                 }
 
-                suppressChangeTracking = true;
-                try
-                {
-                    SelectedPanelChannel = ToPanelChannelDisplay(currentChannel.Value);
-                }
-                finally
-                {
-                    suppressChangeTracking = false;
-                }
+                ApplyDeviceState(() => SelectedPanelChannel = ToPanelChannelDisplay(currentChannel.Value));
             }
         }
     }
@@ -1539,6 +1517,13 @@ public partial class MainWindowViewModel : ViewModelBase
                previous.Address[1] == current.Address[1] &&
                previous.Address[2] == current.Address[2] &&
                previous.Address[3] + 1 == current.Address[3];
+    }
+
+    private void ApplyDeviceState(Action apply)
+    {
+        suppressChangeTracking = true;
+        try { apply(); }
+        finally { suppressChangeTracking = false; }
     }
 
     private static byte[] EncodeDelayTime(int milliseconds)
@@ -1650,8 +1635,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 ? "Refreshing Katana amp editor controls from active read sync."
                 : "Reading Katana amp editor controls.");
             var values = await katanaSession.ReadParametersAsync(AmpControls.Select(control => control.Parameter).ToArray());
-            suppressChangeTracking = true;
-            try
+            ApplyDeviceState(() =>
             {
                 foreach (var control in AmpControls)
                 {
@@ -1659,11 +1643,7 @@ public partial class MainWindowViewModel : ViewModelBase
                     control.Value = value;
                     AppendLog($"{control.DisplayName} reply: {value}");
                 }
-            }
-            finally
-            {
-                suppressChangeTracking = false;
-            }
+            });
 
             if (!backgroundSync)
             {
@@ -1699,16 +1679,11 @@ public partial class MainWindowViewModel : ViewModelBase
             var currentChannel = await katanaSession.ReadCurrentPanelChannelAsync();
             if (currentChannel is not null)
             {
-                suppressChangeTracking = true;
-                try
+                ApplyDeviceState(() =>
                 {
                     SelectedPanelChannel = ToPanelChannelDisplay(currentChannel.Value);
                     AppendLog($"Current panel channel: {SelectedPanelChannel}");
-                }
-                finally
-                {
-                    suppressChangeTracking = false;
-                }
+                });
             }
 
             var parameterList = PanelEffects
@@ -1719,8 +1694,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 .ToArray();
             var values = await katanaSession.ReadParametersAsync(parameterList);
 
-            suppressChangeTracking = true;
-            try
+            ApplyDeviceState(() =>
             {
                 var intValues = values.ToDictionary(kvp => kvp.Key, kvp => (int)kvp.Value, StringComparer.Ordinal);
                 foreach (var effect in PanelEffects)
@@ -1745,11 +1719,7 @@ public partial class MainWindowViewModel : ViewModelBase
                     Pedalboard.SelectedChainPattern = chainValue;
                 }
                 AppendLog($"Amp Type: {SelectedAmpType} / Cabinet Resonance: {SelectedCabinetResonance} / Chain: {PedalboardViewModel.ChainPatternNames[Pedalboard.SelectedChainPattern]}");
-            }
-            finally
-            {
-                suppressChangeTracking = false;
-            }
+            });
 
             lastDelayTapAt = null;
             var patchLevelLoaded = backgroundSync
@@ -1797,8 +1767,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 : "Reading Katana pedal controls.");
             var values = await katanaSession.ReadParametersAsync(PedalFx.GetReadParameters().ToArray());
 
-            suppressChangeTracking = true;
-            try
+            ApplyDeviceState(() =>
             {
                 PedalFx.ApplyValues(values);
                 AppendLog($"Pedal FX: {(PedalFx.IsEnabled ? "On" : "Off")} / {PedalFx.SelectedTypeOption} / {PedalFx.SelectedPositionOption} / Foot Volume {PedalFx.FootVolume}");
@@ -1806,11 +1775,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     AppendLog($"Pedal Wah: {PedalFx.SelectedWahTypeOption} / Pos {PedalFx.PedalPosition} / Min {PedalFx.PedalMinimum} / Max {PedalFx.PedalMaximum} / Level {PedalFx.EffectLevel} / Direct {PedalFx.DirectMix}");
                 }
-            }
-            finally
-            {
-                suppressChangeTracking = false;
-            }
+            });
 
             if (!backgroundSync)
             {
