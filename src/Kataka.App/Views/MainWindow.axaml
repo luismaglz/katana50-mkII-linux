@@ -95,7 +95,7 @@
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto">
                 <Border Classes="amp-shell" Padding="24">
-                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="18">
+                    <Grid RowDefinitions="Auto,Auto" RowSpacing="18">
                         <!-- ROW 0: AMP CONTROLS | CHANNEL STRIP | DEVICE STATUS -->
                         <Grid ColumnDefinitions="Auto,*,300" ColumnSpacing="14">
                             <!-- AMP CONTROLS -->
@@ -234,22 +234,8 @@
                             </StackPanel>
                         </Grid>
 
-                        <!-- ROW 1: PEDALBOARD CHAIN (minimap) with chain selector -->
-                        <Grid Grid.Row="1" ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                            <StackPanel Spacing="4" VerticalAlignment="Center">
-                                <TextBlock Text="CHAIN"
-                                           FontSize="10"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                <ComboBox Classes="midi-port-picker"
-                                          MinWidth="130"
-                                          ItemsSource="{x:Static vm:PedalboardViewModel.ChainPatternNames}"
-                                          SelectedIndex="{Binding Pedalboard.SelectedChainPattern}" />
-                            </StackPanel>
-                            <views:PedalboardChainView Grid.Column="1" />
-                        </Grid>
-                        <!-- ROW 2: FULL PEDALBOARD (all controls visible) -->
-                        <views:PedalboardView Grid.Row="2" />
+                        <!-- ROW 1: FULL PEDALBOARD (chain selector + all pedal controls) -->
+                        <views:PedalboardView Grid.Row="1" />
 
                     </Grid>
                 </Border>

@@ -14,8 +14,20 @@
              x:DataType="vm:MainWindowViewModel">
     <Border Classes="panel-section alt" Padding="18">
         <StackPanel Spacing="12">
-            <TextBlock Text="PEDALBOARD"
-                       FontSize="18" FontWeight="Bold" LetterSpacing="1.5" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <TextBlock Text="PEDALBOARD"
+                           FontSize="18" FontWeight="Bold" LetterSpacing="1.5"
+                           VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                    <TextBlock Text="CHAIN"
+                               FontSize="10" FontWeight="SemiBold"
+                               Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                    <ComboBox Classes="midi-port-picker"
+                              MinWidth="130"
+                              ItemsSource="{x:Static vm:PedalboardViewModel.ChainPatternNames}"
+                              SelectedIndex="{Binding Pedalboard.SelectedChainPattern}" />
+                </StackPanel>
+            </Grid>
 
             <ScrollViewer HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Disabled">

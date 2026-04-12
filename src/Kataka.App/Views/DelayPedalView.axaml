@@ -23,11 +23,8 @@
             <!-- Delay accent bar: blue -->
             <Border Height="6" CornerRadius="8,8,0,0" Background="#2979c9" />
             <StackPanel Spacing="10" Margin="12,10,12,14">
-                <!-- On/Off toggle -->
-                <ToggleButton Classes="effect-button"
-                              HorizontalAlignment="Stretch"
-                              Content="{Binding DisplayName}"
-                              IsChecked="{Binding IsEnabled}" />
+                <!-- On/Off toggle + LED -->
+                <controls:PedalHeaderControl />
                 <!-- Type selector -->
                 <StackPanel Spacing="4" IsVisible="{Binding HasTypeOptions}">
                     <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
