@@ -36,7 +36,10 @@
                 </StackPanel>
                 <!-- Variation color -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-
+                    <controls:RotaryKnob Scale="0.6" Label="E.LEVEL"
+                                         Minimum="0" Maximum="100"
+                                         Value="{Binding EffectLevel}"
+                                         LabelFontSize="12"/>
                     <controls:RotaryKnob Scale="0.6" Label="DRIVE"
                                          Minimum="0" Maximum="120"
                                          Value="{Binding Drive}"
@@ -49,10 +52,7 @@
 
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <controls:RotaryKnob Scale="0.6" Label="E.LEVEL"
-                                         Minimum="0" Maximum="100"
-                                         Value="{Binding EffectLevel}"
-                                         LabelFontSize="12"/>
+
                     <controls:RotaryKnob Scale="0.6" Label="BOTTOM"
                                          Minimum="0" Maximum="100"
                                          DisplayMinimum="-50" DisplayMaximum="50"
@@ -61,6 +61,10 @@
                     <controls:RotaryKnob Scale="0.6" Label="D.MIX"
                                          Minimum="0" Maximum="100"
                                          Value="{Binding DirectMix}"
+                                         LabelFontSize="12"/>
+                    <controls:RotaryKnob Scale="0.6" Label="SOLO LVL"
+                                         Minimum="0" Maximum="100"
+                                         Value="{Binding SoloLevel}"
                                          LabelFontSize="12"/>
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="30">
@@ -71,10 +75,6 @@
                                   Content="SOLO"
                                   Width="100"
                                   IsChecked="{Binding SoloSw}" />
-                    <controls:RotaryKnob Scale="0.6" Label="SOLO LVL"
-                                         Minimum="0" Maximum="100"
-                                         Value="{Binding SoloLevel}"
-                                         LabelFontSize="12"/>
                 </StackPanel>
             </StackPanel>
         </StackPanel>
