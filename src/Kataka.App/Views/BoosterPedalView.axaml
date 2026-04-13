@@ -36,10 +36,10 @@
                 </StackPanel>
                 <!-- Variation color -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <controls:RotaryKnob Scale="0.6" Label="E.LEVEL"
-                                         Minimum="0" Maximum="100"
-                                         Value="{Binding EffectLevel}"
-                                         LabelFontSize="12"/>
+                    <controls:SmallImageRotaryKnob Label="E.LEVEL"
+                                              Minimum="0" Maximum="100"
+                                              Value="{Binding EffectLevel}"
+                                              LabelFontSize="12"/>
                     <controls:RotaryKnob Scale="0.6" Label="DRIVE"
                                          Minimum="0" Maximum="120"
                                          Value="{Binding Drive}"
