@@ -54,4 +54,10 @@ internal sealed class NullKatanaSession : IKatanaSession
 
     public Task WriteBlockAsync(IReadOnlyList<byte> address, IReadOnlyList<byte> data, CancellationToken cancellationToken = default)
         => Task.CompletedTask;
+
+    public Task<TslPatch> ReadCurrentPatchAsync(string name, CancellationToken cancellationToken = default)
+        => Task.FromResult(new TslPatch { Name = name });
+
+    public Task LoadPatchAsync(TslPatch patch, CancellationToken cancellationToken = default)
+        => Task.CompletedTask;
 }

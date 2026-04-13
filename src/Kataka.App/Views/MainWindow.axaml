@@ -168,6 +168,14 @@
                                                    TextWrapping="Wrap" />
                                     </StackPanel>
                                     <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+                                        <Button Classes="transport-button" Content="Load Patch"
+                                                Command="{Binding LoadPatchCommand}"
+                                                IsEnabled="{Binding CanWritePatch}"
+                                                ToolTip.Tip="Load a .tsl patch file and send it to the amp" />
+                                        <Button Classes="transport-button" Content="Save Patch"
+                                                Command="{Binding SavePatchCommand}"
+                                                IsEnabled="{Binding CanWritePatch}"
+                                                ToolTip.Tip="Save the current amp state as a .tsl patch file" />
                                         <Button Classes="transport-button" Content="Write Patch"
                                                 Command="{Binding WritePatchCommand}"
                                                 IsEnabled="{Binding CanWritePatch}"

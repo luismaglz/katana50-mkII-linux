@@ -232,9 +232,7 @@ public partial class ModFxPedalViewModel : PedalViewModel
         get => _level;
         set
         {
-            if (!SetProperty(ref _level, value)) return;
-            if (SuppressingAmpApply || Definition.LevelParameter is null) return;
-            RaiseParameterChanged(Definition.LevelParameter.Key, value);
+            SetProperty(ref _level, value);
         }
     }
 

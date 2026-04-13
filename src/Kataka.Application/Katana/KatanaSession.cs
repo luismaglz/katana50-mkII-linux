@@ -184,6 +184,71 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         await RequireConnection().SendAsync(message, cancellationToken);
     }
 
+    public async Task<TslPatch> ReadCurrentPatchAsync(string name, CancellationToken cancellationToken = default)
+    {
+        var patch = new TslPatch { Name = name };
+        const int chunkSize = 64;
+
+        foreach (var block in KatanaPatchBlocks.All)
+        {
+            var addr = block.Address;
+            var remaining = block.Size;
+            var offset = 0;
+            var blockData = new byte[block.Size];
+
+            while (remaining > 0)
+            {
+                var toRead = Math.Min(remaining, chunkSize);
+                var chunkAddr = AddOffset(addr, offset);
+                var chunk = await ReadBlockAsync(chunkAddr, toRead, cancellationToken);
+                chunk.CopyTo(blockData, offset);
+                offset += toRead;
+                remaining -= toRead;
+            }
+
+            patch.Blocks[block.TslKey] = blockData;
+        }
+
+        return patch;
+    }
+
+    public async Task LoadPatchAsync(TslPatch patch, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(patch);
+        const int chunkSize = 64;
+
+        foreach (var block in KatanaPatchBlocks.All)
+        {
+            if (!patch.Blocks.TryGetValue(block.TslKey, out var data)) continue;
+
+            var addr = block.Address;
+            var offset = 0;
+            var remaining = data.Length;
+
+            while (remaining > 0)
+            {
+                var toWrite = Math.Min(remaining, chunkSize);
+                var chunkAddr = AddOffset(addr, offset);
+                var chunk = data.AsSpan(offset, toWrite).ToArray();
+                await WriteBlockAsync(chunkAddr, chunk, cancellationToken);
+                offset += toWrite;
+                remaining -= toWrite;
+            }
+        }
+    }
+
+    private static byte[] AddOffset(byte[] baseAddr, int offset)
+    {
+        var full = ((baseAddr[0] << 24) | (baseAddr[1] << 16) | (baseAddr[2] << 8) | baseAddr[3]) + offset;
+        return
+        [
+            (byte)((full >> 24) & 0x7F),
+            (byte)((full >> 16) & 0x7F),
+            (byte)((full >> 8)  & 0x7F),
+            (byte)( full        & 0x7F),
+        ];
+    }
+
     public async ValueTask DisposeAsync()
     {
         await DisconnectAsync();

@@ -90,9 +90,7 @@ public partial class DelayPedalViewModel : PedalViewModel
         get => _level;
         set
         {
-            if (!SetProperty(ref _level, value)) return;
-            if (SuppressingAmpApply || _def.LevelParameter is null) return;
-            RaiseParameterChanged(_def.LevelParameter.Key, value);
+            SetProperty(ref _level, value);
         }
     }
 
