@@ -27,7 +27,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly Dictionary<string, byte> pendingAmpWrites = [];
     private readonly Dictionary<string, bool> pendingPanelEffectWrites = [];
     private readonly Dictionary<string, byte> pendingPanelTypeWrites = [];
-    private readonly Dictionary<string, byte> pendingPanelLevelWrites = [];
     private readonly Dictionary<string, byte> pendingPedalWrites = [];
     private readonly Dictionary<string, byte> pendingDetailParamWrites = [];
 
@@ -115,10 +114,6 @@ public partial class MainWindowViewModel : ViewModelBase
                 else if (args.PropertyName == nameof(IBasePedal.SelectedTypeOption))
                 {
                     TrackPanelEffectTypeChange(effectViewModel);
-                }
-                else if (args.PropertyName == nameof(IBasePedal.Level))
-                {
-                    TrackPanelEffectLevelChange(effectViewModel);
                 }
             };
 
@@ -310,7 +305,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (!value)
         {
-            if (pendingAmpWrites.Count > 0 || pendingPanelEffectWrites.Count > 0 || pendingPanelTypeWrites.Count > 0 || pendingPanelLevelWrites.Count > 0 || pendingPedalWrites.Count > 0 || pendingPanelChannel is not null || pendingAmpTypeWrite.HasValue || pendingCabinetResonanceWrite.HasValue || pendingAmpVariationWrite.HasValue || pendingChainPatternWrite.HasValue)
+            if (pendingAmpWrites.Count > 0 || pendingPanelEffectWrites.Count > 0 || pendingPanelTypeWrites.Count > 0 || pendingPedalWrites.Count > 0 || pendingPanelChannel is not null || pendingAmpTypeWrite.HasValue || pendingCabinetResonanceWrite.HasValue || pendingAmpVariationWrite.HasValue || pendingChainPatternWrite.HasValue)
             {
                 AppendLog($"Clearing pending sync queue after disconnect: {DescribePendingWrites()}.");
             }
@@ -318,7 +313,6 @@ public partial class MainWindowViewModel : ViewModelBase
             pendingAmpWrites.Clear();
             pendingPanelEffectWrites.Clear();
             pendingPanelTypeWrites.Clear();
-            pendingPanelLevelWrites.Clear();
             pendingPedalWrites.Clear();
             pendingPanelChannel = null;
             pendingAmpTypeWrite = null;
@@ -973,11 +967,6 @@ public partial class MainWindowViewModel : ViewModelBase
             parts.Add($"{pendingPanelTypeWrites.Count} panel type");
         }
 
-        if (pendingPanelLevelWrites.Count > 0)
-        {
-            parts.Add($"{pendingPanelLevelWrites.Count} panel level");
-        }
-
         if (pendingAmpTypeWrite.HasValue)
         {
             parts.Add("amp type");
@@ -1016,7 +1005,6 @@ public partial class MainWindowViewModel : ViewModelBase
         return pendingAmpWrites.Count > 0 ||
                pendingPanelEffectWrites.Count > 0 ||
                pendingPanelTypeWrites.Count > 0 ||
-               pendingPanelLevelWrites.Count > 0 ||
                pendingAmpTypeWrite.HasValue ||
                pendingCabinetResonanceWrite.HasValue ||
                pendingAmpVariationWrite.HasValue ||
@@ -1128,19 +1116,6 @@ public partial class MainWindowViewModel : ViewModelBase
         UpdateWriteSyncTimer();
     }
 
-    private void TrackPanelEffectLevelChange(IBasePedal effect)
-    {
-        if (suppressChangeTracking || !ActiveWriteSync || !IsConnected || effect.Definition.LevelParameter is null)
-        {
-            return;
-        }
-
-        pendingPanelLevelWrites[effect.Definition.LevelParameter.Key] = (byte)Math.Clamp(effect.Level, 0, 100);
-        AppendLog($"Queued panel level sync: {effect.DisplayName} level -> {effect.Level}.");
-        PauseActiveReadSync("queued writes are pending");
-        UpdateWriteSyncTimer();
-    }
-
     private void TrackDetailParamChange(string key, int value)
     {
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected)
@@ -1207,7 +1182,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        if (pendingAmpWrites.Count == 0 && pendingPanelEffectWrites.Count == 0 && pendingPanelTypeWrites.Count == 0 && pendingPanelLevelWrites.Count == 0 && pendingPedalWrites.Count == 0 && pendingDetailParamWrites.Count == 0 && pendingPanelChannel is null && !pendingAmpTypeWrite.HasValue && !pendingCabinetResonanceWrite.HasValue && !pendingAmpVariationWrite.HasValue && !pendingChainPatternWrite.HasValue)
+        if (pendingAmpWrites.Count == 0 && pendingPanelEffectWrites.Count == 0 && pendingPanelTypeWrites.Count == 0 && pendingPedalWrites.Count == 0 && pendingDetailParamWrites.Count == 0 && pendingPanelChannel is null && !pendingAmpTypeWrite.HasValue && !pendingCabinetResonanceWrite.HasValue && !pendingAmpVariationWrite.HasValue && !pendingChainPatternWrite.HasValue)
         {
             return;
         }
@@ -1221,7 +1196,6 @@ public partial class MainWindowViewModel : ViewModelBase
         var ampSnapshot = new Dictionary<string, byte>(StringComparer.Ordinal);
         var panelSnapshot = new Dictionary<string, bool>(StringComparer.Ordinal);
         var panelTypeSnapshot = new Dictionary<string, byte>(StringComparer.Ordinal);
-        var panelLevelSnapshot = new Dictionary<string, byte>(StringComparer.Ordinal);
         var pedalSnapshot = new Dictionary<string, byte>(StringComparer.Ordinal);
         var detailParamSnapshot = new Dictionary<string, byte>(StringComparer.Ordinal);
         string? channelSnapshot = null;
@@ -1236,7 +1210,6 @@ public partial class MainWindowViewModel : ViewModelBase
             ampSnapshot = new Dictionary<string, byte>(pendingAmpWrites, StringComparer.Ordinal);
             panelSnapshot = new Dictionary<string, bool>(pendingPanelEffectWrites, StringComparer.Ordinal);
             panelTypeSnapshot = new Dictionary<string, byte>(pendingPanelTypeWrites, StringComparer.Ordinal);
-            panelLevelSnapshot = new Dictionary<string, byte>(pendingPanelLevelWrites, StringComparer.Ordinal);
             pedalSnapshot = new Dictionary<string, byte>(pendingPedalWrites, StringComparer.Ordinal);
             detailParamSnapshot = new Dictionary<string, byte>(pendingDetailParamWrites, StringComparer.Ordinal);
             channelSnapshot = pendingPanelChannel;
@@ -1248,9 +1221,7 @@ public partial class MainWindowViewModel : ViewModelBase
             pendingAmpWrites.Clear();
             pendingPanelEffectWrites.Clear();
             pendingPanelTypeWrites.Clear();
-            pendingPanelLevelWrites.Clear();
             pendingPedalWrites.Clear();
-            pendingDetailParamWrites.Clear();
             pendingPanelChannel = null;
             pendingAmpTypeWrite = null;
             pendingCabinetResonanceWrite = null;
@@ -1258,10 +1229,10 @@ public partial class MainWindowViewModel : ViewModelBase
             pendingChainPatternWrite = null;
 
             AppendLog(
-                $"Flushing queued sync: {ampSnapshot.Count} amp, {panelSnapshot.Count} panel, {panelTypeSnapshot.Count} panel type, {panelLevelSnapshot.Count} panel level, {pedalSnapshot.Count} pedal, {detailParamSnapshot.Count} detail, {(channelSnapshot is null ? "no" : "1")} channel change.");
+                $"Flushing queued sync: {ampSnapshot.Count} amp, {panelSnapshot.Count} panel, {panelTypeSnapshot.Count} panel type, {pedalSnapshot.Count} pedal, {detailParamSnapshot.Count} detail, {(channelSnapshot is null ? "no" : "1")} channel change.");
 
             await FlushPendingAmpWritesAsync(ampSnapshot);
-            await FlushPendingPanelWritesAsync(channelSnapshot, panelSnapshot, panelTypeSnapshot, panelLevelSnapshot, ampTypeSnapshot, cabinetSnapshot, ampVariationSnapshot, chainPatternSnapshot);
+            await FlushPendingPanelWritesAsync(channelSnapshot, panelSnapshot, panelTypeSnapshot, ampTypeSnapshot, cabinetSnapshot, ampVariationSnapshot, chainPatternSnapshot);
             await FlushPendingPedalWritesAsync(pedalSnapshot);
             await FlushPendingDetailParamWritesAsync(detailParamSnapshot);
 
@@ -1413,7 +1384,6 @@ public partial class MainWindowViewModel : ViewModelBase
         string? channel,
         IReadOnlyDictionary<string, bool> panelWrites,
         IReadOnlyDictionary<string, byte> panelTypeWrites,
-        IReadOnlyDictionary<string, byte> panelLevelWrites,
         byte? ampTypeWrite,
         byte? cabinetResonanceWrite,
         byte? ampVariationWrite,
@@ -1437,13 +1407,6 @@ public partial class MainWindowViewModel : ViewModelBase
             var effect = PanelEffects.First(panel => panel.Definition.TypeParameter?.Key == entry.Key);
             AppendLog($"Writing queued panel type: {effect.DisplayName} -> {effect.ToTypeOption(entry.Value)}.");
             await katanaSession.WriteBlockAsync(effect.Definition.TypeParameter!.Address, [entry.Value]);
-        }
-
-        foreach (var entry in panelLevelWrites)
-        {
-            var effect = PanelEffects.First(panel => panel.Definition.LevelParameter?.Key == entry.Key);
-            AppendLog($"Writing queued panel level: {effect.DisplayName} level -> {entry.Value}.");
-            await katanaSession.WriteBlockAsync(effect.Definition.LevelParameter!.Address, [entry.Value]);
         }
 
         if (ampTypeWrite.HasValue)

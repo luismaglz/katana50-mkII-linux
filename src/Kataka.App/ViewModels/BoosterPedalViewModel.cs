@@ -49,18 +49,6 @@ public partial class BoosterPedalViewModel : PedalViewModel
             OnPropertyChanged(nameof(VariationBrush));
         }
     }
-
-    private int _level;
-    public override int Level
-    {
-        get => _level;
-        set
-        {
-            SetProperty(ref _level, value);
-        }
-    }
-
-    public override bool HasLevel => Definition.LevelParameter is not null;
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
     // ── Booster-specific controls ─────────────────────────────────────────────────
@@ -176,8 +164,6 @@ public partial class BoosterPedalViewModel : PedalViewModel
             SelectedTypeOption = ToTypeOption((byte)typeVal);
         if (Definition.VariationParameter is not null && values.TryGetValue(Definition.VariationParameter.Key, out var variation))
             Variation = ToVariationString(variation);
-        if (Definition.LevelParameter is not null && values.TryGetValue(Definition.LevelParameter.Key, out var level))
-            Level = level;
         if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterDrive.Key, out var drive)) Drive = Math.Clamp(drive, 0, 120);
         if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterTone.Key, out var tone)) Tone = Math.Clamp(tone, 0, 127);
         if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterBottom.Key, out var bottom)) Bottom = Math.Clamp(bottom, 0, 127);

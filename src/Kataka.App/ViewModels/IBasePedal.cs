@@ -34,14 +34,6 @@ public interface IBasePedal : INotifyPropertyChanged
     /// <summary>Variation color string: "Green", "Red", "Yellow", or "N/A" if not supported.</summary>
     string Variation { get; set; }
 
-    // ── Level knob ────────────────────────────────────────────────────────────────
-
-    /// <summary>Front-panel effect level (KNOB_POS), 0–100.</summary>
-    int Level { get; set; }
-
-    /// <summary>True when this effect has a level parameter (i.e. Definition.LevelParameter is not null).</summary>
-    bool HasLevel { get; }
-
     // ── Sync contract ─────────────────────────────────────────────────────────────
 
     /// <summary>Returns all parameter definitions this pedal needs read from the amp.</summary>

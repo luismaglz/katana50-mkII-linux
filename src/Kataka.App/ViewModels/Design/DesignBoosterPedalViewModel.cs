@@ -7,7 +7,6 @@ public sealed class DesignBoosterPedalViewModel : BoosterPedalViewModel
     public DesignBoosterPedalViewModel()
     {
         IsEnabled = true;
-        Level = 64;
         if (TypeOptions.Count > 0) SelectedTypeOption = TypeOptions[0];
     }
 }

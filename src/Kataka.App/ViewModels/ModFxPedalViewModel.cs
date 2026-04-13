@@ -227,16 +227,17 @@ public partial class ModFxPedalViewModel : PedalViewModel
     }
 
     private int _level;
-    public override int Level
+    public int Level
     {
         get => _level;
         set
         {
-            SetProperty(ref _level, value);
+            if (!SetProperty(ref _level, value)) return;
+            if (!SuppressingAmpApply) RaiseParameterChanged(Definition.LevelParameter!.Key, value);
         }
     }
 
-    public override bool HasLevel => Definition.LevelParameter is not null;
+    public bool HasLevel => Definition.LevelParameter is not null;
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
     public override bool TryGetTypeValue(string? option, out byte value)
