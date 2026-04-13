@@ -96,6 +96,8 @@ These sit in one contiguous block → one SysEx round-trip reads all six.
 
 ### Panel Variation Colors — `FXBOX_SEL_*`
 
+All in PATCH 2 block (base `0x00000620`); offsets `0x19–0x1D`.
+
 | Effect    | Address         |
 |-----------|-----------------|
 | Booster   | `60 00 06 39`   |
@@ -104,7 +106,22 @@ These sit in one contiguous block → one SysEx round-trip reads all six.
 | Delay     | `60 00 06 3C`   |
 | Reverb    | `60 00 06 3D`   |
 
-> ⚠️ **Delay 2 has no variation color byte** in the confirmed MKII source. Do not borrow Reverb's byte for it.
+> ⚠️ **Delay 2 has no variation color byte** — confirmed by BTS address_map.js (no `FXBOX_SEL_DELAY2` entry). Do not borrow Reverb's byte for it.
+
+### Cabinet Resonance & Amp Variation
+
+In PATCH 2 block (base `0x00000620`):
+
+| Parameter          | BTS symbol              | Offset | Address       | Range |
+|--------------------|-------------------------|--------|---------------|-------|
+| Cabinet Resonance  | `PRM_CABINET_RESONANCE` | `0x23` | `60 00 06 43` | 0–2 (LOW/MIDDLE/HIGH) |
+
+In PATCH STATUS block (base `0x00000650`):
+
+| Parameter          | BTS symbol              | Offset | Address       | Range |
+|--------------------|-------------------------|--------|---------------|-------|
+| Amp Type           | `PRM_KNOB_POS_TYPE`     | `0x00` | `60 00 06 50` | 0–4 (ACOUSTIC/CLEAN/CRUNCH/LEAD/BROWN) |
+| Amp Variation      | `PRM_LED_STATE_VARI`    | `0x0C` | `60 00 06 5C` | 0–1 (TYPE1/TYPE2) |
 
 ### Delay
 

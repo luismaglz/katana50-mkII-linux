@@ -17,6 +17,7 @@ internal sealed class NullKatanaSession : IKatanaSession
 
     // Design-time stub — push notifications are never raised without a real MIDI connection.
     public event EventHandler<SysExMessage>? PushNotificationReceived { add { } remove { } }
+    public event EventHandler<KatanaPanelChannel>? PanelChannelChanged { add { } remove { } }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 

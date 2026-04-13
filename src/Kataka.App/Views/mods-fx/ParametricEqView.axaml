@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kataka.App.ViewModels"
+             xmlns:controls="using:Kataka.App.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="Kataka.App.Views.ModsFx.ParametricEqView"
+             x:DataType="vm:ModFxPedalViewModel">
+    <StackPanel Spacing="8">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <controls:RotaryKnob Scale="0.45" Label="LOW CUT"
+                                 Minimum="0" Maximum="17"
+                                 Value="{Binding ParametricEqLowCut}"
+                                 LabelFontSize="10" />
+            <controls:RotaryKnob Scale="0.45" Label="LOW GAIN"
+                                 Minimum="0" Maximum="40"
+                                 Value="{Binding ParametricEqLowGain}"
+                                 LabelFontSize="10" />
+            <controls:RotaryKnob Scale="0.45" Label="LOW-MID FREQ"
+                                 Minimum="0" Maximum="27"
+                                 Value="{Binding ParametricEqLowMidFreq}"
+                                 LabelFontSize="10" />
+            <controls:RotaryKnob Scale="0.45" Label="LOW-MID Q"
+                                 Minimum="0" Maximum="5"
+                                 Value="{Binding ParametricEqLowMidQ}"
+                                 LabelFontSize="10" />
+            <controls:RotaryKnob Scale="0.45" Label="LOW-MID GAIN"
+                                 Minimum="0" Maximum="40"
+                                 Value="{Binding ParametricEqLowMidGain}"
+                                 LabelFontSize="10" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <controls:RotaryKnob Scale="0.45" Label="HIGH-MID FREQ"
+                                 Minimum="0" Maximum="27"
+                                 Value="{Binding ParametricEqHighMidFreq}"
+                                 LabelFontSize="10" />
+            <controls:RotaryKnob Scale="0.45" Label="HIGH-MID Q"
+                                 Minimum="0" Maximum="5"
+                                 Value="{Binding ParametricEqHighMidQ}"
+                                 LabelFontSize="10" />
+            <controls:RotaryKnob Scale="0.45" Label="HIGH-MID GAIN"
+                                 Minimum="0" Maximum="40"
+                                 Value="{Binding ParametricEqHighMidGain}"
+                                 LabelFontSize="10" />
+            <controls:RotaryKnob Scale="0.45" Label="HIGH GAIN"
+                                 Minimum="0" Maximum="40"
+                                 Value="{Binding ParametricEqHighGain}"
+                                 LabelFontSize="10" />
+            <controls:RotaryKnob Scale="0.45" Label="HIGH CUT"
+                                 Minimum="0" Maximum="14"
+                                 Value="{Binding ParametricEqHighCut}"
+                                 LabelFontSize="10" />
+            <controls:RotaryKnob Scale="0.45" Label="LEVEL"
+                                 Minimum="0" Maximum="40"
+                                 Value="{Binding ParametricEqLevel}"
+                                 LabelFontSize="10" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

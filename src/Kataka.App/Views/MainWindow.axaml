@@ -102,19 +102,19 @@
                             <Border Classes="panel-section" Padding="16" MinWidth="340">
                                 <StackPanel Spacing="10">
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="AMP CONTROLS"
-                                                   FontSize="16"
-                                                   FontWeight="Bold"
-                                                   LetterSpacing="1.5" />
+                                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                            <Image Source="/Assets/amplifier.png" Width="28" Height="28" VerticalAlignment="Center" />
+                                            <TextBlock Text="AMP CONTROLS"
+                                                       FontSize="16"
+                                                       FontWeight="Bold"
+                                                       LetterSpacing="1.5"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
                                         <TextBlock Text="{Binding AmpEditorStatus}"
                                                    FontSize="11"
                                                    Foreground="{StaticResource KatanaSubtleTextBrush}"
                                                    TextWrapping="Wrap" />
                                     </StackPanel>
-                                    <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
-                                        <Button Classes="transport-button" Content="Read" Command="{Binding ReadAmpControlsCommand}" />
-                                        <Button Classes="transport-button accent" Content="Push" Command="{Binding WriteAmpControlsCommand}" />
-                                    </WrapPanel>
                                     <ItemsControl ItemsSource="{Binding AmpControls}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
@@ -144,6 +144,13 @@
                                                       SelectedItem="{Binding SelectedCabinetResonance}" />
                                         </StackPanel>
                                     </Grid>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                        <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource KatanaSubtleTextBrush}" VerticalAlignment="Center" />
+                                        <ToggleButton IsChecked="{Binding IsAmpVariation}"
+                                                      Classes="effect-toggle"
+                                                      Content="TYPE 2"
+                                                      ToolTip.Tip="Amp Variation (TYPE 1 / TYPE 2)" />
+                                    </StackPanel>
                                 </StackPanel>
                             </Border>
 
@@ -161,8 +168,6 @@
                                                    TextWrapping="Wrap" />
                                     </StackPanel>
                                     <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
-                                        <Button Classes="transport-button" Content="Read panel" Command="{Binding ReadPanelControlsCommand}" />
-                                        <Button Classes="transport-button accent" Content="Push panel" Command="{Binding WritePanelControlsCommand}" />
                                         <Button Classes="transport-button" Content="Write Patch"
                                                 Command="{Binding WritePatchCommand}"
                                                 IsEnabled="{Binding CanWritePatch}"

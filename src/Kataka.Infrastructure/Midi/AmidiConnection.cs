@@ -15,6 +15,10 @@ internal sealed class AmidiConnection(string inputPortId, string outputPortId) :
     // This event is never raised — push notifications require the persistent DryWetMidiConnection.
     public event EventHandler<SysExMessage>? PushNotificationReceived { add { } remove { } }
 
+    /// <inheritdoc />
+    /// AmidiConnection uses subprocess-per-request and cannot observe Program Change messages.
+    public event EventHandler<byte>? ProgramChangeReceived { add { } remove { } }
+
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     public Task SendAsync(SysExMessage message, CancellationToken cancellationToken = default)

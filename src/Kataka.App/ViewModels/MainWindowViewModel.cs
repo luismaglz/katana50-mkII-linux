@@ -36,6 +36,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private Dictionary<string, Action<byte>> pushHandlerLookup = [];
     private byte? pendingAmpTypeWrite;
     private byte? pendingCabinetResonanceWrite;
+    private byte? pendingAmpVariationWrite;
     private byte? pendingChainPatternWrite;
     private readonly SemaphoreSlim syncOperationGate = new(1, 1);
     private readonly DispatcherTimer writeSyncTimer;
@@ -118,8 +119,6 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     TrackPanelEffectLevelChange(effectViewModel);
                 }
-
-                Pedalboard.Refresh();
             };
 
             PanelEffects.Add(effectViewModel);
@@ -134,7 +133,7 @@ public partial class MainWindowViewModel : ViewModelBase
             PanelChannelOptions.Add(new PanelChannelOptionViewModel(channel));
         }
 
-        Pedalboard = new PedalboardViewModel(panelEffectsByDefinitionKey, () => SelectedPanelChannel);
+        Pedalboard = new PedalboardViewModel(panelEffectsByDefinitionKey, SelectedPanelChannel);
         Pedalboard.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName != nameof(PedalboardViewModel.SelectedChainPattern)) return;
@@ -233,7 +232,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public bool CanWritePatch => IsConnected;
 
     [ObservableProperty]
-    public partial bool ActiveReadSync { get; set; } = true;
+    public partial bool ActiveReadSync { get; set; } = false;
 
     [ObservableProperty]
     public partial bool ActiveWriteSync { get; set; } = true;
@@ -246,6 +245,16 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     public partial string SelectedCabinetResonance { get; set; } = "MIDDLE";
+
+    [ObservableProperty]
+    public partial bool IsAmpVariation { get; set; } = false;
+
+    partial void OnIsAmpVariationChanged(bool value)
+    {
+        if (suppressChangeTracking || !ActiveWriteSync || !IsConnected) return;
+        pendingAmpVariationWrite = value ? (byte)1 : (byte)0;
+        AppendLog($"Queued panel sync: Amp Variation -> {(value ? "TYPE 2" : "TYPE 1")}.");
+    }
 
     partial void OnSelectedAmpTypeChanged(string value)
     {
@@ -268,7 +277,7 @@ public partial class MainWindowViewModel : ViewModelBase
     partial void OnSelectedPanelChannelChanged(string value)
     {
         UpdatePanelChannelSelection();
-        Pedalboard.Refresh();
+        Pedalboard.SelectedChannel = value;
 
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected)
         {
@@ -297,7 +306,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (!value)
         {
-            if (pendingAmpWrites.Count > 0 || pendingPanelEffectWrites.Count > 0 || pendingPanelTypeWrites.Count > 0 || pendingPanelLevelWrites.Count > 0 || pendingPedalWrites.Count > 0 || pendingPanelChannel is not null || pendingAmpTypeWrite.HasValue || pendingCabinetResonanceWrite.HasValue || pendingChainPatternWrite.HasValue)
+            if (pendingAmpWrites.Count > 0 || pendingPanelEffectWrites.Count > 0 || pendingPanelTypeWrites.Count > 0 || pendingPanelLevelWrites.Count > 0 || pendingPedalWrites.Count > 0 || pendingPanelChannel is not null || pendingAmpTypeWrite.HasValue || pendingCabinetResonanceWrite.HasValue || pendingAmpVariationWrite.HasValue || pendingChainPatternWrite.HasValue)
             {
                 AppendLog($"Clearing pending sync queue after disconnect: {DescribePendingWrites()}.");
             }
@@ -310,6 +319,7 @@ public partial class MainWindowViewModel : ViewModelBase
             pendingPanelChannel = null;
             pendingAmpTypeWrite = null;
             pendingCabinetResonanceWrite = null;
+            pendingAmpVariationWrite = null;
             pendingChainPatternWrite = null;
         }
 
@@ -520,6 +530,7 @@ public partial class MainWindowViewModel : ViewModelBase
             // update the UI without a poll round-trip. Build the address→action lookup first.
             BuildPushHandlerLookup();
             katanaSession.PushNotificationReceived += OnAmpPushNotification;
+            katanaSession.PanelChannelChanged      += OnAmpPanelChannelChanged;
 
             var looksLikeKatana =
                 SelectedInputPort.Contains("katana", StringComparison.OrdinalIgnoreCase) &&
@@ -557,7 +568,13 @@ public partial class MainWindowViewModel : ViewModelBase
         finally
         {
             suspendActiveReadSync = false;
-            UpdateReadSyncTimer();
+            // Push notifications (EDITOR_COMMUNICATION_MODE) handle live state updates after
+            // the initial load, so there is no need to auto-start polling on connect.
+            // The user can still enable the read sync checkbox manually if desired.
+            if (ActiveReadSync)
+            {
+                UpdateReadSyncTimer();
+            }
         }
     }
 
@@ -572,6 +589,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         // Unsubscribe from push notifications before disconnecting.
         katanaSession.PushNotificationReceived -= OnAmpPushNotification;
+        katanaSession.PanelChannelChanged      -= OnAmpPanelChannelChanged;
         pushHandlerLookup.Clear();
 
         await katanaSession.DisconnectAsync();
@@ -858,6 +876,11 @@ public partial class MainWindowViewModel : ViewModelBase
             parts.Add("cabinet resonance");
         }
 
+        if (pendingAmpVariationWrite.HasValue)
+        {
+            parts.Add("amp variation");
+        }
+
         if (pendingPedalWrites.Count > 0)
         {
             parts.Add($"{pendingPedalWrites.Count} pedal");
@@ -884,6 +907,7 @@ public partial class MainWindowViewModel : ViewModelBase
                pendingPanelLevelWrites.Count > 0 ||
                pendingAmpTypeWrite.HasValue ||
                pendingCabinetResonanceWrite.HasValue ||
+               pendingAmpVariationWrite.HasValue ||
                pendingChainPatternWrite.HasValue ||
                pendingPedalWrites.Count > 0 ||
                pendingDetailParamWrites.Count > 0 ||
@@ -1071,7 +1095,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        if (pendingAmpWrites.Count == 0 && pendingPanelEffectWrites.Count == 0 && pendingPanelTypeWrites.Count == 0 && pendingPanelLevelWrites.Count == 0 && pendingPedalWrites.Count == 0 && pendingDetailParamWrites.Count == 0 && pendingPanelChannel is null && !pendingAmpTypeWrite.HasValue && !pendingCabinetResonanceWrite.HasValue && !pendingChainPatternWrite.HasValue)
+        if (pendingAmpWrites.Count == 0 && pendingPanelEffectWrites.Count == 0 && pendingPanelTypeWrites.Count == 0 && pendingPanelLevelWrites.Count == 0 && pendingPedalWrites.Count == 0 && pendingDetailParamWrites.Count == 0 && pendingPanelChannel is null && !pendingAmpTypeWrite.HasValue && !pendingCabinetResonanceWrite.HasValue && !pendingAmpVariationWrite.HasValue && !pendingChainPatternWrite.HasValue)
         {
             return;
         }
@@ -1091,6 +1115,7 @@ public partial class MainWindowViewModel : ViewModelBase
         string? channelSnapshot = null;
         byte? ampTypeSnapshot = null;
         byte? cabinetSnapshot = null;
+        byte? ampVariationSnapshot = null;
         byte? chainPatternSnapshot = null;
 
         try
@@ -1105,6 +1130,7 @@ public partial class MainWindowViewModel : ViewModelBase
             channelSnapshot = pendingPanelChannel;
             ampTypeSnapshot = pendingAmpTypeWrite;
             cabinetSnapshot = pendingCabinetResonanceWrite;
+            ampVariationSnapshot = pendingAmpVariationWrite;
             chainPatternSnapshot = pendingChainPatternWrite;
 
             pendingAmpWrites.Clear();
@@ -1116,13 +1142,14 @@ public partial class MainWindowViewModel : ViewModelBase
             pendingPanelChannel = null;
             pendingAmpTypeWrite = null;
             pendingCabinetResonanceWrite = null;
+            pendingAmpVariationWrite = null;
             pendingChainPatternWrite = null;
 
             AppendLog(
                 $"Flushing queued sync: {ampSnapshot.Count} amp, {panelSnapshot.Count} panel, {panelTypeSnapshot.Count} panel type, {panelLevelSnapshot.Count} panel level, {pedalSnapshot.Count} pedal, {detailParamSnapshot.Count} detail, {(channelSnapshot is null ? "no" : "1")} channel change.");
 
             await FlushPendingAmpWritesAsync(ampSnapshot);
-            await FlushPendingPanelWritesAsync(channelSnapshot, panelSnapshot, panelTypeSnapshot, panelLevelSnapshot, ampTypeSnapshot, cabinetSnapshot, chainPatternSnapshot);
+            await FlushPendingPanelWritesAsync(channelSnapshot, panelSnapshot, panelTypeSnapshot, panelLevelSnapshot, ampTypeSnapshot, cabinetSnapshot, ampVariationSnapshot, chainPatternSnapshot);
             await FlushPendingPedalWritesAsync(pedalSnapshot);
             await FlushPendingDetailParamWritesAsync(detailParamSnapshot);
 
@@ -1277,6 +1304,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IReadOnlyDictionary<string, byte> panelLevelWrites,
         byte? ampTypeWrite,
         byte? cabinetResonanceWrite,
+        byte? ampVariationWrite,
         byte? chainPatternWrite)
     {
         if (!string.IsNullOrWhiteSpace(channel))
@@ -1316,6 +1344,12 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             AppendLog($"Writing queued cabinet resonance: {(cabinetResonanceWrite.Value < CabinetResonanceOptions.Length ? CabinetResonanceOptions[cabinetResonanceWrite.Value] : cabinetResonanceWrite.Value.ToString())}.");
             await katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.CabinetResonance.Address, [cabinetResonanceWrite.Value]);
+        }
+
+        if (ampVariationWrite.HasValue)
+        {
+            AppendLog($"Writing queued amp variation: {(ampVariationWrite.Value == 0 ? "TYPE 1" : "TYPE 2")}.");
+            await katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.AmpVariation.Address, [ampVariationWrite.Value]);
         }
 
         if (chainPatternWrite.HasValue)
@@ -1581,9 +1615,45 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             if (value < CabinetResonanceOptions.Length) SelectedCabinetResonance = CabinetResonanceOptions[value];
         };
-        pushHandlerLookup[AddressToKey(KatanaMkIIParameterCatalog.ChainPattern.Address)] = value =>
+        pushHandlerLookup[AddressToKey(KatanaMkIIParameterCatalog.AmpVariation.Address)] = value =>
         {
-            if (value < PedalboardViewModel.ChainPatternNames.Length) Pedalboard.SelectedChainPattern = value;
+            IsAmpVariation = value != 0;
+        };
+        // Panel channel (PATCH NUM) — address 00-01-00-00, INTEGER2x7.
+        // The amp pushes this as a 16-byte DT1 when the user presses a channel button.
+        pushHandlerLookup[AddressToKey([0x00, 0x01, 0x00, 0x00])] = value =>
+        {
+            var displayName = value switch
+            {
+                0 => "Panel",
+                1 => "CH A1",
+                2 => "CH A2",
+                5 => "CH B1",
+                6 => "CH B2",
+                _ => null,
+            };
+            if (displayName is not null)
+            {
+                AppendLog($"Amp channel changed (push): {displayName}");
+                SelectPanelChannel(displayName);
+                // Stop the background poller immediately so it doesn't race with the amp
+                // while it's still settling after the channel switch. The poller will be
+                // resumed after we finish the full re-read sequence below.
+                PauseActiveReadSync("channel change in progress");
+                // Re-read all state from the amp — the new channel has its own parameter values.
+                // A brief delay lets the amp finish its internal channel switch before responding
+                // to SysEx reads. Reads are sequenced (not concurrent) to avoid MIDI contention.
+                // InvokeAsync (not Task.Run) keeps continuations on the UI thread so that
+                // ApplyDeviceState calls never mutate ObservableCollections off-thread.
+                _ = Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    await Task.Delay(150);
+                    await TryReadAmpControlsAsync(backgroundSync: true);
+                    await TryReadPanelControlsAsync(backgroundSync: true);
+                    await TryReadPedalControlsAsync(backgroundSync: true);
+                    ResumeActiveReadSync("channel change re-read complete");
+                });
+            }
         };
     }
 
@@ -1596,15 +1666,18 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var bytes = message.Bytes;
 
-        // Only handle single-byte DT1 (15 bytes total: 13-byte Roland header + 1 data + checksum + F7).
-        // Multi-byte block pushes (e.g. full patch dumps) are not yet handled.
-        if (bytes.Count != 15 || bytes[7] != 0x12)
-        {
-            return;
-        }
+        if (bytes[7] != 0x12) return; // not a DT1
+
+        // Roland DT1: F0 41 DevID Model(4) 0x12 Addr(4) Data(N) Chksum F7 = 14+N bytes.
+        // N=1 → 15 bytes (single-byte parameters, most common).
+        // N=2 → 16 bytes (INTEGER2x7 parameters such as PATCH NUM / panel channel).
+        // Reject anything that doesn't fit these two cases.
+        if (bytes.Count != 15 && bytes.Count != 16) return;
 
         var addressKey = AddressToKey([bytes[8], bytes[9], bytes[10], bytes[11]]);
-        var value = bytes[12];
+
+        // For 2-byte data the meaningful value is always the second (lower) byte.
+        var value = bytes.Count == 16 ? bytes[13] : bytes[12];
 
         if (!pushHandlerLookup.TryGetValue(addressKey, out var action))
         {
@@ -1613,6 +1686,30 @@ public partial class MainWindowViewModel : ViewModelBase
 
         // Marshal to the UI thread — this callback fires on the ALSA background thread.
         Dispatcher.UIThread.Post(() => ApplyDeviceState(() => action(value)));
+    }
+
+    /// <summary>
+    /// Handles a channel-change Program Change pushed by the amp when the user presses
+    /// CH1/CH2/Panel on the front panel. Updates <see cref="SelectedPanelChannel"/> without
+    /// enqueuing a write back to the amp (suppressChangeTracking guard).
+    /// </summary>
+    private void OnAmpPanelChannelChanged(object? sender, KatanaPanelChannel channel)
+    {
+        var displayName = channel switch
+        {
+            KatanaPanelChannel.ChA1 => "CH A1",
+            KatanaPanelChannel.ChA2 => "CH A2",
+            KatanaPanelChannel.ChB1 => "CH B1",
+            KatanaPanelChannel.ChB2 => "CH B2",
+            _                       => "Panel",
+        };
+
+        // Marshal to the UI thread — this callback fires on the ALSA background thread.
+        Dispatcher.UIThread.Post(() =>
+        {
+            AppendLog($"Amp channel changed (push): {displayName}");
+            ApplyDeviceState(() => SelectPanelChannel(displayName));
+        });
     }
 
     /// <summary>
@@ -1786,6 +1883,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 .SelectMany(e => e.GetSyncParameters())
                 .Append(KatanaMkIIParameterCatalog.AmpType)
                 .Append(KatanaMkIIParameterCatalog.CabinetResonance)
+                .Append(KatanaMkIIParameterCatalog.AmpVariation)
                 .Append(KatanaMkIIParameterCatalog.ChainPattern)
                 .ToArray();
             var values = await katanaSession.ReadParametersAsync(parameterList);
@@ -1809,12 +1907,16 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     SelectedCabinetResonance = CabinetResonanceOptions[cabValue];
                 }
+                if (values.TryGetValue(KatanaMkIIParameterCatalog.AmpVariation.Key, out var varValue))
+                {
+                    IsAmpVariation = varValue != 0;
+                }
                 if (values.TryGetValue(KatanaMkIIParameterCatalog.ChainPattern.Key, out var chainValue) &&
                     chainValue < PedalboardViewModel.ChainPatternNames.Length)
                 {
                     Pedalboard.SelectedChainPattern = chainValue;
                 }
-                AppendLog($"Amp Type: {SelectedAmpType} / Cabinet Resonance: {SelectedCabinetResonance} / Chain: {PedalboardViewModel.ChainPatternNames[Pedalboard.SelectedChainPattern]}");
+                AppendLog($"Amp Type: {SelectedAmpType} ({(IsAmpVariation ? "TYPE 2" : "TYPE 1")}) / Cabinet Resonance: {SelectedCabinetResonance} / Chain: {PedalboardViewModel.ChainPatternNames[Pedalboard.SelectedChainPattern]}");
             });
 
             lastDelayTapAt = null;
