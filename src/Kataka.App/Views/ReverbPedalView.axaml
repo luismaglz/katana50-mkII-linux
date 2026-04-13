@@ -39,50 +39,50 @@
 
                 <!-- Row 1: Time, PreDelay, E.Level, D.Mix -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <controls:RotaryKnob Scale="0.6" Label="TIME"
-                                         Description="Adjusts the length (duration) of the reverberation."
-                                         Minimum="0" Maximum="127"
-                                         Value="{Binding Time}"
-                                         LabelFontSize="12" />
-                    <controls:RotaryKnob Scale="0.6" Label="PRE DELAY"
-                                         Description="Adjusts the time delay before the reverb sound appears (0–500 ms)."
-                                         Minimum="0" Maximum="127"
-                                         Value="{Binding PreDelay}"
-                                         LabelFontSize="12" />
-                    <controls:RotaryKnob Scale="0.6" Label="E.LEVEL"
-                                         Description="Adjusts the volume of the reverb (effect) sound."
-                                         Minimum="0" Maximum="100"
-                                         Value="{Binding EffectLevel}"
-                                         LabelFontSize="12" />
-                    <controls:RotaryKnob Scale="0.6" Label="D.MIX"
-                                         Description="Adjusts the volume of the direct (dry) sound."
-                                         Minimum="0" Maximum="100"
-                                         Value="{Binding DirectMix}"
-                                         LabelFontSize="12" />
+                    <controls:SmallImageRotaryKnob  Label="TIME"
+                                                    Description="Adjusts the length (duration) of the reverberation."
+                                                    Minimum="0" Maximum="127"
+                                                    Value="{Binding Time}"
+                                                    LabelFontSize="12" />
+                    <controls:SmallImageRotaryKnob  Label="PRE DELAY"
+                                                    Description="Adjusts the time delay before the reverb sound appears (0–500 ms)."
+                                                    Minimum="0" Maximum="127"
+                                                    Value="{Binding PreDelay}"
+                                                    LabelFontSize="12" />
+                    <controls:SmallImageRotaryKnob  Label="E.LEVEL"
+                                                    Description="Adjusts the volume of the reverb (effect) sound."
+                                                    Minimum="0" Maximum="100"
+                                                    Value="{Binding EffectLevel}"
+                                                    LabelFontSize="12" />
+                    <controls:SmallImageRotaryKnob  Label="D.MIX"
+                                                    Description="Adjusts the volume of the direct (dry) sound."
+                                                    Minimum="0" Maximum="100"
+                                                    Value="{Binding DirectMix}"
+                                                    LabelFontSize="12" />
                 </StackPanel>
 
                 <!-- Row 2: LowCut, HighCut, Density, Color -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <controls:RotaryKnob Scale="0.6" Label="LOW CUT"
-                                         Description="Sets the frequency at which the low cut filter takes effect. At minimum (FLAT), the filter has no effect."
-                                         Minimum="0" Maximum="17"
-                                         Value="{Binding LowCut}"
-                                         LabelFontSize="12" />
-                    <controls:RotaryKnob Scale="0.6" Label="HIGH CUT"
-                                         Description="Sets the frequency at which the high cut filter takes effect. At maximum (FLAT), the filter has no effect."
-                                         Minimum="0" Maximum="17"
-                                         Value="{Binding HighCut}"
-                                         LabelFontSize="12" />
-                    <controls:RotaryKnob Scale="0.6" Label="DENSITY"
-                                         Description="Adjusts the density of the reverb sound."
-                                         Minimum="0" Maximum="10"
-                                         Value="{Binding Density}"
-                                         LabelFontSize="12" />
-                    <controls:RotaryKnob Scale="0.6" Label="COLOR"
-                                         Description="Adjusts the unique tone character of the spring reverb. Only active when TYPE is SPRING."
-                                         Minimum="0" Maximum="100"
-                                         Value="{Binding Color}"
-                                         LabelFontSize="12" />
+                    <controls:SmallImageRotaryKnob  Label="LOW CUT"
+                                                    Description="Sets the frequency at which the low cut filter takes effect. At minimum (FLAT), the filter has no effect."
+                                                    Minimum="0" Maximum="17"
+                                                    Value="{Binding LowCut}"
+                                                    LabelFontSize="12" />
+                    <controls:SmallImageRotaryKnob  Label="HIGH CUT"
+                                                    Description="Sets the frequency at which the high cut filter takes effect. At maximum (FLAT), the filter has no effect."
+                                                    Minimum="0" Maximum="17"
+                                                    Value="{Binding HighCut}"
+                                                    LabelFontSize="12" />
+                    <controls:SmallImageRotaryKnob  Label="DENSITY"
+                                                    Description="Adjusts the density of the reverb sound."
+                                                    Minimum="0" Maximum="10"
+                                                    Value="{Binding Density}"
+                                                    LabelFontSize="12" />
+                    <controls:SmallImageRotaryKnob  Label="COLOR"
+                                                    Description="Adjusts the unique tone character of the spring reverb. Only active when TYPE is SPRING."
+                                                    Minimum="0" Maximum="100"
+                                                    Value="{Binding Color}"
+                                                    LabelFontSize="12" />
                 </StackPanel>
             </StackPanel>
         </StackPanel>
