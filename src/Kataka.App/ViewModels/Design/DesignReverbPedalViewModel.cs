@@ -7,7 +7,6 @@ public sealed class DesignReverbPedalViewModel : ReverbPedalViewModel
     public DesignReverbPedalViewModel()
     {
         IsEnabled = true;
-        Level = 55;
         if (TypeOptions.Count > 0) SelectedTypeOption = TypeOptions[0];
     }
 }

@@ -7,7 +7,6 @@ public sealed class DesignDelayPedalViewModel : DelayPedalViewModel
     public DesignDelayPedalViewModel() : base("delay")
     {
         IsEnabled = true;
-        Level = 60;
         if (TypeOptions.Count > 0) SelectedTypeOption = TypeOptions[0];
     }
 }

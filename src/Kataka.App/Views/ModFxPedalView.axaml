@@ -46,13 +46,6 @@
                             Background="{Binding VariationBrush}" />
                 </StackPanel>
 
-                <!-- Level knob -->
-                <controls:RotaryKnob Scale="0.6" Label="LEVEL"
-                                     Minimum="0" Maximum="100"
-                                     Value="{Binding Level}"
-                                     IsVisible="{Binding HasLevel}"
-                                     HorizontalAlignment="Center" />
-
                 <!-- Type-specific body — one panel visible at a time -->
                 <modsfx:ChorusView         IsVisible="{Binding IsTypeChorus}" />
                 <modsfx:FlangerView        IsVisible="{Binding IsTypeFlanger}" />

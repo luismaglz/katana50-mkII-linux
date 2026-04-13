@@ -52,18 +52,6 @@ public partial class ReverbPedalViewModel : PedalViewModel
         }
     }
 
-    private int _level;
-    public int Level
-    {
-        get => _level;
-        set
-        {
-            if (!SetProperty(ref _level, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(Definition.LevelParameter!.Key, value);
-        }
-    }
-
-    public bool HasLevel => Definition.LevelParameter is not null;
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
     // ── Reverb-specific controls ───────────────────────────────────────────────────
@@ -171,7 +159,6 @@ public partial class ReverbPedalViewModel : PedalViewModel
     {
         var list = new List<KatanaParameterDefinition> { Definition.SwitchParameter };
         if (Definition.TypeParameter is not null) list.Add(Definition.TypeParameter);
-        if (Definition.LevelParameter is not null) list.Add(Definition.LevelParameter);
         if (Definition.VariationParameter is not null) list.Add(Definition.VariationParameter);
         list.Add(KatanaMkIIParameterCatalog.ReverbTime);
         list.Add(KatanaMkIIParameterCatalog.ReverbPreDelay);
@@ -192,8 +179,6 @@ public partial class ReverbPedalViewModel : PedalViewModel
             SelectedTypeOption = ToTypeOption((byte)typeVal);
         if (Definition.VariationParameter is not null && values.TryGetValue(Definition.VariationParameter.Key, out var variation))
             Variation = ToVariationString(variation);
-        if (Definition.LevelParameter is not null && values.TryGetValue(Definition.LevelParameter.Key, out var level))
-            Level = level;
         if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbTime.Key, out var time))             Time        = Math.Clamp(time, 0, 127);
         if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbPreDelay.Key, out var preDelay))     PreDelay    = Math.Clamp(preDelay, 0, 127);
         if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbLowCut.Key, out var lowCut))         LowCut      = Math.Clamp(lowCut, 0, 17);
