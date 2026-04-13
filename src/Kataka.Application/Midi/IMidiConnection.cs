@@ -26,4 +26,11 @@ public interface IMidiConnection : IAsyncDisposable
     /// Fired on the MIDI receive thread — subscribers must marshal to the UI thread if needed.
     /// </summary>
     event EventHandler<SysExMessage>? PushNotificationReceived;
+
+    /// <summary>
+    /// Raised when the device sends a Program Change message (e.g., the user pressed a channel button
+    /// on the amp). The event argument is the raw program number byte (0–127).
+    /// Fired on the MIDI receive thread — subscribers must marshal to the UI thread if needed.
+    /// </summary>
+    event EventHandler<byte>? ProgramChangeReceived;
 }

@@ -1,16 +1,22 @@
 using System;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Kataka.App.ViewModels;
 
-public sealed class PedalboardItemViewModel
+public sealed partial class PedalboardItemViewModel : ObservableObject
 {
     public string Key { get; init; } = string.Empty;
 
     public string DisplayName { get; init; } = string.Empty;
 
-    public string Detail { get; init; } = string.Empty;
+    // Mutable so the AMP node can reflect channel changes without rebuilding the collection.
+    [ObservableProperty]
+    public partial string Detail { get; set; } = string.Empty;
 
     public bool IsEndpoint { get; init; }
+
+    public bool IsInput  => IsEndpoint && DisplayName == "INPUT";
+    public bool IsOutput => IsEndpoint && DisplayName == "OUTPUT";
 
     public bool IsAmp { get; init; }
 

@@ -105,6 +105,11 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition AmpType { get; } =
         new("amp-type", "Amp Type", [0x60, 0x00, 0x06, 0x50], maximum: 4);
 
+    // Amp variation (TYPE 1 / TYPE 2 voicing toggle). PRM_LED_STATE_VARI.
+    // PATCH_STATUS block base 0x650, offset 0x0C → 0x65C → 60 00 06 5C.
+    public static KatanaParameterDefinition AmpVariation { get; } =
+        new("amp-variation", "Variation", [0x60, 0x00, 0x06, 0x5C], maximum: 1);
+
     // Cabinet resonance (0-2: LOW / MIDDLE / HIGH).
     public static KatanaParameterDefinition CabinetResonance { get; } =
         new("amp-cabinet-resonance", "Cabinet", [0x60, 0x00, 0x06, 0x43], maximum: 2);

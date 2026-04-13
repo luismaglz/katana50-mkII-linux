@@ -43,7 +43,11 @@ public sealed class AmidiTransport : IMidiTransport
             throw new InvalidOperationException($"Output port '{outputPortId}' is no longer available.");
         }
 
-        return new AmidiConnection(StripPrefix(inputPortId), StripPrefix(outputPortId));
+        // Both input and output are the same raw MIDI device file for the Katana.
+        // hw:CARD,DEVICE,SUBDEV → /dev/snd/midiC{CARD}D{DEVICE}
+        var hwId = StripPrefix(inputPortId);
+        var devicePath = HwIdToDevicePath(hwId);
+        return new AlsaRawMidiConnection(devicePath);
     }
 
     public static bool IsSupported()
@@ -128,6 +132,23 @@ public sealed class AmidiTransport : IMidiTransport
         portId.Contains(':', StringComparison.Ordinal)
             ? portId[(portId.IndexOf(':', StringComparison.Ordinal) + 1)..]
             : portId;
+
+    /// <summary>
+    /// Maps an ALSA hardware port identifier to the corresponding raw MIDI device file.
+    /// Example: <c>hw:1,0,0</c> → <c>/dev/snd/midiC1D0</c>
+    /// </summary>
+    private static string HwIdToDevicePath(string hwId)
+    {
+        // Strip optional "hw:" prefix, then take card and device fields.
+        var bare = hwId.StartsWith("hw:", StringComparison.OrdinalIgnoreCase) ? hwId[3..] : hwId;
+        var parts = bare.Split(',');
+        if (parts.Length < 2)
+        {
+            throw new ArgumentException($"Cannot parse ALSA port id '{hwId}' — expected hw:CARD,DEVICE[,SUBDEV].");
+        }
+
+        return $"/dev/snd/midiC{parts[0]}D{parts[1]}";
+    }
 
     private static bool TryLocateExecutable(string name)
     {

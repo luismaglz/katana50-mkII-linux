@@ -25,6 +25,9 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     /// <inheritdoc />
     public event EventHandler<SysExMessage>? PushNotificationReceived;
 
+    /// <inheritdoc />
+    public event EventHandler<KatanaPanelChannel>? PanelChannelChanged;
+
     public Task<IReadOnlyList<MidiPortDescriptor>> ListPortsAsync(CancellationToken cancellationToken = default) =>
         midiTransport.ListPortsAsync(cancellationToken);
 
@@ -38,6 +41,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 
         // Forward push notifications from the connection to session subscribers.
         activeConnection.PushNotificationReceived += OnConnectionPushNotification;
+        activeConnection.ProgramChangeReceived    += OnConnectionProgramChange;
 
         // Tell the amp to start sending unsolicited DT1 messages whenever any parameter changes.
         // This mirrors the BTS startCommunication() handshake (EDITOR_COMMUNICATION_MODE = 1).
@@ -53,6 +57,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 
         // Unsubscribe before disposing to prevent callbacks on a dead connection.
         activeConnection.PushNotificationReceived -= OnConnectionPushNotification;
+        activeConnection.ProgramChangeReceived    -= OnConnectionProgramChange;
 
         // Tell the amp to stop sending push notifications before closing the port.
         try
@@ -198,6 +203,18 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     }
 
     /// <summary>
+    /// Translates an incoming Program Change byte to a <see cref="KatanaPanelChannel"/> and
+    /// fires <see cref="PanelChannelChanged"/>. The Katana uses Program Change to report
+    /// which channel button the user pressed on the front panel.
+    /// The PC encoding differs from the SysEx memory encoding — it mirrors <see cref="ToProgramChange"/>.
+    /// </summary>
+    private void OnConnectionProgramChange(object? sender, byte program)
+    {
+        if (TryMapProgramChangeToChannel(program, out var channel))
+            PanelChannelChanged?.Invoke(this, channel);
+    }
+
+    /// <summary>
     /// Writes the EDITOR_COMMUNICATION_MODE flag to the amp.
     /// When enabled (value 1), the amp sends unsolicited DT1 messages for all live parameter changes.
     /// When disabled (value 0), the amp stops sending push notifications.
@@ -295,6 +312,27 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
             KatanaPanelChannel.ChB2 => 6,
             _ => throw new ArgumentOutOfRangeException(nameof(channel), channel, "Unsupported Katana panel channel."),
         };
+    }
+
+    /// <summary>
+    /// Maps an incoming MIDI Program Change byte to a <see cref="KatanaPanelChannel"/>.
+    /// This is the exact inverse of <see cref="ToProgramChange"/>; the encoding differs
+    /// from the SysEx address-memory encoding used by <see cref="TryMapCurrentChannelCode"/>.
+    /// Values: 0=ChA1, 1=ChA2, 4=Panel, 5=ChB1, 6=ChB2.
+    /// </summary>
+    private static bool TryMapProgramChangeToChannel(byte program, out KatanaPanelChannel channel)
+    {
+        channel = program switch
+        {
+            0 => KatanaPanelChannel.ChA1,
+            1 => KatanaPanelChannel.ChA2,
+            4 => KatanaPanelChannel.Panel,
+            5 => KatanaPanelChannel.ChB1,
+            6 => KatanaPanelChannel.ChB2,
+            _ => KatanaPanelChannel.Panel,
+        };
+
+        return program is 0 or 1 or 4 or 5 or 6;
     }
 
     private sealed class ParameterReadGroup

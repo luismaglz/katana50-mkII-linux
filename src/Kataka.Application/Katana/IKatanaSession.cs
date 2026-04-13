@@ -13,6 +13,12 @@ public interface IKatanaSession : IAsyncDisposable
     /// </summary>
     event EventHandler<SysExMessage>? PushNotificationReceived;
 
+    /// <summary>
+    /// Raised when the user presses a channel button on the amp (Program Change).
+    /// Fired on the MIDI receive thread — subscribers must marshal to the UI thread if needed.
+    /// </summary>
+    event EventHandler<KatanaPanelChannel>? PanelChannelChanged;
+
     Task<IReadOnlyList<MidiPortDescriptor>> ListPortsAsync(CancellationToken cancellationToken = default);
 
     Task ConnectAsync(string inputPortId, string outputPortId, CancellationToken cancellationToken = default);

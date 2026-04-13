@@ -52,8 +52,8 @@
                                             CornerRadius="2" Background="#444" />
                                 </Canvas>
 
-                                <!-- ── INPUT / OUTPUT pill ── -->
-                                <Border IsVisible="{Binding IsEndpoint}"
+                                <!-- ── INPUT pill ── -->
+                                <Border IsVisible="{Binding IsInput}"
                                         CornerRadius="20" Width="80"
                                         Padding="10,14"
                                         BorderThickness="2"
@@ -61,14 +61,32 @@
                                         Background="#111c26"
                                         VerticalAlignment="Top">
                                     <StackPanel Spacing="6" HorizontalAlignment="Center">
+                                        <Image Source="/Assets/electric-guitar.png"
+                                               Width="32" Height="32"
+                                               HorizontalAlignment="Center" />
                                         <TextBlock Text="{Binding DisplayName}"
                                                    FontSize="11" FontWeight="Bold"
                                                    HorizontalAlignment="Center"
                                                    Foreground="#7ab0c8" LetterSpacing="1.2" />
-                                        <TextBlock Text="{Binding Detail}"
-                                                   FontSize="9" HorizontalAlignment="Center"
-                                                   TextWrapping="Wrap" TextAlignment="Center"
-                                                   Foreground="#3a6070" />
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- ── OUTPUT pill ── -->
+                                <Border IsVisible="{Binding IsOutput}"
+                                        CornerRadius="20" Width="80"
+                                        Padding="10,14"
+                                        BorderThickness="2"
+                                        BorderBrush="#3a5a6a"
+                                        Background="#111c26"
+                                        VerticalAlignment="Top">
+                                    <StackPanel Spacing="6" HorizontalAlignment="Center">
+                                        <Image Source="/Assets/speakers.png"
+                                               Width="32" Height="32"
+                                               HorizontalAlignment="Center" />
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   FontSize="11" FontWeight="Bold"
+                                                   HorizontalAlignment="Center"
+                                                   Foreground="#7ab0c8" LetterSpacing="1.2" />
                                     </StackPanel>
                                 </Border>
 
@@ -81,9 +99,9 @@
                                         <Border Height="6" CornerRadius="3,3,0,0"
                                                 Background="{Binding FamilyAccentColor}" />
                                         <StackPanel Spacing="5" Margin="10,10,10,12" HorizontalAlignment="Center">
-                                            <TextBlock Text="▣" FontSize="20"
-                                                       HorizontalAlignment="Center"
-                                                       Foreground="#c0392b" />
+                                            <Image Source="/Assets/amplifier.png"
+                                                   Width="40" Height="40"
+                                                   HorizontalAlignment="Center" />
                                             <TextBlock Text="AMP" FontSize="13" FontWeight="Bold"
                                                        HorizontalAlignment="Center"
                                                        Foreground="#e04040" LetterSpacing="2" />

@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kataka.App.ViewModels"
+             xmlns:controls="using:Kataka.App.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="Kataka.App.Views.ModsFx.Flanger117EView"
+             x:DataType="vm:ModFxPedalViewModel">
+    <StackPanel Spacing="8">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <controls:RotaryKnob Scale="0.55" Label="MANUAL"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding Flanger117EManual}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.55" Label="WIDTH"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding Flanger117EWidth}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.55" Label="SPEED"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding Flanger117ESpeed}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.55" Label="REGEN"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding Flanger117ERegen}"
+                                 LabelFontSize="11" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

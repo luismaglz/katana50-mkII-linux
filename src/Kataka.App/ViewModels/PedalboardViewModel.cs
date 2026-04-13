@@ -8,7 +8,7 @@ namespace Kataka.App.ViewModels;
 public partial class PedalboardViewModel : ViewModelBase
 {
     private readonly IReadOnlyDictionary<string, IBasePedal> _pedalsByKey;
-    private readonly Func<string> _getSelectedChannel;
+    private PedalboardItemViewModel? _ampItem;
 
     public static string[] ChainPatternNames { get; } =
         ["CHAIN 1", "CHAIN 2-1", "CHAIN 3-1", "CHAIN 4-1", "CHAIN 2-2", "CHAIN 3-2", "CHAIN 4-2"];
@@ -37,13 +37,23 @@ public partial class PedalboardViewModel : ViewModelBase
 
     public PedalboardViewModel(
         IReadOnlyDictionary<string, IBasePedal> pedalsByKey,
-        Func<string> getSelectedChannel)
+        string initialChannel)
     {
         _pedalsByKey = pedalsByKey;
-        _getSelectedChannel = getSelectedChannel;
+        SelectedChannel = initialChannel;
     }
 
     public ObservableCollection<PedalboardItemViewModel> PedalboardItems { get; } = [];
+
+    // The channel shown on the AMP node. Updated reactively when the user switches channels.
+    [ObservableProperty]
+    public partial string SelectedChannel { get; set; }
+
+    partial void OnSelectedChannelChanged(string value)
+    {
+        if (_ampItem is not null)
+            _ampItem.Detail = value;
+    }
 
     [ObservableProperty]
     public partial int SelectedChainPattern { get; set; } = 2;
@@ -67,15 +77,16 @@ public partial class PedalboardViewModel : ViewModelBase
         var chainIdx = Math.Clamp(SelectedChainPattern, 0, ChainBeforeAmp.Length - 1);
         AddPedalsByKeys(items, ChainBeforeAmp[chainIdx]);
 
-        items.Add(new PedalboardItemViewModel
+        _ampItem = new PedalboardItemViewModel
         {
             Key = "amp",
             DisplayName = "AMP",
-            Detail = _getSelectedChannel(),
+            Detail = SelectedChannel,
             IsAmp = true,
             IsConnectedFromPrevious = items.Count > 0,
             Family = "amp",
-        });
+        };
+        items.Add(_ampItem);
 
         AddPedalsByKeys(items, ChainAfterAmp[chainIdx]);
 
