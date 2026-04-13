@@ -42,4 +42,14 @@ public interface IKatanaSession : IAsyncDisposable
     Task<byte[]> ReadBlockAsync(IReadOnlyList<byte> address, int length, CancellationToken cancellationToken = default);
 
     Task WriteBlockAsync(IReadOnlyList<byte> address, IReadOnlyList<byte> data, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Reads all known patch blocks from the Temporary area and returns a populated <see cref="TslPatch"/>.
+    /// </summary>
+    Task<TslPatch> ReadCurrentPatchAsync(string name, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Writes all blocks in <paramref name="patch"/> to the Temporary area, replacing the active patch state.
+    /// </summary>
+    Task LoadPatchAsync(TslPatch patch, CancellationToken cancellationToken = default);
 }

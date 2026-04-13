@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -179,6 +180,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanWritePatch))]
+    [NotifyCanExecuteChangedFor(nameof(WritePatchCommand))]
+    [NotifyCanExecuteChangedFor(nameof(LoadPatchCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SavePatchCommand))]
     public partial bool IsConnected { get; set; }
 
     [ObservableProperty]
@@ -423,6 +427,114 @@ public partial class MainWindowViewModel : ViewModelBase
             AppendLog("Patch write command failed.");
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
+        }
+    }
+
+    public IStorageProvider? StorageProvider { get; set; }
+
+    [RelayCommand(CanExecute = nameof(CanWritePatch))]
+    private async Task LoadPatchAsync()
+    {
+        if (StorageProvider is null)
+        {
+            StatusMessage = "File dialog not available.";
+            return;
+        }
+
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Open Patch File",
+            AllowMultiple = false,
+            FileTypeFilter =
+            [
+                new FilePickerFileType("Boss Tone Studio Patch") { Patterns = ["*.tsl"] },
+                new FilePickerFileType("All Files") { Patterns = ["*"] },
+            ],
+        });
+
+        if (files.Count == 0) return;
+
+        var file = files[0];
+        try
+        {
+            PauseActiveReadSync("patch load");
+            AppendLog($"Loading patch from {file.Name}...");
+
+            string json;
+            await using (var stream = await file.OpenReadAsync())
+            using (var reader = new System.IO.StreamReader(stream))
+                json = await reader.ReadToEndAsync();
+
+            var patch = TslPatchSerializer.Deserialize(json);
+            AppendLog($"Patch '{patch.Name}' parsed — {patch.Blocks.Count} block(s). Sending to amp...");
+
+            await katanaSession.LoadPatchAsync(patch);
+
+            AppendLog("Patch loaded. Refreshing display...");
+            await TryReadAmpControlsAsync(backgroundSync: false);
+            await TryReadPanelControlsAsync(backgroundSync: false);
+            await TryReadPedalControlsAsync();
+            StatusMessage = $"Patch '{patch.Name}' loaded.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = "Patch load failed.";
+            AppendLog($"Patch load failed: {ex.Message}");
+            Console.Error.WriteLine(ex);
+        }
+        finally
+        {
+            ResumeActiveReadSync("patch load finished");
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanWritePatch))]
+    private async Task SavePatchAsync()
+    {
+        if (StorageProvider is null)
+        {
+            StatusMessage = "File dialog not available.";
+            return;
+        }
+
+        var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save Patch File",
+            SuggestedFileName = "patch.tsl",
+            DefaultExtension = "tsl",
+            FileTypeChoices =
+            [
+                new FilePickerFileType("Boss Tone Studio Patch") { Patterns = ["*.tsl"] },
+            ],
+        });
+
+        if (file is null) return;
+
+        try
+        {
+            PauseActiveReadSync("patch save");
+            AppendLog("Reading all patch blocks from amp...");
+
+            var patchName = System.IO.Path.GetFileNameWithoutExtension(file.Name);
+            var patch = await katanaSession.ReadCurrentPatchAsync(patchName);
+            var json = TslPatchSerializer.Serialize(patch);
+
+            await using var stream = await file.OpenWriteAsync();
+            await using var writer = new System.IO.StreamWriter(stream);
+            await writer.WriteAsync(json);
+
+            AppendLog($"Patch '{patch.Name}' saved to {file.Name}.");
+            StatusMessage = $"Patch saved as '{file.Name}'.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = "Patch save failed.";
+            AppendLog($"Patch save failed: {ex.Message}");
+            Console.Error.WriteLine(ex);
+        }
+        finally
+        {
+            ResumeActiveReadSync("patch save finished");
         }
     }
 
