@@ -36,13 +36,6 @@
                               SelectedItem="{Binding SelectedTypeOption}" />
                 </StackPanel>
 
-                <!-- Variation bar -->
-                <StackPanel Spacing="4">
-                    <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
-                               Foreground="#5a2088" />
-                    <Border Height="16" CornerRadius="4"
-                            Background="{Binding VariationBrush}" />
-                </StackPanel>
 
                 <!-- Row 1: Time, PreDelay, E.Level, D.Mix -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">

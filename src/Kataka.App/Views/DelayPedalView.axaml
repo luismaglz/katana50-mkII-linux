@@ -36,14 +36,6 @@
                               SelectedItem="{Binding SelectedTypeOption}" />
                 </StackPanel>
 
-                <!-- Variation bar (only delay slot 1 has variation) -->
-                <StackPanel Spacing="4" IsVisible="{Binding HasVariation}">
-                    <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
-                               Foreground="#1e9988" />
-                    <Border Height="16" CornerRadius="4"
-                            Background="{Binding VariationBrush}" />
-                </StackPanel>
-
                 <!-- Row 1: Feedback, HiCut, E.Level, D.Mix -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <controls:RotaryKnob Scale="0.6" Label="FEEDBACK"

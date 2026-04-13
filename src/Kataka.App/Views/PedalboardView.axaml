@@ -7,7 +7,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignWidth="1100"
+             d:DesignWidth="2400"
              d:DesignHeight="480"
              d:DataContext="{x:Static dvm:DesignMainWindowViewModel.Instance}"
              x:Class="Kataka.App.Views.PedalboardView"
@@ -54,53 +54,63 @@
 
                                 <!-- ── INPUT pill ── -->
                                 <Border IsVisible="{Binding IsInput}"
-                                        CornerRadius="20" Width="80"
-                                        Padding="10,14"
+                                        CornerRadius="10"
+                                        Width="100"
                                         BorderThickness="2"
                                         BorderBrush="#3a5a6a"
-                                        Background="#111c26"
+                                        Background="#f1f1f1"
                                         VerticalAlignment="Top">
-                                    <StackPanel Spacing="6" HorizontalAlignment="Center">
-                                        <Image Source="/Assets/electric-guitar.png"
-                                               Width="32" Height="32"
-                                               HorizontalAlignment="Center" />
-                                        <TextBlock Text="{Binding DisplayName}"
-                                                   FontSize="11" FontWeight="Bold"
-                                                   HorizontalAlignment="Center"
-                                                   Foreground="#7ab0c8" LetterSpacing="1.2" />
+                                    <StackPanel Spacing="0" HorizontalAlignment="Center">
+                                        <Border Width="96" Height="6" CornerRadius="10,10,0,0"
+                                                Background="{Binding FamilyAccentColor}" />
+                                        <StackPanel Spacing="5" Margin="10,10,10,12" HorizontalAlignment="Center">
+
+                                            <Image Source="/Assets/electric-guitar.png"
+                                                   Width="80" Height="80"
+                                                   HorizontalAlignment="Center" BlendMode="Multiply"/>
+                                            <TextBlock Text="{Binding DisplayName}"
+                                                       FontSize="11" FontWeight="Bold"
+                                                       HorizontalAlignment="Center"
+                                                       Foreground="#7ab0c8" LetterSpacing="1.2" />
+                                        </StackPanel>
                                     </StackPanel>
                                 </Border>
 
                                 <!-- ── OUTPUT pill ── -->
                                 <Border IsVisible="{Binding IsOutput}"
-                                        CornerRadius="20" Width="80"
-                                        Padding="10,14"
+                                        CornerRadius="10"
+                                        Width="100"
                                         BorderThickness="2"
                                         BorderBrush="#3a5a6a"
-                                        Background="#111c26"
+                                        Background="#f1f1f1"
                                         VerticalAlignment="Top">
                                     <StackPanel Spacing="6" HorizontalAlignment="Center">
-                                        <Image Source="/Assets/speakers.png"
-                                               Width="32" Height="32"
-                                               HorizontalAlignment="Center" />
-                                        <TextBlock Text="{Binding DisplayName}"
-                                                   FontSize="11" FontWeight="Bold"
-                                                   HorizontalAlignment="Center"
-                                                   Foreground="#7ab0c8" LetterSpacing="1.2" />
+                                        <Border Width="96" Height="6" CornerRadius="10,10,0,0"
+                                                Background="{Binding FamilyAccentColor}" />
+                                        <StackPanel Spacing="5" Margin="10,10,10,12" HorizontalAlignment="Center">
+
+                                            <Image Source="/Assets/speakers.png"
+                                                   Width="80" Height="80"
+                                                   HorizontalAlignment="Center" />
+                                            <TextBlock Text="{Binding DisplayName}"
+                                                       FontSize="11" FontWeight="Bold"
+                                                       HorizontalAlignment="Center"
+                                                       Foreground="#7ab0c8" LetterSpacing="1.2"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </Border>
 
                                 <!-- ── AMP block ── -->
                                 <Border IsVisible="{Binding IsAmp}"
-                                        Width="110" CornerRadius="3,3,12,12"
+                                        Width="110" CornerRadius="10"
                                         BorderThickness="2" BorderBrush="#8b1c1c"
-                                        Background="#1e0c0c" VerticalAlignment="Top">
+                                        Background="#f1f1f1" VerticalAlignment="Top">
                                     <StackPanel Spacing="0">
-                                        <Border Height="6" CornerRadius="3,3,0,0"
+                                        <Border Height="6" CornerRadius="10,10,0,0"
                                                 Background="{Binding FamilyAccentColor}" />
                                         <StackPanel Spacing="5" Margin="10,10,10,12" HorizontalAlignment="Center">
                                             <Image Source="/Assets/amplifier.png"
-                                                   Width="40" Height="40"
+                                                   Width="80" Height="80"
                                                    HorizontalAlignment="Center" />
                                             <TextBlock Text="AMP" FontSize="13" FontWeight="Bold"
                                                        HorizontalAlignment="Center"

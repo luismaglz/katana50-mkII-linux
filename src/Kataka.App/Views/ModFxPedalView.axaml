@@ -38,13 +38,6 @@
                               SelectedItem="{Binding SelectedTypeOption}" />
                 </StackPanel>
 
-                <!-- Variation color -->
-                <StackPanel Spacing="4">
-                    <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
-                               Foreground="#267a44" />
-                    <Border Height="16" CornerRadius="4"
-                            Background="{Binding VariationBrush}" />
-                </StackPanel>
 
                 <!-- Type-specific body — one panel visible at a time -->
                 <modsfx:ChorusView         IsVisible="{Binding IsTypeChorus}" />
