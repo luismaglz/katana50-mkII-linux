@@ -46,6 +46,22 @@ public abstract class RotaryKnobBase : Control
     public static readonly StyledProperty<bool> IsBipolarProperty =
         AvaloniaProperty.Register<RotaryKnobBase, bool>(nameof(IsBipolar), false);
 
+    /// <summary>
+    /// Optional display minimum. When both <see cref="DisplayMinimum"/> and
+    /// <see cref="DisplayMaximum"/> are set (non-zero or explicitly different from the defaults),
+    /// the value label is interpolated from the wire range [Minimum, Maximum] into
+    /// [DisplayMinimum, DisplayMaximum]. A display range that crosses zero is inherently
+    /// bipolar — the center tick is highlighted automatically without needing IsBipolar.
+    /// </summary>
+    public static readonly StyledProperty<int?> DisplayMinimumProperty =
+        AvaloniaProperty.Register<RotaryKnobBase, int?>(nameof(DisplayMinimum), null);
+
+    /// <summary>
+    /// Optional display maximum. See <see cref="DisplayMinimumProperty"/>.
+    /// </summary>
+    public static readonly StyledProperty<int?> DisplayMaximumProperty =
+        AvaloniaProperty.Register<RotaryKnobBase, int?>(nameof(DisplayMaximum), null);
+
     protected static readonly SolidColorBrush LabelBrush  = new(Color.Parse("#d8d5cb"));
     protected static readonly SolidColorBrush ValueBrush  = new(Color.Parse("#ffcf66"));
 
@@ -58,7 +74,8 @@ public abstract class RotaryKnobBase : Control
         AffectsRender<RotaryKnobBase>(
             LabelProperty, LabelFontSizeProperty,
             MinimumProperty, MaximumProperty, ValueProperty,
-            ScaleProperty, IsBipolarProperty);
+            ScaleProperty, IsBipolarProperty,
+            DisplayMinimumProperty, DisplayMaximumProperty);
         AffectsMeasure<RotaryKnobBase>(ScaleProperty);
         FocusableProperty.OverrideDefaultValue<RotaryKnobBase>(true);
 
@@ -116,6 +133,33 @@ public abstract class RotaryKnobBase : Control
         set => SetValue(IsBipolarProperty, value);
     }
 
+    public int? DisplayMinimum
+    {
+        get => GetValue(DisplayMinimumProperty);
+        set => SetValue(DisplayMinimumProperty, value);
+    }
+
+    public int? DisplayMaximum
+    {
+        get => GetValue(DisplayMaximumProperty);
+        set => SetValue(DisplayMaximumProperty, value);
+    }
+
+    /// <summary>
+    /// True when an explicit display range has been configured (both DisplayMinimum and
+    /// DisplayMaximum are set) and the display range differs from the wire range.
+    /// </summary>
+    protected bool HasDisplayRange =>
+        DisplayMinimum.HasValue && DisplayMaximum.HasValue &&
+        (DisplayMinimum.Value != Minimum || DisplayMaximum.Value != Maximum);
+
+    /// <summary>
+    /// True when the label should show negative–zero–positive. Either an explicit display
+    /// range that crosses zero, or the legacy IsBipolar flag.
+    /// </summary>
+    protected bool IsEffectivelyBipolar =>
+        (HasDisplayRange && DisplayMinimum!.Value < 0 && DisplayMaximum!.Value > 0) || IsBipolar;
+
     // ── Helpers for subclasses ─────────────────────────────────────────────────
 
     /// <summary>Value normalised to [0, 1] across [Minimum, Maximum].</summary>
@@ -125,13 +169,31 @@ public abstract class RotaryKnobBase : Control
             : (double)(Math.Clamp(Value, Minimum, Maximum) - Minimum) / (Maximum - Minimum);
 
     /// <summary>
-    /// Text shown inside / below the knob. When <see cref="IsBipolar"/> is true the value
-    /// is displayed relative to the midpoint (e.g. +20, 0, -15) so that neutral = "0".
+    /// Text shown inside / below the knob.
+    /// <list type="bullet">
+    ///   <item>When <see cref="HasDisplayRange"/> is true the raw <see cref="Value"/> is
+    ///   linearly interpolated from [Minimum, Maximum] into [DisplayMinimum, DisplayMaximum]
+    ///   and that mapped value is shown (with a "+" prefix when positive and the range crosses zero).</item>
+    ///   <item>When <see cref="IsBipolar"/> is true (legacy mode) the value is shown as an
+    ///   offset from the midpoint of [Minimum, Maximum].</item>
+    ///   <item>Otherwise the raw <see cref="Value"/> is shown.</item>
+    /// </list>
     /// </summary>
     protected string DisplayValueText
     {
         get
         {
+            if (HasDisplayRange)
+            {
+                var wireRange    = Math.Max(1, Maximum - Minimum);
+                var displayRange = DisplayMaximum!.Value - DisplayMinimum!.Value;
+                var displayValue = (int)Math.Round(
+                    DisplayMinimum.Value + (double)(Math.Clamp(Value, Minimum, Maximum) - Minimum) / wireRange * displayRange);
+                if (IsEffectivelyBipolar && displayValue > 0)
+                    return $"+{displayValue}";
+                return displayValue.ToString(CultureInfo.InvariantCulture);
+            }
+
             if (!IsBipolar)
                 return Value.ToString(CultureInfo.InvariantCulture);
 

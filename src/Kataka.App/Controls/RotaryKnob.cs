@@ -55,7 +55,7 @@ public class RotaryKnob : RotaryKnobBase
     {
         for (var index = 0; index <= 10; index++)
         {
-            var isCenterTick = IsBipolar && index == 5;
+            var isCenterTick = IsEffectivelyBipolar && index == 5;
             var pen = isCenterTick
                 ? new Pen(CenterTickBrush, 2.5 * scale, lineCap: PenLineCap.Round)
                 : new Pen(TickBrush, 1.5 * scale, lineCap: PenLineCap.Round);
