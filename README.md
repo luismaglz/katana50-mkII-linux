@@ -1,6 +1,6 @@
 # Kataka
 
-A cross-platform desktop editor for the **Boss Katana MK2** guitar amplifier, written in C# with [Avalonia UI](https://avaloniaui.net/).
+A linux desktop editor for the **Boss Katana MK2** guitar amplifier, written in C# with [Avalonia UI](https://avaloniaui.net/).
 
 ![Kataka screenshot](screenshot.png)
 
@@ -24,8 +24,6 @@ All edits are sent to the amp in real time using Roland SysEx DT1/RQ1 messages.
 | Platform | Status |
 |----------|--------|
 | Linux    | ✅ Primary target (uses `amidi`) |
-| macOS    | 🔜 Planned (ALSA abstracted behind interface) |
-| Windows  | 🔜 Planned |
 
 ---
 
