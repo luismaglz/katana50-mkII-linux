@@ -49,8 +49,6 @@ dotnet build src/Kataka.App/Kataka.App.csproj
 dotnet run --project src/Kataka.App/Kataka.App.csproj
 ```
 
-On first launch, Kataka will scan for MIDI ports and connect to the Katana automatically if it is plugged in.
-
 ---
 
 ## Project structure
