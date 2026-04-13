@@ -44,15 +44,6 @@
                             Background="{Binding VariationBrush}" />
                 </StackPanel>
 
-                <!-- Level knob -->
-                <controls:RotaryKnob Scale="0.6" Label="LEVEL"
-                                     Description="Adjusts the overall output level of the reverb pedal."
-                                     Minimum="0" Maximum="100"
-                                     Value="{Binding Level}"
-                                     IsVisible="{Binding HasLevel}"
-                                     HorizontalAlignment="Center"
-                                     LabelFontSize="12" />
-
                 <!-- Row 1: Time, PreDelay, E.Level, D.Mix -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <controls:RotaryKnob Scale="0.6" Label="TIME"

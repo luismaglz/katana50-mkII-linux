@@ -226,18 +226,6 @@ public partial class ModFxPedalViewModel : PedalViewModel
         }
     }
 
-    private int _level;
-    public int Level
-    {
-        get => _level;
-        set
-        {
-            if (!SetProperty(ref _level, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(Definition.LevelParameter!.Key, value);
-        }
-    }
-
-    public bool HasLevel => Definition.LevelParameter is not null;
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
     public override bool TryGetTypeValue(string? option, out byte value)
@@ -1184,7 +1172,6 @@ public partial class ModFxPedalViewModel : PedalViewModel
     {
         var list = new List<KatanaParameterDefinition> { Definition.SwitchParameter };
         if (Definition.TypeParameter is not null) list.Add(Definition.TypeParameter);
-        if (Definition.LevelParameter is not null) list.Add(Definition.LevelParameter);
         if (Definition.VariationParameter is not null) list.Add(Definition.VariationParameter);
         list.AddRange(_chorusParams);
         list.AddRange(_flangerParams);
@@ -1227,8 +1214,6 @@ public partial class ModFxPedalViewModel : PedalViewModel
             SelectedTypeOption = ToTypeOption((byte)typeVal);
         if (Definition.VariationParameter is not null && values.TryGetValue(Definition.VariationParameter.Key, out var variation))
             Variation = ToVariationString(variation);
-        if (Definition.LevelParameter is not null && values.TryGetValue(Definition.LevelParameter.Key, out var level))
-            Level = level;
 
         if (values.TryGetValue(_chorusParams[0].Key, out var v)) ChorusXoverFreq    = v;
         if (values.TryGetValue(_chorusParams[1].Key, out v))     ChorusLowRate      = v;

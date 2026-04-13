@@ -308,13 +308,13 @@ public static partial class KatanaMkIIParameterCatalog
     [
         new("booster", "Booster", BoosterSwitch, variationParameter: BoosterVariation, typeParameter: BoosterType,
             detailParameters: [BoosterDrive, BoosterTone, BoosterBottom, BoosterSoloSw, BoosterSoloLevel, BoosterEffectLevel, BoosterDirectMix]),
-        new("mod", "Mod", ModSwitch, variationParameter: ModVariation, typeParameter: ModType, levelParameter: ModLevel),
-        new("fx", "FX", FxSwitch, variationParameter: FxVariation, typeParameter: FxType, levelParameter: FxLevel),
-        new("delay", "Delay", DelaySwitch, variationParameter: DelayVariation, typeParameter: DelayType, levelParameter: DelayLevel,
+        new("mod", "Mod", ModSwitch, variationParameter: ModVariation, typeParameter: ModType),
+        new("fx", "FX", FxSwitch, variationParameter: FxVariation, typeParameter: FxType),
+        new("delay", "Delay", DelaySwitch, variationParameter: DelayVariation, typeParameter: DelayType,
             detailParameters: [DelayFeedback, DelayHighCut, DelayEffectLevel, DelayDirectMix, DelayTapTime, DelayModRate, DelayModDepth, DelayRange, DelayFilter, DelayFeedbackPhase, DelayDelayPhase, DelayModSw]),
         new("delay2", "Delay 2", Delay2Switch, typeParameter: Delay2Type,
             detailParameters: [Delay2Feedback, Delay2HighCut, Delay2EffectLevel, Delay2DirectMix, Delay2TapTime, Delay2ModRate, Delay2ModDepth, Delay2Range, Delay2Filter, Delay2FeedbackPhase, Delay2DelayPhase, Delay2ModSw]),
-        new("reverb", "Reverb", ReverbSwitch, variationParameter: ReverbVariation, typeParameter: ReverbType, levelParameter: ReverbLevel,
+        new("reverb", "Reverb", ReverbSwitch, variationParameter: ReverbVariation, typeParameter: ReverbType,
             detailParameters: [ReverbTime, ReverbPreDelay, ReverbLowCut, ReverbHighCut, ReverbDensity, ReverbColor, ReverbEffectLevel, ReverbDirectMix]),
     ];
 

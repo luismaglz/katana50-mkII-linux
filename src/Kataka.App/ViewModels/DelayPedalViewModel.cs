@@ -84,18 +84,6 @@ public partial class DelayPedalViewModel : PedalViewModel
         }
     }
 
-    private int _level;
-    public int Level
-    {
-        get => _level;
-        set
-        {
-            if (!SetProperty(ref _level, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(_def.LevelParameter!.Key, value);
-        }
-    }
-
-    public bool HasLevel => _def.LevelParameter is not null;
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
     // ── Delay-specific controls ────────────────────────────────────────────────────
@@ -247,7 +235,6 @@ public partial class DelayPedalViewModel : PedalViewModel
     {
         var list = new List<KatanaParameterDefinition> { _def.SwitchParameter };
         if (_def.TypeParameter is not null) list.Add(_def.TypeParameter);
-        if (_def.LevelParameter is not null) list.Add(_def.LevelParameter);
         if (_def.VariationParameter is not null) list.Add(_def.VariationParameter);
         list.Add(_feedbackParam);
         list.Add(_highCutParam);
@@ -272,8 +259,6 @@ public partial class DelayPedalViewModel : PedalViewModel
             SelectedTypeOption = ToTypeOption((byte)typeVal);
         if (_def.VariationParameter is not null && values.TryGetValue(_def.VariationParameter.Key, out var variation))
             Variation = ToVariationString(variation);
-        if (_def.LevelParameter is not null && values.TryGetValue(_def.LevelParameter.Key, out var level))
-            Level = level;
         if (values.TryGetValue(_feedbackParam.Key, out var feedback))           Feedback             = Math.Clamp(feedback, 0, 100);
         if (values.TryGetValue(_highCutParam.Key, out var highCut))             HighCut              = Math.Clamp(highCut, 0, 14);
         if (values.TryGetValue(_effectLevelParam.Key, out var effectLevel))     EffectLevel          = Math.Clamp(effectLevel, 0, 120);
