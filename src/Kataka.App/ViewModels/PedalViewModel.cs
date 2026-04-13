@@ -43,9 +43,6 @@ public abstract partial class PedalViewModel : ViewModelBase, IBasePedal
     public abstract string ToTypeOption(byte rawValue);
     public abstract string TypeCaption { get; }
     public abstract string Variation { get; set; }
-    public abstract int Level { get; set; }
-    public abstract bool HasLevel { get; }
-
     public abstract IReadOnlyList<KatanaParameterDefinition> GetSyncParameters();
 
     public void ApplyAmpValues(IReadOnlyDictionary<string, int> values)
