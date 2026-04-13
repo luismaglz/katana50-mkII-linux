@@ -165,11 +165,11 @@ public partial class BoosterPedalViewModel : PedalViewModel
         if (Definition.VariationParameter is not null && values.TryGetValue(Definition.VariationParameter.Key, out var variation))
             Variation = ToVariationString(variation);
         if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterDrive.Key, out var drive)) Drive = Math.Clamp(drive, 0, 120);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterTone.Key, out var tone)) Tone = Math.Clamp(tone, 0, 127);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterBottom.Key, out var bottom)) Bottom = Math.Clamp(bottom, 0, 127);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterTone.Key, out var tone)) Tone = Math.Clamp(tone, 0, 100);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterBottom.Key, out var bottom)) Bottom = Math.Clamp(bottom, 0, 100);
         if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterSoloSw.Key, out var soloSw)) SoloSw = soloSw != 0;
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterSoloLevel.Key, out var soloLevel)) SoloLevel = Math.Clamp(soloLevel, 0, 127);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterEffectLevel.Key, out var effectLevel)) EffectLevel = Math.Clamp(effectLevel, 0, 127);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterDirectMix.Key, out var directMix)) DirectMix = Math.Clamp(directMix, 0, 127);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterSoloLevel.Key, out var soloLevel)) SoloLevel = Math.Clamp(soloLevel, 0, 100);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterEffectLevel.Key, out var effectLevel)) EffectLevel = Math.Clamp(effectLevel, 0, 100);
+        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterDirectMix.Key, out var directMix)) DirectMix = Math.Clamp(directMix, 0, 100);
     }
 }

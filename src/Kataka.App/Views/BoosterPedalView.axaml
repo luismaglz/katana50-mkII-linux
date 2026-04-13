@@ -42,23 +42,24 @@
                                          Value="{Binding Drive}"
                                          LabelFontSize="12"/>
                     <controls:RotaryKnob Scale="0.6" Label="TONE"
-                                         Minimum="0" Maximum="127"
+                                         Minimum="0" Maximum="100"
+                                         DisplayMinimum="-50" DisplayMaximum="50"
                                          Value="{Binding Tone}"
                                          LabelFontSize="12"/>
 
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <controls:RotaryKnob Scale="0.6" Label="E.LEVEL"
-                                         Minimum="0" Maximum="127"
+                                         Minimum="0" Maximum="100"
                                          Value="{Binding EffectLevel}"
                                          LabelFontSize="12"/>
                     <controls:RotaryKnob Scale="0.6" Label="BOTTOM"
                                          Minimum="0" Maximum="100"
-                                         IsBipolar="True"
+                                         DisplayMinimum="-50" DisplayMaximum="50"
                                          Value="{Binding Bottom}"
                                          LabelFontSize="12"/>
                     <controls:RotaryKnob Scale="0.6" Label="D.MIX"
-                                         Minimum="0" Maximum="127"
+                                         Minimum="0" Maximum="100"
                                          Value="{Binding DirectMix}"
                                          LabelFontSize="12"/>
                 </StackPanel>
@@ -71,7 +72,7 @@
                                   Width="100"
                                   IsChecked="{Binding SoloSw}" />
                     <controls:RotaryKnob Scale="0.6" Label="SOLO LVL"
-                                         Minimum="0" Maximum="127"
+                                         Minimum="0" Maximum="100"
                                          Value="{Binding SoloLevel}"
                                          LabelFontSize="12"/>
                 </StackPanel>
