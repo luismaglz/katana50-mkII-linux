@@ -22,33 +22,37 @@ public class ModPedalState
 
     #region ModFxPedals State
 
-    public AcGuitarSimState AcGuitarSim = new();
-    public AcProcessorState AcProcessor = new();
-    public AutoWahState AutoWah = new();
-    public ChorusState Chorus = new();
-    public CompState Comp = new();
-    public DC30State DC30 = new();
-    public Flanger117EState Flanger117E = new();
-    public GraphicEqState GraphicEq = new();
-    public GuitarSimState GuitarSim = new();
-    public HarmonistState Harmonist = new();
-    public HeavyOctaveState HeavyOctave = new();
-    public HumanizerState Humanizer = new();
-    public LimiterState Limiter = new();
-    public OctaveState Octave = new();
-    public ParametricEQState ParametricEQ = new();
-    public Phaser90EState Phaser90E = new();
-    public PitchShifterState PitchShifter = new();
-    public RingModState RingMod = new();
-    public RotaryState Rotary = new();
-    public SlicerState Slicer = new();
-    public SlowGearState SlowGear = new();
-    public TremoloState Tremolo = new();
-    public TWahState TWah = new();
-    public UniVState UniV = new();
-    public VibratoState Vibrato = new();
-    public Wah95EState Wah95E = new();
-    public WaveSynthState WaveSynth = new();
+    public AcGuitarSimState AcGuitarSim = new(isMod: true);
+    public AcProcessorState AcProcessor = new(isMod: true);
+    public AutoWahState AutoWah = new(isMod: true);
+    public ChorusState Chorus = new(isMod: true);
+    public CompState Comp = new(isMod: true);
+    public DC30State DC30 = new(isMod: true);
+    public Flanger117EState Flanger117E = new(isMod: true);
+    public FlangerState Flanger = new(isMod: true);
+    public GraphicEqState GraphicEq = new(isMod: true);
+    public GuitarSimState GuitarSim = new(isMod: true);
+    public HarmonistState Harmonist = new(isMod: true);
+    public HeavyOctaveState HeavyOctave = new(isMod: true);
+    public HumanizerState Humanizer = new(isMod: true);
+    public LimiterState Limiter = new(isMod: true);
+    public OctaveState Octave = new(isMod: true);
+    public ParametricEQState ParametricEQ = new(isMod: true);
+    public PedalBendState PedalBend = new(isMod: true);
+    public PedalWahState PedalWah = new(isMod: true);
+    public Phaser90EState Phaser90E = new(isMod: true);
+    public PhaserState Phaser = new(isMod: true);
+    public PitchShifterState PitchShifter = new(isMod: true);
+    public RingModState RingMod = new(isMod: true);
+    public RotaryState Rotary = new(isMod: true);
+    public SlicerState Slicer = new(isMod: true);
+    public SlowGearState SlowGear = new(isMod: true);
+    public TremoloState Tremolo = new(isMod: true);
+    public TWahState TWah = new(isMod: true);
+    public UniVState UniV = new(isMod: true);
+    public VibratoState Vibrato = new(isMod: true);
+    public Wah95EState Wah95E = new(isMod: true);
+    public WaveSynthState WaveSynth = new(isMod: true);
 
     #endregion
 }

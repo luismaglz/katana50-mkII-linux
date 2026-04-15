@@ -24,20 +24,12 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly Dictionary<string, AmpControlViewModel> ampControlsByKey = [];
     private readonly Dictionary<string, IBasePedal> panelEffectsByKey = [];
     private readonly Dictionary<string, IBasePedal> panelEffectsByDefinitionKey = [];
-    private readonly Dictionary<string, byte> pendingAmpWrites = [];
-    private readonly Dictionary<string, bool> pendingPanelEffectWrites = [];
-    private readonly Dictionary<string, byte> pendingPanelTypeWrites = [];
-    private readonly Dictionary<string, byte> pendingPedalWrites = [];
-    private readonly Dictionary<string, byte> pendingDetailParamWrites = [];
+    private readonly Dictionary<string, byte> pendingWrites = [];
 
     // Lookup built once at connect time: maps 4-byte address key (e.g. "60-00-06-50") to an
     // action that updates the matching VM property. Used to apply unsolicited DT1 push notifications
     // from the amp without needing to know which parameter changed ahead of time.
     private Dictionary<string, Action<byte>> pushHandlerLookup = [];
-    private byte? pendingAmpTypeWrite;
-    private byte? pendingCabinetResonanceWrite;
-    private byte? pendingAmpVariationWrite;
-    private byte? pendingChainPatternWrite;
     private readonly SemaphoreSlim syncOperationGate = new(1, 1);
     private readonly DispatcherTimer writeSyncTimer;
     private readonly DispatcherTimer readSyncTimer;
@@ -136,7 +128,7 @@ public partial class MainWindowViewModel : ViewModelBase
             if (suppressChangeTracking || !ActiveWriteSync || !IsConnected) return;
             var value = Pedalboard.SelectedChainPattern;
             if (value < 0 || value >= PedalboardViewModel.ChainPatternNames.Length) return;
-            pendingChainPatternWrite = (byte)value;
+            pendingWrites[KatanaMkIIParameterCatalog.ChainPattern.Key] = (byte)value;
             AppendLog($"Queued panel sync: Chain Pattern -> {PedalboardViewModel.ChainPatternNames[value]}.");
         };
 
@@ -251,7 +243,7 @@ public partial class MainWindowViewModel : ViewModelBase
     partial void OnIsAmpVariationChanged(bool value)
     {
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected) return;
-        pendingAmpVariationWrite = value ? (byte)1 : (byte)0;
+        pendingWrites[KatanaMkIIParameterCatalog.AmpVariation.Key] = value ? (byte)1 : (byte)0;
         AppendLog($"Queued panel sync: Amp Variation -> {(value ? "TYPE 2" : "TYPE 1")}.");
     }
 
@@ -260,7 +252,7 @@ public partial class MainWindowViewModel : ViewModelBase
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected) return;
         var idx = Array.IndexOf(AmpTypeOptions, value);
         if (idx < 0) return;
-        pendingAmpTypeWrite = (byte)idx;
+        pendingWrites[KatanaMkIIParameterCatalog.AmpType.Key] = (byte)idx;
         AppendLog($"Queued panel sync: Amp Type -> {value}.");
     }
 
@@ -269,7 +261,7 @@ public partial class MainWindowViewModel : ViewModelBase
         if (suppressChangeTracking || !ActiveWriteSync || !IsConnected) return;
         var idx = Array.IndexOf(CabinetResonanceOptions, value);
         if (idx < 0) return;
-        pendingCabinetResonanceWrite = (byte)idx;
+        pendingWrites[KatanaMkIIParameterCatalog.CabinetResonance.Key] = (byte)idx;
         AppendLog($"Queued panel sync: Cabinet Resonance -> {value}.");
     }
 
@@ -305,20 +297,13 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (!value)
         {
-            if (pendingAmpWrites.Count > 0 || pendingPanelEffectWrites.Count > 0 || pendingPanelTypeWrites.Count > 0 || pendingPedalWrites.Count > 0 || pendingPanelChannel is not null || pendingAmpTypeWrite.HasValue || pendingCabinetResonanceWrite.HasValue || pendingAmpVariationWrite.HasValue || pendingChainPatternWrite.HasValue)
+            if (pendingWrites.Count > 0 || pendingPanelChannel is not null)
             {
                 AppendLog($"Clearing pending sync queue after disconnect: {DescribePendingWrites()}.");
             }
 
-            pendingAmpWrites.Clear();
-            pendingPanelEffectWrites.Clear();
-            pendingPanelTypeWrites.Clear();
-            pendingPedalWrites.Clear();
+            pendingWrites.Clear();
             pendingPanelChannel = null;
-            pendingAmpTypeWrite = null;
-            pendingCabinetResonanceWrite = null;
-            pendingAmpVariationWrite = null;
-            pendingChainPatternWrite = null;
         }
 
         UpdateWriteSyncTimer();
@@ -951,45 +936,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private string DescribePendingWrites()
     {
+        if (pendingWrites.Count == 0 && pendingPanelChannel is null)
+        {
+            return "no pending changes";
+        }
+
         var parts = new List<string>();
-        if (pendingAmpWrites.Count > 0)
+        if (pendingWrites.Count > 0)
         {
-            parts.Add($"{pendingAmpWrites.Count} amp");
-        }
-
-        if (pendingPanelEffectWrites.Count > 0)
-        {
-            parts.Add($"{pendingPanelEffectWrites.Count} panel");
-        }
-
-        if (pendingPanelTypeWrites.Count > 0)
-        {
-            parts.Add($"{pendingPanelTypeWrites.Count} panel type");
-        }
-
-        if (pendingAmpTypeWrite.HasValue)
-        {
-            parts.Add("amp type");
-        }
-
-        if (pendingCabinetResonanceWrite.HasValue)
-        {
-            parts.Add("cabinet resonance");
-        }
-
-        if (pendingAmpVariationWrite.HasValue)
-        {
-            parts.Add("amp variation");
-        }
-
-        if (pendingPedalWrites.Count > 0)
-        {
-            parts.Add($"{pendingPedalWrites.Count} pedal");
-        }
-
-        if (pendingDetailParamWrites.Count > 0)
-        {
-            parts.Add($"{pendingDetailParamWrites.Count} detail");
+            parts.Add($"{pendingWrites.Count} writes");
         }
 
         if (pendingPanelChannel is not null)
@@ -997,21 +952,12 @@ public partial class MainWindowViewModel : ViewModelBase
             parts.Add("channel");
         }
 
-        return parts.Count == 0 ? "no pending changes" : string.Join(", ", parts);
+        return string.Join(", ", parts);
     }
 
     private bool HasPendingWrites()
     {
-        return pendingAmpWrites.Count > 0 ||
-               pendingPanelEffectWrites.Count > 0 ||
-               pendingPanelTypeWrites.Count > 0 ||
-               pendingAmpTypeWrite.HasValue ||
-               pendingCabinetResonanceWrite.HasValue ||
-               pendingAmpVariationWrite.HasValue ||
-               pendingChainPatternWrite.HasValue ||
-               pendingPedalWrites.Count > 0 ||
-               pendingDetailParamWrites.Count > 0 ||
-               pendingPanelChannel is not null;
+        return pendingWrites.Count > 0 || pendingPanelChannel is not null;
     }
 
     private bool ShouldRunActiveReadSync()
@@ -1079,7 +1025,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         var clampedValue = Math.Clamp(control.Value, control.Minimum, control.Maximum);
-        pendingAmpWrites[control.Parameter.Key] = (byte)clampedValue;
+        pendingWrites[control.Parameter.Key] = (byte)clampedValue;
         AppendLog($"Queued amp sync: {control.DisplayName} -> {clampedValue}.");
         PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
@@ -1092,7 +1038,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        pendingPanelEffectWrites[effect.Definition.SwitchParameter.Key] = effect.IsEnabled;
+        pendingWrites[effect.Definition.SwitchParameter.Key] = effect.IsEnabled ? (byte)1 : (byte)0;
         AppendLog($"Queued panel sync: {effect.DisplayName} -> {(effect.IsEnabled ? "On" : "Off")}.");
         PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
@@ -1110,7 +1056,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        pendingPanelTypeWrites[effect.Definition.TypeParameter.Key] = typeValue;
+        pendingWrites[effect.Definition.TypeParameter.Key] = typeValue;
         AppendLog($"Queued panel type sync: {effect.DisplayName} -> {effect.SelectedTypeOption}.");
         PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
@@ -1123,7 +1069,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        pendingDetailParamWrites[key] = (byte)Math.Clamp(value, 0, 127);
+        pendingWrites[key] = (byte)Math.Clamp(value, 0, 127);
         AppendLog($"Queued detail param sync: {key} -> {value}.");
         PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
@@ -1141,7 +1087,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        pendingPedalWrites[parameter.Key] = value;
+        pendingWrites[parameter.Key] = value;
         AppendLog($"Queued pedal sync: {parameter.DisplayName} -> {description}.");
         PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
@@ -1182,7 +1128,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        if (pendingAmpWrites.Count == 0 && pendingPanelEffectWrites.Count == 0 && pendingPanelTypeWrites.Count == 0 && pendingPedalWrites.Count == 0 && pendingDetailParamWrites.Count == 0 && pendingPanelChannel is null && !pendingAmpTypeWrite.HasValue && !pendingCabinetResonanceWrite.HasValue && !pendingAmpVariationWrite.HasValue && !pendingChainPatternWrite.HasValue)
+        if (!HasPendingWrites())
         {
             return;
         }
@@ -1193,60 +1139,62 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        var ampSnapshot = new Dictionary<string, byte>(StringComparer.Ordinal);
-        var panelSnapshot = new Dictionary<string, bool>(StringComparer.Ordinal);
-        var panelTypeSnapshot = new Dictionary<string, byte>(StringComparer.Ordinal);
-        var pedalSnapshot = new Dictionary<string, byte>(StringComparer.Ordinal);
-        var detailParamSnapshot = new Dictionary<string, byte>(StringComparer.Ordinal);
+        var snapshot = new Dictionary<string, byte>(StringComparer.Ordinal);
         string? channelSnapshot = null;
-        byte? ampTypeSnapshot = null;
-        byte? cabinetSnapshot = null;
-        byte? ampVariationSnapshot = null;
-        byte? chainPatternSnapshot = null;
 
         try
         {
             PauseActiveReadSync("queued write sync is flushing");
-            ampSnapshot = new Dictionary<string, byte>(pendingAmpWrites, StringComparer.Ordinal);
-            panelSnapshot = new Dictionary<string, bool>(pendingPanelEffectWrites, StringComparer.Ordinal);
-            panelTypeSnapshot = new Dictionary<string, byte>(pendingPanelTypeWrites, StringComparer.Ordinal);
-            pedalSnapshot = new Dictionary<string, byte>(pendingPedalWrites, StringComparer.Ordinal);
-            detailParamSnapshot = new Dictionary<string, byte>(pendingDetailParamWrites, StringComparer.Ordinal);
-            channelSnapshot = pendingPanelChannel;
-            ampTypeSnapshot = pendingAmpTypeWrite;
-            cabinetSnapshot = pendingCabinetResonanceWrite;
-            ampVariationSnapshot = pendingAmpVariationWrite;
-            chainPatternSnapshot = pendingChainPatternWrite;
 
-            pendingAmpWrites.Clear();
-            pendingPanelEffectWrites.Clear();
-            pendingPanelTypeWrites.Clear();
-            pendingPedalWrites.Clear();
+            foreach (var entry in pendingWrites)
+                snapshot[entry.Key] = entry.Value;
+            channelSnapshot = pendingPanelChannel;
+
+            pendingWrites.Clear();
             pendingPanelChannel = null;
-            pendingAmpTypeWrite = null;
-            pendingCabinetResonanceWrite = null;
-            pendingAmpVariationWrite = null;
-            pendingChainPatternWrite = null;
+
+            var ampSnapshot = snapshot
+                .Where(e => ampControlsByKey.ContainsKey(e.Key))
+                .ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
+
+            var panelSwitchSnapshot = snapshot
+                .Where(e => panelEffectsByKey.ContainsKey(e.Key))
+                .ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
+
+            var panelTypeSnapshot = snapshot
+                .Where(e => PanelEffects.Any(ef => ef.Definition.TypeParameter?.Key == e.Key))
+                .ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
+
+            var pedalKeys = new HashSet<string>(PedalFx.GetReadParameters().Select(p => p.Key), StringComparer.Ordinal);
+
+            var pedalSnapshot = snapshot
+                .Where(e => pedalKeys.Contains(e.Key))
+                .ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
+
+            var detailParamSnapshot = snapshot
+                .Where(e => !ampSnapshot.ContainsKey(e.Key) && !panelSwitchSnapshot.ContainsKey(e.Key)
+                         && !panelTypeSnapshot.ContainsKey(e.Key) && !pedalSnapshot.ContainsKey(e.Key))
+                .ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
 
             AppendLog(
-                $"Flushing queued sync: {ampSnapshot.Count} amp, {panelSnapshot.Count} panel, {panelTypeSnapshot.Count} panel type, {pedalSnapshot.Count} pedal, {detailParamSnapshot.Count} detail, {(channelSnapshot is null ? "no" : "1")} channel change.");
+                $"Flushing queued sync: {ampSnapshot.Count} amp, {panelSwitchSnapshot.Count} panel, {panelTypeSnapshot.Count} panel type, {pedalSnapshot.Count} pedal, {detailParamSnapshot.Count} detail, {(channelSnapshot is null ? "no" : "1")} channel change.");
 
             await FlushPendingAmpWritesAsync(ampSnapshot);
-            await FlushPendingPanelWritesAsync(channelSnapshot, panelSnapshot, panelTypeSnapshot, ampTypeSnapshot, cabinetSnapshot, ampVariationSnapshot, chainPatternSnapshot);
+            await FlushPendingPanelWritesAsync(channelSnapshot, panelSwitchSnapshot, panelTypeSnapshot, snapshot);
             await FlushPendingPedalWritesAsync(pedalSnapshot);
             await FlushPendingDetailParamWritesAsync(detailParamSnapshot);
 
             if (ActiveReadSync)
             {
                 AppendLog("Active read sync is enabled; refreshing written state from the Katana.");
-                await RefreshWrittenStateAsync(ampSnapshot, panelSnapshot, panelTypeSnapshot, pedalSnapshot, channelSnapshot);
+                await RefreshWrittenStateAsync(ampSnapshot, panelSwitchSnapshot, panelTypeSnapshot, pedalSnapshot, channelSnapshot);
             }
             else
             {
                 AppendLog("Active read sync is disabled; skipping post-write refresh.");
             }
 
-            if (ampSnapshot.Count > 0 || panelSnapshot.Count > 0 || panelTypeSnapshot.Count > 0 || pedalSnapshot.Count > 0 || detailParamSnapshot.Count > 0 || channelSnapshot is not null)
+            if (snapshot.Count > 0 || channelSnapshot is not null)
             {
                 StatusMessage = "Queued changes synced to the Katana.";
                 AppendLog("Queued changes synced to the Katana.");
@@ -1256,29 +1204,9 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            foreach (var entry in ampSnapshot)
+            foreach (var entry in snapshot)
             {
-                pendingAmpWrites[entry.Key] = entry.Value;
-            }
-
-            foreach (var entry in panelSnapshot)
-            {
-                pendingPanelEffectWrites[entry.Key] = entry.Value;
-            }
-
-            foreach (var entry in panelTypeSnapshot)
-            {
-                pendingPanelTypeWrites[entry.Key] = entry.Value;
-            }
-
-            foreach (var entry in pedalSnapshot)
-            {
-                pendingPedalWrites[entry.Key] = entry.Value;
-            }
-
-            foreach (var entry in detailParamSnapshot)
-            {
-                pendingDetailParamWrites[entry.Key] = entry.Value;
+                pendingWrites[entry.Key] = entry.Value;
             }
 
             pendingPanelChannel ??= channelSnapshot;
@@ -1382,12 +1310,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task FlushPendingPanelWritesAsync(
         string? channel,
-        IReadOnlyDictionary<string, bool> panelWrites,
+        IReadOnlyDictionary<string, byte> panelSwitchWrites,
         IReadOnlyDictionary<string, byte> panelTypeWrites,
-        byte? ampTypeWrite,
-        byte? cabinetResonanceWrite,
-        byte? ampVariationWrite,
-        byte? chainPatternWrite)
+        IReadOnlyDictionary<string, byte> allWrites)
     {
         if (!string.IsNullOrWhiteSpace(channel))
         {
@@ -1395,11 +1320,11 @@ public partial class MainWindowViewModel : ViewModelBase
             await katanaSession.SelectPanelChannelAsync(ParsePanelChannelDisplay(channel));
         }
 
-        foreach (var entry in panelWrites)
+        foreach (var entry in panelSwitchWrites)
         {
             var parameter = panelEffectsByKey[entry.Key].Definition.SwitchParameter;
-            AppendLog($"Writing queued panel effect: {panelEffectsByKey[entry.Key].DisplayName} -> {(entry.Value ? "On" : "Off")}.");
-            await katanaSession.WriteBlockAsync(parameter.Address, [entry.Value ? (byte)1 : (byte)0]);
+            AppendLog($"Writing queued panel effect: {panelEffectsByKey[entry.Key].DisplayName} -> {(entry.Value != 0 ? "On" : "Off")}.");
+            await katanaSession.WriteBlockAsync(parameter.Address, [entry.Value]);
         }
 
         foreach (var entry in panelTypeWrites)
@@ -1409,29 +1334,29 @@ public partial class MainWindowViewModel : ViewModelBase
             await katanaSession.WriteBlockAsync(effect.Definition.TypeParameter!.Address, [entry.Value]);
         }
 
-        if (ampTypeWrite.HasValue)
+        if (allWrites.TryGetValue(KatanaMkIIParameterCatalog.AmpType.Key, out var ampTypeValue))
         {
-            AppendLog($"Writing queued amp type: {(ampTypeWrite.Value < AmpTypeOptions.Length ? AmpTypeOptions[ampTypeWrite.Value] : ampTypeWrite.Value.ToString())}.");
-            await katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.AmpType.Address, [ampTypeWrite.Value]);
+            AppendLog($"Writing queued amp type: {(ampTypeValue < AmpTypeOptions.Length ? AmpTypeOptions[ampTypeValue] : ampTypeValue.ToString())}.");
+            await katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.AmpType.Address, [ampTypeValue]);
         }
 
-        if (cabinetResonanceWrite.HasValue)
+        if (allWrites.TryGetValue(KatanaMkIIParameterCatalog.CabinetResonance.Key, out var cabinetValue))
         {
-            AppendLog($"Writing queued cabinet resonance: {(cabinetResonanceWrite.Value < CabinetResonanceOptions.Length ? CabinetResonanceOptions[cabinetResonanceWrite.Value] : cabinetResonanceWrite.Value.ToString())}.");
-            await katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.CabinetResonance.Address, [cabinetResonanceWrite.Value]);
+            AppendLog($"Writing queued cabinet resonance: {(cabinetValue < CabinetResonanceOptions.Length ? CabinetResonanceOptions[cabinetValue] : cabinetValue.ToString())}.");
+            await katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.CabinetResonance.Address, [cabinetValue]);
         }
 
-        if (ampVariationWrite.HasValue)
+        if (allWrites.TryGetValue(KatanaMkIIParameterCatalog.AmpVariation.Key, out var ampVariationValue))
         {
-            AppendLog($"Writing queued amp variation: {(ampVariationWrite.Value == 0 ? "TYPE 1" : "TYPE 2")}.");
-            await katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.AmpVariation.Address, [ampVariationWrite.Value]);
+            AppendLog($"Writing queued amp variation: {(ampVariationValue == 0 ? "TYPE 1" : "TYPE 2")}.");
+            await katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.AmpVariation.Address, [ampVariationValue]);
         }
 
-        if (chainPatternWrite.HasValue)
+        if (allWrites.TryGetValue(KatanaMkIIParameterCatalog.ChainPattern.Key, out var chainPatternValue))
         {
-            var name = chainPatternWrite.Value < PedalboardViewModel.ChainPatternNames.Length ? PedalboardViewModel.ChainPatternNames[chainPatternWrite.Value] : chainPatternWrite.Value.ToString();
+            var name = chainPatternValue < PedalboardViewModel.ChainPatternNames.Length ? PedalboardViewModel.ChainPatternNames[chainPatternValue] : chainPatternValue.ToString();
             AppendLog($"Writing queued chain pattern: {name}.");
-            await katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.ChainPattern.Address, [chainPatternWrite.Value]);
+            await katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.ChainPattern.Address, [chainPatternValue]);
         }
     }
 
@@ -1505,7 +1430,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task RefreshWrittenStateAsync(
         IReadOnlyDictionary<string, byte> ampWrites,
-        IReadOnlyDictionary<string, bool> panelWrites,
+        IReadOnlyDictionary<string, byte> panelSwitchWrites,
         IReadOnlyDictionary<string, byte> panelTypeWrites,
         IReadOnlyDictionary<string, byte> pedalWrites,
         string? channelWrite)
@@ -1525,7 +1450,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     var control = ampControlsByKey[parameter.Key];
                     var expectedValue = ampWrites[parameter.Key];
-                    if (pendingAmpWrites.ContainsKey(parameter.Key) || control.Value != expectedValue)
+                    if (pendingWrites.ContainsKey(parameter.Key) || control.Value != expectedValue)
                     {
                         AppendLog($"Skipping stale amp readback for {control.DisplayName}; a newer local value is pending.");
                         continue;
@@ -1536,13 +1461,13 @@ public partial class MainWindowViewModel : ViewModelBase
             });
         }
 
-        if (panelWrites.Count > 0)
+        if (panelSwitchWrites.Count > 0)
         {
-            var panelParameters = panelWrites.Keys
+            var panelParameters = panelSwitchWrites.Keys
                 .Distinct(StringComparer.Ordinal)
                 .Select(key => panelEffectsByKey[key].Definition.SwitchParameter)
                 .ToArray();
-            AppendLog($"Read sync refreshing panel values: {DescribePanelKeys(panelWrites.Keys)}.");
+            AppendLog($"Read sync refreshing panel values: {DescribePanelKeys(panelSwitchWrites.Keys)}.");
             var values = await katanaSession.ReadParametersAsync(panelParameters);
 
             ApplyDeviceState(() =>
@@ -1550,8 +1475,8 @@ public partial class MainWindowViewModel : ViewModelBase
                 foreach (var parameter in panelParameters)
                 {
                     var effect = panelEffectsByKey[parameter.Key];
-                    var expectedValue = panelWrites[parameter.Key];
-                    if (pendingPanelEffectWrites.ContainsKey(parameter.Key) || effect.IsEnabled != expectedValue)
+                    var expectedValue = panelSwitchWrites[parameter.Key];
+                    if (pendingWrites.ContainsKey(parameter.Key) || effect.IsEnabled != (expectedValue != 0))
                     {
                         AppendLog($"Skipping stale panel readback for {effect.DisplayName}; a newer local value is pending.");
                         continue;
@@ -1577,7 +1502,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     var effect = PanelEffects.First(panel => panel.Definition.TypeParameter?.Key == parameter.Key);
                     var expectedValue = panelTypeWrites[parameter.Key];
-                    if (pendingPanelTypeWrites.ContainsKey(parameter.Key) ||
+                    if (pendingWrites.ContainsKey(parameter.Key) ||
                         !effect.TryGetTypeValue(effect.SelectedTypeOption, out var currentValue) ||
                         currentValue != expectedValue)
                     {
@@ -1604,7 +1529,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 foreach (var parameter in pedalParameters)
                 {
                     var expectedValue = pedalWrites[parameter.Key];
-                    if (pendingPedalWrites.ContainsKey(parameter.Key) ||
+                    if (pendingWrites.ContainsKey(parameter.Key) ||
                         !PedalFx.TryGetCurrentValue(parameter.Key, out var currentValue) ||
                         currentValue != expectedValue)
                     {
