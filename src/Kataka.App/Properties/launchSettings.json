@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Kataka.App": {
+      "commandName": "Project",
+      "environmentVariables": {
+        
+      }
+    },
+    "Kataka.App (dotnet watch)": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "watch run",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}

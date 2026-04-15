@@ -49,6 +49,16 @@ dotnet build src/Kataka.App/Kataka.App.csproj
 dotnet run --project src/Kataka.App/Kataka.App.csproj
 ```
 
+### Hot reload (Linux)
+
+To enable hot reload during development, you can use:
+
+```bash
+dotnet watch run --project src/Kataka.App/Kataka.App.csproj
+```
+
+Or select the `Kataka.App (dotnet watch)` profile in your IDE if supported.
+
 ---
 
 ## Project structure

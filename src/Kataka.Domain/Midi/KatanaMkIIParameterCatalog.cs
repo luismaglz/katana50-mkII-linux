@@ -8,26 +8,26 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition AmpVolume { get; } =
         new("amp-volume", "Volume", [0x60, 0x00, 0x06, 0x52]);
 
-    public static KatanaParameterDefinition Bass { get; } =
+    public static KatanaParameterDefinition AmpBass { get; } =
         new("amp-bass", "Bass", [0x60, 0x00, 0x06, 0x53]);
 
-    public static KatanaParameterDefinition Middle { get; } =
+    public static KatanaParameterDefinition AmpMiddle { get; } =
         new("amp-middle", "Middle", [0x60, 0x00, 0x06, 0x54]);
 
-    public static KatanaParameterDefinition Treble { get; } =
+    public static KatanaParameterDefinition AmpTreble { get; } =
         new("amp-treble", "Treble", [0x60, 0x00, 0x06, 0x55]);
 
-    public static KatanaParameterDefinition Presence { get; } =
+    public static KatanaParameterDefinition AmpPresence { get; } =
         new("amp-presence", "Presence", [0x60, 0x00, 0x06, 0x56]);
 
     public static IReadOnlyList<KatanaParameterDefinition> AmpEditorControls { get; } =
     [
         AmpGain,
         AmpVolume,
-        Bass,
-        Middle,
-        Treble,
-        Presence,
+        AmpBass,
+        AmpMiddle,
+        AmpTreble,
+        AmpPresence,
     ];
 
     public static KatanaParameterDefinition BoosterSwitch { get; } =

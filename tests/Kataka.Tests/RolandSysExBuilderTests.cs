@@ -208,7 +208,7 @@ public sealed class RolandSysExBuilderTests
 
         Assert.True(parsed);
         Assert.Equal([0x36, 0x2A, 0x2C, 0x32, 0x2B, 0x2A], data);
-        Assert.Equal([0x60, 0x00, 0x06, 0x53], KatanaMkIIParameterCatalog.Bass.Address);
-        Assert.Equal([0x60, 0x00, 0x06, 0x56], KatanaMkIIParameterCatalog.Presence.Address);
+        Assert.Equal([0x60, 0x00, 0x06, 0x53], KatanaMkIIParameterCatalog.AmpBass.Address);
+        Assert.Equal([0x60, 0x00, 0x06, 0x56], KatanaMkIIParameterCatalog.AmpPresence.Address);
     }
 }
