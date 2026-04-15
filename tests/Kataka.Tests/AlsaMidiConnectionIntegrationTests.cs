@@ -175,10 +175,10 @@ public sealed class AlsaMidiConnectionIntegrationTests : IAsyncLifetime
         {
             KatanaMkIIParameterCatalog.AmpGain,
             KatanaMkIIParameterCatalog.AmpVolume,
-            KatanaMkIIParameterCatalog.Bass,
-            KatanaMkIIParameterCatalog.Middle,
-            KatanaMkIIParameterCatalog.Treble,
-            KatanaMkIIParameterCatalog.Presence,
+            KatanaMkIIParameterCatalog.AmpBass,
+            KatanaMkIIParameterCatalog.AmpMiddle,
+            KatanaMkIIParameterCatalog.AmpTreble,
+            KatanaMkIIParameterCatalog.AmpPresence,
         };
 
         var exception = await Record.ExceptionAsync(async () =>
