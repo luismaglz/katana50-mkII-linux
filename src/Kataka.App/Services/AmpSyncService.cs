@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Avalonia.Threading;
+
 using Kataka.App.ViewModels;
 using Kataka.Application.Katana;
 using Kataka.Domain.KatanaState;
@@ -11,37 +13,78 @@ using Kataka.Domain.Midi;
 
 namespace Kataka.App.Services;
 
-public sealed class AmpSyncService
+public interface IAmpSyncService
+{
+    /// <summary>
+    ///     Wires up change-tracking subscriptions to the VM's collections and starts the write timer.
+    ///     Call after AmpControls, PanelEffects, PedalFx, and Pedalboard are fully populated.
+    /// </summary>
+    void Initialize(IAmpSyncContext context);
+
+    /// <summary>Builds the push-notification lookup and subscribes to amp events. Call after connect.</summary>
+    void Activate();
+
+    /// <summary>Unsubscribes from amp events. Call before disconnect.</summary>
+    void Deactivate();
+
+    /// <summary>Stops the write sync timer immediately. Call from the window Closing handler.</summary>
+    void Shutdown();
+
+    /// <summary>Clears the pending write queue and updates the write timer. Call on IsConnected change.</summary>
+    void OnConnectionChanged(bool connected);
+
+    /// <summary>
+    ///     Queues a single key→value write and kicks the debounce timer.
+    ///     Used by the VM's partial void OnXxx handlers for standalone panel parameters
+    ///     (AmpType, CabinetResonance, AmpVariation, ChainPattern).
+    /// </summary>
+    void QueueWrite(string key, byte value, string logMessage);
+
+    void TrackPanelChannelChange(string displayName);
+    void UpdateWriteSyncTimer();
+    bool HasPendingWrites();
+    string DescribePendingWrites();
+    void ClearPendingWrites();
+    Task<bool> TryReadAmpControlsAsync();
+    Task<bool> TryReadPanelControlsAsync();
+    Task<bool> TryReadPedalControlsAsync();
+    Task<bool> TryWritePatchLevelAsync();
+}
+
+public sealed class AmpSyncService : IAmpSyncService
 {
     private static readonly TimeSpan WriteSyncDebounce = TimeSpan.FromMilliseconds(125);
 
-    private readonly IKatanaSession _session;
-    private readonly KatanaState    _state;
-    private IAmpSyncContext _context = null!;
-
     private readonly Dictionary<string, AmpControlViewModel> _ampControlsByKey = [];
-    private readonly Dictionary<string, IBasePedal>          _panelEffectsByKey = [];
-    private Dictionary<string, AmpControlState>              _domainAmpControlsByKey = [];
-    private Dictionary<string, AmpControlState>              _domainPanelStatesByKey = [];
-    private Dictionary<string, Action<byte>>                  _pushHandlerLookup = [];
+    private readonly Dictionary<string, IBasePedal> _panelEffectsByKey = [];
 
     private readonly Dictionary<string, byte> _pendingWrites = [];
-    private string? _pendingPanelChannel;
 
-    private readonly SemaphoreSlim   _syncGate = new(1, 1);
+    private readonly IKatanaSession _session;
+    private readonly IKatanaState _state;
+
+    private readonly SemaphoreSlim _syncGate = new(1, 1);
     private readonly DispatcherTimer _writeSyncTimer;
+    private IAmpSyncContext _context = null!;
+    private Dictionary<string, AmpControlState> _domainAmpControlsByKey = [];
+    private Dictionary<string, AmpControlState> _domainPanelStatesByKey = [];
 
-    private int  _flushRetryCount;
+    private int _flushRetryCount;
     private bool _isShuttingDown;
+    private string? _pendingPanelChannel;
+    private Dictionary<string, Action<byte>> _pushHandlerLookup = [];
 
     // ── Construction ──────────────────────────────────────────────────────────
 
-    public AmpSyncService(IKatanaSession session, KatanaState state)
+    public AmpSyncService(IKatanaSession session, IKatanaState state)
     {
         _session = session;
-        _state   = state;
+        _state = state;
 
-        _writeSyncTimer = new DispatcherTimer { Interval = WriteSyncDebounce };
+        _writeSyncTimer = new DispatcherTimer
+        {
+            Interval = WriteSyncDebounce
+        };
         _writeSyncTimer.Tick += async (_, _) =>
         {
             _writeSyncTimer.Stop();
@@ -51,15 +94,15 @@ public sealed class AmpSyncService
     }
 
     /// <summary>
-    /// Wires up change-tracking subscriptions to the VM's collections and starts the write timer.
-    /// Call after AmpControls, PanelEffects, PedalFx, and Pedalboard are fully populated.
+    ///     Wires up change-tracking subscriptions to the VM's collections and starts the write timer.
+    ///     Call after AmpControls, PanelEffects, PedalFx, and Pedalboard are fully populated.
     /// </summary>
     public void Initialize(IAmpSyncContext context)
     {
         _context = context;
 
         _domainAmpControlsByKey = new Dictionary<string, AmpControlState>(_state.GetAmpControlsByKey());
-        _domainPanelStatesByKey  = new Dictionary<string, AmpControlState>(_state.GetPedalDomainControlsByKey());
+        _domainPanelStatesByKey = new Dictionary<string, AmpControlState>(_state.GetPedalDomainControlsByKey());
 
         // Subscribe to ALL domain state changes: fires the pending-write queue.
         // The guard inside ensures we only queue writes for user-initiated changes.
@@ -117,14 +160,14 @@ public sealed class AmpSyncService
     {
         BuildPushHandlerLookup();
         _session.PushNotificationReceived += OnAmpPushNotification;
-        _session.PanelChannelChanged      += OnAmpPanelChannelChanged;
+        _session.PanelChannelChanged += OnAmpPanelChannelChanged;
     }
 
     /// <summary>Unsubscribes from amp events. Call before disconnect.</summary>
     public void Deactivate()
     {
         _session.PushNotificationReceived -= OnAmpPushNotification;
-        _session.PanelChannelChanged      -= OnAmpPanelChannelChanged;
+        _session.PanelChannelChanged -= OnAmpPanelChannelChanged;
         _pushHandlerLookup.Clear();
     }
 
@@ -140,10 +183,7 @@ public sealed class AmpSyncService
     {
         if (!connected)
         {
-            if (_pendingWrites.Count > 0 || _pendingPanelChannel is not null)
-            {
-                _context.Log($"Clearing pending sync queue after disconnect: {DescribePendingWrites()}.");
-            }
+            if (_pendingWrites.Count > 0 || _pendingPanelChannel is not null) _context.Log($"Clearing pending sync queue after disconnect: {DescribePendingWrites()}.");
 
             _pendingWrites.Clear();
             _pendingPanelChannel = null;
@@ -155,9 +195,9 @@ public sealed class AmpSyncService
     // ── Change tracking ───────────────────────────────────────────────────────
 
     /// <summary>
-    /// Queues a single key→value write and kicks the debounce timer.
-    /// Used by the VM's partial void OnXxx handlers for standalone panel parameters
-    /// (AmpType, CabinetResonance, AmpVariation, ChainPattern).
+    ///     Queues a single key→value write and kicks the debounce timer.
+    ///     Used by the VM's partial void OnXxx handlers for standalone panel parameters
+    ///     (AmpType, CabinetResonance, AmpVariation, ChainPattern).
     /// </summary>
     public void QueueWrite(string key, byte value, string logMessage)
     {
@@ -173,6 +213,218 @@ public sealed class AmpSyncService
         _pendingPanelChannel = displayName;
         _context.Log($"Queued panel channel sync: {displayName}.");
         UpdateWriteSyncTimer();
+    }
+
+    // ── Timer control ─────────────────────────────────────────────────────────
+
+    public void UpdateWriteSyncTimer()
+    {
+        _writeSyncTimer.Stop();
+        if (_context is not null && _context.ActiveWriteSync && _context.IsConnected && HasPendingWrites())
+            _writeSyncTimer.Start();
+    }
+
+    // ── State queries ─────────────────────────────────────────────────────────
+
+    public bool HasPendingWrites() => _pendingWrites.Count > 0 || _pendingPanelChannel is not null;
+
+    public string DescribePendingWrites()
+    {
+        if (_pendingWrites.Count == 0 && _pendingPanelChannel is null) return "no pending changes";
+        var parts = new List<string>();
+        if (_pendingWrites.Count > 0) parts.Add($"{_pendingWrites.Count} writes");
+        if (_pendingPanelChannel is not null) parts.Add("channel");
+        return string.Join(", ", parts);
+    }
+
+    public void ClearPendingWrites()
+    {
+        _pendingWrites.Clear();
+        _pendingPanelChannel = null;
+    }
+
+    // ── Public read operations ────────────────────────────────────────────────
+
+    public async Task<bool> TryReadAmpControlsAsync()
+    {
+        try
+        {
+            _context.Log("Reading Katana amp editor controls.");
+            var values = await _session.ReadParametersAsync(_context.AmpControls.Select(c => c.Parameter).ToArray());
+            ApplyDeviceState(() =>
+            {
+                foreach (var control in _context.AmpControls)
+                {
+                    var value = values[control.Parameter.Key];
+                    // Write to domain state only — VM observes via ValueChanged subscription.
+                    if (_domainAmpControlsByKey.TryGetValue(control.Parameter.Key, out var domainControl))
+                        domainControl.Value = value;
+                    _context.Log($"{control.DisplayName} reply: {value}");
+                }
+            });
+
+            _context.StatusMessage = "Amp editor controls read successfully.";
+            _context.AmpEditorStatus = "Amp editor values were loaded from the Katana.";
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _context.AmpEditorStatus = "Amp editor read failed.";
+            _context.StatusMessage = ex.Message;
+            _context.Log("Amp editor read failed.");
+            _context.Log(ex.ToString());
+            Console.Error.WriteLine(ex);
+            return false;
+        }
+    }
+
+    public async Task<bool> TryReadPanelControlsAsync()
+    {
+        try
+        {
+            _context.Log("Reading Katana panel controls.");
+
+            var currentChannel = await _session.ReadCurrentPanelChannelAsync();
+            if (currentChannel is not null)
+                ApplyDeviceState(() =>
+                {
+                    _context.SelectedPanelChannel = IAmpSyncContext.ToPanelChannelDisplay(currentChannel.Value);
+                    _context.Log($"Current panel channel: {_context.SelectedPanelChannel}");
+                });
+
+            var parameterList = _context.PanelEffects
+                .SelectMany(e => e.GetSyncParameters())
+                .Append(KatanaMkIIParameterCatalog.AmpType)
+                .Append(KatanaMkIIParameterCatalog.CabinetResonance)
+                .Append(KatanaMkIIParameterCatalog.AmpVariation)
+                .Append(KatanaMkIIParameterCatalog.ChainPattern)
+                .ToArray();
+            var values = await _session.ReadParametersAsync(parameterList);
+
+            ApplyDeviceState(() =>
+            {
+                // Write amp/panel param values to domain state.
+                // Domain-migrated VMs (Booster, Delay, Reverb) observe via ValueChanged — no direct VM call needed.
+                // AmpType, CabinetResonance, AmpVariation are in _domainAmpControlsByKey and also update
+                // the MainWindowViewModel string properties via their ValueChanged subscriptions.
+                foreach (var (key, rawValue) in values)
+                {
+                    if (_domainAmpControlsByKey.TryGetValue(key, out var ampControl))
+                        ampControl.Value = rawValue;
+                    else if (_domainPanelStatesByKey.TryGetValue(key, out var panelControl))
+                        panelControl.Value = rawValue;
+                }
+
+                // ModFxPedalViewModel still uses the legacy ApplyAmpValues path.
+                var intValues = values.ToDictionary(kvp => kvp.Key, kvp => (int)kvp.Value, StringComparer.Ordinal);
+                foreach (var effect in _context.PanelEffects.OfType<ModFxPedalViewModel>())
+                {
+                    effect.ApplyAmpValues(intValues);
+                }
+
+                // ChainPattern still drives Pedalboard directly (Pedalboard not yet domain-migrated).
+                if (values.TryGetValue(KatanaMkIIParameterCatalog.ChainPattern.Key, out var chainValue) &&
+                    chainValue < PedalboardViewModel.ChainPatternNames.Length)
+                    _context.Pedalboard.SelectedChainPattern = chainValue;
+
+                foreach (var effect in _context.PanelEffects)
+                {
+                    _context.Log($"{effect.DisplayName}: {(effect.IsEnabled ? "On" : "Off")} / {effect.Variation} / {effect.TypeCaption}");
+                }
+
+                _context.Log(
+                    $"Amp Type: {_context.SelectedAmpType} ({(_context.IsAmpVariation ? "TYPE 2" : "TYPE 1")}) / " +
+                    $"Cabinet Resonance: {_context.SelectedCabinetResonance} / " +
+                    $"Chain: {PedalboardViewModel.ChainPatternNames[_context.Pedalboard.SelectedChainPattern]}");
+            });
+
+            _context.ResetDelayTap();
+            var patchLevelLoaded = await TryRefreshPatchLevelAsync();
+            var delayTimeLoaded = await TryRefreshDelayTimeAsync();
+
+            _context.StatusMessage = "Panel controls read successfully.";
+            _context.PanelControlsStatus = (patchLevelLoaded, delayTimeLoaded) switch
+            {
+                (true, true) => "Panel channel, patch level, effect toggles, variation colors, effect types, and delay time were loaded.",
+                (true, false) => "Panel channel, patch level, effect toggles, variation colors, and effect types were loaded. Delay time refresh failed.",
+                (false, true) => "Panel channel, effect toggles, variation colors, effect types, and delay time were loaded. Patch level mapping is still pending.",
+                _ => "Panel channel, effect toggles, variation colors, and effect types were loaded. Patch level mapping is still pending, and delay time refresh failed."
+            };
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _context.PanelControlsStatus = "Panel control read failed.";
+            _context.StatusMessage = ex.Message;
+            _context.Log("Panel control read failed.");
+            _context.Log(ex.ToString());
+            Console.Error.WriteLine(ex);
+            return false;
+        }
+    }
+
+    public async Task<bool> TryReadPedalControlsAsync()
+    {
+        try
+        {
+            _context.Log("Reading Katana pedal controls.");
+            var values = await _session.ReadParametersAsync(_context.PedalFx.GetReadParameters().ToArray());
+
+            ApplyDeviceState(() =>
+            {
+                _context.PedalFx.ApplyValues(values);
+                _context.Log(
+                    $"Pedal FX: {(_context.PedalFx.IsEnabled ? "On" : "Off")} / {_context.PedalFx.SelectedTypeOption} / {_context.PedalFx.SelectedPositionOption} / Foot Volume {_context.PedalFx.FootVolume}");
+                if (_context.PedalFx.IsWahMode)
+                    _context.Log(
+                        $"Pedal Wah: {_context.PedalFx.SelectedWahTypeOption} / Pos {_context.PedalFx.PedalPosition} / Min {_context.PedalFx.PedalMinimum} / Max {_context.PedalFx.PedalMaximum} / Level {_context.PedalFx.EffectLevel} / Direct {_context.PedalFx.DirectMix}");
+            });
+
+            _context.StatusMessage = "Pedal controls read successfully.";
+            _context.PedalControlsStatus = _context.PedalFx.IsWahMode
+                ? "Pedal FX, wah controls, and foot volume were loaded."
+                : "Pedal FX type and foot volume were loaded. Non-wah subtype controls are not surfaced yet.";
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _context.PedalControlsStatus = "Pedal control read failed.";
+            _context.StatusMessage = ex.Message;
+            _context.Log("Pedal control read failed.");
+            _context.Log(ex.ToString());
+            Console.Error.WriteLine(ex);
+            return false;
+        }
+    }
+
+    public async Task<bool> TryWritePatchLevelAsync()
+    {
+        if (!_context.PatchLevelMappingVerified) return false;
+        try
+        {
+            var requested = Math.Clamp(
+                _context.PatchLevel,
+                KatanaMkIIParameterCatalog.PatchLevel.Minimum,
+                KatanaMkIIParameterCatalog.PatchLevel.Maximum);
+            if (requested != _context.PatchLevel)
+            {
+                _context.PatchLevel = requested;
+                _context.Log($"Clamped Patch Level to {requested}.");
+            }
+
+            _context.PatchLevel = await _session.WriteParameterAsync(KatanaMkIIParameterCatalog.PatchLevel, (byte)requested);
+            _context.Log($"Patch Level confirmed at {_context.PatchLevel}.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _context.Log("Patch level write failed.");
+            _context.Log(ex.ToString());
+            Console.Error.WriteLine(ex);
+            return false;
+        }
     }
 
     private void TrackAmpControlChange(AmpControlViewModel control)
@@ -219,18 +471,9 @@ public sealed class AmpSyncService
         UpdateWriteSyncTimer();
     }
 
-    // ── Timer control ─────────────────────────────────────────────────────────
-
-    public void UpdateWriteSyncTimer()
-    {
-        _writeSyncTimer.Stop();
-        if (_context is not null && _context.ActiveWriteSync && _context.IsConnected && HasPendingWrites())
-            _writeSyncTimer.Start();
-    }
-
     /// <summary>
-    /// Subscribes to each domain AmpControlState's ValueChanged event.
-    /// When a value changes and the app is in a write-ready state, the key→value is queued for flush.
+    ///     Subscribes to each domain AmpControlState's ValueChanged event.
+    ///     When a value changes and the app is in a write-ready state, the key→value is queued for flush.
     /// </summary>
     private void SubscribeDomainWriteTracking(IEnumerable<AmpControlState> states)
     {
@@ -246,25 +489,6 @@ public sealed class AmpSyncService
                 UpdateWriteSyncTimer();
             };
         }
-    }
-
-    // ── State queries ─────────────────────────────────────────────────────────
-
-    public bool HasPendingWrites() => _pendingWrites.Count > 0 || _pendingPanelChannel is not null;
-
-    public string DescribePendingWrites()
-    {
-        if (_pendingWrites.Count == 0 && _pendingPanelChannel is null) return "no pending changes";
-        var parts = new List<string>();
-        if (_pendingWrites.Count > 0)        parts.Add($"{_pendingWrites.Count} writes");
-        if (_pendingPanelChannel is not null) parts.Add("channel");
-        return string.Join(", ", parts);
-    }
-
-    public void ClearPendingWrites()
-    {
-        _pendingWrites.Clear();
-        _pendingPanelChannel = null;
     }
 
     // ── Write flush loop ──────────────────────────────────────────────────────
@@ -285,8 +509,11 @@ public sealed class AmpSyncService
 
         try
         {
-            foreach (var entry in _pendingWrites) snapshot[entry.Key] = entry.Value;
-            channelSnapshot      = _pendingPanelChannel;
+            foreach (var entry in _pendingWrites)
+            {
+                snapshot[entry.Key] = entry.Value;
+            }
+            channelSnapshot = _pendingPanelChannel;
             _pendingWrites.Clear();
             _pendingPanelChannel = null;
 
@@ -311,7 +538,7 @@ public sealed class AmpSyncService
 
             var detailParamSnapshot = snapshot
                 .Where(e => !ampSnapshot.ContainsKey(e.Key) && !panelSwitchSnapshot.ContainsKey(e.Key)
-                         && !panelTypeSnapshot.ContainsKey(e.Key) && !pedalSnapshot.ContainsKey(e.Key))
+                                                            && !panelTypeSnapshot.ContainsKey(e.Key) && !pedalSnapshot.ContainsKey(e.Key))
                 .ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
 
             _context.Log(
@@ -334,7 +561,10 @@ public sealed class AmpSyncService
         }
         catch (Exception ex)
         {
-            foreach (var entry in snapshot) _pendingWrites[entry.Key] = entry.Value;
+            foreach (var entry in snapshot)
+            {
+                _pendingWrites[entry.Key] = entry.Value;
+            }
             _pendingPanelChannel ??= channelSnapshot;
             _flushRetryCount++;
             var backoffMs = Math.Min(100 * (1 << _flushRetryCount), 2000);
@@ -365,7 +595,10 @@ public sealed class AmpSyncService
         var groupStart = 0;
         while (groupStart < orderedParameters.Count)
         {
-            var group = new List<KatanaParameterDefinition> { orderedParameters[groupStart] };
+            var group = new List<KatanaParameterDefinition>
+            {
+                orderedParameters[groupStart]
+            };
             var groupIndex = groupStart + 1;
             while (groupIndex < orderedParameters.Count && CanBatchWrite(group[^1], orderedParameters[groupIndex]))
             {
@@ -408,13 +641,13 @@ public sealed class AmpSyncService
 
         if (allWrites.TryGetValue(KatanaMkIIParameterCatalog.AmpType.Key, out var ampTypeValue))
         {
-            _context.Log($"Writing queued amp type: {(_context.AmpTypeOptions.ElementAtOrDefault(ampTypeValue) ?? ampTypeValue.ToString())}.");
+            _context.Log($"Writing queued amp type: {_context.AmpTypeOptions.ElementAtOrDefault(ampTypeValue) ?? ampTypeValue.ToString()}.");
             await _session.WriteBlockAsync(KatanaMkIIParameterCatalog.AmpType.Address, [ampTypeValue]);
         }
 
         if (allWrites.TryGetValue(KatanaMkIIParameterCatalog.CabinetResonance.Key, out var cabinetValue))
         {
-            _context.Log($"Writing queued cabinet resonance: {(_context.CabinetResonanceOptions.ElementAtOrDefault(cabinetValue) ?? cabinetValue.ToString())}.");
+            _context.Log($"Writing queued cabinet resonance: {_context.CabinetResonanceOptions.ElementAtOrDefault(cabinetValue) ?? cabinetValue.ToString()}.");
             await _session.WriteBlockAsync(KatanaMkIIParameterCatalog.CabinetResonance.Address, [cabinetValue]);
         }
 
@@ -447,7 +680,10 @@ public sealed class AmpSyncService
         var groupStart = 0;
         while (groupStart < orderedParameters.Count)
         {
-            var group = new List<KatanaParameterDefinition> { orderedParameters[groupStart] };
+            var group = new List<KatanaParameterDefinition>
+            {
+                orderedParameters[groupStart]
+            };
             var groupIndex = groupStart + 1;
             while (groupIndex < orderedParameters.Count && CanBatchWrite(group[^1], orderedParameters[groupIndex]))
             {
@@ -486,160 +722,6 @@ public sealed class AmpSyncService
         }
     }
 
-    // ── Public read operations ────────────────────────────────────────────────
-
-    public async Task<bool> TryReadAmpControlsAsync()
-    {
-        try
-        {
-            _context.Log("Reading Katana amp editor controls.");
-            var values = await _session.ReadParametersAsync(_context.AmpControls.Select(c => c.Parameter).ToArray());
-            ApplyDeviceState(() =>
-            {
-                foreach (var control in _context.AmpControls)
-                {
-                    var value = values[control.Parameter.Key];
-                    // Write to domain state only — VM observes via ValueChanged subscription.
-                    if (_domainAmpControlsByKey.TryGetValue(control.Parameter.Key, out var domainControl))
-                        domainControl.Value = value;
-                    _context.Log($"{control.DisplayName} reply: {value}");
-                }
-            });
-
-            _context.StatusMessage   = "Amp editor controls read successfully.";
-            _context.AmpEditorStatus = "Amp editor values were loaded from the Katana.";
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _context.AmpEditorStatus = "Amp editor read failed.";
-            _context.StatusMessage   = ex.Message;
-            _context.Log("Amp editor read failed.");
-            _context.Log(ex.ToString());
-            Console.Error.WriteLine(ex);
-            return false;
-        }
-    }
-
-    public async Task<bool> TryReadPanelControlsAsync()
-    {
-        try
-        {
-            _context.Log("Reading Katana panel controls.");
-
-            var currentChannel = await _session.ReadCurrentPanelChannelAsync();
-            if (currentChannel is not null)
-            {
-                ApplyDeviceState(() =>
-                {
-                    _context.SelectedPanelChannel = IAmpSyncContext.ToPanelChannelDisplay(currentChannel.Value);
-                    _context.Log($"Current panel channel: {_context.SelectedPanelChannel}");
-                });
-            }
-
-            var parameterList = _context.PanelEffects
-                .SelectMany(e => e.GetSyncParameters())
-                .Append(KatanaMkIIParameterCatalog.AmpType)
-                .Append(KatanaMkIIParameterCatalog.CabinetResonance)
-                .Append(KatanaMkIIParameterCatalog.AmpVariation)
-                .Append(KatanaMkIIParameterCatalog.ChainPattern)
-                .ToArray();
-            var values = await _session.ReadParametersAsync(parameterList);
-
-            ApplyDeviceState(() =>
-            {
-                // Write amp/panel param values to domain state.
-                // Domain-migrated VMs (Booster, Delay, Reverb) observe via ValueChanged — no direct VM call needed.
-                // AmpType, CabinetResonance, AmpVariation are in _domainAmpControlsByKey and also update
-                // the MainWindowViewModel string properties via their ValueChanged subscriptions.
-                foreach (var (key, rawValue) in values)
-                {
-                    if (_domainAmpControlsByKey.TryGetValue(key, out var ampControl))
-                        ampControl.Value = rawValue;
-                    else if (_domainPanelStatesByKey.TryGetValue(key, out var panelControl))
-                        panelControl.Value = rawValue;
-                }
-
-                // ModFxPedalViewModel still uses the legacy ApplyAmpValues path.
-                var intValues = values.ToDictionary(kvp => kvp.Key, kvp => (int)kvp.Value, StringComparer.Ordinal);
-                foreach (var effect in _context.PanelEffects.OfType<ModFxPedalViewModel>())
-                    effect.ApplyAmpValues(intValues);
-
-                // ChainPattern still drives Pedalboard directly (Pedalboard not yet domain-migrated).
-                if (values.TryGetValue(KatanaMkIIParameterCatalog.ChainPattern.Key, out var chainValue) &&
-                    chainValue < PedalboardViewModel.ChainPatternNames.Length)
-                    _context.Pedalboard.SelectedChainPattern = chainValue;
-
-                foreach (var effect in _context.PanelEffects)
-                    _context.Log($"{effect.DisplayName}: {(effect.IsEnabled ? "On" : "Off")} / {effect.Variation} / {effect.TypeCaption}");
-
-                _context.Log(
-                    $"Amp Type: {_context.SelectedAmpType} ({(_context.IsAmpVariation ? "TYPE 2" : "TYPE 1")}) / " +
-                    $"Cabinet Resonance: {_context.SelectedCabinetResonance} / " +
-                    $"Chain: {PedalboardViewModel.ChainPatternNames[_context.Pedalboard.SelectedChainPattern]}");
-            });
-
-            _context.ResetDelayTap();
-            var patchLevelLoaded = await TryRefreshPatchLevelAsync();
-            var delayTimeLoaded  = await TryRefreshDelayTimeAsync();
-
-            _context.StatusMessage = "Panel controls read successfully.";
-            _context.PanelControlsStatus = (patchLevelLoaded, delayTimeLoaded) switch
-            {
-                (true, true)   => "Panel channel, patch level, effect toggles, variation colors, effect types, and delay time were loaded.",
-                (true, false)  => "Panel channel, patch level, effect toggles, variation colors, and effect types were loaded. Delay time refresh failed.",
-                (false, true)  => "Panel channel, effect toggles, variation colors, effect types, and delay time were loaded. Patch level mapping is still pending.",
-                _              => "Panel channel, effect toggles, variation colors, and effect types were loaded. Patch level mapping is still pending, and delay time refresh failed.",
-            };
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _context.PanelControlsStatus = "Panel control read failed.";
-            _context.StatusMessage       = ex.Message;
-            _context.Log("Panel control read failed.");
-            _context.Log(ex.ToString());
-            Console.Error.WriteLine(ex);
-            return false;
-        }
-    }
-
-    public async Task<bool> TryReadPedalControlsAsync()
-    {
-        try
-        {
-            _context.Log("Reading Katana pedal controls.");
-            var values = await _session.ReadParametersAsync(_context.PedalFx.GetReadParameters().ToArray());
-
-            ApplyDeviceState(() =>
-            {
-                _context.PedalFx.ApplyValues(values);
-                _context.Log($"Pedal FX: {(_context.PedalFx.IsEnabled ? "On" : "Off")} / {_context.PedalFx.SelectedTypeOption} / {_context.PedalFx.SelectedPositionOption} / Foot Volume {_context.PedalFx.FootVolume}");
-                if (_context.PedalFx.IsWahMode)
-                {
-                    _context.Log($"Pedal Wah: {_context.PedalFx.SelectedWahTypeOption} / Pos {_context.PedalFx.PedalPosition} / Min {_context.PedalFx.PedalMinimum} / Max {_context.PedalFx.PedalMaximum} / Level {_context.PedalFx.EffectLevel} / Direct {_context.PedalFx.DirectMix}");
-                }
-            });
-
-            _context.StatusMessage = "Pedal controls read successfully.";
-            _context.PedalControlsStatus = _context.PedalFx.IsWahMode
-                ? "Pedal FX, wah controls, and foot volume were loaded."
-                : "Pedal FX type and foot volume were loaded. Non-wah subtype controls are not surfaced yet.";
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _context.PedalControlsStatus = "Pedal control read failed.";
-            _context.StatusMessage       = ex.Message;
-            _context.Log("Pedal control read failed.");
-            _context.Log(ex.ToString());
-            Console.Error.WriteLine(ex);
-            return false;
-        }
-    }
-
     private async Task<bool> TryRefreshPatchLevelAsync()
     {
         if (!_context.PatchLevelMappingVerified) return false;
@@ -666,50 +748,22 @@ public sealed class AmpSyncService
             var delayTime = DecodeDelayTime(data);
             if (delayTime <= 0)
             {
-                _context.DelayTimeMs    = null;
+                _context.DelayTimeMs = null;
                 _context.DelayTapStatus = "Delay time is not currently readable for the active effect state.";
                 _context.Log("Delay time reply did not contain a usable millisecond value.");
                 return false;
             }
 
-            _context.DelayTimeMs    = delayTime;
+            _context.DelayTimeMs = delayTime;
             _context.DelayTapStatus = $"Delay time loaded: {delayTime} ms.";
             _context.Log($"Delay time reply: {delayTime} ms.");
             return true;
         }
         catch (Exception ex)
         {
-            _context.DelayTimeMs    = null;
+            _context.DelayTimeMs = null;
             _context.DelayTapStatus = "Delay time refresh failed.";
             _context.Log("Delay time read failed.");
-            _context.Log(ex.ToString());
-            Console.Error.WriteLine(ex);
-            return false;
-        }
-    }
-
-    public async Task<bool> TryWritePatchLevelAsync()
-    {
-        if (!_context.PatchLevelMappingVerified) return false;
-        try
-        {
-            var requested = Math.Clamp(
-                _context.PatchLevel,
-                KatanaMkIIParameterCatalog.PatchLevel.Minimum,
-                KatanaMkIIParameterCatalog.PatchLevel.Maximum);
-            if (requested != _context.PatchLevel)
-            {
-                _context.PatchLevel = requested;
-                _context.Log($"Clamped Patch Level to {requested}.");
-            }
-
-            _context.PatchLevel = await _session.WriteParameterAsync(KatanaMkIIParameterCatalog.PatchLevel, (byte)requested);
-            _context.Log($"Patch Level confirmed at {_context.PatchLevel}.");
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _context.Log("Patch level write failed.");
             _context.Log(ex.ToString());
             Console.Error.WriteLine(ex);
             return false;
@@ -739,7 +793,7 @@ public sealed class AmpSyncService
             foreach (var param in effect.GetSyncParameters())
             {
                 var capturedEffect = effect;
-                var capturedKey    = param.Key;
+                var capturedKey = param.Key;
                 _pushHandlerLookup[AddressToKey(param.Address)] = value =>
                 {
                     if (_domainPanelStatesByKey.TryGetValue(capturedKey, out var domainControl))
@@ -747,7 +801,7 @@ public sealed class AmpSyncService
                     else
                         capturedEffect.ApplyAmpValues(new Dictionary<string, int>(StringComparer.Ordinal)
                         {
-                            [capturedKey] = value,
+                            [capturedKey] = value
                         });
                 };
             }
@@ -778,7 +832,7 @@ public sealed class AmpSyncService
                 2 => "CH A2",
                 5 => "CH B1",
                 6 => "CH B2",
-                _ => null,
+                _ => null
             };
             if (displayName is null) return;
 
@@ -805,7 +859,7 @@ public sealed class AmpSyncService
         if (bytes.Count != 15 && bytes.Count != 16) return;
 
         var addressKey = AddressToKey([bytes[8], bytes[9], bytes[10], bytes[11]]);
-        var value      = bytes.Count == 16 ? bytes[13] : bytes[12];
+        var value = bytes.Count == 16 ? bytes[13] : bytes[12];
 
         if (!_pushHandlerLookup.TryGetValue(addressKey, out var action)) return;
 
@@ -827,8 +881,14 @@ public sealed class AmpSyncService
     private void ApplyDeviceState(Action apply)
     {
         _context.SuppressChangeTracking = true;
-        try   { apply(); }
-        finally { _context.SuppressChangeTracking = false; }
+        try
+        {
+            apply();
+        }
+        finally
+        {
+            _context.SuppressChangeTracking = false;
+        }
     }
 
     private string DescribeAmpKeys(IEnumerable<string> keys) =>
@@ -853,6 +913,6 @@ public sealed class AmpSyncService
     {
         if (data.Count != 2)
             throw new ArgumentException("Delay time data must contain exactly 2 bytes.", nameof(data));
-        return ((data[0] & 0x0F) << 7) | (data[1] & 0x7F);
+        return (data[0] & 0x0F) << 7 | data[1] & 0x7F;
     }
 }

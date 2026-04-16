@@ -1,16 +1,21 @@
-﻿using Avalonia;
-using System;
+﻿using System;
+
+using Avalonia;
+
 using CommunityToolkit.Mvvm.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
+
+using Kataka.App.Services;
 using Kataka.App.ViewModels;
 using Kataka.Application.Katana;
 using Kataka.Application.Midi;
 using Kataka.Domain.KatanaState;
 using Kataka.Infrastructure.Midi;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Kataka.App;
 
-sealed class Program
+internal sealed class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -29,11 +34,9 @@ sealed class Program
     {
         services.AddSingleton<IMidiTransport>(_ => DefaultMidiTransport.Create());
         services.AddSingleton<IKatanaSession, KatanaSession>();
-        services.AddSingleton<KatanaState>();
-        services.AddSingleton<MainWindowViewModel>(sp =>
-            new MainWindowViewModel(
-                sp.GetRequiredService<IKatanaSession>(),
-                sp.GetRequiredService<KatanaState>()));
+        services.AddSingleton<IKatanaState, KatanaState>();
+        services.AddSingleton<IAmpSyncService, AmpSyncService>();
+        services.AddSingleton<MainWindowViewModel>();
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.

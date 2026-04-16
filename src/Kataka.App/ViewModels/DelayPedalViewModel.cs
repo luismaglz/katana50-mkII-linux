@@ -33,7 +33,7 @@ public partial class DelayPedalViewModel : PedalViewModel
 
     private readonly bool _hasVariation;
 
-    public DelayPedalViewModel(string slot, KatanaState katanaState) : base(
+    public DelayPedalViewModel(string slot, IKatanaState katanaState) : base(
         KatanaMkIIParameterCatalog.PanelEffects.First(e => e.Key == slot))
     {
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();

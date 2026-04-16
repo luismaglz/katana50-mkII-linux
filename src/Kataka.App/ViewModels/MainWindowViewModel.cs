@@ -1,39 +1,43 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Avalonia.Platform.Storage;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+
 using Kataka.App.Services;
 using Kataka.Application.Katana;
 using Kataka.Domain.KatanaState;
 using Kataka.Domain.Midi;
+using Kataka.Infrastructure.Midi;
 
 namespace Kataka.App.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 {
     private static readonly TimeSpan TapResetThreshold = TimeSpan.FromSeconds(2.5);
-    private readonly IKatanaSession katanaSession;
-    private readonly KatanaState _katanaState;
-    private readonly AmpSyncService syncService;
+    private readonly IKatanaState _katanaState;
     private readonly Dictionary<string, string> inputPortIds = [];
+    private readonly IKatanaSession katanaSession;
     private readonly Dictionary<string, string> outputPortIds = [];
+    private readonly IAmpSyncService syncService;
     private DateTimeOffset? lastDelayTapAt;
-    private bool suppressChangeTracking;
 
-    public MainWindowViewModel()
-        : this(new KatanaSession(Kataka.Infrastructure.Midi.DefaultMidiTransport.Create()), new KatanaState())
+    public MainWindowViewModel() : this(new KatanaSession(DefaultMidiTransport.Create()), new KatanaState(),
+        new AmpSyncService(new KatanaSession(DefaultMidiTransport.Create()), new KatanaState()))
     {
     }
 
-    public MainWindowViewModel(IKatanaSession katanaSession, KatanaState katanaState)
+    public MainWindowViewModel(IKatanaSession katanaSession, IKatanaState katanaState, IAmpSyncService ampSyncService)
     {
         this.katanaSession = katanaSession;
         _katanaState = katanaState;
-        syncService = new AmpSyncService(katanaSession, katanaState);
+        syncService = ampSyncService;
 
         // AmpControls are driven by domain state — VMs wrap AmpControlState directly.
         var ampStatesByKey = katanaState.GetAmpControlsByKey();
@@ -57,14 +61,10 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             IsAmpVariation = katanaState.AmpVariation.Value != 0;
 
         foreach (var effectViewModel in new IBasePedal[]
-        {
-            new BoosterPedalViewModel(katanaState),
-            new ModFxPedalViewModel("mod"),
-            new ModFxPedalViewModel("fx"),
-            new DelayPedalViewModel("delay", katanaState),
-            new DelayPedalViewModel("delay2", katanaState),
-            new ReverbPedalViewModel(katanaState),
-        })
+                 {
+                     new BoosterPedalViewModel(katanaState), new ModFxPedalViewModel("mod"), new ModFxPedalViewModel("fx"), new DelayPedalViewModel("delay", katanaState),
+                     new DelayPedalViewModel("delay2", katanaState), new ReverbPedalViewModel(katanaState)
+                 })
         {
             PanelEffects.Add(effectViewModel);
         }
@@ -88,9 +88,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
     public ObservableCollection<string> OutputPorts { get; } = [];
 
     [ObservableProperty]
-    public partial string StatusMessage { get; set; } = "Ready to scan for MIDI devices.";
-
-    [ObservableProperty]
     public partial string DetectionMessage { get; set; } = "No scan has been run yet.";
 
     [ObservableProperty]
@@ -106,27 +103,12 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
     public partial string? SelectedOutputPort { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanWritePatch))]
-    [NotifyCanExecuteChangedFor(nameof(WritePatchCommand))]
-    [NotifyCanExecuteChangedFor(nameof(LoadPatchCommand))]
-    [NotifyCanExecuteChangedFor(nameof(SavePatchCommand))]
-    public partial bool IsConnected { get; set; }
-
-    [ObservableProperty]
     public partial string DiagnosticLog { get; set; } = "Diagnostic log ready.";
 
     [ObservableProperty]
     public partial string IdentityReply { get; set; } = "Identity request has not been run yet.";
 
-    public ObservableCollection<AmpControlViewModel> AmpControls { get; } = [];
-
-    public ObservableCollection<IBasePedal> PanelEffects { get; } = [];
-
     public ObservableCollection<PanelChannelOptionViewModel> PanelChannelOptions { get; } = [];
-
-    public PedalFxViewModel PedalFx { get; } = new();
-
-    public PedalboardViewModel Pedalboard { get; private set; } = null!;
 
     public ObservableCollection<string> PanelChannels { get; } =
     [
@@ -134,8 +116,35 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
         "CH A1",
         "CH A2",
         "CH B1",
-        "CH B2",
+        "CH B2"
     ];
+
+    public bool IsPatchLevelAvailable => false;
+
+    public bool CanWritePatch => IsConnected;
+
+    public static string[] AmpTypeOptions { get; } = ["ACOUSTIC", "CLEAN", "CRUNCH", "LEAD", "BROWN"];
+    public static string[] CabinetResonanceOptions { get; } = ["LOW", "MIDDLE", "HIGH"];
+
+    public IStorageProvider? StorageProvider { get; set; }
+
+    [ObservableProperty]
+    public partial string StatusMessage { get; set; } = "Ready to scan for MIDI devices.";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanWritePatch))]
+    [NotifyCanExecuteChangedFor(nameof(WritePatchCommand))]
+    [NotifyCanExecuteChangedFor(nameof(LoadPatchCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SavePatchCommand))]
+    public partial bool IsConnected { get; set; }
+
+    public ObservableCollection<AmpControlViewModel> AmpControls { get; } = [];
+
+    public ObservableCollection<IBasePedal> PanelEffects { get; } = [];
+
+    public PedalFxViewModel PedalFx { get; } = new();
+
+    public PedalboardViewModel Pedalboard { get; } = null!;
 
     [ObservableProperty]
     public partial string AmpEditorStatus { get; set; } = "Amp editor values have not been read yet.";
@@ -158,15 +167,8 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
     [ObservableProperty]
     public partial int? DelayTimeMs { get; set; }
 
-    public bool IsPatchLevelAvailable => false;
-
-    public bool CanWritePatch => IsConnected;
-
     [ObservableProperty]
     public partial bool ActiveWriteSync { get; set; } = true;
-
-    public static string[] AmpTypeOptions { get; } = ["ACOUSTIC", "CLEAN", "CRUNCH", "LEAD", "BROWN"];
-    public static string[] CabinetResonanceOptions { get; } = ["LOW", "MIDDLE", "HIGH"];
 
     [ObservableProperty]
     public partial string SelectedAmpType { get; set; } = "CLEAN";
@@ -176,6 +178,22 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 
     [ObservableProperty]
     public partial bool IsAmpVariation { get; set; } = false;
+
+    // ── IAmpSyncContext explicit interface members ────────────────────────────
+
+    bool IAmpSyncContext.SuppressChangeTracking { get; set; }
+
+    bool IAmpSyncContext.PatchLevelMappingVerified => false;
+
+    string[] IAmpSyncContext.AmpTypeOptions => AmpTypeOptions;
+
+    string[] IAmpSyncContext.CabinetResonanceOptions => CabinetResonanceOptions;
+
+    void IAmpSyncContext.Log(string message) => AppendLog(message);
+
+    void IAmpSyncContext.ApplyPedalValue(string key, byte value) => ApplyPedalValue(key, value);
+
+    void IAmpSyncContext.ResetDelayTap() => lastDelayTapAt = null;
 
     partial void OnIsAmpVariationChanged(bool value)
     {
@@ -210,18 +228,12 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
         syncService.UpdateWriteSyncTimer();
     }
 
-    partial void OnIsConnectedChanged(bool value)
-    {
-        syncService.OnConnectionChanged(value);
-    }
+    partial void OnIsConnectedChanged(bool value) => syncService.OnConnectionChanged(value);
 
     [RelayCommand]
     private void SelectPanelChannel(string? channel)
     {
-        if (!string.IsNullOrWhiteSpace(channel))
-        {
-            SelectedPanelChannel = channel;
-        }
+        if (!string.IsNullOrWhiteSpace(channel)) SelectedPanelChannel = channel;
     }
 
     [RelayCommand]
@@ -297,8 +309,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
         }
     }
 
-    public IStorageProvider? StorageProvider { get; set; }
-
     [RelayCommand(CanExecute = nameof(CanWritePatch))]
     private async Task LoadPatchAsync()
     {
@@ -314,9 +324,15 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             AllowMultiple = false,
             FileTypeFilter =
             [
-                new FilePickerFileType("Boss Tone Studio Patch") { Patterns = ["*.tsl"] },
-                new FilePickerFileType("All Files") { Patterns = ["*"] },
-            ],
+                new FilePickerFileType("Boss Tone Studio Patch")
+                {
+                    Patterns = ["*.tsl"]
+                },
+                new FilePickerFileType("All Files")
+                {
+                    Patterns = ["*"]
+                }
+            ]
         });
 
         if (files.Count == 0) return;
@@ -328,8 +344,10 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 
             string json;
             await using (var stream = await file.OpenReadAsync())
-            using (var reader = new System.IO.StreamReader(stream))
+            using (var reader = new StreamReader(stream))
+            {
                 json = await reader.ReadToEndAsync();
+            }
 
             var patch = TslPatchSerializer.Deserialize(json);
             AppendLog($"Patch '{patch.Name}' parsed — {patch.Blocks.Count} block(s). Sending to amp...");
@@ -366,8 +384,11 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             DefaultExtension = "tsl",
             FileTypeChoices =
             [
-                new FilePickerFileType("Boss Tone Studio Patch") { Patterns = ["*.tsl"] },
-            ],
+                new FilePickerFileType("Boss Tone Studio Patch")
+                {
+                    Patterns = ["*.tsl"]
+                }
+            ]
         });
 
         if (file is null) return;
@@ -376,12 +397,12 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
         {
             AppendLog("Reading all patch blocks from amp...");
 
-            var patchName = System.IO.Path.GetFileNameWithoutExtension(file.Name);
+            var patchName = Path.GetFileNameWithoutExtension(file.Name);
             var patch = await katanaSession.ReadCurrentPatchAsync(patchName);
             var json = TslPatchSerializer.Serialize(patch);
 
             await using var stream = await file.OpenWriteAsync();
-            await using var writer = new System.IO.StreamWriter(stream);
+            await using var writer = new StreamWriter(stream);
             await writer.WriteAsync(json);
 
             AppendLog($"Patch '{patch.Name}' saved to {file.Name}.");
@@ -481,15 +502,9 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
         try
         {
             AppendLog($"Opening input '{SelectedInputPort}' and output '{SelectedOutputPort}'.");
-            if (!inputPortIds.TryGetValue(SelectedInputPort, out var inputPortId))
-            {
-                throw new InvalidOperationException($"Input port '{SelectedInputPort}' is not available.");
-            }
+            if (!inputPortIds.TryGetValue(SelectedInputPort, out var inputPortId)) throw new InvalidOperationException($"Input port '{SelectedInputPort}' is not available.");
 
-            if (!outputPortIds.TryGetValue(SelectedOutputPort, out var outputPortId))
-            {
-                throw new InvalidOperationException($"Output port '{SelectedOutputPort}' is not available.");
-            }
+            if (!outputPortIds.TryGetValue(SelectedOutputPort, out var outputPortId)) throw new InvalidOperationException($"Output port '{SelectedOutputPort}' is not available.");
 
             await katanaSession.ConnectAsync(inputPortId, outputPortId);
             IsConnected = true;
@@ -509,17 +524,17 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             AppendLog("MIDI ports opened successfully.");
 
             AppendLog("Auto-loading amp, panel, and pedal state.");
-            var ampLoaded   = await syncService.TryReadAmpControlsAsync();
+            var ampLoaded = await syncService.TryReadAmpControlsAsync();
             var panelLoaded = await syncService.TryReadPanelControlsAsync();
             var pedalLoaded = await syncService.TryReadPedalControlsAsync();
 
             StatusMessage = (ampLoaded, panelLoaded, pedalLoaded) switch
             {
-                (true, true, true)   => "MIDI ports opened and the current amp, panel, and pedal state was loaded.",
-                (true, true, false)  => "MIDI ports opened. Amp and panel state loaded, but pedal refresh failed.",
-                (true, false, true)  => "MIDI ports opened. Amp and pedal state loaded, but panel refresh failed.",
-                (false, true, true)  => "MIDI ports opened. Panel and pedal state loaded, but amp refresh failed.",
-                _                    => "MIDI ports opened, but part of the initial state refresh failed.",
+                (true, true, true) => "MIDI ports opened and the current amp, panel, and pedal state was loaded.",
+                (true, true, false) => "MIDI ports opened. Amp and panel state loaded, but pedal refresh failed.",
+                (true, false, true) => "MIDI ports opened. Amp and pedal state loaded, but panel refresh failed.",
+                (false, true, true) => "MIDI ports opened. Panel and pedal state loaded, but amp refresh failed.",
+                _ => "MIDI ports opened, but part of the initial state refresh failed."
             };
         }
         catch (Exception ex)
@@ -624,10 +639,7 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
                 control.Value = confirmedValue;
                 AppendLog($"{control.DisplayName} confirmed at {confirmedValue}.");
 
-                if (confirmedValue != requestedValue)
-                {
-                    mismatches.Add($"{control.DisplayName} ({requestedValue}->{confirmedValue})");
-                }
+                if (confirmedValue != requestedValue) mismatches.Add($"{control.DisplayName} ({requestedValue}->{confirmedValue})");
             }
 
             StatusMessage = mismatches.Count == 0
@@ -739,20 +751,14 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 
             foreach (var parameter in PedalFx.GetManualWriteParameters())
             {
-                if (!PedalFx.TryGetCurrentValue(parameter.Key, out var requestedValue))
-                {
-                    continue;
-                }
+                if (!PedalFx.TryGetCurrentValue(parameter.Key, out var requestedValue)) continue;
 
                 AppendLog($"Writing {parameter.DisplayName} = {requestedValue}.");
                 var confirmedValue = await katanaSession.WriteParameterAsync(parameter, requestedValue);
                 ApplyPedalValue(parameter.Key, confirmedValue);
                 AppendLog($"{parameter.DisplayName} confirmed at {confirmedValue}.");
 
-                if (confirmedValue != requestedValue)
-                {
-                    mismatches.Add($"{parameter.DisplayName} ({requestedValue}->{confirmedValue})");
-                }
+                if (confirmedValue != requestedValue) mismatches.Add($"{parameter.DisplayName} ({requestedValue}->{confirmedValue})");
             }
 
             StatusMessage = mismatches.Count == 0
@@ -834,36 +840,13 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
     private static byte[] EncodeDelayTime(int milliseconds)
     {
         var clamped = Math.Clamp(milliseconds, 1, 2000);
-        return [(byte)((clamped >> 7) & 0x0F), (byte)(clamped & 0x7F)];
+        return [(byte)(clamped >> 7 & 0x0F), (byte)(clamped & 0x7F)];
     }
 
     private static int DecodeDelayTime(IReadOnlyList<byte> data)
     {
-        if (data.Count != 2)
-        {
-            throw new ArgumentException("Delay time data must contain exactly 2 bytes.", nameof(data));
-        }
+        if (data.Count != 2) throw new ArgumentException("Delay time data must contain exactly 2 bytes.", nameof(data));
 
-        return ((data[0] & 0x0F) << 7) | (data[1] & 0x7F);
+        return (data[0] & 0x0F) << 7 | data[1] & 0x7F;
     }
-
-    // ── IAmpSyncContext explicit interface members ────────────────────────────
-
-    bool IAmpSyncContext.SuppressChangeTracking
-    {
-        get => suppressChangeTracking;
-        set => suppressChangeTracking = value;
-    }
-
-    bool IAmpSyncContext.PatchLevelMappingVerified => false;
-
-    string[] IAmpSyncContext.AmpTypeOptions => AmpTypeOptions;
-
-    string[] IAmpSyncContext.CabinetResonanceOptions => CabinetResonanceOptions;
-
-    void IAmpSyncContext.Log(string message) => AppendLog(message);
-
-    void IAmpSyncContext.ApplyPedalValue(string key, byte value) => ApplyPedalValue(key, value);
-
-    void IAmpSyncContext.ResetDelayTap() => lastDelayTapAt = null;
 }

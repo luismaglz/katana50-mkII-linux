@@ -18,7 +18,7 @@ public partial class ReverbPedalViewModel : PedalViewModel
 
     private readonly ReverbPedalState _state;
 
-    public ReverbPedalViewModel(KatanaState katanaState) : base(OwnDefinition)
+    public ReverbPedalViewModel(IKatanaState katanaState) : base(OwnDefinition)
     {
         _state = katanaState.ReverbPedal;
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
