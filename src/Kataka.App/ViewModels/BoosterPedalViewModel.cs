@@ -18,7 +18,7 @@ public partial class BoosterPedalViewModel : PedalViewModel
 
     private readonly BoostPedalState _state;
 
-    public BoosterPedalViewModel(KatanaState katanaState) : base(OwnDefinition)
+    public BoosterPedalViewModel(IKatanaState katanaState) : base(OwnDefinition)
     {
         _state = katanaState.BoostPedal;
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
