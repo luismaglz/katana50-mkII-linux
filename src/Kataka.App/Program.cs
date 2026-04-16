@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Kataka.App.ViewModels;
 using Kataka.Application.Katana;
 using Kataka.Application.Midi;
+using Kataka.Domain.KatanaState;
 using Kataka.Infrastructure.Midi;
 
 namespace Kataka.App;
@@ -28,7 +29,11 @@ sealed class Program
     {
         services.AddSingleton<IMidiTransport>(_ => DefaultMidiTransport.Create());
         services.AddSingleton<IKatanaSession, KatanaSession>();
-        services.AddSingleton<MainWindowViewModel>();
+        services.AddSingleton<KatanaState>();
+        services.AddSingleton<MainWindowViewModel>(sp =>
+            new MainWindowViewModel(
+                sp.GetRequiredService<IKatanaSession>(),
+                sp.GetRequiredService<KatanaState>()));
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.

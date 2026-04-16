@@ -7,7 +7,7 @@ public class AmpControlState
     public AmpControlState(KatanaParameterDefinition parameter, int displayMinimum = 0, int displayMaximum = 100, string displayUnit = "", string displayName = "", string description = "")
     {
         Parameter = parameter;
-        Value = parameter.Minimum;
+        _value = parameter.Minimum;
         DisplayMinimum = displayMinimum;
         DisplayMaximum = displayMaximum;
         DisplayUnit = displayUnit;
@@ -30,5 +30,18 @@ public class AmpControlState
 
     public string DisplayUnit { get; set; }
 
-    public int Value { get; set; }
+    private int _value;
+
+    public event Action? ValueChanged;
+
+    public int Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+            _value = value;
+            ValueChanged?.Invoke();
+        }
+    }
 }

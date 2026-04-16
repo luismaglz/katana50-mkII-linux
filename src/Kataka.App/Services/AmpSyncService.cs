@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using Kataka.App.ViewModels;
 using Kataka.Application.Katana;
+using Kataka.Domain.KatanaState;
 using Kataka.Domain.Midi;
 
 namespace Kataka.App.Services;
@@ -15,10 +16,12 @@ public sealed class AmpSyncService
     private static readonly TimeSpan WriteSyncDebounce = TimeSpan.FromMilliseconds(125);
 
     private readonly IKatanaSession _session;
+    private readonly KatanaState    _state;
     private IAmpSyncContext _context = null!;
 
     private readonly Dictionary<string, AmpControlViewModel> _ampControlsByKey = [];
     private readonly Dictionary<string, IBasePedal>          _panelEffectsByKey = [];
+    private Dictionary<string, AmpControlState>              _domainAmpControlsByKey = [];
     private Dictionary<string, Action<byte>>                  _pushHandlerLookup = [];
 
     private readonly Dictionary<string, byte> _pendingWrites = [];
@@ -32,9 +35,10 @@ public sealed class AmpSyncService
 
     // ── Construction ──────────────────────────────────────────────────────────
 
-    public AmpSyncService(IKatanaSession session)
+    public AmpSyncService(IKatanaSession session, KatanaState state)
     {
         _session = session;
+        _state   = state;
 
         _writeSyncTimer = new DispatcherTimer { Interval = WriteSyncDebounce };
         _writeSyncTimer.Tick += async (_, _) =>
@@ -52,6 +56,8 @@ public sealed class AmpSyncService
     public void Initialize(IAmpSyncContext context)
     {
         _context = context;
+
+        _domainAmpControlsByKey = new Dictionary<string, AmpControlState>(_state.GetAmpControlsByKey());
 
         _ampControlsByKey.Clear();
         foreach (var control in context.AmpControls)
@@ -466,6 +472,8 @@ public sealed class AmpSyncService
                 {
                     var value = values[control.Parameter.Key];
                     control.Value = value;
+                    if (_domainAmpControlsByKey.TryGetValue(control.Parameter.Key, out var domainControl))
+                        domainControl.Value = value;
                     _context.Log($"{control.DisplayName} reply: {value}");
                 }
             });
@@ -686,7 +694,12 @@ public sealed class AmpSyncService
         foreach (var control in _context.AmpControls)
         {
             var captured = control;
-            _pushHandlerLookup[AddressToKey(captured.Parameter.Address)] = value => captured.Value = value;
+            _pushHandlerLookup[AddressToKey(captured.Parameter.Address)] = value =>
+            {
+                captured.Value = value;
+                if (_domainAmpControlsByKey.TryGetValue(captured.Parameter.Key, out var domainControl))
+                    domainControl.Value = value;
+            };
         }
 
         foreach (var effect in _context.PanelEffects)
