@@ -1,9 +1,12 @@
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Avalonia.Media;
+
 using Kataka.Domain.Midi;
+
+using ReactiveUI;
 
 namespace Kataka.App.ViewModels;
 
@@ -51,71 +54,71 @@ public partial class ModFxPedalViewModel : PedalViewModel
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
         if (slot == "mod")
         {
-            _chorusParams       = KatanaMkIIParameterCatalog.ModChorusParams;
-            _flangerParams      = KatanaMkIIParameterCatalog.ModFlangerParams;
-            _phaserParams       = KatanaMkIIParameterCatalog.ModPhaserParams;
-            _uniVParams         = KatanaMkIIParameterCatalog.ModUniVParams;
-            _tremoloParams      = KatanaMkIIParameterCatalog.ModTremoloParams;
-            _vibratoParams      = KatanaMkIIParameterCatalog.ModVibratoParams;
-            _rotaryParams       = KatanaMkIIParameterCatalog.ModRotaryParams;
-            _ringModParams      = KatanaMkIIParameterCatalog.ModRingModParams;
-            _slowGearParams     = KatanaMkIIParameterCatalog.ModSlowGearParams;
-            _slicerParams       = KatanaMkIIParameterCatalog.ModSlicerParams;
-            _compParams         = KatanaMkIIParameterCatalog.ModCompParams;
-            _limiterParams      = KatanaMkIIParameterCatalog.ModLimiterParams;
-            _tWahParams         = KatanaMkIIParameterCatalog.ModTWahParams;
-            _autoWahParams      = KatanaMkIIParameterCatalog.ModAutoWahParams;
-            _pedalWahParams     = KatanaMkIIParameterCatalog.ModPedalWahParams;
-            _graphicEqParams    = KatanaMkIIParameterCatalog.ModGraphicEqParams;
+            _chorusParams = KatanaMkIIParameterCatalog.ModChorusParams;
+            _flangerParams = KatanaMkIIParameterCatalog.ModFlangerParams;
+            _phaserParams = KatanaMkIIParameterCatalog.ModPhaserParams;
+            _uniVParams = KatanaMkIIParameterCatalog.ModUniVParams;
+            _tremoloParams = KatanaMkIIParameterCatalog.ModTremoloParams;
+            _vibratoParams = KatanaMkIIParameterCatalog.ModVibratoParams;
+            _rotaryParams = KatanaMkIIParameterCatalog.ModRotaryParams;
+            _ringModParams = KatanaMkIIParameterCatalog.ModRingModParams;
+            _slowGearParams = KatanaMkIIParameterCatalog.ModSlowGearParams;
+            _slicerParams = KatanaMkIIParameterCatalog.ModSlicerParams;
+            _compParams = KatanaMkIIParameterCatalog.ModCompParams;
+            _limiterParams = KatanaMkIIParameterCatalog.ModLimiterParams;
+            _tWahParams = KatanaMkIIParameterCatalog.ModTWahParams;
+            _autoWahParams = KatanaMkIIParameterCatalog.ModAutoWahParams;
+            _pedalWahParams = KatanaMkIIParameterCatalog.ModPedalWahParams;
+            _graphicEqParams = KatanaMkIIParameterCatalog.ModGraphicEqParams;
             _parametricEqParams = KatanaMkIIParameterCatalog.ModParametricEqParams;
-            _guitarSimParams    = KatanaMkIIParameterCatalog.ModGuitarSimParams;
-            _acGuitarSimParams  = KatanaMkIIParameterCatalog.ModAcGuitarSimParams;
-            _acProcessorParams  = KatanaMkIIParameterCatalog.ModAcProcessorParams;
-            _waveSynthParams    = KatanaMkIIParameterCatalog.ModWaveSynthParams;
-            _octaveParams       = KatanaMkIIParameterCatalog.ModOctaveParams;
-            _heavyOctaveParams  = KatanaMkIIParameterCatalog.ModHeavyOctaveParams;
+            _guitarSimParams = KatanaMkIIParameterCatalog.ModGuitarSimParams;
+            _acGuitarSimParams = KatanaMkIIParameterCatalog.ModAcGuitarSimParams;
+            _acProcessorParams = KatanaMkIIParameterCatalog.ModAcProcessorParams;
+            _waveSynthParams = KatanaMkIIParameterCatalog.ModWaveSynthParams;
+            _octaveParams = KatanaMkIIParameterCatalog.ModOctaveParams;
+            _heavyOctaveParams = KatanaMkIIParameterCatalog.ModHeavyOctaveParams;
             _pitchShifterParams = KatanaMkIIParameterCatalog.ModPitchShifterParams;
-            _harmonistParams    = KatanaMkIIParameterCatalog.ModHarmonistParams;
-            _humanizerParams    = KatanaMkIIParameterCatalog.ModHumanizerParams;
-            _phaser90EParams    = KatanaMkIIParameterCatalog.ModPhaser90EParams;
-            _flanger117EParams  = KatanaMkIIParameterCatalog.ModFlanger117EParams;
-            _wah95EParams       = KatanaMkIIParameterCatalog.ModWah95EParams;
-            _dc30Params         = KatanaMkIIParameterCatalog.ModDC30Params;
-            _pedalBendParams    = KatanaMkIIParameterCatalog.ModPedalBendParams;
+            _harmonistParams = KatanaMkIIParameterCatalog.ModHarmonistParams;
+            _humanizerParams = KatanaMkIIParameterCatalog.ModHumanizerParams;
+            _phaser90EParams = KatanaMkIIParameterCatalog.ModPhaser90EParams;
+            _flanger117EParams = KatanaMkIIParameterCatalog.ModFlanger117EParams;
+            _wah95EParams = KatanaMkIIParameterCatalog.ModWah95EParams;
+            _dc30Params = KatanaMkIIParameterCatalog.ModDC30Params;
+            _pedalBendParams = KatanaMkIIParameterCatalog.ModPedalBendParams;
         }
         else
         {
-            _chorusParams       = KatanaMkIIParameterCatalog.FxChorusParams;
-            _flangerParams      = KatanaMkIIParameterCatalog.FxFlangerParams;
-            _phaserParams       = KatanaMkIIParameterCatalog.FxPhaserParams;
-            _uniVParams         = KatanaMkIIParameterCatalog.FxUniVParams;
-            _tremoloParams      = KatanaMkIIParameterCatalog.FxTremoloParams;
-            _vibratoParams      = KatanaMkIIParameterCatalog.FxVibratoParams;
-            _rotaryParams       = KatanaMkIIParameterCatalog.FxRotaryParams;
-            _ringModParams      = KatanaMkIIParameterCatalog.FxRingModParams;
-            _slowGearParams     = KatanaMkIIParameterCatalog.FxSlowGearParams;
-            _slicerParams       = KatanaMkIIParameterCatalog.FxSlicerParams;
-            _compParams         = KatanaMkIIParameterCatalog.FxCompParams;
-            _limiterParams      = KatanaMkIIParameterCatalog.FxLimiterParams;
-            _tWahParams         = KatanaMkIIParameterCatalog.FxTWahParams;
-            _autoWahParams      = KatanaMkIIParameterCatalog.FxAutoWahParams;
-            _pedalWahParams     = KatanaMkIIParameterCatalog.FxPedalWahParams;
-            _graphicEqParams    = KatanaMkIIParameterCatalog.FxGraphicEqParams;
+            _chorusParams = KatanaMkIIParameterCatalog.FxChorusParams;
+            _flangerParams = KatanaMkIIParameterCatalog.FxFlangerParams;
+            _phaserParams = KatanaMkIIParameterCatalog.FxPhaserParams;
+            _uniVParams = KatanaMkIIParameterCatalog.FxUniVParams;
+            _tremoloParams = KatanaMkIIParameterCatalog.FxTremoloParams;
+            _vibratoParams = KatanaMkIIParameterCatalog.FxVibratoParams;
+            _rotaryParams = KatanaMkIIParameterCatalog.FxRotaryParams;
+            _ringModParams = KatanaMkIIParameterCatalog.FxRingModParams;
+            _slowGearParams = KatanaMkIIParameterCatalog.FxSlowGearParams;
+            _slicerParams = KatanaMkIIParameterCatalog.FxSlicerParams;
+            _compParams = KatanaMkIIParameterCatalog.FxCompParams;
+            _limiterParams = KatanaMkIIParameterCatalog.FxLimiterParams;
+            _tWahParams = KatanaMkIIParameterCatalog.FxTWahParams;
+            _autoWahParams = KatanaMkIIParameterCatalog.FxAutoWahParams;
+            _pedalWahParams = KatanaMkIIParameterCatalog.FxPedalWahParams;
+            _graphicEqParams = KatanaMkIIParameterCatalog.FxGraphicEqParams;
             _parametricEqParams = KatanaMkIIParameterCatalog.FxParametricEqParams;
-            _guitarSimParams    = KatanaMkIIParameterCatalog.FxGuitarSimParams;
-            _acGuitarSimParams  = KatanaMkIIParameterCatalog.FxAcGuitarSimParams;
-            _acProcessorParams  = KatanaMkIIParameterCatalog.FxAcProcessorParams;
-            _waveSynthParams    = KatanaMkIIParameterCatalog.FxWaveSynthParams;
-            _octaveParams       = KatanaMkIIParameterCatalog.FxOctaveParams;
-            _heavyOctaveParams  = KatanaMkIIParameterCatalog.FxHeavyOctaveParams;
+            _guitarSimParams = KatanaMkIIParameterCatalog.FxGuitarSimParams;
+            _acGuitarSimParams = KatanaMkIIParameterCatalog.FxAcGuitarSimParams;
+            _acProcessorParams = KatanaMkIIParameterCatalog.FxAcProcessorParams;
+            _waveSynthParams = KatanaMkIIParameterCatalog.FxWaveSynthParams;
+            _octaveParams = KatanaMkIIParameterCatalog.FxOctaveParams;
+            _heavyOctaveParams = KatanaMkIIParameterCatalog.FxHeavyOctaveParams;
             _pitchShifterParams = KatanaMkIIParameterCatalog.FxPitchShifterParams;
-            _harmonistParams    = KatanaMkIIParameterCatalog.FxHarmonistParams;
-            _humanizerParams    = KatanaMkIIParameterCatalog.FxHumanizerParams;
-            _phaser90EParams    = KatanaMkIIParameterCatalog.FxPhaser90EParams;
-            _flanger117EParams  = KatanaMkIIParameterCatalog.FxFlanger117EParams;
-            _wah95EParams       = KatanaMkIIParameterCatalog.FxWah95EParams;
-            _dc30Params         = KatanaMkIIParameterCatalog.FxDC30Params;
-            _pedalBendParams    = KatanaMkIIParameterCatalog.FxPedalBendParams;
+            _harmonistParams = KatanaMkIIParameterCatalog.FxHarmonistParams;
+            _humanizerParams = KatanaMkIIParameterCatalog.FxHumanizerParams;
+            _phaser90EParams = KatanaMkIIParameterCatalog.FxPhaser90EParams;
+            _flanger117EParams = KatanaMkIIParameterCatalog.FxFlanger117EParams;
+            _wah95EParams = KatanaMkIIParameterCatalog.FxWah95EParams;
+            _dc30Params = KatanaMkIIParameterCatalog.FxDC30Params;
+            _pedalBendParams = KatanaMkIIParameterCatalog.FxPedalBendParams;
         }
     }
 
@@ -133,7 +136,7 @@ public partial class ModFxPedalViewModel : PedalViewModel
         private set
         {
             var __old = _selectedTypeIndex;
-if (!ChangeProperty(ref _selectedTypeIndex, value)) return;
+            if (!ChangeProperty(ref _selectedTypeIndex, value)) return;
             this.RaisePropertyChanged(nameof(IsTypeChorus));
             this.RaisePropertyChanged(nameof(IsTypeFlanger));
             this.RaisePropertyChanged(nameof(IsTypePhaser));
@@ -168,37 +171,37 @@ if (!ChangeProperty(ref _selectedTypeIndex, value)) return;
         }
     }
 
-    public bool IsTypeChorus        => SelectedTypeIndex == 0;
-    public bool IsTypeFlanger       => SelectedTypeIndex == 1;
-    public bool IsTypePhaser        => SelectedTypeIndex == 2;
-    public bool IsTypeUnivibe       => SelectedTypeIndex == 3;
-    public bool IsTypeTremolo       => SelectedTypeIndex == 4;
-    public bool IsTypeVibrato       => SelectedTypeIndex == 5;
-    public bool IsTypeRotary        => SelectedTypeIndex == 6;
-    public bool IsTypeRingMod       => SelectedTypeIndex == 7;
-    public bool IsTypeSlowGear      => SelectedTypeIndex == 8;
-    public bool IsTypeSlicer        => SelectedTypeIndex == 9;
-    public bool IsTypeComp          => SelectedTypeIndex == 10;
-    public bool IsTypeLimiter       => SelectedTypeIndex == 11;
-    public bool IsTypeTouchWah      => SelectedTypeIndex == 12;
-    public bool IsTypeAutoWah       => SelectedTypeIndex == 13;
-    public bool IsTypePedalWah      => SelectedTypeIndex == 14;
-    public bool IsTypeGraphicEq     => SelectedTypeIndex == 15;
-    public bool IsTypeParametricEq  => SelectedTypeIndex == 16;
-    public bool IsTypeGuitarSim     => SelectedTypeIndex == 17;
-    public bool IsTypeAcGuitarSim   => SelectedTypeIndex == 18;
-    public bool IsTypeAcProcessor   => SelectedTypeIndex == 19;
-    public bool IsTypeWaveSynth     => SelectedTypeIndex == 20;
-    public bool IsTypeOctave        => SelectedTypeIndex == 21;
-    public bool IsTypeHeavyOctave   => SelectedTypeIndex == 22;
-    public bool IsTypePitchShifter  => SelectedTypeIndex == 23;
-    public bool IsTypeHarmonist     => SelectedTypeIndex == 24;
-    public bool IsTypeHumanizer     => SelectedTypeIndex == 25;
-    public bool IsTypePhaser90E     => SelectedTypeIndex == 26;
-    public bool IsTypeFlanger117E   => SelectedTypeIndex == 27;
-    public bool IsTypeWah95E        => SelectedTypeIndex == 28;
-    public bool IsTypeDc30          => SelectedTypeIndex == 29;
-    public bool IsTypePedalBend     => SelectedTypeIndex == 30;
+    public bool IsTypeChorus => SelectedTypeIndex == 0;
+    public bool IsTypeFlanger => SelectedTypeIndex == 1;
+    public bool IsTypePhaser => SelectedTypeIndex == 2;
+    public bool IsTypeUnivibe => SelectedTypeIndex == 3;
+    public bool IsTypeTremolo => SelectedTypeIndex == 4;
+    public bool IsTypeVibrato => SelectedTypeIndex == 5;
+    public bool IsTypeRotary => SelectedTypeIndex == 6;
+    public bool IsTypeRingMod => SelectedTypeIndex == 7;
+    public bool IsTypeSlowGear => SelectedTypeIndex == 8;
+    public bool IsTypeSlicer => SelectedTypeIndex == 9;
+    public bool IsTypeComp => SelectedTypeIndex == 10;
+    public bool IsTypeLimiter => SelectedTypeIndex == 11;
+    public bool IsTypeTouchWah => SelectedTypeIndex == 12;
+    public bool IsTypeAutoWah => SelectedTypeIndex == 13;
+    public bool IsTypePedalWah => SelectedTypeIndex == 14;
+    public bool IsTypeGraphicEq => SelectedTypeIndex == 15;
+    public bool IsTypeParametricEq => SelectedTypeIndex == 16;
+    public bool IsTypeGuitarSim => SelectedTypeIndex == 17;
+    public bool IsTypeAcGuitarSim => SelectedTypeIndex == 18;
+    public bool IsTypeAcProcessor => SelectedTypeIndex == 19;
+    public bool IsTypeWaveSynth => SelectedTypeIndex == 20;
+    public bool IsTypeOctave => SelectedTypeIndex == 21;
+    public bool IsTypeHeavyOctave => SelectedTypeIndex == 22;
+    public bool IsTypePitchShifter => SelectedTypeIndex == 23;
+    public bool IsTypeHarmonist => SelectedTypeIndex == 24;
+    public bool IsTypeHumanizer => SelectedTypeIndex == 25;
+    public bool IsTypePhaser90E => SelectedTypeIndex == 26;
+    public bool IsTypeFlanger117E => SelectedTypeIndex == 27;
+    public bool IsTypeWah95E => SelectedTypeIndex == 28;
+    public bool IsTypeDc30 => SelectedTypeIndex == 29;
+    public bool IsTypePedalBend => SelectedTypeIndex == 30;
 
     // ── IBasePedal abstract overrides ────────────────────────────────────────────
 
@@ -1217,216 +1220,216 @@ if (!ChangeProperty(ref _selectedTypeIndex, value)) return;
         if (Definition.VariationParameter is not null && values.TryGetValue(Definition.VariationParameter.Key, out var variation))
             Variation = ToVariationString(variation);
 
-        if (values.TryGetValue(_chorusParams[0].Key, out var v)) ChorusXoverFreq    = v;
-        if (values.TryGetValue(_chorusParams[1].Key, out v))     ChorusLowRate      = v;
-        if (values.TryGetValue(_chorusParams[2].Key, out v))     ChorusLowDepth     = v;
-        if (values.TryGetValue(_chorusParams[3].Key, out v))     ChorusLowPreDelay  = v;
-        if (values.TryGetValue(_chorusParams[4].Key, out v))     ChorusLowLevel     = v;
-        if (values.TryGetValue(_chorusParams[5].Key, out v))     ChorusHighRate     = v;
-        if (values.TryGetValue(_chorusParams[6].Key, out v))     ChorusHighDepth    = v;
-        if (values.TryGetValue(_chorusParams[7].Key, out v))     ChorusHighPreDelay = v;
-        if (values.TryGetValue(_chorusParams[8].Key, out v))     ChorusHighLevel    = v;
-        if (values.TryGetValue(_chorusParams[9].Key, out v))     ChorusDirectMix    = v;
+        if (values.TryGetValue(_chorusParams[0].Key, out var v)) ChorusXoverFreq = v;
+        if (values.TryGetValue(_chorusParams[1].Key, out v)) ChorusLowRate = v;
+        if (values.TryGetValue(_chorusParams[2].Key, out v)) ChorusLowDepth = v;
+        if (values.TryGetValue(_chorusParams[3].Key, out v)) ChorusLowPreDelay = v;
+        if (values.TryGetValue(_chorusParams[4].Key, out v)) ChorusLowLevel = v;
+        if (values.TryGetValue(_chorusParams[5].Key, out v)) ChorusHighRate = v;
+        if (values.TryGetValue(_chorusParams[6].Key, out v)) ChorusHighDepth = v;
+        if (values.TryGetValue(_chorusParams[7].Key, out v)) ChorusHighPreDelay = v;
+        if (values.TryGetValue(_chorusParams[8].Key, out v)) ChorusHighLevel = v;
+        if (values.TryGetValue(_chorusParams[9].Key, out v)) ChorusDirectMix = v;
 
-        if (values.TryGetValue(_flangerParams[0].Key, out v)) FlangerRate        = v;
-        if (values.TryGetValue(_flangerParams[1].Key, out v)) FlangerDepth       = v;
-        if (values.TryGetValue(_flangerParams[2].Key, out v)) FlangerManual      = v;
-        if (values.TryGetValue(_flangerParams[3].Key, out v)) FlangerResonance   = v;
-        if (values.TryGetValue(_flangerParams[4].Key, out v)) FlangerLowCut      = v;
+        if (values.TryGetValue(_flangerParams[0].Key, out v)) FlangerRate = v;
+        if (values.TryGetValue(_flangerParams[1].Key, out v)) FlangerDepth = v;
+        if (values.TryGetValue(_flangerParams[2].Key, out v)) FlangerManual = v;
+        if (values.TryGetValue(_flangerParams[3].Key, out v)) FlangerResonance = v;
+        if (values.TryGetValue(_flangerParams[4].Key, out v)) FlangerLowCut = v;
         if (values.TryGetValue(_flangerParams[5].Key, out v)) FlangerEffectLevel = v;
-        if (values.TryGetValue(_flangerParams[6].Key, out v)) FlangerDirectMix   = v;
+        if (values.TryGetValue(_flangerParams[6].Key, out v)) FlangerDirectMix = v;
 
-        if (values.TryGetValue(_phaserParams[0].Key, out v)) PhaserType        = v;
-        if (values.TryGetValue(_phaserParams[1].Key, out v)) PhaserRate        = v;
-        if (values.TryGetValue(_phaserParams[2].Key, out v)) PhaserDepth       = v;
-        if (values.TryGetValue(_phaserParams[3].Key, out v)) PhaserManual      = v;
-        if (values.TryGetValue(_phaserParams[4].Key, out v)) PhaserResonance   = v;
-        if (values.TryGetValue(_phaserParams[5].Key, out v)) PhaserStepRate    = v;
+        if (values.TryGetValue(_phaserParams[0].Key, out v)) PhaserType = v;
+        if (values.TryGetValue(_phaserParams[1].Key, out v)) PhaserRate = v;
+        if (values.TryGetValue(_phaserParams[2].Key, out v)) PhaserDepth = v;
+        if (values.TryGetValue(_phaserParams[3].Key, out v)) PhaserManual = v;
+        if (values.TryGetValue(_phaserParams[4].Key, out v)) PhaserResonance = v;
+        if (values.TryGetValue(_phaserParams[5].Key, out v)) PhaserStepRate = v;
         if (values.TryGetValue(_phaserParams[6].Key, out v)) PhaserEffectLevel = v;
-        if (values.TryGetValue(_phaserParams[7].Key, out v)) PhaserDirectMix   = v;
+        if (values.TryGetValue(_phaserParams[7].Key, out v)) PhaserDirectMix = v;
 
-        if (values.TryGetValue(_uniVParams[0].Key, out v)) UniVRate  = v;
+        if (values.TryGetValue(_uniVParams[0].Key, out v)) UniVRate = v;
         if (values.TryGetValue(_uniVParams[1].Key, out v)) UniVDepth = v;
         if (values.TryGetValue(_uniVParams[2].Key, out v)) UniVLevel = v;
 
         if (values.TryGetValue(_tremoloParams[0].Key, out v)) TremoloWaveShape = v;
-        if (values.TryGetValue(_tremoloParams[1].Key, out v)) TremoloRate      = v;
-        if (values.TryGetValue(_tremoloParams[2].Key, out v)) TremoloDepth     = v;
-        if (values.TryGetValue(_tremoloParams[3].Key, out v)) TremoloLevel     = v;
+        if (values.TryGetValue(_tremoloParams[1].Key, out v)) TremoloRate = v;
+        if (values.TryGetValue(_tremoloParams[2].Key, out v)) TremoloDepth = v;
+        if (values.TryGetValue(_tremoloParams[3].Key, out v)) TremoloLevel = v;
 
-        if (values.TryGetValue(_vibratoParams[0].Key, out v)) VibratoRate  = v;
+        if (values.TryGetValue(_vibratoParams[0].Key, out v)) VibratoRate = v;
         if (values.TryGetValue(_vibratoParams[1].Key, out v)) VibratoDepth = v;
         if (values.TryGetValue(_vibratoParams[2].Key, out v)) VibratoLevel = v;
 
         if (values.TryGetValue(_rotaryParams[0].Key, out v)) RotaryRateFast = v;
-        if (values.TryGetValue(_rotaryParams[1].Key, out v)) RotaryDepth    = v;
-        if (values.TryGetValue(_rotaryParams[2].Key, out v)) RotaryLevel    = v;
+        if (values.TryGetValue(_rotaryParams[1].Key, out v)) RotaryDepth = v;
+        if (values.TryGetValue(_rotaryParams[2].Key, out v)) RotaryLevel = v;
 
-        if (values.TryGetValue(_ringModParams[0].Key, out v)) RingModMode        = v;
-        if (values.TryGetValue(_ringModParams[1].Key, out v)) RingModFrequency   = v;
+        if (values.TryGetValue(_ringModParams[0].Key, out v)) RingModMode = v;
+        if (values.TryGetValue(_ringModParams[1].Key, out v)) RingModFrequency = v;
         if (values.TryGetValue(_ringModParams[2].Key, out v)) RingModEffectLevel = v;
-        if (values.TryGetValue(_ringModParams[3].Key, out v)) RingModDirectMix   = v;
+        if (values.TryGetValue(_ringModParams[3].Key, out v)) RingModDirectMix = v;
 
-        if (values.TryGetValue(_slowGearParams[0].Key, out v)) SlowGearSens     = v;
+        if (values.TryGetValue(_slowGearParams[0].Key, out v)) SlowGearSens = v;
         if (values.TryGetValue(_slowGearParams[1].Key, out v)) SlowGearRiseTime = v;
-        if (values.TryGetValue(_slowGearParams[2].Key, out v)) SlowGearLevel    = v;
+        if (values.TryGetValue(_slowGearParams[2].Key, out v)) SlowGearLevel = v;
 
-        if (values.TryGetValue(_slicerParams[0].Key, out v)) SlicerPattern     = v;
-        if (values.TryGetValue(_slicerParams[1].Key, out v)) SlicerRate        = v;
+        if (values.TryGetValue(_slicerParams[0].Key, out v)) SlicerPattern = v;
+        if (values.TryGetValue(_slicerParams[1].Key, out v)) SlicerRate = v;
         if (values.TryGetValue(_slicerParams[2].Key, out v)) SlicerTriggerSens = v;
         if (values.TryGetValue(_slicerParams[3].Key, out v)) SlicerEffectLevel = v;
-        if (values.TryGetValue(_slicerParams[4].Key, out v)) SlicerDirectMix   = v;
+        if (values.TryGetValue(_slicerParams[4].Key, out v)) SlicerDirectMix = v;
 
-        if (values.TryGetValue(_compParams[0].Key, out v)) CompType    = v;
+        if (values.TryGetValue(_compParams[0].Key, out v)) CompType = v;
         if (values.TryGetValue(_compParams[1].Key, out v)) CompSustain = v;
-        if (values.TryGetValue(_compParams[2].Key, out v)) CompAttack  = v;
-        if (values.TryGetValue(_compParams[3].Key, out v)) CompTone    = v;
-        if (values.TryGetValue(_compParams[4].Key, out v)) CompLevel   = v;
+        if (values.TryGetValue(_compParams[2].Key, out v)) CompAttack = v;
+        if (values.TryGetValue(_compParams[3].Key, out v)) CompTone = v;
+        if (values.TryGetValue(_compParams[4].Key, out v)) CompLevel = v;
 
-        if (values.TryGetValue(_limiterParams[0].Key, out v)) LimiterType      = v;
-        if (values.TryGetValue(_limiterParams[1].Key, out v)) LimiterAttack    = v;
+        if (values.TryGetValue(_limiterParams[0].Key, out v)) LimiterType = v;
+        if (values.TryGetValue(_limiterParams[1].Key, out v)) LimiterAttack = v;
         if (values.TryGetValue(_limiterParams[2].Key, out v)) LimiterThreshold = v;
-        if (values.TryGetValue(_limiterParams[3].Key, out v)) LimiterRatio     = v;
-        if (values.TryGetValue(_limiterParams[4].Key, out v)) LimiterRelease   = v;
-        if (values.TryGetValue(_limiterParams[5].Key, out v)) LimiterLevel     = v;
+        if (values.TryGetValue(_limiterParams[3].Key, out v)) LimiterRatio = v;
+        if (values.TryGetValue(_limiterParams[4].Key, out v)) LimiterRelease = v;
+        if (values.TryGetValue(_limiterParams[5].Key, out v)) LimiterLevel = v;
 
-        if (values.TryGetValue(_tWahParams[0].Key, out v)) TWahMode        = v;
-        if (values.TryGetValue(_tWahParams[1].Key, out v)) TWahPolarity    = v;
-        if (values.TryGetValue(_tWahParams[2].Key, out v)) TWahSens        = v;
-        if (values.TryGetValue(_tWahParams[3].Key, out v)) TWahFreq        = v;
-        if (values.TryGetValue(_tWahParams[4].Key, out v)) TWahPeak        = v;
-        if (values.TryGetValue(_tWahParams[5].Key, out v)) TWahDirectMix   = v;
+        if (values.TryGetValue(_tWahParams[0].Key, out v)) TWahMode = v;
+        if (values.TryGetValue(_tWahParams[1].Key, out v)) TWahPolarity = v;
+        if (values.TryGetValue(_tWahParams[2].Key, out v)) TWahSens = v;
+        if (values.TryGetValue(_tWahParams[3].Key, out v)) TWahFreq = v;
+        if (values.TryGetValue(_tWahParams[4].Key, out v)) TWahPeak = v;
+        if (values.TryGetValue(_tWahParams[5].Key, out v)) TWahDirectMix = v;
         if (values.TryGetValue(_tWahParams[6].Key, out v)) TWahEffectLevel = v;
 
-        if (values.TryGetValue(_autoWahParams[0].Key, out v)) AutoWahMode        = v;
-        if (values.TryGetValue(_autoWahParams[1].Key, out v)) AutoWahFreq        = v;
-        if (values.TryGetValue(_autoWahParams[2].Key, out v)) AutoWahPeak        = v;
-        if (values.TryGetValue(_autoWahParams[3].Key, out v)) AutoWahRate        = v;
-        if (values.TryGetValue(_autoWahParams[4].Key, out v)) AutoWahDepth       = v;
-        if (values.TryGetValue(_autoWahParams[5].Key, out v)) AutoWahDirectMix   = v;
+        if (values.TryGetValue(_autoWahParams[0].Key, out v)) AutoWahMode = v;
+        if (values.TryGetValue(_autoWahParams[1].Key, out v)) AutoWahFreq = v;
+        if (values.TryGetValue(_autoWahParams[2].Key, out v)) AutoWahPeak = v;
+        if (values.TryGetValue(_autoWahParams[3].Key, out v)) AutoWahRate = v;
+        if (values.TryGetValue(_autoWahParams[4].Key, out v)) AutoWahDepth = v;
+        if (values.TryGetValue(_autoWahParams[5].Key, out v)) AutoWahDirectMix = v;
         if (values.TryGetValue(_autoWahParams[6].Key, out v)) AutoWahEffectLevel = v;
 
-        if (values.TryGetValue(_pedalWahParams[0].Key, out v)) PedalWahType        = v;
+        if (values.TryGetValue(_pedalWahParams[0].Key, out v)) PedalWahType = v;
         if (values.TryGetValue(_pedalWahParams[1].Key, out v)) PedalWahPedalPosition = v;
-        if (values.TryGetValue(_pedalWahParams[2].Key, out v)) PedalWahPedalMin    = v;
-        if (values.TryGetValue(_pedalWahParams[3].Key, out v)) PedalWahPedalMax    = v;
+        if (values.TryGetValue(_pedalWahParams[2].Key, out v)) PedalWahPedalMin = v;
+        if (values.TryGetValue(_pedalWahParams[3].Key, out v)) PedalWahPedalMax = v;
         if (values.TryGetValue(_pedalWahParams[4].Key, out v)) PedalWahEffectLevel = v;
-        if (values.TryGetValue(_pedalWahParams[5].Key, out v)) PedalWahDirectMix   = v;
+        if (values.TryGetValue(_pedalWahParams[5].Key, out v)) PedalWahDirectMix = v;
 
-        if (values.TryGetValue(_graphicEqParams[0].Key,  out v)) GraphicEq31Hz  = v;
-        if (values.TryGetValue(_graphicEqParams[1].Key,  out v)) GraphicEq62Hz  = v;
-        if (values.TryGetValue(_graphicEqParams[2].Key,  out v)) GraphicEq125Hz = v;
-        if (values.TryGetValue(_graphicEqParams[3].Key,  out v)) GraphicEq250Hz = v;
-        if (values.TryGetValue(_graphicEqParams[4].Key,  out v)) GraphicEq500Hz = v;
-        if (values.TryGetValue(_graphicEqParams[5].Key,  out v)) GraphicEq1kHz  = v;
-        if (values.TryGetValue(_graphicEqParams[6].Key,  out v)) GraphicEq2kHz  = v;
-        if (values.TryGetValue(_graphicEqParams[7].Key,  out v)) GraphicEq4kHz  = v;
-        if (values.TryGetValue(_graphicEqParams[8].Key,  out v)) GraphicEq8kHz  = v;
-        if (values.TryGetValue(_graphicEqParams[9].Key,  out v)) GraphicEq16kHz = v;
+        if (values.TryGetValue(_graphicEqParams[0].Key, out v)) GraphicEq31Hz = v;
+        if (values.TryGetValue(_graphicEqParams[1].Key, out v)) GraphicEq62Hz = v;
+        if (values.TryGetValue(_graphicEqParams[2].Key, out v)) GraphicEq125Hz = v;
+        if (values.TryGetValue(_graphicEqParams[3].Key, out v)) GraphicEq250Hz = v;
+        if (values.TryGetValue(_graphicEqParams[4].Key, out v)) GraphicEq500Hz = v;
+        if (values.TryGetValue(_graphicEqParams[5].Key, out v)) GraphicEq1kHz = v;
+        if (values.TryGetValue(_graphicEqParams[6].Key, out v)) GraphicEq2kHz = v;
+        if (values.TryGetValue(_graphicEqParams[7].Key, out v)) GraphicEq4kHz = v;
+        if (values.TryGetValue(_graphicEqParams[8].Key, out v)) GraphicEq8kHz = v;
+        if (values.TryGetValue(_graphicEqParams[9].Key, out v)) GraphicEq16kHz = v;
         if (values.TryGetValue(_graphicEqParams[10].Key, out v)) GraphicEqLevel = v;
 
-        if (values.TryGetValue(_parametricEqParams[0].Key,  out v)) ParametricEqLowCut      = v;
-        if (values.TryGetValue(_parametricEqParams[1].Key,  out v)) ParametricEqLowGain     = v;
-        if (values.TryGetValue(_parametricEqParams[2].Key,  out v)) ParametricEqLowMidFreq  = v;
-        if (values.TryGetValue(_parametricEqParams[3].Key,  out v)) ParametricEqLowMidQ     = v;
-        if (values.TryGetValue(_parametricEqParams[4].Key,  out v)) ParametricEqLowMidGain  = v;
-        if (values.TryGetValue(_parametricEqParams[5].Key,  out v)) ParametricEqHighMidFreq = v;
-        if (values.TryGetValue(_parametricEqParams[6].Key,  out v)) ParametricEqHighMidQ    = v;
-        if (values.TryGetValue(_parametricEqParams[7].Key,  out v)) ParametricEqHighMidGain = v;
-        if (values.TryGetValue(_parametricEqParams[8].Key,  out v)) ParametricEqHighGain    = v;
-        if (values.TryGetValue(_parametricEqParams[9].Key,  out v)) ParametricEqHighCut     = v;
-        if (values.TryGetValue(_parametricEqParams[10].Key, out v)) ParametricEqLevel       = v;
+        if (values.TryGetValue(_parametricEqParams[0].Key, out v)) ParametricEqLowCut = v;
+        if (values.TryGetValue(_parametricEqParams[1].Key, out v)) ParametricEqLowGain = v;
+        if (values.TryGetValue(_parametricEqParams[2].Key, out v)) ParametricEqLowMidFreq = v;
+        if (values.TryGetValue(_parametricEqParams[3].Key, out v)) ParametricEqLowMidQ = v;
+        if (values.TryGetValue(_parametricEqParams[4].Key, out v)) ParametricEqLowMidGain = v;
+        if (values.TryGetValue(_parametricEqParams[5].Key, out v)) ParametricEqHighMidFreq = v;
+        if (values.TryGetValue(_parametricEqParams[6].Key, out v)) ParametricEqHighMidQ = v;
+        if (values.TryGetValue(_parametricEqParams[7].Key, out v)) ParametricEqHighMidGain = v;
+        if (values.TryGetValue(_parametricEqParams[8].Key, out v)) ParametricEqHighGain = v;
+        if (values.TryGetValue(_parametricEqParams[9].Key, out v)) ParametricEqHighCut = v;
+        if (values.TryGetValue(_parametricEqParams[10].Key, out v)) ParametricEqLevel = v;
 
-        if (values.TryGetValue(_guitarSimParams[0].Key, out v)) GuitarSimType  = v;
-        if (values.TryGetValue(_guitarSimParams[1].Key, out v)) GuitarSimLow   = v;
-        if (values.TryGetValue(_guitarSimParams[2].Key, out v)) GuitarSimHigh  = v;
+        if (values.TryGetValue(_guitarSimParams[0].Key, out v)) GuitarSimType = v;
+        if (values.TryGetValue(_guitarSimParams[1].Key, out v)) GuitarSimLow = v;
+        if (values.TryGetValue(_guitarSimParams[2].Key, out v)) GuitarSimHigh = v;
         if (values.TryGetValue(_guitarSimParams[3].Key, out v)) GuitarSimLevel = v;
-        if (values.TryGetValue(_guitarSimParams[4].Key, out v)) GuitarSimBody  = v;
+        if (values.TryGetValue(_guitarSimParams[4].Key, out v)) GuitarSimBody = v;
 
-        if (values.TryGetValue(_acGuitarSimParams[0].Key, out v)) AcGuitarSimHigh  = v;
-        if (values.TryGetValue(_acGuitarSimParams[1].Key, out v)) AcGuitarSimBody  = v;
-        if (values.TryGetValue(_acGuitarSimParams[2].Key, out v)) AcGuitarSimLow   = v;
+        if (values.TryGetValue(_acGuitarSimParams[0].Key, out v)) AcGuitarSimHigh = v;
+        if (values.TryGetValue(_acGuitarSimParams[1].Key, out v)) AcGuitarSimBody = v;
+        if (values.TryGetValue(_acGuitarSimParams[2].Key, out v)) AcGuitarSimLow = v;
         if (values.TryGetValue(_acGuitarSimParams[3].Key, out v)) AcGuitarSimLevel = v;
 
-        if (values.TryGetValue(_acProcessorParams[0].Key, out v)) AcProcessorType     = v;
-        if (values.TryGetValue(_acProcessorParams[1].Key, out v)) AcProcessorBass     = v;
-        if (values.TryGetValue(_acProcessorParams[2].Key, out v)) AcProcessorMid      = v;
-        if (values.TryGetValue(_acProcessorParams[3].Key, out v)) AcProcessorMidFreq  = v;
-        if (values.TryGetValue(_acProcessorParams[4].Key, out v)) AcProcessorTreble   = v;
+        if (values.TryGetValue(_acProcessorParams[0].Key, out v)) AcProcessorType = v;
+        if (values.TryGetValue(_acProcessorParams[1].Key, out v)) AcProcessorBass = v;
+        if (values.TryGetValue(_acProcessorParams[2].Key, out v)) AcProcessorMid = v;
+        if (values.TryGetValue(_acProcessorParams[3].Key, out v)) AcProcessorMidFreq = v;
+        if (values.TryGetValue(_acProcessorParams[4].Key, out v)) AcProcessorTreble = v;
         if (values.TryGetValue(_acProcessorParams[5].Key, out v)) AcProcessorPresence = v;
-        if (values.TryGetValue(_acProcessorParams[6].Key, out v)) AcProcessorLevel    = v;
+        if (values.TryGetValue(_acProcessorParams[6].Key, out v)) AcProcessorLevel = v;
 
-        if (values.TryGetValue(_waveSynthParams[0].Key, out v)) WaveSynthWave        = v;
-        if (values.TryGetValue(_waveSynthParams[1].Key, out v)) WaveSynthCutoff      = v;
-        if (values.TryGetValue(_waveSynthParams[2].Key, out v)) WaveSynthResonance   = v;
-        if (values.TryGetValue(_waveSynthParams[3].Key, out v)) WaveSynthFilterSens  = v;
+        if (values.TryGetValue(_waveSynthParams[0].Key, out v)) WaveSynthWave = v;
+        if (values.TryGetValue(_waveSynthParams[1].Key, out v)) WaveSynthCutoff = v;
+        if (values.TryGetValue(_waveSynthParams[2].Key, out v)) WaveSynthResonance = v;
+        if (values.TryGetValue(_waveSynthParams[3].Key, out v)) WaveSynthFilterSens = v;
         if (values.TryGetValue(_waveSynthParams[4].Key, out v)) WaveSynthFilterDecay = v;
         if (values.TryGetValue(_waveSynthParams[5].Key, out v)) WaveSynthFilterDepth = v;
-        if (values.TryGetValue(_waveSynthParams[6].Key, out v)) WaveSynthSynthLevel  = v;
-        if (values.TryGetValue(_waveSynthParams[7].Key, out v)) WaveSynthDirectMix   = v;
+        if (values.TryGetValue(_waveSynthParams[6].Key, out v)) WaveSynthSynthLevel = v;
+        if (values.TryGetValue(_waveSynthParams[7].Key, out v)) WaveSynthDirectMix = v;
 
-        if (values.TryGetValue(_octaveParams[0].Key, out v)) OctaveRange       = v;
+        if (values.TryGetValue(_octaveParams[0].Key, out v)) OctaveRange = v;
         if (values.TryGetValue(_octaveParams[1].Key, out v)) OctaveEffectLevel = v;
-        if (values.TryGetValue(_octaveParams[2].Key, out v)) OctaveDirectMix   = v;
+        if (values.TryGetValue(_octaveParams[2].Key, out v)) OctaveDirectMix = v;
 
         if (values.TryGetValue(_heavyOctaveParams[0].Key, out v)) HeavyOctave1OctLevel = v;
         if (values.TryGetValue(_heavyOctaveParams[1].Key, out v)) HeavyOctave2OctLevel = v;
         if (values.TryGetValue(_heavyOctaveParams[2].Key, out v)) HeavyOctaveDirectMix = v;
 
-        if (values.TryGetValue(_pitchShifterParams[0].Key,  out v)) PitchShifterVoice     = v;
-        if (values.TryGetValue(_pitchShifterParams[1].Key,  out v)) PitchShifterPS1Mode   = v;
-        if (values.TryGetValue(_pitchShifterParams[2].Key,  out v)) PitchShifterPS1Pitch  = v;
-        if (values.TryGetValue(_pitchShifterParams[3].Key,  out v)) PitchShifterPS1Fine   = v;
-        if (values.TryGetValue(_pitchShifterParams[4].Key,  out v)) PitchShifterPS1Level  = v;
-        if (values.TryGetValue(_pitchShifterParams[5].Key,  out v)) PitchShifterPS2Mode   = v;
-        if (values.TryGetValue(_pitchShifterParams[6].Key,  out v)) PitchShifterPS2Pitch  = v;
-        if (values.TryGetValue(_pitchShifterParams[7].Key,  out v)) PitchShifterPS2Fine   = v;
-        if (values.TryGetValue(_pitchShifterParams[8].Key,  out v)) PitchShifterPS2Level  = v;
-        if (values.TryGetValue(_pitchShifterParams[9].Key,  out v)) PitchShifterFeedback  = v;
+        if (values.TryGetValue(_pitchShifterParams[0].Key, out v)) PitchShifterVoice = v;
+        if (values.TryGetValue(_pitchShifterParams[1].Key, out v)) PitchShifterPS1Mode = v;
+        if (values.TryGetValue(_pitchShifterParams[2].Key, out v)) PitchShifterPS1Pitch = v;
+        if (values.TryGetValue(_pitchShifterParams[3].Key, out v)) PitchShifterPS1Fine = v;
+        if (values.TryGetValue(_pitchShifterParams[4].Key, out v)) PitchShifterPS1Level = v;
+        if (values.TryGetValue(_pitchShifterParams[5].Key, out v)) PitchShifterPS2Mode = v;
+        if (values.TryGetValue(_pitchShifterParams[6].Key, out v)) PitchShifterPS2Pitch = v;
+        if (values.TryGetValue(_pitchShifterParams[7].Key, out v)) PitchShifterPS2Fine = v;
+        if (values.TryGetValue(_pitchShifterParams[8].Key, out v)) PitchShifterPS2Level = v;
+        if (values.TryGetValue(_pitchShifterParams[9].Key, out v)) PitchShifterFeedback = v;
         if (values.TryGetValue(_pitchShifterParams[10].Key, out v)) PitchShifterDirectMix = v;
 
-        if (values.TryGetValue(_harmonistParams[0].Key, out v)) HarmonistVoice     = v;
-        if (values.TryGetValue(_harmonistParams[1].Key, out v)) HarmonistHarmony1  = v;
-        if (values.TryGetValue(_harmonistParams[2].Key, out v)) HarmonistLevel1    = v;
-        if (values.TryGetValue(_harmonistParams[3].Key, out v)) HarmonistHarmony2  = v;
-        if (values.TryGetValue(_harmonistParams[4].Key, out v)) HarmonistLevel2    = v;
-        if (values.TryGetValue(_harmonistParams[5].Key, out v)) HarmonistFeedback  = v;
+        if (values.TryGetValue(_harmonistParams[0].Key, out v)) HarmonistVoice = v;
+        if (values.TryGetValue(_harmonistParams[1].Key, out v)) HarmonistHarmony1 = v;
+        if (values.TryGetValue(_harmonistParams[2].Key, out v)) HarmonistLevel1 = v;
+        if (values.TryGetValue(_harmonistParams[3].Key, out v)) HarmonistHarmony2 = v;
+        if (values.TryGetValue(_harmonistParams[4].Key, out v)) HarmonistLevel2 = v;
+        if (values.TryGetValue(_harmonistParams[5].Key, out v)) HarmonistFeedback = v;
         if (values.TryGetValue(_harmonistParams[6].Key, out v)) HarmonistDirectMix = v;
 
-        if (values.TryGetValue(_humanizerParams[0].Key, out v)) HumanizerMode   = v;
+        if (values.TryGetValue(_humanizerParams[0].Key, out v)) HumanizerMode = v;
         if (values.TryGetValue(_humanizerParams[1].Key, out v)) HumanizerVowel1 = v;
         if (values.TryGetValue(_humanizerParams[2].Key, out v)) HumanizerVowel2 = v;
-        if (values.TryGetValue(_humanizerParams[3].Key, out v)) HumanizerSens   = v;
-        if (values.TryGetValue(_humanizerParams[4].Key, out v)) HumanizerRate   = v;
-        if (values.TryGetValue(_humanizerParams[5].Key, out v)) HumanizerDepth  = v;
+        if (values.TryGetValue(_humanizerParams[3].Key, out v)) HumanizerSens = v;
+        if (values.TryGetValue(_humanizerParams[4].Key, out v)) HumanizerRate = v;
+        if (values.TryGetValue(_humanizerParams[5].Key, out v)) HumanizerDepth = v;
         if (values.TryGetValue(_humanizerParams[6].Key, out v)) HumanizerManual = v;
-        if (values.TryGetValue(_humanizerParams[7].Key, out v)) HumanizerLevel  = v;
+        if (values.TryGetValue(_humanizerParams[7].Key, out v)) HumanizerLevel = v;
 
         if (values.TryGetValue(_phaser90EParams[0].Key, out v)) Phaser90EScript = v;
-        if (values.TryGetValue(_phaser90EParams[1].Key, out v)) Phaser90ESpeed  = v;
+        if (values.TryGetValue(_phaser90EParams[1].Key, out v)) Phaser90ESpeed = v;
 
         if (values.TryGetValue(_flanger117EParams[0].Key, out v)) Flanger117EManual = v;
-        if (values.TryGetValue(_flanger117EParams[1].Key, out v)) Flanger117EWidth  = v;
-        if (values.TryGetValue(_flanger117EParams[2].Key, out v)) Flanger117ESpeed  = v;
-        if (values.TryGetValue(_flanger117EParams[3].Key, out v)) Flanger117ERegen  = v;
+        if (values.TryGetValue(_flanger117EParams[1].Key, out v)) Flanger117EWidth = v;
+        if (values.TryGetValue(_flanger117EParams[2].Key, out v)) Flanger117ESpeed = v;
+        if (values.TryGetValue(_flanger117EParams[3].Key, out v)) Flanger117ERegen = v;
 
         if (values.TryGetValue(_wah95EParams[0].Key, out v)) Wah95EPedalPosition = v;
-        if (values.TryGetValue(_wah95EParams[1].Key, out v)) Wah95EPedalMin      = v;
-        if (values.TryGetValue(_wah95EParams[2].Key, out v)) Wah95EPedalMax      = v;
-        if (values.TryGetValue(_wah95EParams[3].Key, out v)) Wah95EEffectLevel   = v;
-        if (values.TryGetValue(_wah95EParams[4].Key, out v)) Wah95EDirectMix     = v;
+        if (values.TryGetValue(_wah95EParams[1].Key, out v)) Wah95EPedalMin = v;
+        if (values.TryGetValue(_wah95EParams[2].Key, out v)) Wah95EPedalMax = v;
+        if (values.TryGetValue(_wah95EParams[3].Key, out v)) Wah95EEffectLevel = v;
+        if (values.TryGetValue(_wah95EParams[4].Key, out v)) Wah95EDirectMix = v;
 
-        if (values.TryGetValue(_dc30Params[0].Key, out v)) DC30Selector       = v;
-        if (values.TryGetValue(_dc30Params[1].Key, out v)) DC30InputVolume    = v;
+        if (values.TryGetValue(_dc30Params[0].Key, out v)) DC30Selector = v;
+        if (values.TryGetValue(_dc30Params[1].Key, out v)) DC30InputVolume = v;
         if (values.TryGetValue(_dc30Params[2].Key, out v)) DC30ChorusIntensity = v;
-        if (values.TryGetValue(_dc30Params[3].Key, out v)) DC30EchoIntensity  = v;
-        if (values.TryGetValue(_dc30Params[4].Key, out v)) DC30EchoVolume     = v;
-        if (values.TryGetValue(_dc30Params[5].Key, out v)) DC30Tone           = v;
-        if (values.TryGetValue(_dc30Params[6].Key, out v)) DC30Output         = v;
+        if (values.TryGetValue(_dc30Params[3].Key, out v)) DC30EchoIntensity = v;
+        if (values.TryGetValue(_dc30Params[4].Key, out v)) DC30EchoVolume = v;
+        if (values.TryGetValue(_dc30Params[5].Key, out v)) DC30Tone = v;
+        if (values.TryGetValue(_dc30Params[6].Key, out v)) DC30Output = v;
 
-        if (values.TryGetValue(_pedalBendParams[0].Key, out v)) PedalBendPitch        = v;
+        if (values.TryGetValue(_pedalBendParams[0].Key, out v)) PedalBendPitch = v;
         if (values.TryGetValue(_pedalBendParams[1].Key, out v)) PedalBendPedalPosition = v;
-        if (values.TryGetValue(_pedalBendParams[2].Key, out v)) PedalBendEffectLevel  = v;
-        if (values.TryGetValue(_pedalBendParams[3].Key, out v)) PedalBendDirectMix    = v;
+        if (values.TryGetValue(_pedalBendParams[2].Key, out v)) PedalBendEffectLevel = v;
+        if (values.TryGetValue(_pedalBendParams[3].Key, out v)) PedalBendDirectMix = v;
     }
 }

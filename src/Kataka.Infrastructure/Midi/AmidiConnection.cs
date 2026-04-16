@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+
 using Kataka.Application.Midi;
 using Kataka.Domain.Midi;
 

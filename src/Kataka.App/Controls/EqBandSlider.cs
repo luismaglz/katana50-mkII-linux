@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -33,19 +34,19 @@ public class EqBandSlider : Control
         AvaloniaProperty.Register<EqBandSlider, double>(nameof(Scale), 1.0);
 
     // ── Colours ───────────────────────────────────────────────────────────────
-    private static readonly SolidColorBrush TrackBrush      = new(Color.Parse("#1a1d22"));
+    private static readonly SolidColorBrush TrackBrush = new(Color.Parse("#1a1d22"));
     private static readonly SolidColorBrush TrackBorderBrush = new(Color.Parse("#3a3f47"));
-    private static readonly SolidColorBrush CentreBrush     = new(Color.Parse("#4a4f57"));
-    private static readonly SolidColorBrush BoostBrush      = new(Color.Parse("#3dbf6c"));
-    private static readonly SolidColorBrush CutBrush        = new(Color.Parse("#e05050"));
-    private static readonly SolidColorBrush NeutralBrush    = new(Color.Parse("#4a4f57"));
-    private static readonly SolidColorBrush ThumbBrush      = new(Color.Parse("#d8d5cb"));
-    private static readonly SolidColorBrush LabelBrush      = new(Color.Parse("#7a8090"));
-    private static readonly SolidColorBrush ValueBrush      = new(Color.Parse("#ffcf66"));
+    private static readonly SolidColorBrush CentreBrush = new(Color.Parse("#4a4f57"));
+    private static readonly SolidColorBrush BoostBrush = new(Color.Parse("#3dbf6c"));
+    private static readonly SolidColorBrush CutBrush = new(Color.Parse("#e05050"));
+    private static readonly SolidColorBrush NeutralBrush = new(Color.Parse("#4a4f57"));
+    private static readonly SolidColorBrush ThumbBrush = new(Color.Parse("#d8d5cb"));
+    private static readonly SolidColorBrush LabelBrush = new(Color.Parse("#7a8090"));
+    private static readonly SolidColorBrush ValueBrush = new(Color.Parse("#ffcf66"));
 
-    private bool  _isDragging;
+    private bool _isDragging;
     private double _dragStartY;
-    private int   _dragStartValue;
+    private int _dragStartValue;
 
     static EqBandSlider()
     {
@@ -86,9 +87,9 @@ public class EqBandSlider : Control
 
     // ── Layout ────────────────────────────────────────────────────────────────
 
-    private double TrackWidth  => 14 * Scale;
+    private double TrackWidth => 14 * Scale;
     private double TrackHeight => 100 * Scale;
-    private double TotalWidth  => 44 * Scale;
+    private double TotalWidth => 44 * Scale;
     private double LabelHeight => 16 * Scale;
     private double ValueHeight => 16 * Scale;
     // Layout: [valueText] [track] [label]
@@ -103,11 +104,11 @@ public class EqBandSlider : Control
     {
         base.Render(context);
 
-        var s        = Scale;
-        var tw       = TrackWidth;
-        var th       = TrackHeight;
-        var totalW   = TotalWidth;
-        var trackX   = (totalW - tw) / 2;
+        var s = Scale;
+        var tw = TrackWidth;
+        var th = TrackHeight;
+        var totalW = TotalWidth;
+        var trackX = (totalW - tw) / 2;
         var trackTop = ValueHeight + 6 * s;
 
         // Track background
@@ -115,17 +116,17 @@ public class EqBandSlider : Control
         context.DrawRectangle(TrackBrush, new Pen(TrackBorderBrush, 1), trackRect, 3, 3);
 
         // Centre line
-        var range    = Math.Max(1, Maximum - Minimum);
-        var midVal   = (Minimum + Maximum) / 2;
-        var midNorm  = (double)(midVal - Minimum) / range;
-        var centreY  = trackTop + th * (1.0 - midNorm);
+        var range = Math.Max(1, Maximum - Minimum);
+        var midVal = (Minimum + Maximum) / 2;
+        var midNorm = (double)(midVal - Minimum) / range;
+        var centreY = trackTop + th * (1.0 - midNorm);
         context.DrawLine(new Pen(CentreBrush, 1.5 * s), new Point(trackX, centreY), new Point(trackX + tw, centreY));
 
         // Filled bar from centre to current value
-        var norm     = (double)(Math.Clamp(Value, Minimum, Maximum) - Minimum) / range;
-        var thumbY   = trackTop + th * (1.0 - norm);
-        var barTop   = Math.Min(thumbY, centreY);
-        var barBot   = Math.Max(thumbY, centreY);
+        var norm = (double)(Math.Clamp(Value, Minimum, Maximum) - Minimum) / range;
+        var thumbY = trackTop + th * (1.0 - norm);
+        var barTop = Math.Min(thumbY, centreY);
+        var barBot = Math.Max(thumbY, centreY);
         var barHeight = barBot - barTop;
         if (barHeight > 0)
         {
@@ -134,19 +135,19 @@ public class EqBandSlider : Control
         }
 
         // Thumb
-        var thumbH   = 6 * s;
+        var thumbH = 6 * s;
         var thumbRect = new Rect(trackX - 2 * s, thumbY - thumbH / 2, tw + 4 * s, thumbH);
         context.DrawRectangle(ThumbBrush, null, thumbRect, 2, 2);
 
         // Value text (offset from centre, e.g. +12, 0, -8)
-        var offset    = Value - midVal;
-        var valStr    = offset > 0 ? $"+{offset}" : offset.ToString(CultureInfo.InvariantCulture);
-        var valText   = MakeText(valStr, 9 * s, FontWeight.SemiBold, ValueBrush);
+        var offset = Value - midVal;
+        var valStr = offset > 0 ? $"+{offset}" : offset.ToString(CultureInfo.InvariantCulture);
+        var valText = MakeText(valStr, 9 * s, FontWeight.SemiBold, ValueBrush);
         var valOrigin = new Point((totalW - valText.Width) / 2, 0);
         context.DrawText(valText, valOrigin);
 
         // Frequency label
-        var lblText   = MakeText(Label, 9 * s, FontWeight.Normal, LabelBrush);
+        var lblText = MakeText(Label, 9 * s, FontWeight.Normal, LabelBrush);
         var lblOrigin = new Point((totalW - lblText.Width) / 2, trackTop + th + 4 * s);
         context.DrawText(lblText, lblOrigin);
     }
@@ -158,8 +159,8 @@ public class EqBandSlider : Control
         base.OnPointerPressed(e);
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
         Focus();
-        _isDragging    = true;
-        _dragStartY     = e.GetPosition(this).Y;
+        _isDragging = true;
+        _dragStartY = e.GetPosition(this).Y;
         _dragStartValue = Value;
         e.Pointer.Capture(this);
         e.Handled = true;
@@ -170,9 +171,9 @@ public class EqBandSlider : Control
         base.OnPointerMoved(e);
         if (!_isDragging) return;
         var deltaY = _dragStartY - e.GetPosition(this).Y; // up = positive
-        var range  = Math.Max(1, Maximum - Minimum);
+        var range = Math.Max(1, Maximum - Minimum);
         var adjusted = _dragStartValue + (int)Math.Round(deltaY * range / TrackHeight);
-        Value     = Math.Clamp(adjusted, Minimum, Maximum);
+        Value = Math.Clamp(adjusted, Minimum, Maximum);
         e.Handled = true;
     }
 
@@ -188,7 +189,7 @@ public class EqBandSlider : Control
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
         base.OnPointerWheelChanged(e);
-        Value    = Math.Clamp(Value + (e.Delta.Y > 0 ? 1 : -1), Minimum, Maximum);
+        Value = Math.Clamp(Value + (e.Delta.Y > 0 ? 1 : -1), Minimum, Maximum);
         e.Handled = true;
     }
 
@@ -197,7 +198,7 @@ public class EqBandSlider : Control
         base.OnKeyDown(e);
         switch (e.Key)
         {
-            case Key.Up:   Value = Math.Clamp(Value + 1, Minimum, Maximum); e.Handled = true; break;
+            case Key.Up: Value = Math.Clamp(Value + 1, Minimum, Maximum); e.Handled = true; break;
             case Key.Down: Value = Math.Clamp(Value - 1, Minimum, Maximum); e.Handled = true; break;
         }
     }

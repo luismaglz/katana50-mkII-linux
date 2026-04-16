@@ -1,4 +1,5 @@
 using System;
+
 using Avalonia;
 using Avalonia.Media;
 
@@ -9,11 +10,11 @@ namespace Kataka.App.Controls;
 /// </summary>
 public sealed class LargeImageRotaryKnob : RotaryKnobBase
 {
-    private const double ImgSize    = 114;
-    private const double PadX       = 6;
-    private const double TopPad     = 30;
-    private const double BottomPad  = 8;
-    private const double ValueSize  = 21;
+    private const double ImgSize = 114;
+    private const double PadX = 6;
+    private const double TopPad = 30;
+    private const double BottomPad = 8;
+    private const double ValueSize = 21;
 
     protected override Size MeasureOverride(Size availableSize) => new(174, 234);
 
@@ -22,11 +23,11 @@ public sealed class LargeImageRotaryKnob : RotaryKnobBase
         base.Render(context);
         var bounds = Bounds.Deflate(PadX);
 
-        var labelText   = CreateText(Label.ToUpperInvariant(), LabelFontSize, FontWeight.Bold, LabelBrush);
+        var labelText = CreateText(Label.ToUpperInvariant(), LabelFontSize, FontWeight.Bold, LabelBrush);
         context.DrawText(labelText, new Point((bounds.Width - labelText.Width) / 2, bounds.Top));
 
-        var cx     = bounds.Width  / 2;
-        var cy     = labelText.Height + TopPad + ImgSize / 2;
+        var cx = bounds.Width / 2;
+        var cy = labelText.Height + TopPad + ImgSize / 2;
         var imgRect = new Rect(cx - ImgSize / 2, cy - ImgSize / 2, ImgSize, ImgSize);
 
         var angleRad = KnobImageAsset.MinAngleRad + NormalizedValue * KnobImageAsset.AngleSweep * Math.PI / 180.0;

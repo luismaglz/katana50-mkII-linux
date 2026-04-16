@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 using Kataka.App.ViewModels;
 using Kataka.Application.Katana;
 using Kataka.Domain.Midi;
@@ -37,7 +38,7 @@ public interface IAmpSyncState
         "CH A2" => KatanaPanelChannel.ChA2,
         "CH B1" => KatanaPanelChannel.ChB1,
         "CH B2" => KatanaPanelChannel.ChB2,
-        _       => KatanaPanelChannel.Panel,
+        _ => KatanaPanelChannel.Panel,
     };
 
     static string ToPanelChannelDisplay(KatanaPanelChannel channel) => channel switch
@@ -46,6 +47,6 @@ public interface IAmpSyncState
         KatanaPanelChannel.ChA2 => "CH A2",
         KatanaPanelChannel.ChB1 => "CH B1",
         KatanaPanelChannel.ChB2 => "CH B2",
-        _                       => "Panel",
+        _ => "Panel",
     };
 }

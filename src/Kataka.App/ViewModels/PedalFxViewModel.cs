@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+
 using Kataka.Domain.Midi;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 

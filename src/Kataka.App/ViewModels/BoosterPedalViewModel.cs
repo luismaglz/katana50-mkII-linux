@@ -1,10 +1,13 @@
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Avalonia.Media;
+
 using Kataka.Domain.KatanaState;
 using Kataka.Domain.Midi;
+
+using ReactiveUI;
 
 namespace Kataka.App.ViewModels;
 
@@ -25,14 +28,14 @@ public partial class BoosterPedalViewModel : PedalViewModel
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
 
         _state.EnabledState.ValueChanged += () => this.RaisePropertyChanged(nameof(IsEnabled));
-        _state.Type.ValueChanged         += () => { this.RaisePropertyChanged(nameof(SelectedTypeOption)); this.RaisePropertyChanged(nameof(TypeCaption)); };
-        _state.Variation.ValueChanged    += () => { this.RaisePropertyChanged(nameof(Variation)); this.RaisePropertyChanged(nameof(VariationBrush)); };
-        _state.Drive.ValueChanged          += () => this.RaisePropertyChanged(nameof(Drive));
-        _state.Tone.ValueChanged           += () => this.RaisePropertyChanged(nameof(Tone));
-        _state.Bottom.ValueChanged         += () => this.RaisePropertyChanged(nameof(Bottom));
-        _state.SoloSw.ValueChanged         += () => this.RaisePropertyChanged(nameof(SoloSw));
-        _state.SoloLevel.ValueChanged      += () => this.RaisePropertyChanged(nameof(SoloLevel));
-        _state.EffectLevel.ValueChanged    += () => this.RaisePropertyChanged(nameof(EffectLevel));
+        _state.Type.ValueChanged += () => { this.RaisePropertyChanged(nameof(SelectedTypeOption)); this.RaisePropertyChanged(nameof(TypeCaption)); };
+        _state.Variation.ValueChanged += () => { this.RaisePropertyChanged(nameof(Variation)); this.RaisePropertyChanged(nameof(VariationBrush)); };
+        _state.Drive.ValueChanged += () => this.RaisePropertyChanged(nameof(Drive));
+        _state.Tone.ValueChanged += () => this.RaisePropertyChanged(nameof(Tone));
+        _state.Bottom.ValueChanged += () => this.RaisePropertyChanged(nameof(Bottom));
+        _state.SoloSw.ValueChanged += () => this.RaisePropertyChanged(nameof(SoloSw));
+        _state.SoloLevel.ValueChanged += () => this.RaisePropertyChanged(nameof(SoloLevel));
+        _state.EffectLevel.ValueChanged += () => this.RaisePropertyChanged(nameof(EffectLevel));
         _state.BoosterDirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(DirectMix));
     }
 

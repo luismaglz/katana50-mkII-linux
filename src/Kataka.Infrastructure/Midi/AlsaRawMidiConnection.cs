@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Text;
+
 using Kataka.Application.Midi;
 using Kataka.Domain.Midi;
 
@@ -337,8 +338,8 @@ internal sealed partial class AlsaRawMidiConnection : IMidiConnection
     private static partial class Libc
     {
         public const int O_RDWR = 2;
-        public const int EINTR  = 4;   // Interrupted system call
-        public const int EBADF  = 9;   // Bad file descriptor (fd was closed)
+        public const int EINTR = 4;   // Interrupted system call
+        public const int EBADF = 9;   // Bad file descriptor (fd was closed)
 
         [LibraryImport("libc", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
         public static partial int open(string path, int flags);

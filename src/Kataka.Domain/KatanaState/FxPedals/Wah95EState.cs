@@ -7,11 +7,11 @@ public class Wah95EState
     public Wah95EState(bool isMod)
     {
         var p = isMod ? KatanaMkIIParameterCatalog.ModWah95EParams : KatanaMkIIParameterCatalog.FxWah95EParams;
-        PedalPos    = new AmpControlState(p[0], description: "Adjusts the position of the wah pedal. This parameter is used after it has been assigned to an EXP Pedal or similar controller.");
-        PedalMin    = new AmpControlState(p[1], description: "Selects the tone produced when the heel of the EXP Pedal is depressed.");
-        PedalMax    = new AmpControlState(p[2], description: "Selects the tone produced when the toe of the EXP Pedal is depressed.");
+        PedalPos = new AmpControlState(p[0], description: "Adjusts the position of the wah pedal. This parameter is used after it has been assigned to an EXP Pedal or similar controller.");
+        PedalMin = new AmpControlState(p[1], description: "Selects the tone produced when the heel of the EXP Pedal is depressed.");
+        PedalMax = new AmpControlState(p[2], description: "Selects the tone produced when the toe of the EXP Pedal is depressed.");
         EffectLevel = new AmpControlState(p[3], description: "Adjusts the volume of the effect sound.");
-        DirectMix   = new AmpControlState(p[4], description: "Adjusts the volume of the direct sound.");
+        DirectMix = new AmpControlState(p[4], description: "Adjusts the volume of the direct sound.");
     }
 
     public AmpControlState PedalPos;

@@ -21,6 +21,7 @@ using ReactiveUI.Fody.Helpers;
 namespace Kataka.App.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase, IAmpSyncState
+
 {
     private static readonly TimeSpan TapResetThreshold = TimeSpan.FromSeconds(2.5);
     private readonly IKatanaState _katanaState;
@@ -687,16 +688,16 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncState
     {
         switch (parameterKey)
         {
-            case "pedal-fx-switch":       PedalFx.IsEnabled = value != 0; break;
-            case "pedal-fx-type":         PedalFx.SelectedTypeOption = PedalFxViewModel.ToPedalTypeOption(value); break;
-            case "pedal-fx-position":     PedalFx.SelectedPositionOption = PedalFxViewModel.ToPositionOption(value); break;
-            case "pedal-fx-wah-type":     PedalFx.SelectedWahTypeOption = PedalFxViewModel.ToWahTypeOption(value); break;
+            case "pedal-fx-switch": PedalFx.IsEnabled = value != 0; break;
+            case "pedal-fx-type": PedalFx.SelectedTypeOption = PedalFxViewModel.ToPedalTypeOption(value); break;
+            case "pedal-fx-position": PedalFx.SelectedPositionOption = PedalFxViewModel.ToPositionOption(value); break;
+            case "pedal-fx-wah-type": PedalFx.SelectedWahTypeOption = PedalFxViewModel.ToWahTypeOption(value); break;
             case "pedal-fx-wah-position": PedalFx.PedalPosition = value; break;
-            case "pedal-fx-wah-min":      PedalFx.PedalMinimum = value; break;
-            case "pedal-fx-wah-max":      PedalFx.PedalMaximum = value; break;
+            case "pedal-fx-wah-min": PedalFx.PedalMinimum = value; break;
+            case "pedal-fx-wah-max": PedalFx.PedalMaximum = value; break;
             case "pedal-fx-wah-effect-level": PedalFx.EffectLevel = value; break;
-            case "pedal-fx-wah-direct-mix":   PedalFx.DirectMix = value; break;
-            case "pedal-fx-foot-volume":       PedalFx.FootVolume = value; break;
+            case "pedal-fx-wah-direct-mix": PedalFx.DirectMix = value; break;
+            case "pedal-fx-foot-volume": PedalFx.FootVolume = value; break;
         }
     }
 

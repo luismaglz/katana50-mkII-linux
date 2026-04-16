@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -62,12 +63,12 @@ public abstract class RotaryKnobBase : Control
     public static readonly StyledProperty<int?> DisplayMaximumProperty =
         AvaloniaProperty.Register<RotaryKnobBase, int?>(nameof(DisplayMaximum), null);
 
-    protected static readonly SolidColorBrush LabelBrush  = new(Color.Parse("#d8d5cb"));
-    protected static readonly SolidColorBrush ValueBrush  = new(Color.Parse("#ffcf66"));
+    protected static readonly SolidColorBrush LabelBrush = new(Color.Parse("#d8d5cb"));
+    protected static readonly SolidColorBrush ValueBrush = new(Color.Parse("#ffcf66"));
 
-    private bool  _isDragging;
+    private bool _isDragging;
     private Point _dragStart;
-    private int   _dragStartValue;
+    private int _dragStartValue;
 
     static RotaryKnobBase()
     {
@@ -79,7 +80,7 @@ public abstract class RotaryKnobBase : Control
         AffectsMeasure<RotaryKnobBase>(ScaleProperty);
         FocusableProperty.OverrideDefaultValue<RotaryKnobBase>(true);
 
-        LabelProperty.Changed      .AddClassHandler<RotaryKnobBase>((k, _) => k.UpdateTooltip());
+        LabelProperty.Changed.AddClassHandler<RotaryKnobBase>((k, _) => k.UpdateTooltip());
         DescriptionProperty.Changed.AddClassHandler<RotaryKnobBase>((k, _) => k.UpdateTooltip());
     }
 
@@ -185,7 +186,7 @@ public abstract class RotaryKnobBase : Control
         {
             if (HasDisplayRange)
             {
-                var wireRange    = Math.Max(1, Maximum - Minimum);
+                var wireRange = Math.Max(1, Maximum - Minimum);
                 var displayRange = DisplayMaximum!.Value - DisplayMinimum!.Value;
                 var displayValue = (int)Math.Round(
                     DisplayMinimum.Value + (double)(Math.Clamp(Value, Minimum, Maximum) - Minimum) / wireRange * displayRange);
@@ -197,7 +198,7 @@ public abstract class RotaryKnobBase : Control
             if (!IsBipolar)
                 return Value.ToString(CultureInfo.InvariantCulture);
 
-            var mid    = (Minimum + Maximum) / 2;
+            var mid = (Minimum + Maximum) / 2;
             var offset = Value - mid;
             return offset > 0
                 ? $"+{offset}"
@@ -220,7 +221,7 @@ public abstract class RotaryKnobBase : Control
     private void UpdateTooltip()
     {
         var label = Label;
-        var desc  = Description;
+        var desc = Description;
 
         if (string.IsNullOrWhiteSpace(label) && string.IsNullOrWhiteSpace(desc))
         {
@@ -232,16 +233,16 @@ public abstract class RotaryKnobBase : Control
         if (!string.IsNullOrWhiteSpace(label))
             panel.Children.Add(new TextBlock
             {
-                Text       = label,
-                FontSize   = 13,
+                Text = label,
+                FontSize = 13,
                 FontWeight = FontWeight.SemiBold
             });
         if (!string.IsNullOrWhiteSpace(desc))
             panel.Children.Add(new TextBlock
             {
-                Text        = desc,
-                FontSize    = 11,
-                MaxWidth    = 260,
+                Text = desc,
+                FontSize = 11,
+                MaxWidth = 260,
                 TextWrapping = TextWrapping.Wrap
             });
 
@@ -255,8 +256,8 @@ public abstract class RotaryKnobBase : Control
         base.OnPointerPressed(e);
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
         Focus();
-        _isDragging    = true;
-        _dragStart      = e.GetPosition(this);
+        _isDragging = true;
+        _dragStart = e.GetPosition(this);
         _dragStartValue = Value;
         e.Pointer.Capture(this);
         e.Handled = true;
@@ -266,12 +267,12 @@ public abstract class RotaryKnobBase : Control
     {
         base.OnPointerMoved(e);
         if (!_isDragging) return;
-        var current  = e.GetPosition(this);
-        var delta    = (_dragStart.Y - current.Y) + ((current.X - _dragStart.X) * 0.35);
-        var range    = Math.Max(1, Maximum - Minimum);
+        var current = e.GetPosition(this);
+        var delta = (_dragStart.Y - current.Y) + ((current.X - _dragStart.X) * 0.35);
+        var range = Math.Max(1, Maximum - Minimum);
         var adjusted = _dragStartValue + (int)Math.Round(delta * range / 180.0);
-        Value        = Math.Clamp(adjusted, Minimum, Maximum);
-        e.Handled    = true;
+        Value = Math.Clamp(adjusted, Minimum, Maximum);
+        e.Handled = true;
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
@@ -287,7 +288,7 @@ public abstract class RotaryKnobBase : Control
     {
         base.OnPointerWheelChanged(e);
         var step = Math.Max(1, (Maximum - Minimum) / 40);
-        Value    = Math.Clamp(Value + ((e.Delta.Y > 0 ? 1 : -1) * step), Minimum, Maximum);
+        Value = Math.Clamp(Value + ((e.Delta.Y > 0 ? 1 : -1) * step), Minimum, Maximum);
         e.Handled = true;
     }
 
@@ -299,12 +300,12 @@ public abstract class RotaryKnobBase : Control
         {
             case Key.Up:
             case Key.Right:
-                Value    = Math.Clamp(Value + step, Minimum, Maximum);
+                Value = Math.Clamp(Value + step, Minimum, Maximum);
                 e.Handled = true;
                 break;
             case Key.Down:
             case Key.Left:
-                Value    = Math.Clamp(Value - step, Minimum, Maximum);
+                Value = Math.Clamp(Value - step, Minimum, Maximum);
                 e.Handled = true;
                 break;
         }
