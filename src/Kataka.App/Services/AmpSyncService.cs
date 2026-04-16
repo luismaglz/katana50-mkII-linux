@@ -45,9 +45,12 @@ public interface IAmpSyncService
     bool HasPendingWrites();
     string DescribePendingWrites();
     void ClearPendingWrites();
-    Task<bool> TryReadAmpControlsAsync();
-    Task<bool> TryReadPanelControlsAsync();
-    Task<bool> TryReadPedalControlsAsync();
+
+    Task<bool> TryRefreshAmpStateAsync();
+
+    // Task<bool> TryReadAmpControlsAsync();
+    // Task<bool> TryReadPanelControlsAsync();
+    // Task<bool> TryReadPedalControlsAsync();
     Task<bool> TryWritePatchLevelAsync();
 }
 
@@ -243,7 +246,15 @@ public sealed class AmpSyncService : IAmpSyncService
         _pendingPanelChannel = null;
     }
 
-    // ── Public read operations ────────────────────────────────────────────────
+    public async Task<bool> TryRefreshAmpStateAsync()
+    {
+        await TryReadAmpControlsAsync();
+        await TryReadPanelControlsAsync();
+        await TryReadPedalControlsAsync();
+        return true;
+    }
+
+// ── Public read operations ────────────────────────────────────────────────
 
     public async Task<bool> TryReadAmpControlsAsync()
     {

@@ -14,7 +14,6 @@ using Kataka.App.Services;
 using Kataka.Application.Katana;
 using Kataka.Domain.KatanaState;
 using Kataka.Domain.Midi;
-using Kataka.Infrastructure.Midi;
 
 namespace Kataka.App.ViewModels;
 
@@ -26,12 +25,8 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
     private readonly IKatanaSession katanaSession;
     private readonly Dictionary<string, string> outputPortIds = [];
     private readonly IAmpSyncService syncService;
-    private DateTimeOffset? lastDelayTapAt;
 
-    public MainWindowViewModel() : this(new KatanaSession(DefaultMidiTransport.Create()), new KatanaState(),
-        new AmpSyncService(new KatanaSession(DefaultMidiTransport.Create()), new KatanaState()))
-    {
-    }
+    private DateTimeOffset? lastDelayTapAt;
 
     public MainWindowViewModel(IKatanaSession katanaSession, IKatanaState katanaState, IAmpSyncService ampSyncService)
     {
@@ -40,11 +35,12 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
         syncService = ampSyncService;
 
         // AmpControls are driven by domain state — VMs wrap AmpControlState directly.
-        var ampStatesByKey = katanaState.GetAmpControlsByKey();
-        foreach (var parameter in KatanaMkIIParameterCatalog.AmpEditorControls)
-        {
-            AmpControls.Add(new AmpControlViewModel(ampStatesByKey[parameter.Key]));
-        }
+        // var ampStatesByKey = katanaState.GetAmpControlsByKey();
+        // foreach (var parameter in KatanaMkIIParameterCatalog.AmpEditorControls)
+        // {
+        //     AmpControls.Add(new AmpControlViewModel(ampStatesByKey[parameter.Key]));
+        // }
+
 
         // Subscribe to domain state changes that drive the panel-level VM properties.
         katanaState.AmpType.ValueChanged += () =>
@@ -138,8 +134,10 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
     [NotifyCanExecuteChangedFor(nameof(SavePatchCommand))]
     public partial bool IsConnected { get; set; }
 
-    public ObservableCollection<AmpControlViewModel> AmpControls { get; } = [];
+    // //TODO: Remove
+    // public ObservableCollection<AmpControlViewModel> AmpControls { get; } = [];
 
+    public ObservableCollection<AmpControlViewModel> AmpControls { get; }
     public ObservableCollection<IBasePedal> PanelEffects { get; } = [];
 
     public PedalFxViewModel PedalFx { get; } = new();
@@ -355,9 +353,7 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             await katanaSession.LoadPatchAsync(patch);
 
             AppendLog("Patch loaded. Refreshing display...");
-            await syncService.TryReadAmpControlsAsync();
-            await syncService.TryReadPanelControlsAsync();
-            await syncService.TryReadPedalControlsAsync();
+            await syncService.TryRefreshAmpStateAsync();
             StatusMessage = $"Patch '{patch.Name}' loaded.";
         }
         catch (Exception ex)
@@ -524,18 +520,16 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             AppendLog("MIDI ports opened successfully.");
 
             AppendLog("Auto-loading amp, panel, and pedal state.");
-            var ampLoaded = await syncService.TryReadAmpControlsAsync();
-            var panelLoaded = await syncService.TryReadPanelControlsAsync();
-            var pedalLoaded = await syncService.TryReadPedalControlsAsync();
+            await syncService.TryRefreshAmpStateAsync();
 
-            StatusMessage = (ampLoaded, panelLoaded, pedalLoaded) switch
-            {
-                (true, true, true) => "MIDI ports opened and the current amp, panel, and pedal state was loaded.",
-                (true, true, false) => "MIDI ports opened. Amp and panel state loaded, but pedal refresh failed.",
-                (true, false, true) => "MIDI ports opened. Amp and pedal state loaded, but panel refresh failed.",
-                (false, true, true) => "MIDI ports opened. Panel and pedal state loaded, but amp refresh failed.",
-                _ => "MIDI ports opened, but part of the initial state refresh failed."
-            };
+            // StatusMessage = (ampLoaded, panelLoaded, pedalLoaded) switch
+            // {
+            //     (true, true, true) => "MIDI ports opened and the current amp, panel, and pedal state was loaded.",
+            //     (true, true, false) => "MIDI ports opened. Amp and panel state loaded, but pedal refresh failed.",
+            //     (true, false, true) => "MIDI ports opened. Amp and pedal state loaded, but panel refresh failed.",
+            //     (false, true, true) => "MIDI ports opened. Panel and pedal state loaded, but amp refresh failed.",
+            //     _ => "MIDI ports opened, but part of the initial state refresh failed."
+            // };
         }
         catch (Exception ex)
         {
@@ -608,56 +602,56 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             return;
         }
 
-        await syncService.TryReadAmpControlsAsync();
+        await syncService.TryRefreshAmpStateAsync();
     }
 
-    [RelayCommand]
-    private async Task WriteAmpControlsAsync()
-    {
-        if (!katanaSession.IsConnected)
-        {
-            StatusMessage = "Connect to a MIDI port before writing amp controls.";
-            return;
-        }
-
-        try
-        {
-            AppendLog("Writing Katana amp editor controls.");
-            var mismatches = new List<string>();
-
-            foreach (var control in AmpControls)
-            {
-                var requestedValue = Math.Clamp(control.Value, control.Minimum, control.Maximum);
-                if (requestedValue != control.Value)
-                {
-                    control.Value = requestedValue;
-                    AppendLog($"Clamped {control.DisplayName} to {requestedValue}.");
-                }
-
-                AppendLog($"Writing {control.DisplayName} = {requestedValue}.");
-                var confirmedValue = await katanaSession.WriteParameterAsync(control.Parameter, (byte)requestedValue);
-                control.Value = confirmedValue;
-                AppendLog($"{control.DisplayName} confirmed at {confirmedValue}.");
-
-                if (confirmedValue != requestedValue) mismatches.Add($"{control.DisplayName} ({requestedValue}->{confirmedValue})");
-            }
-
-            StatusMessage = mismatches.Count == 0
-                ? "Amp editor controls updated successfully."
-                : "Amp editor write completed, but some read-back values differed.";
-            AmpEditorStatus = mismatches.Count == 0
-                ? "Amp editor values were written and confirmed."
-                : $"Read-back mismatches: {string.Join(", ", mismatches)}";
-        }
-        catch (Exception ex)
-        {
-            AmpEditorStatus = "Amp editor write failed.";
-            StatusMessage = ex.Message;
-            AppendLog("Amp editor write failed.");
-            AppendLog(ex.ToString());
-            Console.Error.WriteLine(ex);
-        }
-    }
+    // [RelayCommand]
+    // private async Task WriteAmpControlsAsync()
+    // {
+    //     if (!katanaSession.IsConnected)
+    //     {
+    //         StatusMessage = "Connect to a MIDI port before writing amp controls.";
+    //         return;
+    //     }
+    //
+    //     try
+    //     {
+    //         AppendLog("Writing Katana amp editor controls.");
+    //         var mismatches = new List<string>();
+    //
+    //         foreach (var control in AmpControls)
+    //         {
+    //             var requestedValue = Math.Clamp(control.Value, control.Minimum, control.Maximum);
+    //             if (requestedValue != control.Value)
+    //             {
+    //                 control.Value = requestedValue;
+    //                 AppendLog($"Clamped {control.DisplayName} to {requestedValue}.");
+    //             }
+    //
+    //             AppendLog($"Writing {control.DisplayName} = {requestedValue}.");
+    //             var confirmedValue = await katanaSession.WriteParameterAsync(control.Parameter, requestedValue);
+    //             control.Value = confirmedValue;
+    //             AppendLog($"{control.DisplayName} confirmed at {confirmedValue}.");
+    //
+    //             if (confirmedValue != requestedValue) mismatches.Add($"{control.DisplayName} ({requestedValue}->{confirmedValue})");
+    //         }
+    //
+    //         StatusMessage = mismatches.Count == 0
+    //             ? "Amp editor controls updated successfully."
+    //             : "Amp editor write completed, but some read-back values differed.";
+    //         AmpEditorStatus = mismatches.Count == 0
+    //             ? "Amp editor values were written and confirmed."
+    //             : $"Read-back mismatches: {string.Join(", ", mismatches)}";
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         AmpEditorStatus = "Amp editor write failed.";
+    //         StatusMessage = ex.Message;
+    //         AppendLog("Amp editor write failed.");
+    //         AppendLog(ex.ToString());
+    //         Console.Error.WriteLine(ex);
+    //     }
+    // }
 
     [RelayCommand]
     private async Task ReadPanelControlsAsync()
@@ -668,7 +662,7 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             return;
         }
 
-        await syncService.TryReadPanelControlsAsync();
+        await syncService.TryRefreshAmpStateAsync();
     }
 
     [RelayCommand]
@@ -680,7 +674,7 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             return;
         }
 
-        await syncService.TryReadPedalControlsAsync();
+        await syncService.TryRefreshAmpStateAsync();
     }
 
     [RelayCommand]

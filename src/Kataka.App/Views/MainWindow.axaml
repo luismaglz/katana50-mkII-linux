@@ -15,8 +15,9 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="Kataka - Amp Panel">
 
+
     <Design.DataContext>
-        <dvm:DesignMainWindowViewModel/>
+        <dvm:DesignMainWindowViewModel />
     </Design.DataContext>
 
     <Grid RowDefinitions="Auto,*" Margin="20" RowSpacing="18">
@@ -92,7 +93,8 @@
                                 <StackPanel Spacing="10">
                                     <StackPanel Spacing="4">
                                         <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                                            <Image Source="/Assets/amplifier.png" Width="28" Height="28" VerticalAlignment="Center" />
+                                            <Image Source="/Assets/amplifier.png" Width="28" Height="28"
+                                                   VerticalAlignment="Center" />
                                             <TextBlock Text="AMP CONTROLS"
                                                        FontSize="16"
                                                        FontWeight="Bold"
@@ -119,22 +121,27 @@
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
+                                    <views:PanelView></views:PanelView>
                                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                                         <StackPanel Spacing="4">
-                                            <TextBlock Text="AMP TYPE" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                            <TextBlock Text="AMP TYPE" FontSize="10" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource KatanaSubtleTextBrush}" />
                                             <ComboBox Classes="midi-port-picker" HorizontalAlignment="Stretch"
                                                       ItemsSource="{x:Static vm:MainWindowViewModel.AmpTypeOptions}"
                                                       SelectedItem="{Binding SelectedAmpType}" />
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Spacing="4">
-                                            <TextBlock Text="CABINET" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                                            <TextBlock Text="CABINET" FontSize="10" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource KatanaSubtleTextBrush}" />
                                             <ComboBox Classes="midi-port-picker" HorizontalAlignment="Stretch"
                                                       ItemsSource="{x:Static vm:MainWindowViewModel.CabinetResonanceOptions}"
                                                       SelectedItem="{Binding SelectedCabinetResonance}" />
                                         </StackPanel>
                                     </Grid>
                                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                        <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource KatanaSubtleTextBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource KatanaSubtleTextBrush}"
+                                                   VerticalAlignment="Center" />
                                         <ToggleButton IsChecked="{Binding IsAmpVariation}"
                                                       Classes="effect-toggle"
                                                       Content="TYPE 2"
@@ -193,11 +200,13 @@
                                                              Value="{Binding PatchLevel}" />
                                         <Border Classes="panel-section" Padding="12" MinWidth="160">
                                             <StackPanel Spacing="8">
-                                                <TextBlock Text="TAP TEMPO" FontWeight="Bold" FontSize="12" LetterSpacing="1.2" />
+                                                <TextBlock Text="TAP TEMPO" FontWeight="Bold" FontSize="12"
+                                                           LetterSpacing="1.2" />
                                                 <TextBlock Text="{Binding DelayTapStatus}"
                                                            TextWrapping="Wrap" FontSize="11"
                                                            Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                                <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding DelayTimeMs, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                                <StackPanel Orientation="Horizontal" Spacing="8"
+                                                            IsVisible="{Binding DelayTimeMs, Converter={x:Static ObjectConverters.IsNotNull}}">
                                                     <TextBlock Text="{Binding DelayTimeMs, StringFormat='{}{0} ms'}"
                                                                FontSize="20" FontWeight="Bold"
                                                                Foreground="{StaticResource KatanaAccentBrush}" />
@@ -227,8 +236,10 @@
                                 </Border>
                                 <Border Classes="panel-section" Padding="16">
                                     <StackPanel Spacing="8">
-                                        <TextBlock Text="LIVE STATUS" FontSize="16" FontWeight="Bold" LetterSpacing="1.5" />
-                                        <TextBlock Text="{Binding StatusMessage}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                        <TextBlock Text="LIVE STATUS" FontSize="16" FontWeight="Bold"
+                                                   LetterSpacing="1.5" />
+                                        <TextBlock Text="{Binding StatusMessage}" FontWeight="SemiBold"
+                                                   TextWrapping="Wrap" />
                                         <TextBlock Text="{Binding DetectionMessage}" TextWrapping="Wrap" FontSize="11"
                                                    Foreground="{StaticResource KatanaSubtleTextBrush}" />
                                     </StackPanel>
@@ -250,9 +261,10 @@
                                    FontSize="18"
                                    FontWeight="Bold"
                                    LetterSpacing="1.5" />
-                        <TextBlock Text="The log stays pinned beside the amp controls so you can watch protocol traffic without scrolling away from the panel."
-                                   TextWrapping="Wrap"
-                                   Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                        <TextBlock
+                            Text="The log stays pinned beside the amp controls so you can watch protocol traffic without scrolling away from the panel."
+                            TextWrapping="Wrap"
+                            Foreground="{StaticResource KatanaSubtleTextBrush}" />
                     </StackPanel>
 
                     <TextBox Grid.Row="1"
