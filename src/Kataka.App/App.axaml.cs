@@ -1,11 +1,6 @@
-using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
-using Avalonia.Data.Core.Plugins;
-using System.Linq;
 using Avalonia.Markup.Xaml;
-using Kataka.Application.Katana;
-using Kataka.Infrastructure.Midi;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Kataka.App.ViewModels;
 using Kataka.App.Views;
 
@@ -22,10 +17,10 @@ public partial class App : Avalonia.Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainWindowViewModel(new KatanaSession(DefaultMidiTransport.Create())),
-            };
+            var vm = Ioc.Default.GetRequiredService<MainWindowViewModel>();
+            var window = new MainWindow { DataContext = vm };
+            window.Closing += (_, _) => vm.Shutdown();
+            desktop.MainWindow = window;
         }
 
         base.OnFrameworkInitializationCompleted();
