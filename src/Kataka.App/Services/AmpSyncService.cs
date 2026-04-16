@@ -13,7 +13,6 @@ namespace Kataka.App.Services;
 public sealed class AmpSyncService
 {
     private static readonly TimeSpan WriteSyncDebounce = TimeSpan.FromMilliseconds(125);
-    private static readonly TimeSpan ReadSyncInterval  = TimeSpan.FromSeconds(2);
 
     private readonly IKatanaSession _session;
     private IAmpSyncContext _context = null!;
@@ -25,13 +24,10 @@ public sealed class AmpSyncService
     private readonly Dictionary<string, byte> _pendingWrites = [];
     private string? _pendingPanelChannel;
 
-    private readonly SemaphoreSlim  _syncGate = new(1, 1);
+    private readonly SemaphoreSlim   _syncGate = new(1, 1);
     private readonly DispatcherTimer _writeSyncTimer;
-    private readonly DispatcherTimer _readSyncTimer;
 
-    private int  _activeReadSyncPhase;
     private int  _flushRetryCount;
-    private bool _suspendActiveReadSync;
     private bool _isShuttingDown;
 
     // ── Construction ──────────────────────────────────────────────────────────
@@ -47,18 +43,10 @@ public sealed class AmpSyncService
             await FlushPendingWritesAsync();
             if (HasPendingWrites()) UpdateWriteSyncTimer();
         };
-
-        _readSyncTimer = new DispatcherTimer { Interval = ReadSyncInterval };
-        _readSyncTimer.Tick += async (_, _) =>
-        {
-            _readSyncTimer.Stop();
-            await RunActiveReadSyncCycleAsync();
-            if (ShouldRunActiveReadSync()) UpdateReadSyncTimer();
-        };
     }
 
     /// <summary>
-    /// Wires up change-tracking subscriptions to the VM's collections and starts the sync timers.
+    /// Wires up change-tracking subscriptions to the VM's collections and starts the write timer.
     /// Call after AmpControls, PanelEffects, PedalFx, and Pedalboard are fully populated.
     /// </summary>
     public void Initialize(IAmpSyncContext context)
@@ -100,14 +88,12 @@ public sealed class AmpSyncService
             if (value < 0 || value >= PedalboardViewModel.ChainPatternNames.Length) return;
             _pendingWrites[KatanaMkIIParameterCatalog.ChainPattern.Key] = (byte)value;
             _context.Log($"Queued panel sync: Chain Pattern -> {PedalboardViewModel.ChainPatternNames[value]}.");
-            PauseActiveReadSync("queued writes are pending");
             UpdateWriteSyncTimer();
         };
 
         context.PedalFx.PropertyChanged += (_, args) => TrackPedalChange(args.PropertyName);
 
         UpdateWriteSyncTimer();
-        UpdateReadSyncTimer();
     }
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -128,15 +114,14 @@ public sealed class AmpSyncService
         _pushHandlerLookup.Clear();
     }
 
-    /// <summary>Stops both sync timers immediately. Call from the window Closing handler.</summary>
+    /// <summary>Stops the write sync timer immediately. Call from the window Closing handler.</summary>
     public void Shutdown()
     {
         _isShuttingDown = true;
         _writeSyncTimer.Stop();
-        _readSyncTimer.Stop();
     }
 
-    /// <summary>Clears the pending write queue and updates timers. Call on IsConnected change.</summary>
+    /// <summary>Clears the pending write queue and updates the write timer. Call on IsConnected change.</summary>
     public void OnConnectionChanged(bool connected)
     {
         if (!connected)
@@ -151,7 +136,6 @@ public sealed class AmpSyncService
         }
 
         UpdateWriteSyncTimer();
-        UpdateReadSyncTimer();
     }
 
     // ── Change tracking ───────────────────────────────────────────────────────
@@ -166,7 +150,6 @@ public sealed class AmpSyncService
         if (_context.SuppressChangeTracking || !_context.ActiveWriteSync || !_context.IsConnected) return;
         _pendingWrites[key] = value;
         _context.Log($"Queued panel sync: {logMessage}.");
-        PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
     }
 
@@ -175,7 +158,6 @@ public sealed class AmpSyncService
         if (_context.SuppressChangeTracking || !_context.ActiveWriteSync || !_context.IsConnected) return;
         _pendingPanelChannel = displayName;
         _context.Log($"Queued panel channel sync: {displayName}.");
-        PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
     }
 
@@ -185,7 +167,6 @@ public sealed class AmpSyncService
         var clampedValue = Math.Clamp(control.Value, control.Minimum, control.Maximum);
         _pendingWrites[control.Parameter.Key] = (byte)clampedValue;
         _context.Log($"Queued amp sync: {control.DisplayName} -> {clampedValue}.");
-        PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
     }
 
@@ -194,7 +175,6 @@ public sealed class AmpSyncService
         if (_context.SuppressChangeTracking || !_context.ActiveWriteSync || !_context.IsConnected) return;
         _pendingWrites[effect.Definition.SwitchParameter.Key] = effect.IsEnabled ? (byte)1 : (byte)0;
         _context.Log($"Queued panel sync: {effect.DisplayName} -> {(effect.IsEnabled ? "On" : "Off")}.");
-        PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
     }
 
@@ -205,7 +185,6 @@ public sealed class AmpSyncService
         if (!effect.TryGetTypeValue(effect.SelectedTypeOption, out var typeValue)) return;
         _pendingWrites[effect.Definition.TypeParameter.Key] = typeValue;
         _context.Log($"Queued panel type sync: {effect.DisplayName} -> {effect.SelectedTypeOption}.");
-        PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
     }
 
@@ -214,7 +193,6 @@ public sealed class AmpSyncService
         if (_context.SuppressChangeTracking || !_context.ActiveWriteSync || !_context.IsConnected) return;
         _pendingWrites[key] = (byte)Math.Clamp(value, 0, 127);
         _context.Log($"Queued detail param sync: {key} -> {value}.");
-        PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
     }
 
@@ -224,7 +202,6 @@ public sealed class AmpSyncService
         if (!_context.PedalFx.TryGetParameterValue(propertyName, out var parameter, out var value, out var description)) return;
         _pendingWrites[parameter.Key] = value;
         _context.Log($"Queued pedal sync: {parameter.DisplayName} -> {description}.");
-        PauseActiveReadSync("queued writes are pending");
         UpdateWriteSyncTimer();
     }
 
@@ -237,12 +214,6 @@ public sealed class AmpSyncService
             _writeSyncTimer.Start();
     }
 
-    public void UpdateReadSyncTimer()
-    {
-        _readSyncTimer.Stop();
-        if (ShouldRunActiveReadSync()) _readSyncTimer.Start();
-    }
-
     // ── State queries ─────────────────────────────────────────────────────────
 
     public bool HasPendingWrites() => _pendingWrites.Count > 0 || _pendingPanelChannel is not null;
@@ -251,8 +222,8 @@ public sealed class AmpSyncService
     {
         if (_pendingWrites.Count == 0 && _pendingPanelChannel is null) return "no pending changes";
         var parts = new List<string>();
-        if (_pendingWrites.Count > 0)          parts.Add($"{_pendingWrites.Count} writes");
-        if (_pendingPanelChannel is not null)   parts.Add("channel");
+        if (_pendingWrites.Count > 0)        parts.Add($"{_pendingWrites.Count} writes");
+        if (_pendingPanelChannel is not null) parts.Add("channel");
         return string.Join(", ", parts);
     }
 
@@ -260,30 +231,6 @@ public sealed class AmpSyncService
     {
         _pendingWrites.Clear();
         _pendingPanelChannel = null;
-    }
-
-    private bool ShouldRunActiveReadSync()
-        => _context is not null
-           && _context.ActiveReadSync && _context.IsConnected
-           && !_suspendActiveReadSync && !HasPendingWrites();
-
-    // ── Read sync pause / resume ──────────────────────────────────────────────
-
-    public void PauseActiveReadSync(string reason)
-    {
-        if (!_suspendActiveReadSync)
-            _context.Log($"Active read sync paused: {reason}.");
-        _suspendActiveReadSync = true;
-        UpdateReadSyncTimer();
-    }
-
-    public void ResumeActiveReadSync(string reason)
-    {
-        var wasSuspended = _suspendActiveReadSync;
-        _suspendActiveReadSync = false;
-        UpdateReadSyncTimer();
-        if (wasSuspended && _context.ActiveReadSync && _context.IsConnected)
-            _context.Log($"Active read sync resumed: {reason}.");
     }
 
     // ── Write flush loop ──────────────────────────────────────────────────────
@@ -304,10 +251,8 @@ public sealed class AmpSyncService
 
         try
         {
-            PauseActiveReadSync("queued write sync is flushing");
-
             foreach (var entry in _pendingWrites) snapshot[entry.Key] = entry.Value;
-            channelSnapshot    = _pendingPanelChannel;
+            channelSnapshot      = _pendingPanelChannel;
             _pendingWrites.Clear();
             _pendingPanelChannel = null;
 
@@ -345,16 +290,6 @@ public sealed class AmpSyncService
             await FlushPendingPedalWritesAsync(pedalSnapshot);
             await FlushPendingDetailParamWritesAsync(detailParamSnapshot);
 
-            if (_context.ActiveReadSync)
-            {
-                _context.Log("Active read sync is enabled; refreshing written state from the Katana.");
-                await RefreshWrittenStateAsync(ampSnapshot, panelSwitchSnapshot, panelTypeSnapshot, pedalSnapshot, channelSnapshot);
-            }
-            else
-            {
-                _context.Log("Active read sync is disabled; skipping post-write refresh.");
-            }
-
             if (snapshot.Count > 0 || channelSnapshot is not null)
             {
                 _context.StatusMessage = "Queued changes synced to the Katana.";
@@ -374,49 +309,6 @@ public sealed class AmpSyncService
             _context.Log(ex.ToString());
             Console.Error.WriteLine(ex);
             await Task.Delay(backoffMs);
-        }
-        finally
-        {
-            ResumeActiveReadSync("queued write sync finished");
-            _syncGate.Release();
-        }
-    }
-
-    private async Task RunActiveReadSyncCycleAsync()
-    {
-        if (_isShuttingDown || !ShouldRunActiveReadSync()) return;
-
-        if (HasPendingWrites())
-        {
-            _context.Log("Active read sync deferred because queued writes are waiting to flush.");
-            return;
-        }
-
-        if (!_syncGate.Wait(0))
-        {
-            _context.Log("Active read sync skipped because another sync operation is already running.");
-            return;
-        }
-
-        try
-        {
-            switch (_activeReadSyncPhase)
-            {
-                case 0:
-                    _context.Log("Active read sync polling amp controls.");
-                    await TryReadAmpControlsAsync(backgroundSync: true);
-                    break;
-                case 1:
-                    _context.Log("Active read sync polling panel state.");
-                    await TryReadPanelControlsAsync(backgroundSync: true);
-                    break;
-                default:
-                    _context.Log("Active read sync polling pedal state.");
-                    await TryReadPedalControlsAsync(backgroundSync: true);
-                    break;
-            }
-
-            _activeReadSyncPhase = (_activeReadSyncPhase + 1) % 3;
         }
         finally
         {
@@ -560,142 +452,13 @@ public sealed class AmpSyncService
         }
     }
 
-    private async Task RefreshWrittenStateAsync(
-        IReadOnlyDictionary<string, byte> ampWrites,
-        IReadOnlyDictionary<string, byte> panelSwitchWrites,
-        IReadOnlyDictionary<string, byte> panelTypeWrites,
-        IReadOnlyDictionary<string, byte> pedalWrites,
-        string? channelWrite)
-    {
-        if (ampWrites.Count > 0)
-        {
-            var ampParameters = ampWrites.Keys
-                .Distinct(StringComparer.Ordinal)
-                .Select(key => _ampControlsByKey[key].Parameter)
-                .ToArray();
-            _context.Log($"Read sync refreshing amp values: {DescribeAmpKeys(ampWrites.Keys)}.");
-            var values = await _session.ReadParametersAsync(ampParameters);
-
-            ApplyDeviceState(() =>
-            {
-                foreach (var parameter in ampParameters)
-                {
-                    var control = _ampControlsByKey[parameter.Key];
-                    var expectedValue = ampWrites[parameter.Key];
-                    if (_pendingWrites.ContainsKey(parameter.Key) || control.Value != expectedValue)
-                    {
-                        _context.Log($"Skipping stale amp readback for {control.DisplayName}; a newer local value is pending.");
-                        continue;
-                    }
-                    control.Value = values[parameter.Key];
-                }
-            });
-        }
-
-        if (panelSwitchWrites.Count > 0)
-        {
-            var panelParameters = panelSwitchWrites.Keys
-                .Distinct(StringComparer.Ordinal)
-                .Select(key => _panelEffectsByKey[key].Definition.SwitchParameter)
-                .ToArray();
-            _context.Log($"Read sync refreshing panel values: {DescribePanelKeys(panelSwitchWrites.Keys)}.");
-            var values = await _session.ReadParametersAsync(panelParameters);
-
-            ApplyDeviceState(() =>
-            {
-                foreach (var parameter in panelParameters)
-                {
-                    var effect = _panelEffectsByKey[parameter.Key];
-                    var expectedValue = panelSwitchWrites[parameter.Key];
-                    if (_pendingWrites.ContainsKey(parameter.Key) || effect.IsEnabled != (expectedValue != 0))
-                    {
-                        _context.Log($"Skipping stale panel readback for {effect.DisplayName}; a newer local value is pending.");
-                        continue;
-                    }
-                    effect.IsEnabled = values[parameter.Key] != 0;
-                }
-            });
-        }
-
-        if (panelTypeWrites.Count > 0)
-        {
-            var typeParameters = _context.PanelEffects
-                .Where(ef => ef.Definition.TypeParameter is not null && panelTypeWrites.ContainsKey(ef.Definition.TypeParameter.Key))
-                .Select(ef => ef.Definition.TypeParameter!)
-                .ToArray();
-            _context.Log($"Read sync refreshing panel types: {string.Join(", ", typeParameters.Select(p => p.DisplayName))}.");
-            var values = await _session.ReadParametersAsync(typeParameters);
-
-            ApplyDeviceState(() =>
-            {
-                foreach (var parameter in typeParameters)
-                {
-                    var effect = _context.PanelEffects.First(p => p.Definition.TypeParameter?.Key == parameter.Key);
-                    var expectedValue = panelTypeWrites[parameter.Key];
-                    if (_pendingWrites.ContainsKey(parameter.Key) ||
-                        !effect.TryGetTypeValue(effect.SelectedTypeOption, out var currentValue) ||
-                        currentValue != expectedValue)
-                    {
-                        _context.Log($"Skipping stale panel type readback for {effect.DisplayName}; a newer local value is pending.");
-                        continue;
-                    }
-                    effect.SelectedTypeOption = effect.ToTypeOption(values[parameter.Key]);
-                }
-            });
-        }
-
-        if (pedalWrites.Count > 0)
-        {
-            var pedalParameters = pedalWrites.Keys
-                .Select(_context.PedalFx.GetParameter)
-                .DistinctBy(p => p.Key)
-                .ToArray();
-            _context.Log($"Read sync refreshing pedal values: {DescribePedalKeys(pedalWrites.Keys)}.");
-            var values = await _session.ReadParametersAsync(pedalParameters);
-
-            ApplyDeviceState(() =>
-            {
-                foreach (var parameter in pedalParameters)
-                {
-                    var expectedValue = pedalWrites[parameter.Key];
-                    if (_pendingWrites.ContainsKey(parameter.Key) ||
-                        !_context.PedalFx.TryGetCurrentValue(parameter.Key, out var currentValue) ||
-                        currentValue != expectedValue)
-                    {
-                        _context.Log($"Skipping stale pedal readback for {parameter.DisplayName}; a newer local value is pending.");
-                        continue;
-                    }
-                    _context.ApplyPedalValue(parameter.Key, values[parameter.Key]);
-                }
-            });
-        }
-
-        if (channelWrite is not null)
-        {
-            _context.Log("Read sync refreshing current panel channel.");
-            var currentChannel = await _session.ReadCurrentPanelChannelAsync();
-            if (currentChannel is not null)
-            {
-                if (_pendingPanelChannel is not null ||
-                    !string.Equals(_context.SelectedPanelChannel, channelWrite, StringComparison.Ordinal))
-                {
-                    _context.Log("Skipping stale panel channel readback; a newer local channel selection is pending.");
-                    return;
-                }
-                ApplyDeviceState(() => _context.SelectedPanelChannel = IAmpSyncContext.ToPanelChannelDisplay(currentChannel.Value));
-            }
-        }
-    }
-
     // ── Public read operations ────────────────────────────────────────────────
 
-    public async Task<bool> TryReadAmpControlsAsync(bool backgroundSync = false)
+    public async Task<bool> TryReadAmpControlsAsync()
     {
         try
         {
-            _context.Log(backgroundSync
-                ? "Refreshing Katana amp editor controls from active read sync."
-                : "Reading Katana amp editor controls.");
+            _context.Log("Reading Katana amp editor controls.");
             var values = await _session.ReadParametersAsync(_context.AmpControls.Select(c => c.Parameter).ToArray());
             ApplyDeviceState(() =>
             {
@@ -707,22 +470,14 @@ public sealed class AmpSyncService
                 }
             });
 
-            if (!backgroundSync)
-            {
-                _context.StatusMessage   = "Amp editor controls read successfully.";
-                _context.AmpEditorStatus = "Amp editor values were loaded from the Katana.";
-            }
-
+            _context.StatusMessage   = "Amp editor controls read successfully.";
+            _context.AmpEditorStatus = "Amp editor values were loaded from the Katana.";
             return true;
         }
         catch (Exception ex)
         {
-            if (!backgroundSync)
-            {
-                _context.AmpEditorStatus = "Amp editor read failed.";
-                _context.StatusMessage   = ex.Message;
-            }
-
+            _context.AmpEditorStatus = "Amp editor read failed.";
+            _context.StatusMessage   = ex.Message;
             _context.Log("Amp editor read failed.");
             _context.Log(ex.ToString());
             Console.Error.WriteLine(ex);
@@ -730,13 +485,11 @@ public sealed class AmpSyncService
         }
     }
 
-    public async Task<bool> TryReadPanelControlsAsync(bool backgroundSync = false)
+    public async Task<bool> TryReadPanelControlsAsync()
     {
         try
         {
-            _context.Log(backgroundSync
-                ? "Refreshing Katana panel controls from active read sync."
-                : "Reading Katana panel controls.");
+            _context.Log("Reading Katana panel controls.");
 
             var currentChannel = await _session.ReadCurrentPanelChannelAsync();
             if (currentChannel is not null)
@@ -788,31 +541,24 @@ public sealed class AmpSyncService
             });
 
             _context.ResetDelayTap();
-            var patchLevelLoaded = backgroundSync ? false : await TryRefreshPatchLevelAsync();
-            var delayTimeLoaded  = backgroundSync ? false : await TryRefreshDelayTimeAsync();
+            var patchLevelLoaded = await TryRefreshPatchLevelAsync();
+            var delayTimeLoaded  = await TryRefreshDelayTimeAsync();
 
-            if (!backgroundSync)
+            _context.StatusMessage = "Panel controls read successfully.";
+            _context.PanelControlsStatus = (patchLevelLoaded, delayTimeLoaded) switch
             {
-                _context.StatusMessage = "Panel controls read successfully.";
-                _context.PanelControlsStatus = (patchLevelLoaded, delayTimeLoaded) switch
-                {
-                    (true, true)   => "Panel channel, patch level, effect toggles, variation colors, effect types, and delay time were loaded.",
-                    (true, false)  => "Panel channel, patch level, effect toggles, variation colors, and effect types were loaded. Delay time refresh failed.",
-                    (false, true)  => "Panel channel, effect toggles, variation colors, effect types, and delay time were loaded. Patch level mapping is still pending.",
-                    _              => "Panel channel, effect toggles, variation colors, and effect types were loaded. Patch level mapping is still pending, and delay time refresh failed.",
-                };
-            }
+                (true, true)   => "Panel channel, patch level, effect toggles, variation colors, effect types, and delay time were loaded.",
+                (true, false)  => "Panel channel, patch level, effect toggles, variation colors, and effect types were loaded. Delay time refresh failed.",
+                (false, true)  => "Panel channel, effect toggles, variation colors, effect types, and delay time were loaded. Patch level mapping is still pending.",
+                _              => "Panel channel, effect toggles, variation colors, and effect types were loaded. Patch level mapping is still pending, and delay time refresh failed.",
+            };
 
             return true;
         }
         catch (Exception ex)
         {
-            if (!backgroundSync)
-            {
-                _context.PanelControlsStatus = "Panel control read failed.";
-                _context.StatusMessage       = ex.Message;
-            }
-
+            _context.PanelControlsStatus = "Panel control read failed.";
+            _context.StatusMessage       = ex.Message;
             _context.Log("Panel control read failed.");
             _context.Log(ex.ToString());
             Console.Error.WriteLine(ex);
@@ -820,13 +566,11 @@ public sealed class AmpSyncService
         }
     }
 
-    public async Task<bool> TryReadPedalControlsAsync(bool backgroundSync = false)
+    public async Task<bool> TryReadPedalControlsAsync()
     {
         try
         {
-            _context.Log(backgroundSync
-                ? "Refreshing Katana pedal controls from active read sync."
-                : "Reading Katana pedal controls.");
+            _context.Log("Reading Katana pedal controls.");
             var values = await _session.ReadParametersAsync(_context.PedalFx.GetReadParameters().ToArray());
 
             ApplyDeviceState(() =>
@@ -839,24 +583,17 @@ public sealed class AmpSyncService
                 }
             });
 
-            if (!backgroundSync)
-            {
-                _context.StatusMessage = "Pedal controls read successfully.";
-                _context.PedalControlsStatus = _context.PedalFx.IsWahMode
-                    ? "Pedal FX, wah controls, and foot volume were loaded."
-                    : "Pedal FX type and foot volume were loaded. Non-wah subtype controls are not surfaced yet.";
-            }
+            _context.StatusMessage = "Pedal controls read successfully.";
+            _context.PedalControlsStatus = _context.PedalFx.IsWahMode
+                ? "Pedal FX, wah controls, and foot volume were loaded."
+                : "Pedal FX type and foot volume were loaded. Non-wah subtype controls are not surfaced yet.";
 
             return true;
         }
         catch (Exception ex)
         {
-            if (!backgroundSync)
-            {
-                _context.PedalControlsStatus = "Pedal control read failed.";
-                _context.StatusMessage       = ex.Message;
-            }
-
+            _context.PedalControlsStatus = "Pedal control read failed.";
+            _context.StatusMessage       = ex.Message;
             _context.Log("Pedal control read failed.");
             _context.Log(ex.ToString());
             Console.Error.WriteLine(ex);
@@ -890,20 +627,20 @@ public sealed class AmpSyncService
             var delayTime = DecodeDelayTime(data);
             if (delayTime <= 0)
             {
-                _context.DelayTimeMs  = null;
+                _context.DelayTimeMs    = null;
                 _context.DelayTapStatus = "Delay time is not currently readable for the active effect state.";
                 _context.Log("Delay time reply did not contain a usable millisecond value.");
                 return false;
             }
 
-            _context.DelayTimeMs  = delayTime;
+            _context.DelayTimeMs    = delayTime;
             _context.DelayTapStatus = $"Delay time loaded: {delayTime} ms.";
             _context.Log($"Delay time reply: {delayTime} ms.");
             return true;
         }
         catch (Exception ex)
         {
-            _context.DelayTimeMs  = null;
+            _context.DelayTimeMs    = null;
             _context.DelayTapStatus = "Delay time refresh failed.";
             _context.Log("Delay time read failed.");
             _context.Log(ex.ToString());
@@ -995,15 +732,13 @@ public sealed class AmpSyncService
 
             _context.Log($"Amp channel changed (push): {displayName}");
             ApplyDeviceState(() => _context.SelectedPanelChannel = displayName);
-            PauseActiveReadSync("channel change in progress");
             // Re-read all state after the amp finishes its internal channel switch.
             _ = Dispatcher.UIThread.InvokeAsync(async () =>
             {
                 await Task.Delay(150);
-                await TryReadAmpControlsAsync(backgroundSync: true);
-                await TryReadPanelControlsAsync(backgroundSync: true);
-                await TryReadPedalControlsAsync(backgroundSync: true);
-                ResumeActiveReadSync("channel change re-read complete");
+                await TryReadAmpControlsAsync();
+                await TryReadPanelControlsAsync();
+                await TryReadPedalControlsAsync();
             });
         };
     }

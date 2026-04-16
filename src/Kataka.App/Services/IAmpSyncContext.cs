@@ -15,7 +15,6 @@ public interface IAmpSyncContext
     // ── Flags the service reads ───────────────────────────────────────────────
 
     bool IsConnected { get; }
-    bool ActiveReadSync { get; }
     bool ActiveWriteSync { get; }
 
     /// <summary>

@@ -1,6 +1,6 @@
 ﻿using Avalonia;
 using System;
-using Kataka.App.Services;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Kataka.App.ViewModels;
 using Kataka.Application.Katana;
@@ -19,22 +19,21 @@ sealed class Program
     {
         var services = new ServiceCollection();
         ConfigureServices(services);
-        var provider = services.BuildServiceProvider();
+        Ioc.Default.ConfigureServices(services.BuildServiceProvider());
 
-        BuildAvaloniaApp(provider).StartWithClassicDesktopLifetime(args);
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 
     private static void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IMidiTransport>(_ => DefaultMidiTransport.Create());
         services.AddSingleton<IKatanaSession, KatanaSession>();
-        services.AddSingleton<IAmpStateService, AmpStateService>();
         services.AddSingleton<MainWindowViewModel>();
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp(IServiceProvider? services = null)
-        => AppBuilder.Configure(() => new App(services))
+    public static AppBuilder BuildAvaloniaApp()
+        => AppBuilder.Configure<App>()
             .UsePlatformDetect()
 #if DEBUG
             .WithDeveloperTools()

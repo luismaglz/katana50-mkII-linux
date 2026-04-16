@@ -144,9 +144,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
     public bool CanWritePatch => IsConnected;
 
     [ObservableProperty]
-    public partial bool ActiveReadSync { get; set; } = false;
-
-    [ObservableProperty]
     public partial bool ActiveWriteSync { get; set; } = true;
 
     public static string[] AmpTypeOptions { get; } = ["ACOUSTIC", "CLEAN", "CRUNCH", "LEAD", "BROWN"];
@@ -188,12 +185,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
         UpdatePanelChannelSelection();
         Pedalboard.SelectedChannel = value;
         syncService.TrackPanelChannelChange(value);
-    }
-
-    partial void OnActiveReadSyncChanged(bool value)
-    {
-        AppendLog($"Active read sync {(value ? "enabled" : "disabled")}.");
-        syncService.UpdateReadSyncTimer();
     }
 
     partial void OnActiveWriteSyncChanged(bool value)
@@ -243,25 +234,12 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 
         try
         {
-            syncService.PauseActiveReadSync("tap delay write is in progress");
             AppendLog($"Writing tapped delay time: {tappedDelayTime} ms.");
             await katanaSession.WriteBlockAsync(
                 KatanaMkIIParameterCatalog.DelayTimeAddress,
                 EncodeDelayTime(tappedDelayTime));
-            if (ActiveReadSync)
-            {
-                var confirmedDelayTime = DecodeDelayTime(
-                    await katanaSession.ReadBlockAsync(KatanaMkIIParameterCatalog.DelayTimeAddress, 2));
-                DelayTimeMs = confirmedDelayTime;
-                DelayTapStatus = $"Delay time tapped to {confirmedDelayTime} ms.";
-                AppendLog($"Delay time confirmed at {confirmedDelayTime} ms.");
-            }
-            else
-            {
-                DelayTimeMs = tappedDelayTime;
-                DelayTapStatus = $"Delay time tapped to {tappedDelayTime} ms.";
-            }
-
+            DelayTimeMs = tappedDelayTime;
+            DelayTapStatus = $"Delay time tapped to {tappedDelayTime} ms.";
             StatusMessage = "Delay time updated from tap tempo.";
         }
         catch (Exception ex)
@@ -271,10 +249,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             AppendLog("Delay tap write failed.");
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
-        }
-        finally
-        {
-            syncService.ResumeActiveReadSync("tap delay write finished");
         }
     }
 
@@ -333,7 +307,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
         var file = files[0];
         try
         {
-            syncService.PauseActiveReadSync("patch load");
             AppendLog($"Loading patch from {file.Name}...");
 
             string json;
@@ -347,8 +320,8 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             await katanaSession.LoadPatchAsync(patch);
 
             AppendLog("Patch loaded. Refreshing display...");
-            await syncService.TryReadAmpControlsAsync(backgroundSync: false);
-            await syncService.TryReadPanelControlsAsync(backgroundSync: false);
+            await syncService.TryReadAmpControlsAsync();
+            await syncService.TryReadPanelControlsAsync();
             await syncService.TryReadPedalControlsAsync();
             StatusMessage = $"Patch '{patch.Name}' loaded.";
         }
@@ -357,10 +330,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             StatusMessage = "Patch load failed.";
             AppendLog($"Patch load failed: {ex.Message}");
             Console.Error.WriteLine(ex);
-        }
-        finally
-        {
-            syncService.ResumeActiveReadSync("patch load finished");
         }
     }
 
@@ -388,7 +357,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 
         try
         {
-            syncService.PauseActiveReadSync("patch save");
             AppendLog("Reading all patch blocks from amp...");
 
             var patchName = System.IO.Path.GetFileNameWithoutExtension(file.Name);
@@ -407,10 +375,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             StatusMessage = "Patch save failed.";
             AppendLog($"Patch save failed: {ex.Message}");
             Console.Error.WriteLine(ex);
-        }
-        finally
-        {
-            syncService.ResumeActiveReadSync("patch save finished");
         }
     }
 
@@ -499,7 +463,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 
         try
         {
-            syncService.PauseActiveReadSync("connection in progress");
             AppendLog($"Opening input '{SelectedInputPort}' and output '{SelectedOutputPort}'.");
             if (!inputPortIds.TryGetValue(SelectedInputPort, out var inputPortId))
             {
@@ -550,13 +513,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             AppendLog("Connection failed.");
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
-        }
-        finally
-        {
-            // Push notifications (EDITOR_COMMUNICATION_MODE) handle live state updates after
-            // the initial load, so there is no need to auto-start polling on connect.
-            // The user can still enable the read sync checkbox manually if desired.
-            syncService.ResumeActiveReadSync("connection complete");
         }
     }
 
@@ -634,7 +590,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 
         try
         {
-            syncService.PauseActiveReadSync("manual amp write is in progress");
             AppendLog("Writing Katana amp editor controls.");
             var mismatches = new List<string>();
 
@@ -673,10 +628,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
         }
-        finally
-        {
-            syncService.ResumeActiveReadSync("manual amp write finished");
-        }
     }
 
     [RelayCommand]
@@ -714,7 +665,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 
         try
         {
-            syncService.PauseActiveReadSync("manual panel write is in progress");
             AppendLog("Writing Katana panel controls.");
 
             var channel = IAmpSyncContext.ParsePanelChannelDisplay(SelectedPanelChannel);
@@ -754,10 +704,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
         }
-        finally
-        {
-            syncService.ResumeActiveReadSync("manual panel write finished");
-        }
     }
 
     [RelayCommand]
@@ -771,7 +717,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 
         try
         {
-            syncService.PauseActiveReadSync("manual pedal write is in progress");
             AppendLog("Writing Katana pedal controls.");
             var mismatches = new List<string>();
 
@@ -807,10 +752,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
             AppendLog("Pedal control write failed.");
             AppendLog(ex.ToString());
             Console.Error.WriteLine(ex);
-        }
-        finally
-        {
-            syncService.ResumeActiveReadSync("manual pedal write finished");
         }
     }
 
