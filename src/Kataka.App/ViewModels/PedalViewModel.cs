@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Avalonia.Media;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Kataka.Domain.Midi;
+using ReactiveUI;
 
 namespace Kataka.App.ViewModels;
 
@@ -26,7 +26,7 @@ public abstract partial class PedalViewModel : ViewModelBase, IBasePedal
     public virtual bool IsEnabled
     {
         get => _isEnabled;
-        set => SetProperty(ref _isEnabled, value);
+        set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
     }
 
     /// <summary>When true, property setters must not raise ParameterChanged (amp is pushing values in).</summary>

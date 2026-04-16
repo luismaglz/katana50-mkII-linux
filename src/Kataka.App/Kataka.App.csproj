@@ -8,27 +8,34 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**"/>
+    <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="12.0.0"/>
-    <PackageReference Include="Avalonia.Desktop" Version="12.0.0"/>
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.0"/>
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.0"/>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5"/>
+    <PackageReference Include="Avalonia" Version="12.0.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.0" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.9" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.0" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.0" />
+    <PackageReference Include="Fody" Version="6.9.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
+    <PackageReference Include="ReactiveUI" Version="23.2.1" />
+    <PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
     <!-- Override transitive dependency to patched version (CVE-2026-39959 / GHSA-xrw6-gwf8-vvr9) -->
-    <PackageReference Include="Tmds.DBus.Protocol" Version="0.92.0"/>
+    <PackageReference Include="Tmds.DBus.Protocol" Version="0.92.0" />
     <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.0">
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1"/>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kataka.Application\Kataka.Application.csproj"/>
-    <ProjectReference Include="..\Kataka.Infrastructure\Kataka.Infrastructure.csproj"/>
+    <ProjectReference Include="..\Kataka.Application\Kataka.Application.csproj" />
+    <ProjectReference Include="..\Kataka.Infrastructure\Kataka.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

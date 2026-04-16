@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Kataka.Domain.Midi;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace Kataka.App.ViewModels;
 
@@ -44,6 +45,14 @@ public partial class PedalFxViewModel : ViewModelBase
         Evh95EffectLevel = 100;
         Evh95DirectMix = 0;
         FootVolume = KatanaMkIIParameterCatalog.FootVolume.Maximum;
+
+        this.WhenAnyValue(x => x.SelectedTypeOption)
+            .Subscribe(_ =>
+            {
+                this.RaisePropertyChanged(nameof(IsWahMode));
+                this.RaisePropertyChanged(nameof(IsBendMode));
+                this.RaisePropertyChanged(nameof(IsEvh95Mode));
+            });
     }
 
     public ObservableCollection<string> TypeOptions { get; } = [];
@@ -52,75 +61,68 @@ public partial class PedalFxViewModel : ViewModelBase
 
     public ObservableCollection<string> WahTypeOptions { get; } = [];
 
-    [ObservableProperty]
-    public partial bool IsEnabled { get; set; }
+    [Reactive]
+    public bool IsEnabled { get; set; }
 
-    [ObservableProperty]
-    public partial string SelectedTypeOption { get; set; }
+    [Reactive]
+    public string SelectedTypeOption { get; set; }
 
-    [ObservableProperty]
-    public partial string SelectedPositionOption { get; set; }
+    [Reactive]
+    public string SelectedPositionOption { get; set; }
 
-    [ObservableProperty]
-    public partial string SelectedWahTypeOption { get; set; }
+    [Reactive]
+    public string SelectedWahTypeOption { get; set; }
 
-    [ObservableProperty]
-    public partial int PedalPosition { get; set; }
+    [Reactive]
+    public int PedalPosition { get; set; }
 
-    [ObservableProperty]
-    public partial int PedalMinimum { get; set; }
+    [Reactive]
+    public int PedalMinimum { get; set; }
 
-    [ObservableProperty]
-    public partial int PedalMaximum { get; set; }
+    [Reactive]
+    public int PedalMaximum { get; set; }
 
-    [ObservableProperty]
-    public partial int EffectLevel { get; set; }
+    [Reactive]
+    public int EffectLevel { get; set; }
 
-    [ObservableProperty]
-    public partial int DirectMix { get; set; }
+    [Reactive]
+    public int DirectMix { get; set; }
 
-    [ObservableProperty]
-    public partial int BendPitch { get; set; }
+    [Reactive]
+    public int BendPitch { get; set; }
 
-    [ObservableProperty]
-    public partial int BendPosition { get; set; }
+    [Reactive]
+    public int BendPosition { get; set; }
 
-    [ObservableProperty]
-    public partial int BendEffectLevel { get; set; }
+    [Reactive]
+    public int BendEffectLevel { get; set; }
 
-    [ObservableProperty]
-    public partial int BendDirectMix { get; set; }
+    [Reactive]
+    public int BendDirectMix { get; set; }
 
-    [ObservableProperty]
-    public partial int Evh95Position { get; set; }
+    [Reactive]
+    public int Evh95Position { get; set; }
 
-    [ObservableProperty]
-    public partial int Evh95Minimum { get; set; }
+    [Reactive]
+    public int Evh95Minimum { get; set; }
 
-    [ObservableProperty]
-    public partial int Evh95Maximum { get; set; }
+    [Reactive]
+    public int Evh95Maximum { get; set; }
 
-    [ObservableProperty]
-    public partial int Evh95EffectLevel { get; set; }
+    [Reactive]
+    public int Evh95EffectLevel { get; set; }
 
-    [ObservableProperty]
-    public partial int Evh95DirectMix { get; set; }
+    [Reactive]
+    public int Evh95DirectMix { get; set; }
 
-    [ObservableProperty]
-    public partial int FootVolume { get; set; }
+    [Reactive]
+    public int FootVolume { get; set; }
 
     public bool IsWahMode => TryParsePedalTypeOption(SelectedTypeOption, out var value) && value == 0;
 
     public bool IsBendMode => TryParsePedalTypeOption(SelectedTypeOption, out var value) && value == 1;
 
     public bool IsEvh95Mode => TryParsePedalTypeOption(SelectedTypeOption, out var value) && value == 2;
-
-    partial void OnSelectedTypeOptionChanged(string value)
-    {
-        OnPropertyChanged(nameof(IsWahMode));
-        OnPropertyChanged(nameof(IsBendMode));
-        OnPropertyChanged(nameof(IsEvh95Mode));
-    }
 
     public IReadOnlyList<KatanaParameterDefinition> GetReadParameters()
     {

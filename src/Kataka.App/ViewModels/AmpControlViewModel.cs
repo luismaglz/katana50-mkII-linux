@@ -1,3 +1,4 @@
+using ReactiveUI;
 using System;
 using Kataka.Domain.KatanaState;
 using Kataka.Domain.Midi;
@@ -11,7 +12,7 @@ public class AmpControlViewModel : ViewModelBase
     public AmpControlViewModel(AmpControlState state)
     {
         _state = state;
-        _state.ValueChanged += () => OnPropertyChanged(nameof(Value));
+        _state.ValueChanged += () => this.RaisePropertyChanged(nameof(Value));
     }
 
     public KatanaParameterDefinition Parameter => _state.Parameter;

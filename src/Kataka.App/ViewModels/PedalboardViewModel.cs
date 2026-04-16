@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
+using System.Reactive.Disposables;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace Kataka.App.ViewModels;
 
 public partial class PedalboardViewModel : ViewModelBase
 {
     private readonly IReadOnlyDictionary<string, IBasePedal> _pedalsByKey;
+    private readonly CompositeDisposable _disposables = new();
     private PedalboardItemViewModel? _ampItem;
 
     public static string[] ChainPatternNames { get; } =
@@ -41,24 +44,23 @@ public partial class PedalboardViewModel : ViewModelBase
     {
         _pedalsByKey = pedalsByKey;
         SelectedChannel = initialChannel;
+
+        this.WhenAnyValue(x => x.SelectedChannel)
+            .Subscribe(v => { if (_ampItem is not null) _ampItem.Detail = v; });
+
+
+        this.WhenAnyValue(x => x.SelectedChainPattern)
+            .Subscribe(_ => Refresh());
+
     }
 
     public ObservableCollection<PedalboardItemViewModel> PedalboardItems { get; } = [];
 
-    // The channel shown on the AMP node. Updated reactively when the user switches channels.
-    [ObservableProperty]
-    public partial string SelectedChannel { get; set; }
+    [Reactive]
+    public string SelectedChannel { get; set; } = string.Empty;
 
-    partial void OnSelectedChannelChanged(string value)
-    {
-        if (_ampItem is not null)
-            _ampItem.Detail = value;
-    }
-
-    [ObservableProperty]
-    public partial int SelectedChainPattern { get; set; } = 2;
-
-    partial void OnSelectedChainPatternChanged(int value) => Refresh();
+    [Reactive]
+    public int SelectedChainPattern { get; set; } = 2;
 
     public void Refresh()
     {

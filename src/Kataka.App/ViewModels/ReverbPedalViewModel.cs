@@ -1,3 +1,4 @@
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,17 +24,17 @@ public partial class ReverbPedalViewModel : PedalViewModel
         _state = katanaState.ReverbPedal;
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
 
-        _state.EnabledState.ValueChanged += () => OnPropertyChanged(nameof(IsEnabled));
-        _state.Type.ValueChanged         += () => { OnPropertyChanged(nameof(SelectedTypeOption)); OnPropertyChanged(nameof(TypeCaption)); };
-        _state.Variation.ValueChanged    += () => { OnPropertyChanged(nameof(Variation)); OnPropertyChanged(nameof(VariationBrush)); };
-        _state.Time.ValueChanged         += () => OnPropertyChanged(nameof(Time));
-        _state.PreDelay.ValueChanged     += () => OnPropertyChanged(nameof(PreDelay));
-        _state.LowCut.ValueChanged       += () => OnPropertyChanged(nameof(LowCut));
-        _state.HighCut.ValueChanged      += () => OnPropertyChanged(nameof(HighCut));
-        _state.Density.ValueChanged      += () => OnPropertyChanged(nameof(Density));
-        _state.Color.ValueChanged        += () => OnPropertyChanged(nameof(Color));
-        _state.EffectLevel.ValueChanged  += () => OnPropertyChanged(nameof(EffectLevel));
-        _state.DirectMix.ValueChanged    += () => OnPropertyChanged(nameof(DirectMix));
+        _state.EnabledState.ValueChanged += () => this.RaisePropertyChanged(nameof(IsEnabled));
+        _state.Type.ValueChanged         += () => { this.RaisePropertyChanged(nameof(SelectedTypeOption)); this.RaisePropertyChanged(nameof(TypeCaption)); };
+        _state.Variation.ValueChanged    += () => { this.RaisePropertyChanged(nameof(Variation)); this.RaisePropertyChanged(nameof(VariationBrush)); };
+        _state.Time.ValueChanged         += () => this.RaisePropertyChanged(nameof(Time));
+        _state.PreDelay.ValueChanged     += () => this.RaisePropertyChanged(nameof(PreDelay));
+        _state.LowCut.ValueChanged       += () => this.RaisePropertyChanged(nameof(LowCut));
+        _state.HighCut.ValueChanged      += () => this.RaisePropertyChanged(nameof(HighCut));
+        _state.Density.ValueChanged      += () => this.RaisePropertyChanged(nameof(Density));
+        _state.Color.ValueChanged        += () => this.RaisePropertyChanged(nameof(Color));
+        _state.EffectLevel.ValueChanged  += () => this.RaisePropertyChanged(nameof(EffectLevel));
+        _state.DirectMix.ValueChanged    += () => this.RaisePropertyChanged(nameof(DirectMix));
     }
 
     // ── View-only properties ──────────────────────────────────────────────────────
