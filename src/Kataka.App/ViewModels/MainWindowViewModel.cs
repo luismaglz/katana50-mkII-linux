@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Kataka.App.Services;
 using Kataka.Application.Katana;
+using Kataka.Domain.KatanaState;
 using Kataka.Domain.Midi;
 
 namespace Kataka.App.ViewModels;
@@ -23,14 +24,14 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
     private bool suppressChangeTracking;
 
     public MainWindowViewModel()
-        : this(new KatanaSession(Kataka.Infrastructure.Midi.DefaultMidiTransport.Create()))
+        : this(new KatanaSession(Kataka.Infrastructure.Midi.DefaultMidiTransport.Create()), new KatanaState())
     {
     }
 
-    public MainWindowViewModel(IKatanaSession katanaSession)
+    public MainWindowViewModel(IKatanaSession katanaSession, KatanaState katanaState)
     {
         this.katanaSession = katanaSession;
-        syncService = new AmpSyncService(katanaSession);
+        syncService = new AmpSyncService(katanaSession, katanaState);
 
         foreach (var parameter in KatanaMkIIParameterCatalog.AmpEditorControls)
         {
