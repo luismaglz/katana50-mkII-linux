@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Media;
+using Kataka.Domain.KatanaState;
 using Kataka.Domain.Midi;
 
 namespace Kataka.App.ViewModels;
@@ -15,120 +16,107 @@ public partial class BoosterPedalViewModel : PedalViewModel
     private static readonly IReadOnlyDictionary<string, byte> ReverseTypeTable =
         TypeTable.ToDictionary(kvp => kvp.Value, kvp => kvp.Key, StringComparer.OrdinalIgnoreCase);
 
-    public BoosterPedalViewModel() : base(OwnDefinition)
+    private readonly BoostPedalState _state;
+
+    public BoosterPedalViewModel(KatanaState katanaState) : base(OwnDefinition)
     {
+        _state = katanaState.BoostPedal;
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
+
+        _state.EnabledState.ValueChanged += () => OnPropertyChanged(nameof(IsEnabled));
+        _state.Type.ValueChanged         += () => { OnPropertyChanged(nameof(SelectedTypeOption)); OnPropertyChanged(nameof(TypeCaption)); };
+        _state.Variation.ValueChanged    += () => { OnPropertyChanged(nameof(Variation)); OnPropertyChanged(nameof(VariationBrush)); };
+        _state.Drive.ValueChanged          += () => OnPropertyChanged(nameof(Drive));
+        _state.Tone.ValueChanged           += () => OnPropertyChanged(nameof(Tone));
+        _state.Bottom.ValueChanged         += () => OnPropertyChanged(nameof(Bottom));
+        _state.SoloSw.ValueChanged         += () => OnPropertyChanged(nameof(SoloSw));
+        _state.SoloLevel.ValueChanged      += () => OnPropertyChanged(nameof(SoloLevel));
+        _state.EffectLevel.ValueChanged    += () => OnPropertyChanged(nameof(EffectLevel));
+        _state.BoosterDirectMix.ValueChanged += () => OnPropertyChanged(nameof(DirectMix));
     }
+
+    // ── View-only properties ──────────────────────────────────────────────────────
 
     public IReadOnlyList<string> TypeOptions { get; }
     public bool HasTypeOptions => TypeOptions.Count > 0;
     public IBrush VariationBrush => GetVariationBrush(Variation);
 
-    // ── IBasePedal abstract overrides ────────────────────────────────────────────
+    // ── IBasePedal abstract overrides ─────────────────────────────────────────────
 
-    private string? _selectedTypeOption;
+    public override bool IsEnabled
+    {
+        get => _state.EnabledState.Value != 0;
+        set => _state.EnabledState.Value = value ? 1 : 0;
+    }
+
     public override string? SelectedTypeOption
     {
-        get => _selectedTypeOption;
+        get => TypeTable.TryGetValue((byte)_state.Type.Value, out var name) ? name : null;
         set
         {
-            if (!SetProperty(ref _selectedTypeOption, value)) return;
-            OnPropertyChanged(nameof(TypeCaption));
-            if (SuppressingAmpApply || Definition.TypeParameter is null || !TryGetTypeValue(value, out var byteValue)) return;
-            RaiseParameterChanged(Definition.TypeParameter.Key, byteValue);
+            if (value is not null && ReverseTypeTable.TryGetValue(value, out var byteVal))
+                _state.Type.Value = byteVal;
         }
     }
 
-    private string _variation = "N/A";
     public override string Variation
     {
-        get => _variation;
+        get => ToVariationString(_state.Variation.Value);
         set
         {
-            if (!SetProperty(ref _variation, value)) return;
-            OnPropertyChanged(nameof(VariationBrush));
+            // Reverse the string→int mapping
+            var raw = value switch { "Green" => 0, "Red" => 1, "Yellow" => 2, _ => -1 };
+            if (raw >= 0) _state.Variation.Value = raw;
         }
     }
+
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
     // ── Booster-specific controls ─────────────────────────────────────────────────
 
-    private int _drive;
     public int Drive
     {
-        get => _drive;
-        set
-        {
-            if (!SetProperty(ref _drive, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.BoosterDrive.Key, value);
-        }
+        get => _state.Drive.Value;
+        set => _state.Drive.Value = value;
     }
 
-    private int _tone;
     public int Tone
     {
-        get => _tone;
-        set
-        {
-            if (!SetProperty(ref _tone, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.BoosterTone.Key, value);
-        }
+        get => _state.Tone.Value;
+        set => _state.Tone.Value = value;
     }
 
-    private int _bottom;
     public int Bottom
     {
-        get => _bottom;
-        set
-        {
-            if (!SetProperty(ref _bottom, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.BoosterBottom.Key, value);
-        }
+        get => _state.Bottom.Value;
+        set => _state.Bottom.Value = value;
     }
 
-    private bool _soloSw;
     public bool SoloSw
     {
-        get => _soloSw;
-        set
-        {
-            if (!SetProperty(ref _soloSw, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.BoosterSoloSw.Key, value ? 1 : 0);
-        }
+        get => _state.SoloSw.Value != 0;
+        set => _state.SoloSw.Value = value ? 1 : 0;
     }
 
-    private int _soloLevel;
     public int SoloLevel
     {
-        get => _soloLevel;
-        set
-        {
-            if (!SetProperty(ref _soloLevel, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.BoosterSoloLevel.Key, value);
-        }
+        get => _state.SoloLevel.Value;
+        set => _state.SoloLevel.Value = value;
     }
 
-    private int _effectLevel;
     public int EffectLevel
     {
-        get => _effectLevel;
-        set
-        {
-            if (!SetProperty(ref _effectLevel, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.BoosterEffectLevel.Key, value);
-        }
+        get => _state.EffectLevel.Value;
+        set => _state.EffectLevel.Value = value;
     }
 
-    private int _directMix;
     public int DirectMix
     {
-        get => _directMix;
-        set
-        {
-            if (!SetProperty(ref _directMix, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.BoosterDirectMix.Key, value);
-        }
+        get => _state.BoosterDirectMix.Value;
+        set => _state.BoosterDirectMix.Value = value;
     }
+
+    // ── IBasePedal sync contract ──────────────────────────────────────────────────
 
     public override bool TryGetTypeValue(string? option, out byte value)
     {
@@ -155,21 +143,5 @@ public partial class BoosterPedalViewModel : PedalViewModel
         list.Add(KatanaMkIIParameterCatalog.BoosterEffectLevel);
         list.Add(KatanaMkIIParameterCatalog.BoosterDirectMix);
         return list;
-    }
-
-    protected override void ApplyAmpValuesCore(IReadOnlyDictionary<string, int> values)
-    {
-        if (values.TryGetValue(Definition.SwitchParameter.Key, out var sw)) IsEnabled = sw != 0;
-        if (Definition.TypeParameter is not null && values.TryGetValue(Definition.TypeParameter.Key, out var typeVal))
-            SelectedTypeOption = ToTypeOption((byte)typeVal);
-        if (Definition.VariationParameter is not null && values.TryGetValue(Definition.VariationParameter.Key, out var variation))
-            Variation = ToVariationString(variation);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterDrive.Key, out var drive)) Drive = Math.Clamp(drive, 0, 120);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterTone.Key, out var tone)) Tone = Math.Clamp(tone, 0, 100);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterBottom.Key, out var bottom)) Bottom = Math.Clamp(bottom, 0, 100);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterSoloSw.Key, out var soloSw)) SoloSw = soloSw != 0;
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterSoloLevel.Key, out var soloLevel)) SoloLevel = Math.Clamp(soloLevel, 0, 100);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterEffectLevel.Key, out var effectLevel)) EffectLevel = Math.Clamp(effectLevel, 0, 100);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.BoosterDirectMix.Key, out var directMix)) DirectMix = Math.Clamp(directMix, 0, 100);
     }
 }

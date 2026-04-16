@@ -22,6 +22,7 @@ public sealed class AmpSyncService
     private readonly Dictionary<string, AmpControlViewModel> _ampControlsByKey = [];
     private readonly Dictionary<string, IBasePedal>          _panelEffectsByKey = [];
     private Dictionary<string, AmpControlState>              _domainAmpControlsByKey = [];
+    private Dictionary<string, AmpControlState>              _domainPanelStatesByKey = [];
     private Dictionary<string, Action<byte>>                  _pushHandlerLookup = [];
 
     private readonly Dictionary<string, byte> _pendingWrites = [];
@@ -58,32 +59,39 @@ public sealed class AmpSyncService
         _context = context;
 
         _domainAmpControlsByKey = new Dictionary<string, AmpControlState>(_state.GetAmpControlsByKey());
+        _domainPanelStatesByKey  = new Dictionary<string, AmpControlState>(_state.GetPedalDomainControlsByKey());
+
+        // Subscribe to ALL domain state changes: fires the pending-write queue.
+        // The guard inside ensures we only queue writes for user-initiated changes.
+        SubscribeDomainWriteTracking(_domainAmpControlsByKey.Values);
+        SubscribeDomainWriteTracking(_domainPanelStatesByKey.Values);
 
         _ampControlsByKey.Clear();
         foreach (var control in context.AmpControls)
         {
             _ampControlsByKey[control.Parameter.Key] = control;
-            var captured = control;
-            control.PropertyChanged += (_, args) =>
-            {
-                if (args.PropertyName == nameof(AmpControlViewModel.Value))
-                    TrackAmpControlChange(captured);
-            };
+            // No VM PropertyChanged subscription — domain ValueChanged drives writes now.
         }
 
         _panelEffectsByKey.Clear();
         foreach (var effect in context.PanelEffects)
         {
             _panelEffectsByKey[effect.Definition.SwitchParameter.Key] = effect;
-            var captured = effect;
-            effect.PropertyChanged += (_, args) =>
+
+            // Domain-migrated VMs (Booster, Delay, Reverb) write through domain state.
+            // Only ModFxPedalViewModel still uses the legacy VM-event path.
+            if (effect is ModFxPedalViewModel)
             {
-                if (args.PropertyName == nameof(IBasePedal.IsEnabled))
-                    TrackPanelEffectChange(captured);
-                else if (args.PropertyName == nameof(IBasePedal.SelectedTypeOption))
-                    TrackPanelEffectTypeChange(captured);
-            };
-            effect.ParameterChanged += (_, args) => TrackDetailParamChange(args.Key, args.Value);
+                var captured = effect;
+                effect.PropertyChanged += (_, args) =>
+                {
+                    if (args.PropertyName == nameof(IBasePedal.IsEnabled))
+                        TrackPanelEffectChange(captured);
+                    else if (args.PropertyName == nameof(IBasePedal.SelectedTypeOption))
+                        TrackPanelEffectTypeChange(captured);
+                };
+                effect.ParameterChanged += (_, args) => TrackDetailParamChange(args.Key, args.Value);
+            }
         }
 
         context.Pedalboard.PropertyChanged += (_, args) =>
@@ -218,6 +226,26 @@ public sealed class AmpSyncService
         _writeSyncTimer.Stop();
         if (_context is not null && _context.ActiveWriteSync && _context.IsConnected && HasPendingWrites())
             _writeSyncTimer.Start();
+    }
+
+    /// <summary>
+    /// Subscribes to each domain AmpControlState's ValueChanged event.
+    /// When a value changes and the app is in a write-ready state, the key→value is queued for flush.
+    /// </summary>
+    private void SubscribeDomainWriteTracking(IEnumerable<AmpControlState> states)
+    {
+        foreach (var state in states)
+        {
+            var captured = state;
+            captured.ValueChanged += () =>
+            {
+                if (_context.SuppressChangeTracking || !_context.ActiveWriteSync || !_context.IsConnected) return;
+                var value = Math.Clamp(captured.Value, captured.Minimum, captured.Maximum);
+                _pendingWrites[captured.Parameter.Key] = (byte)value;
+                _context.Log($"Queued sync: {captured.Parameter.DisplayName} -> {value}.");
+                UpdateWriteSyncTimer();
+            };
+        }
     }
 
     // ── State queries ─────────────────────────────────────────────────────────
@@ -471,7 +499,7 @@ public sealed class AmpSyncService
                 foreach (var control in _context.AmpControls)
                 {
                     var value = values[control.Parameter.Key];
-                    control.Value = value;
+                    // Write to domain state only — VM observes via ValueChanged subscription.
                     if (_domainAmpControlsByKey.TryGetValue(control.Parameter.Key, out var domainControl))
                         domainControl.Value = value;
                     _context.Log($"{control.DisplayName} reply: {value}");
@@ -520,27 +548,30 @@ public sealed class AmpSyncService
 
             ApplyDeviceState(() =>
             {
-                var intValues = values.ToDictionary(kvp => kvp.Key, kvp => (int)kvp.Value, StringComparer.Ordinal);
-                foreach (var effect in _context.PanelEffects)
+                // Write amp/panel param values to domain state.
+                // Domain-migrated VMs (Booster, Delay, Reverb) observe via ValueChanged — no direct VM call needed.
+                // AmpType, CabinetResonance, AmpVariation are in _domainAmpControlsByKey and also update
+                // the MainWindowViewModel string properties via their ValueChanged subscriptions.
+                foreach (var (key, rawValue) in values)
                 {
-                    effect.ApplyAmpValues(intValues);
-                    _context.Log($"{effect.DisplayName}: {(effect.IsEnabled ? "On" : "Off")} / {effect.Variation} / {effect.TypeCaption}");
+                    if (_domainAmpControlsByKey.TryGetValue(key, out var ampControl))
+                        ampControl.Value = rawValue;
+                    else if (_domainPanelStatesByKey.TryGetValue(key, out var panelControl))
+                        panelControl.Value = rawValue;
                 }
 
-                if (values.TryGetValue(KatanaMkIIParameterCatalog.AmpType.Key, out var ampTypeValue) &&
-                    ampTypeValue < _context.AmpTypeOptions.Length)
-                    _context.SelectedAmpType = _context.AmpTypeOptions[ampTypeValue];
+                // ModFxPedalViewModel still uses the legacy ApplyAmpValues path.
+                var intValues = values.ToDictionary(kvp => kvp.Key, kvp => (int)kvp.Value, StringComparer.Ordinal);
+                foreach (var effect in _context.PanelEffects.OfType<ModFxPedalViewModel>())
+                    effect.ApplyAmpValues(intValues);
 
-                if (values.TryGetValue(KatanaMkIIParameterCatalog.CabinetResonance.Key, out var cabValue) &&
-                    cabValue < _context.CabinetResonanceOptions.Length)
-                    _context.SelectedCabinetResonance = _context.CabinetResonanceOptions[cabValue];
-
-                if (values.TryGetValue(KatanaMkIIParameterCatalog.AmpVariation.Key, out var varValue))
-                    _context.IsAmpVariation = varValue != 0;
-
+                // ChainPattern still drives Pedalboard directly (Pedalboard not yet domain-migrated).
                 if (values.TryGetValue(KatanaMkIIParameterCatalog.ChainPattern.Key, out var chainValue) &&
                     chainValue < PedalboardViewModel.ChainPatternNames.Length)
                     _context.Pedalboard.SelectedChainPattern = chainValue;
+
+                foreach (var effect in _context.PanelEffects)
+                    _context.Log($"{effect.DisplayName}: {(effect.IsEnabled ? "On" : "Off")} / {effect.Variation} / {effect.TypeCaption}");
 
                 _context.Log(
                     $"Amp Type: {_context.SelectedAmpType} ({(_context.IsAmpVariation ? "TYPE 2" : "TYPE 1")}) / " +
@@ -691,17 +722,18 @@ public sealed class AmpSyncService
     {
         _pushHandlerLookup = new Dictionary<string, Action<byte>>(StringComparer.Ordinal);
 
+        // Amp controls: write to domain only — VMs observe via ValueChanged.
         foreach (var control in _context.AmpControls)
         {
             var captured = control;
             _pushHandlerLookup[AddressToKey(captured.Parameter.Address)] = value =>
             {
-                captured.Value = value;
                 if (_domainAmpControlsByKey.TryGetValue(captured.Parameter.Key, out var domainControl))
                     domainControl.Value = value;
             };
         }
 
+        // Panel effects: domain-migrated VMs use domain state; ModFx still uses ApplyAmpValues.
         foreach (var effect in _context.PanelEffects)
         {
             foreach (var param in effect.GetSyncParameters())
@@ -709,24 +741,31 @@ public sealed class AmpSyncService
                 var capturedEffect = effect;
                 var capturedKey    = param.Key;
                 _pushHandlerLookup[AddressToKey(param.Address)] = value =>
-                    capturedEffect.ApplyAmpValues(new Dictionary<string, int>(StringComparer.Ordinal)
-                    {
-                        [capturedKey] = value,
-                    });
+                {
+                    if (_domainPanelStatesByKey.TryGetValue(capturedKey, out var domainControl))
+                        domainControl.Value = value;
+                    else
+                        capturedEffect.ApplyAmpValues(new Dictionary<string, int>(StringComparer.Ordinal)
+                        {
+                            [capturedKey] = value,
+                        });
+                };
             }
         }
 
+        // AmpType / CabinetResonance / AmpVariation push — write to domain; MainWindowViewModel
+        // subscriptions update the string properties automatically.
         _pushHandlerLookup[AddressToKey(KatanaMkIIParameterCatalog.AmpType.Address)] = value =>
         {
-            if (value < _context.AmpTypeOptions.Length) _context.SelectedAmpType = _context.AmpTypeOptions[value];
+            if (_domainAmpControlsByKey.TryGetValue(KatanaMkIIParameterCatalog.AmpType.Key, out var c)) c.Value = value;
         };
         _pushHandlerLookup[AddressToKey(KatanaMkIIParameterCatalog.CabinetResonance.Address)] = value =>
         {
-            if (value < _context.CabinetResonanceOptions.Length) _context.SelectedCabinetResonance = _context.CabinetResonanceOptions[value];
+            if (_domainAmpControlsByKey.TryGetValue(KatanaMkIIParameterCatalog.CabinetResonance.Key, out var c)) c.Value = value;
         };
         _pushHandlerLookup[AddressToKey(KatanaMkIIParameterCatalog.AmpVariation.Address)] = value =>
         {
-            _context.IsAmpVariation = value != 0;
+            if (_domainAmpControlsByKey.TryGetValue(KatanaMkIIParameterCatalog.AmpVariation.Key, out var c)) c.Value = value;
         };
 
         // Panel channel — PATCH NUM: address 00-01-00-00, INTEGER2x7 (16-byte DT1)
