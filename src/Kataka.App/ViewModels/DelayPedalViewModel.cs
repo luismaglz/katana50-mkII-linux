@@ -1,3 +1,4 @@
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,21 +83,21 @@ public partial class DelayPedalViewModel : PedalViewModel
             _hasVariation   = false;
         }
 
-        _enabledState.ValueChanged   += () => OnPropertyChanged(nameof(IsEnabled));
-        _typeState.ValueChanged      += () => { OnPropertyChanged(nameof(SelectedTypeOption)); OnPropertyChanged(nameof(TypeCaption)); };
-        _variationState?.ValueChanged += () => { OnPropertyChanged(nameof(Variation)); OnPropertyChanged(nameof(VariationBrush)); };
-        _feedback.ValueChanged       += () => OnPropertyChanged(nameof(Feedback));
-        _highCut.ValueChanged        += () => OnPropertyChanged(nameof(HighCut));
-        _effectLevel.ValueChanged    += () => OnPropertyChanged(nameof(EffectLevel));
-        _directMix.ValueChanged      += () => OnPropertyChanged(nameof(DirectMix));
-        _tapTime.ValueChanged        += () => OnPropertyChanged(nameof(TapTime));
-        _modRate.ValueChanged        += () => OnPropertyChanged(nameof(ModRate));
-        _modDepth.ValueChanged       += () => OnPropertyChanged(nameof(ModDepth));
-        _range.ValueChanged          += () => OnPropertyChanged(nameof(RangeHigh));
-        _filter.ValueChanged         += () => OnPropertyChanged(nameof(FilterOn));
-        _feedbackPhase.ValueChanged  += () => OnPropertyChanged(nameof(FeedbackPhaseInverse));
-        _delayPhase.ValueChanged     += () => OnPropertyChanged(nameof(DelayPhaseInverse));
-        _modSw.ValueChanged          += () => OnPropertyChanged(nameof(ModSwOn));
+        _enabledState.ValueChanged   += () => this.RaisePropertyChanged(nameof(IsEnabled));
+        _typeState.ValueChanged      += () => { this.RaisePropertyChanged(nameof(SelectedTypeOption)); this.RaisePropertyChanged(nameof(TypeCaption)); };
+        _variationState?.ValueChanged += () => { this.RaisePropertyChanged(nameof(Variation)); this.RaisePropertyChanged(nameof(VariationBrush)); };
+        _feedback.ValueChanged       += () => this.RaisePropertyChanged(nameof(Feedback));
+        _highCut.ValueChanged        += () => this.RaisePropertyChanged(nameof(HighCut));
+        _effectLevel.ValueChanged    += () => this.RaisePropertyChanged(nameof(EffectLevel));
+        _directMix.ValueChanged      += () => this.RaisePropertyChanged(nameof(DirectMix));
+        _tapTime.ValueChanged        += () => this.RaisePropertyChanged(nameof(TapTime));
+        _modRate.ValueChanged        += () => this.RaisePropertyChanged(nameof(ModRate));
+        _modDepth.ValueChanged       += () => this.RaisePropertyChanged(nameof(ModDepth));
+        _range.ValueChanged          += () => this.RaisePropertyChanged(nameof(RangeHigh));
+        _filter.ValueChanged         += () => this.RaisePropertyChanged(nameof(FilterOn));
+        _feedbackPhase.ValueChanged  += () => this.RaisePropertyChanged(nameof(FeedbackPhaseInverse));
+        _delayPhase.ValueChanged     += () => this.RaisePropertyChanged(nameof(DelayPhaseInverse));
+        _modSw.ValueChanged          += () => this.RaisePropertyChanged(nameof(ModSwOn));
     }
 
     // ── View-only properties ──────────────────────────────────────────────────────

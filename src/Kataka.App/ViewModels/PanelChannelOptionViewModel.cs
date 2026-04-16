@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+using ReactiveUI.Fody.Helpers;
 
 namespace Kataka.App.ViewModels;
 
@@ -6,6 +6,6 @@ public partial class PanelChannelOptionViewModel(string displayName) : ViewModel
 {
     public string DisplayName { get; } = displayName;
 
-    [ObservableProperty]
-    public partial bool IsSelected { get; set; }
+    [Reactive]
+    public bool IsSelected { get; set; }
 }
