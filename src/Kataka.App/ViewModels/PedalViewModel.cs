@@ -22,8 +22,12 @@ public abstract partial class PedalViewModel : ViewModelBase, IBasePedal
 
     public string DisplayName => Definition.DisplayName;
 
-    [ObservableProperty]
-    public partial bool IsEnabled { get; set; }
+    private bool _isEnabled;
+    public virtual bool IsEnabled
+    {
+        get => _isEnabled;
+        set => SetProperty(ref _isEnabled, value);
+    }
 
     /// <summary>When true, property setters must not raise ParameterChanged (amp is pushing values in).</summary>
     protected bool SuppressingAmpApply { get; private set; }
@@ -58,7 +62,11 @@ public abstract partial class PedalViewModel : ViewModelBase, IBasePedal
         }
     }
 
-    protected abstract void ApplyAmpValuesCore(IReadOnlyDictionary<string, int> values);
+    /// <summary>
+    /// Override in VMs that still use the legacy ApplyAmpValues path (ModFxPedalViewModel).
+    /// Domain-migrated VMs leave this as a no-op — domain ValueChanged subscriptions handle updates.
+    /// </summary>
+    protected virtual void ApplyAmpValuesCore(IReadOnlyDictionary<string, int> values) { }
 
     protected static IBrush GetVariationBrush(string variation) => variation switch
     {

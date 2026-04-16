@@ -17,6 +17,7 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 {
     private static readonly TimeSpan TapResetThreshold = TimeSpan.FromSeconds(2.5);
     private readonly IKatanaSession katanaSession;
+    private readonly KatanaState _katanaState;
     private readonly AmpSyncService syncService;
     private readonly Dictionary<string, string> inputPortIds = [];
     private readonly Dictionary<string, string> outputPortIds = [];
@@ -31,21 +32,38 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
     public MainWindowViewModel(IKatanaSession katanaSession, KatanaState katanaState)
     {
         this.katanaSession = katanaSession;
+        _katanaState = katanaState;
         syncService = new AmpSyncService(katanaSession, katanaState);
 
+        // AmpControls are driven by domain state — VMs wrap AmpControlState directly.
+        var ampStatesByKey = katanaState.GetAmpControlsByKey();
         foreach (var parameter in KatanaMkIIParameterCatalog.AmpEditorControls)
         {
-            AmpControls.Add(new AmpControlViewModel(parameter));
+            AmpControls.Add(new AmpControlViewModel(ampStatesByKey[parameter.Key]));
         }
+
+        // Subscribe to domain state changes that drive the panel-level VM properties.
+        katanaState.AmpType.ValueChanged += () =>
+        {
+            var idx = katanaState.AmpType.Value;
+            if (idx < AmpTypeOptions.Length) SelectedAmpType = AmpTypeOptions[idx];
+        };
+        katanaState.CabinetResonance.ValueChanged += () =>
+        {
+            var idx = katanaState.CabinetResonance.Value;
+            if (idx < CabinetResonanceOptions.Length) SelectedCabinetResonance = CabinetResonanceOptions[idx];
+        };
+        katanaState.AmpVariation.ValueChanged += () =>
+            IsAmpVariation = katanaState.AmpVariation.Value != 0;
 
         foreach (var effectViewModel in new IBasePedal[]
         {
-            new BoosterPedalViewModel(),
+            new BoosterPedalViewModel(katanaState),
             new ModFxPedalViewModel("mod"),
             new ModFxPedalViewModel("fx"),
-            new DelayPedalViewModel("delay"),
-            new DelayPedalViewModel("delay2"),
-            new ReverbPedalViewModel(),
+            new DelayPedalViewModel("delay", katanaState),
+            new DelayPedalViewModel("delay2", katanaState),
+            new ReverbPedalViewModel(katanaState),
         })
         {
             PanelEffects.Add(effectViewModel);
@@ -161,24 +179,22 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncContext
 
     partial void OnIsAmpVariationChanged(bool value)
     {
-        syncService.QueueWrite(
-            KatanaMkIIParameterCatalog.AmpVariation.Key,
-            value ? (byte)1 : (byte)0,
-            $"Amp Variation -> {(value ? "TYPE 2" : "TYPE 1")}");
+        // Write to domain — service subscribes to domain.ValueChanged and queues the write.
+        _katanaState.AmpVariation.Value = value ? 1 : 0;
     }
 
     partial void OnSelectedAmpTypeChanged(string value)
     {
         var idx = Array.IndexOf(AmpTypeOptions, value);
         if (idx < 0) return;
-        syncService.QueueWrite(KatanaMkIIParameterCatalog.AmpType.Key, (byte)idx, $"Amp Type -> {value}");
+        _katanaState.AmpType.Value = idx;
     }
 
     partial void OnSelectedCabinetResonanceChanged(string value)
     {
         var idx = Array.IndexOf(CabinetResonanceOptions, value);
         if (idx < 0) return;
-        syncService.QueueWrite(KatanaMkIIParameterCatalog.CabinetResonance.Key, (byte)idx, $"Cabinet Resonance -> {value}");
+        _katanaState.CabinetResonance.Value = idx;
     }
 
     partial void OnSelectedPanelChannelChanged(string value)

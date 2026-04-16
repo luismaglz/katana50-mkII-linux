@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Media;
+using Kataka.Domain.KatanaState;
 using Kataka.Domain.Midi;
 
 namespace Kataka.App.ViewModels;
@@ -15,9 +16,24 @@ public partial class ReverbPedalViewModel : PedalViewModel
     private static readonly IReadOnlyDictionary<string, byte> ReverseTypeTable =
         TypeTable.ToDictionary(kvp => kvp.Value, kvp => kvp.Key, StringComparer.OrdinalIgnoreCase);
 
-    public ReverbPedalViewModel() : base(OwnDefinition)
+    private readonly ReverbPedalState _state;
+
+    public ReverbPedalViewModel(KatanaState katanaState) : base(OwnDefinition)
     {
+        _state = katanaState.ReverbPedal;
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
+
+        _state.EnabledState.ValueChanged += () => OnPropertyChanged(nameof(IsEnabled));
+        _state.Type.ValueChanged         += () => { OnPropertyChanged(nameof(SelectedTypeOption)); OnPropertyChanged(nameof(TypeCaption)); };
+        _state.Variation.ValueChanged    += () => { OnPropertyChanged(nameof(Variation)); OnPropertyChanged(nameof(VariationBrush)); };
+        _state.Time.ValueChanged         += () => OnPropertyChanged(nameof(Time));
+        _state.PreDelay.ValueChanged     += () => OnPropertyChanged(nameof(PreDelay));
+        _state.LowCut.ValueChanged       += () => OnPropertyChanged(nameof(LowCut));
+        _state.HighCut.ValueChanged      += () => OnPropertyChanged(nameof(HighCut));
+        _state.Density.ValueChanged      += () => OnPropertyChanged(nameof(Density));
+        _state.Color.ValueChanged        += () => OnPropertyChanged(nameof(Color));
+        _state.EffectLevel.ValueChanged  += () => OnPropertyChanged(nameof(EffectLevel));
+        _state.DirectMix.ValueChanged    += () => OnPropertyChanged(nameof(DirectMix));
     }
 
     // ── View-only properties ──────────────────────────────────────────────────────
@@ -26,123 +42,87 @@ public partial class ReverbPedalViewModel : PedalViewModel
     public bool HasTypeOptions => TypeOptions.Count > 0;
     public IBrush VariationBrush => GetVariationBrush(Variation);
 
-    // ── IBasePedal abstract overrides ────────────────────────────────────────────
+    // ── IBasePedal abstract overrides ─────────────────────────────────────────────
 
-    private string? _selectedTypeOption;
+    public override bool IsEnabled
+    {
+        get => _state.EnabledState.Value != 0;
+        set => _state.EnabledState.Value = value ? 1 : 0;
+    }
+
     public override string? SelectedTypeOption
     {
-        get => _selectedTypeOption;
+        get => TypeTable.TryGetValue((byte)_state.Type.Value, out var name) ? name : null;
         set
         {
-            if (!SetProperty(ref _selectedTypeOption, value)) return;
-            OnPropertyChanged(nameof(TypeCaption));
-            if (SuppressingAmpApply || Definition.TypeParameter is null || !TryGetTypeValue(value, out var byteValue)) return;
-            RaiseParameterChanged(Definition.TypeParameter.Key, byteValue);
+            if (value is not null && ReverseTypeTable.TryGetValue(value, out var byteVal))
+                _state.Type.Value = byteVal;
         }
     }
 
-    private string _variation = "N/A";
     public override string Variation
     {
-        get => _variation;
+        get => ToVariationString(_state.Variation.Value);
         set
         {
-            if (!SetProperty(ref _variation, value)) return;
-            OnPropertyChanged(nameof(VariationBrush));
+            var raw = value switch { "Green" => 0, "Red" => 1, "Yellow" => 2, _ => -1 };
+            if (raw >= 0) _state.Variation.Value = raw;
         }
     }
 
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
-    // ── Reverb-specific controls ───────────────────────────────────────────────────
+    // ── Reverb-specific controls ──────────────────────────────────────────────────
 
-    private int _time;
     public int Time
     {
-        get => _time;
-        set
-        {
-            if (!SetProperty(ref _time, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbTime.Key, value);
-        }
+        get => _state.Time.Value;
+        set => _state.Time.Value = value;
     }
 
-    private int _preDelay;
     public int PreDelay
     {
-        get => _preDelay;
-        set
-        {
-            if (!SetProperty(ref _preDelay, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbPreDelay.Key, value);
-        }
+        get => _state.PreDelay.Value;
+        set => _state.PreDelay.Value = value;
     }
 
-    private int _lowCut;
     public int LowCut
     {
-        get => _lowCut;
-        set
-        {
-            if (!SetProperty(ref _lowCut, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbLowCut.Key, value);
-        }
+        get => _state.LowCut.Value;
+        set => _state.LowCut.Value = value;
     }
 
-    private int _highCut;
     public int HighCut
     {
-        get => _highCut;
-        set
-        {
-            if (!SetProperty(ref _highCut, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbHighCut.Key, value);
-        }
+        get => _state.HighCut.Value;
+        set => _state.HighCut.Value = value;
     }
 
-    private int _density;
     public int Density
     {
-        get => _density;
-        set
-        {
-            if (!SetProperty(ref _density, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbDensity.Key, value);
-        }
+        get => _state.Density.Value;
+        set => _state.Density.Value = value;
     }
 
-    private int _color;
     public int Color
     {
-        get => _color;
-        set
-        {
-            if (!SetProperty(ref _color, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbColor.Key, value);
-        }
+        get => _state.Color.Value;
+        set => _state.Color.Value = value;
     }
 
-    private int _effectLevel;
     public int EffectLevel
     {
-        get => _effectLevel;
-        set
-        {
-            if (!SetProperty(ref _effectLevel, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbEffectLevel.Key, value);
-        }
+        get => _state.EffectLevel.Value;
+        set => _state.EffectLevel.Value = value;
     }
 
-    private int _directMix;
     public int DirectMix
     {
-        get => _directMix;
-        set
-        {
-            if (!SetProperty(ref _directMix, value)) return;
-            if (!SuppressingAmpApply) RaiseParameterChanged(KatanaMkIIParameterCatalog.ReverbDirectMix.Key, value);
-        }
+        get => _state.DirectMix.Value;
+        set => _state.DirectMix.Value = value;
     }
+
+    // ── IBasePedal sync contract ──────────────────────────────────────────────────
 
     public override bool TryGetTypeValue(string? option, out byte value)
     {
@@ -169,23 +149,5 @@ public partial class ReverbPedalViewModel : PedalViewModel
         list.Add(KatanaMkIIParameterCatalog.ReverbEffectLevel);
         list.Add(KatanaMkIIParameterCatalog.ReverbDirectMix);
         return list;
-    }
-
-    protected override void ApplyAmpValuesCore(IReadOnlyDictionary<string, int> values)
-    {
-        if (values.TryGetValue(Definition.SwitchParameter.Key, out var sw))
-            IsEnabled = sw != 0;
-        if (Definition.TypeParameter is not null && values.TryGetValue(Definition.TypeParameter.Key, out var typeVal))
-            SelectedTypeOption = ToTypeOption((byte)typeVal);
-        if (Definition.VariationParameter is not null && values.TryGetValue(Definition.VariationParameter.Key, out var variation))
-            Variation = ToVariationString(variation);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbTime.Key, out var time))             Time        = Math.Clamp(time, 0, 127);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbPreDelay.Key, out var preDelay))     PreDelay    = Math.Clamp(preDelay, 0, 127);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbLowCut.Key, out var lowCut))         LowCut      = Math.Clamp(lowCut, 0, 17);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbHighCut.Key, out var highCut))       HighCut     = Math.Clamp(highCut, 0, 17);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbDensity.Key, out var density))       Density     = Math.Clamp(density, 0, 10);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbColor.Key, out var color))           Color       = Math.Clamp(color, 0, 100);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbEffectLevel.Key, out var effLevel))  EffectLevel = Math.Clamp(effLevel, 0, 100);
-        if (values.TryGetValue(KatanaMkIIParameterCatalog.ReverbDirectMix.Key, out var directMix))   DirectMix   = Math.Clamp(directMix, 0, 100);
     }
 }
