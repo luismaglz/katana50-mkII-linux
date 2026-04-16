@@ -1,0 +1,57 @@
+# Default: normalize line endings to LF on checkin
+* text=auto eol=lf
+
+# C# source files
+*.cs        text eol=lf
+*.csx       text eol=lf
+*.cake      text eol=lf
+
+# Project/solution files
+*.csproj    text eol=lf
+*.sln       text eol=lf
+*.slnx      text eol=lf
+*.props     text eol=lf
+*.targets   text eol=lf
+*.ruleset   text eol=lf
+*.editorconfig text eol=lf
+
+# Config/data files
+*.json      text eol=lf
+*.xml       text eol=lf
+*.yaml      text eol=lf
+*.yml       text eol=lf
+*.toml      text eol=lf
+*.ini       text eol=lf
+*.config    text eol=lf
+
+# Scripts
+*.sh        text eol=lf
+*.bash      text eol=lf
+*.ps1       text eol=crlf
+*.psm1      text eol=crlf
+*.psd1      text eol=crlf
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+
+# Markup/docs
+*.md        text eol=lf
+*.txt       text eol=lf
+*.html      text eol=lf
+*.css       text eol=lf
+*.xaml      text eol=lf
+
+# TSL files (Boss Tone Studio presets)
+*.tsl       text eol=lf
+
+# Binary files — no line ending conversion
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.pdf       binary
+*.zip       binary
+*.dll       binary
+*.exe       binary
+*.pdb       binary
+*.nupkg     binary

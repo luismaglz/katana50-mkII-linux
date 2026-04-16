@@ -375,10 +375,10 @@ public sealed class AmpSyncService : IAmpSyncService
             var status = "Panel controls read successfully.";
             var detail = (patchLevelLoaded, delayTimeLoaded) switch
             {
-                (true,  true)  => "Panel channel, patch level, effect toggles, variation colors, effect types, and delay time were loaded.",
-                (true,  false) => "Panel channel, patch level, effect toggles, variation colors, and effect types were loaded. Delay time refresh failed.",
-                (false, true)  => "Panel channel, effect toggles, variation colors, effect types, and delay time were loaded. Patch level mapping is still pending.",
-                _              => "Panel channel, effect toggles, variation colors, and effect types were loaded. Patch level mapping is still pending, and delay time refresh failed."
+                (true, true) => "Panel channel, patch level, effect toggles, variation colors, effect types, and delay time were loaded.",
+                (true, false) => "Panel channel, patch level, effect toggles, variation colors, and effect types were loaded. Delay time refresh failed.",
+                (false, true) => "Panel channel, effect toggles, variation colors, effect types, and delay time were loaded. Patch level mapping is still pending.",
+                _ => "Panel channel, effect toggles, variation colors, and effect types were loaded. Patch level mapping is still pending, and delay time refresh failed."
             };
 
             EmitStatus(status);
@@ -800,7 +800,7 @@ public sealed class AmpSyncService : IAmpSyncService
                         domainControl.Value = value;
                     else
                         capturedEffect.ApplyAmpValues(new Dictionary<string, int>(StringComparer.Ordinal)
-                            { [capturedKey] = value });
+                        { [capturedKey] = value });
                 };
             }
         }

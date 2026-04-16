@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -8,9 +9,9 @@ namespace Kataka.App.Controls;
 
 public class RotaryKnob : RotaryKnobBase
 {
-    private static readonly SolidColorBrush FaceBrush   = new(Color.Parse("#2c2f35"));
-    private static readonly SolidColorBrush BezelBrush  = new(Color.Parse("#0f1114"));
-    private static readonly SolidColorBrush TickBrush   = new(Color.Parse("#4a4f57"));
+    private static readonly SolidColorBrush FaceBrush = new(Color.Parse("#2c2f35"));
+    private static readonly SolidColorBrush BezelBrush = new(Color.Parse("#0f1114"));
+    private static readonly SolidColorBrush TickBrush = new(Color.Parse("#4a4f57"));
     private static readonly SolidColorBrush CenterTickBrush = new(Color.Parse("#ffcf66"));
 
     protected override Size MeasureOverride(Size availableSize)
@@ -23,30 +24,30 @@ public class RotaryKnob : RotaryKnobBase
     {
         base.Render(context);
 
-        var s      = Scale;
+        var s = Scale;
         var bounds = Bounds.Deflate(4 * s);
         var resolvedLabelSize = LabelFontSize > 0 ? LabelFontSize : 12 * s;
-        var labelText   = CreateText(Label.ToUpperInvariant(), resolvedLabelSize, FontWeight.Bold, LabelBrush);
+        var labelText = CreateText(Label.ToUpperInvariant(), resolvedLabelSize, FontWeight.Bold, LabelBrush);
         var labelOrigin = new Point((bounds.Width - labelText.Width) / 2, bounds.Top);
         context.DrawText(labelText, labelOrigin);
 
         var diameter = Math.Min(bounds.Width - 12 * s, bounds.Height - labelText.Height - 56 * s);
-        var radius   = diameter / 2;
-        var center   = new Point(bounds.Width / 2, labelText.Height + 20 * s + radius);
+        var radius = diameter / 2;
+        var center = new Point(bounds.Width / 2, labelText.Height + 20 * s + radius);
 
         DrawTicks(context, center, radius + 4 * s, s);
         context.DrawEllipse(BezelBrush, new Pen(new SolidColorBrush(Color.Parse("#0a0c0e")), 2 * s), center, radius + 8 * s, radius + 8 * s);
-        context.DrawEllipse(FaceBrush,  new Pen(new SolidColorBrush(Color.Parse("#565b64")), 1.5 * s), center, radius, radius);
+        context.DrawEllipse(FaceBrush, new Pen(new SolidColorBrush(Color.Parse("#565b64")), 1.5 * s), center, radius, radius);
 
-        var angle         = DegreesToRadians(135 + (NormalizedValue * 270));
+        var angle = DegreesToRadians(135 + (NormalizedValue * 270));
         var indicatorLength = radius * 0.68;
-        var pointerEnd    = new Point(
+        var pointerEnd = new Point(
             center.X + Math.Cos(angle) * indicatorLength,
             center.Y + Math.Sin(angle) * indicatorLength);
         context.DrawLine(new Pen(ValueBrush, 4 * s, lineCap: PenLineCap.Round), center, pointerEnd);
         context.DrawEllipse(ValueBrush, null, center, 4 * s, 4 * s);
 
-        var valueText   = CreateText(DisplayValueText, 14 * s, FontWeight.SemiBold, ValueBrush);
+        var valueText = CreateText(DisplayValueText, 14 * s, FontWeight.SemiBold, ValueBrush);
         var valueOrigin = new Point((bounds.Width - valueText.Width) / 2, center.Y + radius + 14 * s);
         context.DrawText(valueText, valueOrigin);
     }

@@ -1,7 +1,9 @@
-using ReactiveUI;
 using System;
+
 using Kataka.Domain.KatanaState;
 using Kataka.Domain.Midi;
+
+using ReactiveUI;
 
 namespace Kataka.App.ViewModels;
 

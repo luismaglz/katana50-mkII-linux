@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+
 using Kataka.Domain.Midi;
 
 namespace Kataka.App.ViewModels;

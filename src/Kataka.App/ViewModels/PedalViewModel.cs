@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+
 using Avalonia.Media;
+
 using Kataka.Domain.Midi;
+
 using ReactiveUI;
 
 namespace Kataka.App.ViewModels;
@@ -70,10 +73,10 @@ public abstract partial class PedalViewModel : ViewModelBase, IBasePedal
 
     protected static IBrush GetVariationBrush(string variation) => variation switch
     {
-        "Green"  => GreenVariationBrush,
-        "Red"    => RedVariationBrush,
+        "Green" => GreenVariationBrush,
+        "Red" => RedVariationBrush,
         "Yellow" => YellowVariationBrush,
-        _        => OffVariationBrush,
+        _ => OffVariationBrush,
     };
 
     protected static string ToVariationString(int rawValue) => rawValue switch

@@ -1,6 +1,8 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+
 using CommunityToolkit.Mvvm.DependencyInjection;
+
 using Kataka.App.ViewModels;
 using Kataka.App.Views;
 

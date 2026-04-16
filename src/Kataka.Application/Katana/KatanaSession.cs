@@ -41,7 +41,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 
         // Forward push notifications from the connection to session subscribers.
         activeConnection.PushNotificationReceived += OnConnectionPushNotification;
-        activeConnection.ProgramChangeReceived    += OnConnectionProgramChange;
+        activeConnection.ProgramChangeReceived += OnConnectionProgramChange;
 
         // Tell the amp to start sending unsolicited DT1 messages whenever any parameter changes.
         // This mirrors the BTS startCommunication() handshake (EDITOR_COMMUNICATION_MODE = 1).
@@ -57,7 +57,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 
         // Unsubscribe before disposing to prevent callbacks on a dead connection.
         activeConnection.PushNotificationReceived -= OnConnectionPushNotification;
-        activeConnection.ProgramChangeReceived    -= OnConnectionProgramChange;
+        activeConnection.ProgramChangeReceived -= OnConnectionProgramChange;
 
         // Tell the amp to stop sending push notifications before closing the port.
         try
