@@ -97,12 +97,6 @@ public partial class AmpEditorViewModel : ViewModelBase
             .Subscribe(v => _katanaState.AmpVariation.Value = v ? 1 : 0)
             .DisposeWith(Disposables);
 
-        this.WhenAnyValue(x => x.ActiveWriteSync)
-            .Subscribe(v =>
-            {
-                _logger.LogInformation("Active write sync {State}.", v ? "enabled" : "disabled");
-                syncService.UpdateWriteSyncTimer();
-            }).DisposeWith(Disposables);
     }
 
     public ObservableCollection<AmpControlViewModel> AmpControls { get; } = [];
@@ -125,8 +119,7 @@ public partial class AmpEditorViewModel : ViewModelBase
     [Reactive] public string SelectedCabinetResonance { get; set; } = "MIDDLE";
     [Reactive] public bool IsAmpVariation { get; set; } = false;
     [Reactive] public string SelectedPanelChannel { get; set; } = "Panel";
-    [Reactive] public bool ActiveWriteSync { get; set; } = true;
-    [Reactive] public string PanelControlsStatus { get; set; } = "Panel controls have not been read yet.";
+[Reactive] public string PanelControlsStatus { get; set; } = "Panel controls have not been read yet.";
     [Reactive] public string PedalControlsStatus { get; set; } = "Pedal controls have not been read yet.";
 
     internal void Initialize()

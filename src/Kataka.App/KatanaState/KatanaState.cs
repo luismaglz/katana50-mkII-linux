@@ -151,7 +151,7 @@ public class KatanaState : IKatanaState
     {
         if (_stateFields.TryGetValue(key, out var state))
         {
-            state.Value = value;
+            state.SetFromAmp(value);
             _logger.LogInformation("{Name} : {Value} Refreshed", key, value);
         }
         else
