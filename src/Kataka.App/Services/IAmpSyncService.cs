@@ -24,18 +24,11 @@ public interface IAmpSyncService
     /// <summary>Unsubscribes from amp push events. Call before disconnect.</summary>
     void Deactivate();
 
-    /// <summary>Stops the write sync timer. Call from the window Closing handler.</summary>
+    /// <summary>Stops the write loop and cleans up. Call from the window Closing handler.</summary>
     void Shutdown();
 
-    /// <summary>Clears the pending write queue and updates the write timer. Call on IsConnected change.</summary>
+    /// <summary>Starts or stops the write loop based on connection state.</summary>
     void OnConnectionChanged(bool connected);
-
-    // ── Write queue ───────────────────────────────────────────────────────────
-
-    void UpdateWriteSyncTimer();
-    bool HasPendingWrites();
-    string DescribePendingWrites();
-    void ClearPendingWrites();
 
     // ── Read operations ───────────────────────────────────────────────────────
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 using Avalonia.Threading;
@@ -17,17 +18,14 @@ namespace Kataka.App.Services;
 
 public sealed class AmpSyncService : IAmpSyncService
 {
-    private static readonly TimeSpan WriteSyncDebounce = TimeSpan.FromMilliseconds(125);
-
-    private readonly Dictionary<string, (IReadOnlyList<byte> Address, byte Value)> _pendingWrites = [];
     private readonly IKatanaSession _session;
     private readonly IKatanaState _katanaState;
-    private readonly SemaphoreSlim _syncGate = new(1, 1);
-    private readonly DispatcherTimer _writeSyncTimer;
     private readonly ILogger<AmpSyncService> _logger;
 
-    private bool _suppressWrites;
     private bool _stateWritesSubscribed;
+
+    private Channel<(IReadOnlyList<byte> Address, byte Value)>? _writeChannel;
+    private CancellationTokenSource? _writeCts;
 
     // ── Observable subjects ───────────────────────────────────────────────────
 
@@ -46,13 +44,6 @@ public sealed class AmpSyncService : IAmpSyncService
         _session = session;
         _katanaState = katanaState;
         _logger = logger;
-
-        _writeSyncTimer = new DispatcherTimer { Interval = WriteSyncDebounce };
-        _writeSyncTimer.Tick += async (_, _) =>
-        {
-            _writeSyncTimer.Stop();
-            await FlushPendingWritesAsync();
-        };
     }
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -69,37 +60,59 @@ public sealed class AmpSyncService : IAmpSyncService
         _session.PanelChannelChanged -= OnAmpPanelChannelChanged;
     }
 
-    public void Shutdown() => _writeSyncTimer.Stop();
+    public void Shutdown() => StopWriteLoop();
 
     public void OnConnectionChanged(bool connected)
     {
         if (!connected)
-        {
-            if (_pendingWrites.Count > 0)
-                _logger.LogInformation("Clearing {Count} pending writes after disconnect.", _pendingWrites.Count);
-            _pendingWrites.Clear();
-        }
-
-        UpdateWriteSyncTimer();
+            StopWriteLoop();
     }
 
-    // ── Timer control ─────────────────────────────────────────────────────────
+    // ── Write loop ────────────────────────────────────────────────────────────
 
-    public void UpdateWriteSyncTimer()
+    private void StartWriteLoop()
     {
-        _writeSyncTimer.Stop();
-        if (_session.IsConnected && _pendingWrites.Count > 0)
-            _writeSyncTimer.Start();
+        StopWriteLoop();
+
+        _writeChannel = Channel.CreateUnbounded<(IReadOnlyList<byte>, byte)>(
+            new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
+        _writeCts = new CancellationTokenSource();
+
+        _ = RunWriteLoopAsync(_writeChannel, _writeCts.Token);
     }
 
-    // ── State queries ─────────────────────────────────────────────────────────
+    private void StopWriteLoop()
+    {
+        _writeCts?.Cancel();
+        _writeCts?.Dispose();
+        _writeCts = null;
+        _writeChannel = null; // stale items abandoned and GC'd
+    }
 
-    public bool HasPendingWrites() => _pendingWrites.Count > 0;
-
-    public string DescribePendingWrites() =>
-        _pendingWrites.Count == 0 ? "no pending changes" : $"{_pendingWrites.Count} writes";
-
-    public void ClearPendingWrites() => _pendingWrites.Clear();
+    private async Task RunWriteLoopAsync(
+        Channel<(IReadOnlyList<byte> Address, byte Value)> channel,
+        CancellationToken ct)
+    {
+        var reader = channel.Reader;
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(20));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(ct))
+            {
+                if (!reader.TryRead(out var msg)) continue;
+                try
+                {
+                    await _session.WriteBlockAsync(msg.Address, [msg.Value]);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    _logger.LogWarning(ex, "Write failed for {Address}.",
+                        string.Join("-", msg.Address.Select(b => b.ToString("X2"))));
+                }
+            }
+        }
+        catch (OperationCanceledException) { }
+    }
 
     // ── Read operations ───────────────────────────────────────────────────────
 
@@ -108,19 +121,12 @@ public sealed class AmpSyncService : IAmpSyncService
         try
         {
             _logger.LogInformation("Seeding KatanaState from full patch read.");
-            _suppressWrites = true;
-            try
-            {
-                var allStates = await _session.ReadAllPatchStatesAsync();
-                _katanaState.SetStates(allStates);
-            }
-            finally
-            {
-                _suppressWrites = false;
-            }
+            var allStates = await _session.ReadAllPatchStatesAsync();
+            _katanaState.SetStates(allStates);
 
             SubscribeToStateWrites();
-            _logger.LogInformation("KatanaState seeded. Write-back subscriptions active.");
+            StartWriteLoop();
+            _logger.LogInformation("KatanaState seeded. Write loop started.");
             return true;
         }
         catch (Exception ex)
@@ -146,34 +152,8 @@ public sealed class AmpSyncService : IAmpSyncService
 
     private void OnDomainStateChanged(AmpControlState state)
     {
-        if (_suppressWrites || !_session.IsConnected) return;
-        _pendingWrites[state.Parameter.AddressString] = (state.Parameter.Address, (byte)state.Value);
-        UpdateWriteSyncTimer();
-    }
-
-    private async Task FlushPendingWritesAsync()
-    {
-        if (_pendingWrites.Count == 0) return;
-        if (!await _syncGate.WaitAsync(0)) return;
-        try
-        {
-            var snapshot = _pendingWrites.ToList();
-            _pendingWrites.Clear();
-            foreach (var (_, (address, value)) in snapshot)
-            {
-                _logger.LogInformation("Writing {Address} = {Value}",
-                    string.Join("-", address.Select(b => b.ToString("X2"))), value);
-                await _session.WriteBlockAsync(address, [value]);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Flush pending writes failed.");
-        }
-        finally
-        {
-            _syncGate.Release();
-        }
+        if (!_session.IsConnected) return;
+        _writeChannel?.Writer.TryWrite((state.Parameter.Address, (byte)state.Value));
     }
 
     // ── Push notification infrastructure ─────────────────────────────────────

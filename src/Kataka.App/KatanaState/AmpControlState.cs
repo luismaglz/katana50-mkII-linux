@@ -46,4 +46,10 @@ public class AmpControlState
             ValueChanged?.Invoke();
         }
     }
+
+    /// <summary>
+    /// Updates the value from an amp read or push notification without firing <see cref="ValueChanged"/>,
+    /// preventing the write-back loop.
+    /// </summary>
+    public void SetFromAmp(int value) => _value = value;
 }
