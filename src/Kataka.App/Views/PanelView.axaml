@@ -21,8 +21,8 @@
     <Border MinWidth="160" CornerRadius="8" VerticalAlignment="Top">
         <Border.Background>
             <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-                <GradientStop Offset="0" Color="#2e3138" />
-                <GradientStop Offset="1" Color="#1c1f24" />
+                <GradientStop Offset="0" Color="{StaticResource ColorCardBgTop}" />
+                <GradientStop Offset="1" Color="{StaticResource ColorCardBgBottom}" />
             </LinearGradientBrush>
         </Border.Background>
 

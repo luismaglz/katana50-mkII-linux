@@ -42,8 +42,8 @@ public sealed class LargeImageRotaryKnob : RotaryKnobBase
                 context.DrawImage(bmp, imgRect);
             else
                 context.DrawEllipse(
-                    new SolidColorBrush(Color.Parse("#2c2f35")),
-                    new Pen(new SolidColorBrush(Color.Parse("#565b64")), 1.5),
+                    KatanaPalette.KnobFaceBrush,
+                    KatanaPalette.KnobRimPen,
                     new Point(cx, cy), ImgSize / 2, ImgSize / 2);
         }
 
