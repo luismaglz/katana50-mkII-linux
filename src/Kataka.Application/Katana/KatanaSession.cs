@@ -212,6 +212,38 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         return patch;
     }
 
+    public async Task<IReadOnlyDictionary<string, byte>> ReadAllPatchStatesAsync(CancellationToken cancellationToken = default)
+    {
+        var result = new Dictionary<string, byte>(StringComparer.Ordinal);
+        const int chunkSize = 64;
+
+        foreach (var block in KatanaPatchBlocks.All)
+        {
+            var addr = block.Address;
+            var remaining = block.Size;
+            var offset = 0;
+
+            while (remaining > 0)
+            {
+                var toRead = Math.Min(remaining, chunkSize);
+                var chunkAddr = AddOffset(addr, offset);
+                var chunk = await ReadBlockAsync(chunkAddr, toRead, cancellationToken);
+
+                for (var i = 0; i < chunk.Length; i++)
+                {
+                    var byteAddr = AddOffset(chunkAddr, i);
+                    var key = $"{byteAddr[0]:X2}-{byteAddr[1]:X2}-{byteAddr[2]:X2}-{byteAddr[3]:X2}";
+                    result[key] = chunk[i];
+                }
+
+                offset += toRead;
+                remaining -= toRead;
+            }
+        }
+
+        return result;
+    }
+
     public async Task LoadPatchAsync(TslPatch patch, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(patch);
