@@ -11,6 +11,24 @@ public sealed class DesignMainWindowViewModel : MainWindowViewModel
     public DesignMainWindowViewModel() : base(new NullKatanaSession(), new KatanaState(), new AmpSyncService(new NullKatanaSession(), new KatanaState()))
     {
         // IsConnected is false, so none of these will queue MIDI writes.
+        AmpEditor.SelectedAmpType = "CRUNCH";
+        AmpEditor.SelectedCabinetResonance = "MIDDLE";
+        AmpEditor.SelectedPanelChannel = "CH A1";
+        AmpEditor.Pedalboard.SelectedChainPattern = 2;
+        AmpEditor.Pedalboard.Refresh();
+    }
+}
+
+public sealed class DesignAmpEditorViewModel : AmpEditorViewModel
+{
+    public static DesignAmpEditorViewModel Instance => new();
+
+    public DesignAmpEditorViewModel() : base(
+        new NullKatanaSession(),
+        new KatanaState(),
+        new AmpSyncService(new NullKatanaSession(), new KatanaState()),
+        _ => { }, _ => { })
+    {
         SelectedAmpType = "CRUNCH";
         SelectedCabinetResonance = "MIDDLE";
         SelectedPanelChannel = "CH A1";

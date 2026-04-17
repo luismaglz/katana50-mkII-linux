@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kataka.App.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="Kataka.App.Views.DiagnosticsView"
+             x:DataType="vm:DiagnosticsViewModel">
+
+    <Border Classes="transport-shell" Padding="18">
+        <Grid RowDefinitions="Auto,*" RowSpacing="12">
+            <StackPanel Spacing="8">
+                <TextBlock Text="DIAGNOSTICS"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           LetterSpacing="1.5" />
+                <TextBlock
+                    Text="The log stays pinned beside the amp controls so you can watch protocol traffic without scrolling away from the panel."
+                    TextWrapping="Wrap"
+                    Foreground="{StaticResource KatanaSubtleTextBrush}" />
+            </StackPanel>
+
+            <TextBox Grid.Row="1"
+                     Classes="diagnostic-log"
+                     IsReadOnly="True"
+                     Text="{Binding DiagnosticLog}"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     VerticalAlignment="Stretch" />
+        </Grid>
+    </Border>
+</UserControl>
