@@ -11,9 +11,21 @@ public class KatanaState : IKatanaState
 {
     private readonly ILogger<KatanaState> _logger;
 
+    private readonly Dictionary<string, AmpControlState> _stateFields = new();
+
     public KatanaState(ILogger<KatanaState> logger)
     {
         _logger = logger;
+
+        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpType.AddressString, AmpType);
+        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpVariation.AddressString, AmpVariation);
+        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpGain.AddressString, Gain);
+        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpVolume.AddressString, Volume);
+        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpBass.AddressString, Bass);
+        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpMiddle.AddressString, Middle);
+        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpTreble.AddressString, Treble);
+        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpPresence.AddressString, Presence);
+        _stateFields.TryAdd(KatanaMkIIParameterCatalog.CabinetResonance.AddressString, CabinetResonance);
     }
 
     /// <summary>
@@ -112,51 +124,21 @@ public class KatanaState : IKatanaState
         return dict;
     }
 
+
     public void SetStates(IReadOnlyDictionary<string, byte> values)
     {
-        foreach (var keyValuePair in values)
-        {
-            SetState(keyValuePair.Key, keyValuePair.Value);
-        }
+        foreach (var keyValuePair in values) SetState(keyValuePair.Key, keyValuePair.Value);
     }
 
     public void SetState(string key, byte value)
     {
-        switch (key)
-        {
-            case var n when n == KatanaMkIIParameterCatalog.AmpType.Key:
-                AmpType.Value = value;
-                _logger.LogInformation("{Name} : {Value} Refreshed", key, value);
-                break;
-            case var n when n == KatanaMkIIParameterCatalog.AmpVariation.Key:
-                AmpVariation.Value = value;
+        _logger.LogInformation("{Name} : {Value} Refreshed", key, value);
 
-                break;
-            case var n when n == KatanaMkIIParameterCatalog.AmpGain.Key:
-                Gain.Value = value;
-                break;
-            case var n when n == KatanaMkIIParameterCatalog.AmpVolume.Key:
-                Volume.Value = value;
-                break;
-            case var n when n == KatanaMkIIParameterCatalog.AmpBass.Key:
-                Bass.Value = value;
-                break;
-            case var n when n == KatanaMkIIParameterCatalog.AmpMiddle.Key:
-                Middle.Value = value;
-                break;
-            case var n when n == KatanaMkIIParameterCatalog.AmpTreble.Key:
-                Treble.Value = value;
-                break;
-            case var n when n == KatanaMkIIParameterCatalog.AmpPresence.Key:
-                Presence.Value = value;
-                break;
-            case var n when n == KatanaMkIIParameterCatalog.CabinetResonance.Key:
-                CabinetResonance.Value = value;
-                break;
-            default:
-                _logger.LogInformation("{Key}: {Value} was not able to be matched to a State Control", key, value);
-                break;
-        }
+        if (_stateFields.TryGetValue(key, out var state))
+            state.Value = value;
+
+        else
+            _logger.LogWarning("Received update for unknown parameter key: {Key}", key);
     }
 
     #region Pedals

@@ -15,14 +15,10 @@ public sealed class KatanaParameterDefinition
         ArgumentNullException.ThrowIfNull(address);
 
         if (address.Count != 4)
-        {
             throw new ArgumentException("Katana parameter addresses must contain exactly 4 bytes.", nameof(address));
-        }
 
         if (minimum > maximum)
-        {
             throw new ArgumentOutOfRangeException(nameof(minimum), "Minimum must be less than or equal to maximum.");
-        }
 
         Key = key;
         DisplayName = displayName;
@@ -37,6 +33,8 @@ public sealed class KatanaParameterDefinition
     public string DisplayName { get; }
 
     public IReadOnlyList<byte> Address { get; }
+
+    public string AddressString => string.Join("-", Address);
 
     public byte Minimum { get; }
 
