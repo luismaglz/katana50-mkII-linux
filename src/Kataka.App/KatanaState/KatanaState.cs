@@ -140,6 +140,8 @@ public class KatanaState : IKatanaState
     }
 
 
+    public IReadOnlyDictionary<string, AmpControlState> GetAllRegisteredStates() => _stateFields;
+
     public void SetStates(IReadOnlyDictionary<string, byte> values)
     {
         foreach (var keyValuePair in values) SetState(keyValuePair.Key, keyValuePair.Value);

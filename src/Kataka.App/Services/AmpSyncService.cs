@@ -22,7 +22,7 @@ public sealed class AmpSyncService : IAmpSyncService
 
     private readonly Dictionary<string, AmpControlViewModel> _ampControlsByKey = [];
     private readonly Dictionary<string, IBasePedal> _panelEffectsByKey = [];
-    private readonly Dictionary<string, byte> _pendingWrites = [];
+    private readonly Dictionary<string, (IReadOnlyList<byte> Address, byte Value)> _pendingWrites = [];
     private readonly IKatanaSession _session;
     private readonly IKatanaState _katanaState;
     private readonly SemaphoreSlim _syncGate = new(1, 1);
@@ -31,8 +31,8 @@ public sealed class AmpSyncService : IAmpSyncService
     private Dictionary<string, AmpControlState> _domainAmpControlsByKey = [];
     private Dictionary<string, AmpControlState> _domainPanelStatesByKey = [];
 
-    private int _flushRetryCount;
-    private bool _isShuttingDown;
+    private bool _suppressWrites;
+    private bool _stateWritesSubscribed;
     private string? _pendingPanelChannel;
     private Dictionary<string, Action<byte>> _pushHandlerLookup = [];
     // private IAmpSyncState _context = null!;
@@ -52,7 +52,6 @@ public sealed class AmpSyncService : IAmpSyncService
     public IObservable<string> StatusMessages => _statusSubject;
 
     private readonly ILogger<AmpSyncService> _logger;
-    private readonly Utilities _utilities;
 
     // ── Construction ──────────────────────────────────────────────────────────
 
@@ -66,8 +65,7 @@ public sealed class AmpSyncService : IAmpSyncService
         _writeSyncTimer.Tick += async (_, _) =>
         {
             _writeSyncTimer.Stop();
-            // await FlushPendingWritesAsync();
-            if (HasPendingWrites()) UpdateWriteSyncTimer();
+            await FlushPendingWritesAsync();
         };
     }
 
@@ -88,7 +86,6 @@ public sealed class AmpSyncService : IAmpSyncService
 
     public void Shutdown()
     {
-        _isShuttingDown = true;
         _writeSyncTimer.Stop();
     }
 
@@ -109,8 +106,15 @@ public sealed class AmpSyncService : IAmpSyncService
 
     public void QueueWrite(string key, byte value, string logMessage)
     {
+        // Legacy API — prefer state-subscription writes via SubscribeToStateWrites.
+        // Kept for compatibility; callers must pass an address-string key.
         if (!_session.IsConnected) return;
-        _pendingWrites[key] = value;
+        var parts = key.Split('-');
+        if (parts.Length == 4)
+        {
+            var address = parts.Select(p => Convert.ToByte(p, 16)).ToArray();
+            _pendingWrites[key] = (address, value);
+        }
         _logger.LogInformation("Queued panel sync: {Message}.", logMessage);
         UpdateWriteSyncTimer();
     }
@@ -147,46 +151,31 @@ public sealed class AmpSyncService : IAmpSyncService
 
     public async Task<bool> TryRefreshAmpStateAsync()
     {
-        await TryReadAmpControlsAsync();
-        // await TryReadPanelControlsAsync();
-        // await TryReadPedalControlsAsync();
-        return true;
-    }
-
-    private async Task<bool> TryReadAmpControlsAsync()
-    {
         try
         {
-            _logger.LogInformation("Reading Katana amp editor controls.");
-            List<KatanaParameterDefinition> controls = new(
-                [
-                    KatanaMkIIParameterCatalog.AmpType,
-                    KatanaMkIIParameterCatalog.AmpVariation,
-                    KatanaMkIIParameterCatalog.AmpGain,
-                    KatanaMkIIParameterCatalog.AmpVolume,
-                    KatanaMkIIParameterCatalog.AmpBass,
-                    KatanaMkIIParameterCatalog.AmpMiddle,
-                    KatanaMkIIParameterCatalog.AmpTreble,
-                    KatanaMkIIParameterCatalog.AmpPresence,
-                    KatanaMkIIParameterCatalog.CabinetResonance
-                ]);
+            _logger.LogInformation("Seeding KatanaState from full patch read.");
+            _suppressWrites = true;
+            try
+            {
+                var allStates = await _session.ReadAllPatchStatesAsync();
+                _katanaState.SetStates(allStates);
+            }
+            finally
+            {
+                _suppressWrites = false;
+            }
 
-            var values = await _session.ReadParametersAsync(controls);
-            _katanaState.SetStates(values);
+            SubscribeToStateWrites();
+            _logger.LogInformation("KatanaState seeded. Write-back subscriptions active.");
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Amp editor read failed.");
-            _readCompletedSubject.OnNext(new DeviceReadMetadata(
-                null, false, false,
-                ex.Message,
-                string.Empty,
-                string.Empty,
-                "Amp editor read failed."));
+            _logger.LogError(ex, "Full patch state read failed.");
             return false;
         }
     }
+
 
     // private async Task<bool> TryReadPanelControlsAsync()
     // {
@@ -626,6 +615,52 @@ public sealed class AmpSyncService : IAmpSyncService
         {
             _logger.LogError(ex, "Delay time read failed.");
             return null;
+        }
+    }
+
+    // ── State write-back ──────────────────────────────────────────────────────
+
+    private void SubscribeToStateWrites()
+    {
+        if (_stateWritesSubscribed) return;
+        _stateWritesSubscribed = true;
+
+        foreach (var (_, state) in _katanaState.GetAllRegisteredStates())
+        {
+            var captured = state;
+            captured.ValueChanged += () => OnDomainStateChanged(captured);
+        }
+    }
+
+    private void OnDomainStateChanged(AmpControlState state)
+    {
+        if (_suppressWrites || !_session.IsConnected) return;
+        _pendingWrites[state.Parameter.AddressString] = (state.Parameter.Address, (byte)state.Value);
+        UpdateWriteSyncTimer();
+    }
+
+    private async Task FlushPendingWritesAsync()
+    {
+        if (_pendingWrites.Count == 0) return;
+        if (!await _syncGate.WaitAsync(0)) return;
+        try
+        {
+            var snapshot = _pendingWrites.ToList();
+            _pendingWrites.Clear();
+            foreach (var (_, (address, value)) in snapshot)
+            {
+                _logger.LogInformation("Writing {Address} = {Value}",
+                    string.Join("-", address.Select(b => b.ToString("X2"))), value);
+                await _session.WriteBlockAsync(address, [value]);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Flush pending writes failed.");
+        }
+        finally
+        {
+            _syncGate.Release();
         }
     }
 

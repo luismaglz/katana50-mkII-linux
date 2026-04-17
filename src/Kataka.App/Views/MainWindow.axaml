@@ -29,12 +29,12 @@
                     <Grid RowDefinitions="Auto,Auto" RowSpacing="18">
 
                         <Grid ColumnDefinitions="Auto,*,300" ColumnSpacing="14">
-                            <!-- <views:AmpControlsView DataContext="{Binding AmpEditor}" /> -->
-                            <!-- <views:ChannelStripView Grid.Column="1" /> -->
-                            <!-- <views:DeviceStatusView Grid.Column="2" /> -->
+                            <views:AmpControlsView DataContext="{Binding AmpEditor}" />
+                            <views:ChannelStripView Grid.Column="1" />
+                            <views:DeviceStatusView Grid.Column="2" />
                         </Grid>
 
-                        <!-- <views:PedalboardView Grid.Row="1" DataContext="{Binding AmpEditor}" /> -->
+                        <views:PedalboardView Grid.Row="1" DataContext="{Binding AmpEditor}" />
 
                     </Grid>
                 </Border>

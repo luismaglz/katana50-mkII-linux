@@ -61,4 +61,7 @@ internal sealed class NullKatanaSession : IKatanaSession
 
     public Task LoadPatchAsync(TslPatch patch, CancellationToken cancellationToken = default)
         => Task.CompletedTask;
+
+    public Task<IReadOnlyDictionary<string, byte>> ReadAllPatchStatesAsync(CancellationToken cancellationToken = default)
+        => Task.FromResult<IReadOnlyDictionary<string, byte>>(new Dictionary<string, byte>());
 }

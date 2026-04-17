@@ -9,10 +9,10 @@
              x:DataType="vm:PanelViewModel">
     <UserControl.Resources>
         <DataTemplate x:Key="AmpControlTemplate" x:DataType="vm:AmpControlViewModel">
-            <controls:LargeImageRotaryKnob Label="{Binding DisplayName}"
-                                           Minimum="{Binding Minimum}"
-                                           Maximum="{Binding Maximum}"
-                                           Value="{Binding Value}" />
+            <controls:RotaryKnob Label="{Binding DisplayName}"
+                                 Minimum="{Binding Minimum}"
+                                 Maximum="{Binding Maximum}"
+                                 Value="{Binding Value}" />
         </DataTemplate>
     </UserControl.Resources>
 
@@ -24,7 +24,7 @@
             </LinearGradientBrush>
         </Border.Background>
 
-        <StackPanel Spacing="0">
+        <StackPanel Spacing="0" HorizontalAlignment="Center" Margin="12" Orientation="Horizontal">
             <ContentControl Content="{Binding AmpType}" ContentTemplate="{StaticResource AmpControlTemplate}" />
             <ContentControl Content="{Binding AmpVariation}" ContentTemplate="{StaticResource AmpControlTemplate}" />
             <ContentControl Content="{Binding Gain}" ContentTemplate="{StaticResource AmpControlTemplate}" />
