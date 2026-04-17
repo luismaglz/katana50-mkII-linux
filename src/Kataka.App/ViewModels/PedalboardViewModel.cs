@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reactive.Disposables;
-
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -10,8 +8,7 @@ namespace Kataka.App.ViewModels;
 
 public partial class PedalboardViewModel : ViewModelBase
 {
-    private readonly IReadOnlyDictionary<string, IBasePedal> _pedalsByKey;
-    private readonly CompositeDisposable _disposables = new();
+    private readonly IReadOnlyDictionary<string, PedalViewModel> _pedalsByKey;
     private PedalboardItemViewModel? _ampItem;
 
     public static string[] ChainPatternNames { get; } =
@@ -40,18 +37,19 @@ public partial class PedalboardViewModel : ViewModelBase
     ];
 
     public PedalboardViewModel(
-        IReadOnlyDictionary<string, IBasePedal> pedalsByKey,
+        IReadOnlyDictionary<string, PedalViewModel> pedalsByKey,
         string initialChannel)
     {
         _pedalsByKey = pedalsByKey;
         SelectedChannel = initialChannel;
 
         this.WhenAnyValue(x => x.SelectedChannel)
-            .Subscribe(v => { if (_ampItem is not null) _ampItem.Detail = v; });
-
+            .Subscribe(v => { if (_ampItem is not null) _ampItem.Detail = v; })
+            .DisposeWith(Disposables);
 
         this.WhenAnyValue(x => x.SelectedChainPattern)
-            .Subscribe(_ => Refresh());
+            .Subscribe(_ => Refresh())
+            .DisposeWith(Disposables);
 
     }
 

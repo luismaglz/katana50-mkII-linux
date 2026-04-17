@@ -24,7 +24,7 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
     public bool IsConnectedFromPrevious { get; init; }
 
     // For effect items in the chain, points to the live PedalViewModel with controls.
-    public IBasePedal? PanelEffect { get; init; }
+    public PedalViewModel? PanelEffect { get; init; }
 
     // Per-family flags for binding IsVisible in pedal-type-specific views.
     public bool IsBooster => Family is "booster";

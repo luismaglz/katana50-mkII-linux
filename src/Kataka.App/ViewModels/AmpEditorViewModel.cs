@@ -51,7 +51,7 @@ public partial class AmpEditorViewModel : ViewModelBase
         katanaState.AmpVariation.ValueChanged += () =>
             IsAmpVariation = katanaState.AmpVariation.Value != 0;
 
-        foreach (var effectViewModel in new IBasePedal[]
+        foreach (var effectViewModel in new PedalViewModel[]
                  {
                      new BoosterPedalViewModel(katanaState),
                      new ModFxPedalViewModel("mod"),
@@ -75,7 +75,7 @@ public partial class AmpEditorViewModel : ViewModelBase
         {
             if (meta.PanelControlsStatus.Length > 0) PanelControlsStatus = meta.PanelControlsStatus;
             if (meta.PedalControlsStatus.Length > 0) PedalControlsStatus = meta.PedalControlsStatus;
-        });
+        }).DisposeWith(Disposables);
 
         this.WhenAnyValue(x => x.SelectedAmpType)
             .Subscribe(v =>
@@ -83,7 +83,7 @@ public partial class AmpEditorViewModel : ViewModelBase
                 var idx = Array.IndexOf(AmpTypeOptions, v);
                 if (idx < 0) return;
                 _katanaState.AmpType.Value = idx;
-            });
+            }).DisposeWith(Disposables);
 
         this.WhenAnyValue(x => x.SelectedCabinetResonance)
             .Subscribe(v =>
@@ -91,21 +91,22 @@ public partial class AmpEditorViewModel : ViewModelBase
                 var idx = Array.IndexOf(CabinetResonanceOptions, v);
                 if (idx < 0) return;
                 _katanaState.CabinetResonance.Value = idx;
-            });
+            }).DisposeWith(Disposables);
 
         this.WhenAnyValue(x => x.IsAmpVariation)
-            .Subscribe(v => _katanaState.AmpVariation.Value = v ? 1 : 0);
+            .Subscribe(v => _katanaState.AmpVariation.Value = v ? 1 : 0)
+            .DisposeWith(Disposables);
 
         this.WhenAnyValue(x => x.ActiveWriteSync)
             .Subscribe(v =>
             {
                 _logger.LogInformation("Active write sync {State}.", v ? "enabled" : "disabled");
                 syncService.UpdateWriteSyncTimer();
-            });
+            }).DisposeWith(Disposables);
     }
 
     public ObservableCollection<AmpControlViewModel> AmpControls { get; } = [];
-    public ObservableCollection<IBasePedal> PanelEffects { get; } = [];
+    public ObservableCollection<PedalViewModel> PanelEffects { get; } = [];
     public PedalFxViewModel PedalFx { get; } = new();
     public PedalboardViewModel Pedalboard { get; }
     public PanelViewModel Panel { get; }

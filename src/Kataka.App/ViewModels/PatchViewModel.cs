@@ -50,7 +50,7 @@ public partial class PatchViewModel : ViewModelBase
             {
                 _lastDelayTapAt = null;
             }
-        });
+        }).DisposeWith(Disposables);
     }
 
     [Reactive] public int PatchLevel { get; set; } = 100;
