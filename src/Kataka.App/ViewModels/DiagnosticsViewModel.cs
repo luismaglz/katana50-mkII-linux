@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using CommunityToolkit.Mvvm.Input;
 
+using Kataka.App.Logging;
 using Kataka.App.Services;
 
 using ReactiveUI.Fody.Helpers;
@@ -14,12 +15,12 @@ public partial class DiagnosticsViewModel : ViewModelBase
     private readonly IAmpSyncService _syncService;
     private readonly Func<bool> _isConnected;
 
-    public DiagnosticsViewModel(IAmpSyncService syncService, Func<bool> isConnected)
+    public DiagnosticsViewModel(IAmpSyncService syncService, ObservableLoggerProvider loggerProvider, Func<bool> isConnected)
     {
         _syncService = syncService;
         _isConnected = isConnected;
 
-        syncService.LogMessages.Subscribe(AppendRaw);
+        loggerProvider.LogMessages.Subscribe(AppendRaw);
 
         syncService.ReadCompleted.Subscribe(meta =>
         {

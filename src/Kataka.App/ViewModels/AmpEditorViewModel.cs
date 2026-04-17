@@ -10,6 +10,8 @@ using Kataka.App.Services;
 using Kataka.Application.Katana;
 using Kataka.Domain.KatanaState;
 
+using Microsoft.Extensions.Logging;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -21,20 +23,20 @@ public partial class AmpEditorViewModel : ViewModelBase
     private readonly IKatanaState _katanaState;
     private readonly IAmpSyncService _syncService;
     private readonly Action<string> _appendStatus;
-    private readonly Action<string> _appendLog;
+    private readonly ILogger<AmpEditorViewModel> _logger;
 
     public AmpEditorViewModel(
         IKatanaSession katanaSession,
         IKatanaState katanaState,
         IAmpSyncService syncService,
         Action<string> appendStatus,
-        Action<string> appendLog)
+        ILogger<AmpEditorViewModel> logger)
     {
         _katanaSession = katanaSession;
         _katanaState = katanaState;
         _syncService = syncService;
         _appendStatus = appendStatus;
-        _appendLog = appendLog;
+        _logger = logger;
 
         katanaState.AmpType.ValueChanged += () =>
         {
@@ -97,7 +99,7 @@ public partial class AmpEditorViewModel : ViewModelBase
         this.WhenAnyValue(x => x.ActiveWriteSync)
             .Subscribe(v =>
             {
-                _appendLog($"Active write sync {(v ? "enabled" : "disabled")}.");
+                _logger.LogInformation("Active write sync {State}.", v ? "enabled" : "disabled");
                 syncService.UpdateWriteSyncTimer();
             });
     }
@@ -167,10 +169,10 @@ public partial class AmpEditorViewModel : ViewModelBase
 
         try
         {
-            _appendLog("Writing Katana panel controls.");
+            _logger.LogInformation("Writing Katana panel controls.");
             var channel = IAmpSyncState.ParsePanelChannelDisplay(SelectedPanelChannel);
             await _katanaSession.SelectPanelChannelAsync(channel);
-            _appendLog($"Selected panel channel: {SelectedPanelChannel}");
+            _logger.LogInformation("Selected panel channel: {Channel}", SelectedPanelChannel);
             var patchLevelWritten = await _syncService.TryWritePatchLevelAsync();
 
             foreach (var effect in PanelEffects)
@@ -179,7 +181,7 @@ public partial class AmpEditorViewModel : ViewModelBase
                     effect.Definition.SwitchParameter,
                     effect.IsEnabled ? (byte)1 : (byte)0);
                 effect.IsEnabled = confirmedValue != 0;
-                _appendLog($"{effect.DisplayName} confirmed {(effect.IsEnabled ? "On" : "Off")}.");
+                _logger.LogInformation("{Name} confirmed {State}.", effect.DisplayName, effect.IsEnabled ? "On" : "Off");
 
                 if (effect.Definition.TypeParameter is not null &&
                     effect.TryGetTypeValue(effect.SelectedTypeOption, out var requestedType))
@@ -187,7 +189,7 @@ public partial class AmpEditorViewModel : ViewModelBase
                     var confirmedType = await _katanaSession.WriteParameterAsync(
                         effect.Definition.TypeParameter, requestedType);
                     effect.SelectedTypeOption = effect.ToTypeOption(confirmedType);
-                    _appendLog($"{effect.DisplayName} type confirmed at {effect.SelectedTypeOption}.");
+                    _logger.LogInformation("{Name} type confirmed at {Type}.", effect.DisplayName, effect.SelectedTypeOption);
                 }
             }
 
@@ -200,9 +202,7 @@ public partial class AmpEditorViewModel : ViewModelBase
         {
             PanelControlsStatus = "Panel control write failed.";
             _appendStatus(ex.Message);
-            _appendLog("Panel control write failed.");
-            _appendLog(ex.ToString());
-            Console.Error.WriteLine(ex);
+            _logger.LogError(ex, "Panel control write failed.");
         }
     }
 
@@ -217,17 +217,17 @@ public partial class AmpEditorViewModel : ViewModelBase
 
         try
         {
-            _appendLog("Writing Katana pedal controls.");
+            _logger.LogInformation("Writing Katana pedal controls.");
             var mismatches = new List<string>();
 
             foreach (var parameter in PedalFx.GetManualWriteParameters())
             {
                 if (!PedalFx.TryGetCurrentValue(parameter.Key, out var requestedValue)) continue;
 
-                _appendLog($"Writing {parameter.DisplayName} = {requestedValue}.");
+                _logger.LogInformation("Writing {Name} = {Value}.", parameter.DisplayName, requestedValue);
                 var confirmedValue = await _katanaSession.WriteParameterAsync(parameter, requestedValue);
                 ApplyPedalValue(parameter.Key, confirmedValue);
-                _appendLog($"{parameter.DisplayName} confirmed at {confirmedValue}.");
+                _logger.LogInformation("{Name} confirmed at {Value}.", parameter.DisplayName, confirmedValue);
 
                 if (confirmedValue != requestedValue)
                     mismatches.Add($"{parameter.DisplayName} ({requestedValue}->{confirmedValue})");
@@ -244,9 +244,7 @@ public partial class AmpEditorViewModel : ViewModelBase
         {
             PedalControlsStatus = "Pedal control write failed.";
             _appendStatus(ex.Message);
-            _appendLog("Pedal control write failed.");
-            _appendLog(ex.ToString());
-            Console.Error.WriteLine(ex);
+            _logger.LogError(ex, "Pedal control write failed.");
         }
     }
 

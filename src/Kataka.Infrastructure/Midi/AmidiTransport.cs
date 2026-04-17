@@ -22,7 +22,7 @@ public sealed class AmidiTransport : IMidiTransport
         return ports;
     }
 
-    public async Task<IMidiConnection> OpenAsync(
+    public Task<IMidiConnection> OpenAsync(
         string inputPortId,
         string outputPortId,
         CancellationToken cancellationToken = default)
@@ -30,25 +30,12 @@ public sealed class AmidiTransport : IMidiTransport
         ArgumentException.ThrowIfNullOrWhiteSpace(inputPortId);
         ArgumentException.ThrowIfNullOrWhiteSpace(outputPortId);
 
-        var ports = await ListPortsAsync(cancellationToken);
-        var inputExists = ports.Any(port => port.Direction == MidiPortDirection.Input && port.Id == inputPortId);
-        var outputExists = ports.Any(port => port.Direction == MidiPortDirection.Output && port.Id == outputPortId);
-
-        if (!inputExists)
-        {
-            throw new InvalidOperationException($"Input port '{inputPortId}' is no longer available.");
-        }
-
-        if (!outputExists)
-        {
-            throw new InvalidOperationException($"Output port '{outputPortId}' is no longer available.");
-        }
-
         // Both input and output are the same raw MIDI device file for the Katana.
         // hw:CARD,DEVICE,SUBDEV → /dev/snd/midiC{CARD}D{DEVICE}
+        // If the device path doesn't exist, AlsaRawMidiConnection throws IOException.
         var hwId = StripPrefix(inputPortId);
         var devicePath = HwIdToDevicePath(hwId);
-        return new AlsaRawMidiConnection(devicePath);
+        return Task.FromResult<IMidiConnection>(new AlsaRawMidiConnection(devicePath));
     }
 
     public static bool IsSupported()

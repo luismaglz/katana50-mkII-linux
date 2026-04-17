@@ -3,9 +3,12 @@ using System.Collections.Generic;
 
 using Avalonia.Platform.Storage;
 
+using Kataka.App.Logging;
 using Kataka.App.Services;
 using Kataka.Application.Katana;
 using Kataka.Domain.KatanaState;
+
+using Microsoft.Extensions.Logging;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -16,14 +19,15 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncState
 {
     private readonly IAmpSyncService syncService;
 
-    public MainWindowViewModel(IKatanaSession katanaSession, IKatanaState katanaState, IAmpSyncService ampSyncService)
+    public MainWindowViewModel(IKatanaSession katanaSession, IKatanaState katanaState, IAmpSyncService ampSyncService,
+        ILoggerFactory loggerFactory, ObservableLoggerProvider loggerProvider)
     {
         syncService = ampSyncService;
 
-        MidiConnection = new MidiConnectionViewModel(katanaSession, ampSyncService, AppendStatus, AppendLog);
-        Diagnostics    = new DiagnosticsViewModel(ampSyncService, () => MidiConnection.IsConnected);
-        Patch          = new PatchViewModel(katanaSession, ampSyncService, () => MidiConnection.IsConnected, AppendStatus, AppendLog);
-        AmpEditor      = new AmpEditorViewModel(katanaSession, katanaState, ampSyncService, AppendStatus, AppendLog);
+        MidiConnection = new MidiConnectionViewModel(katanaSession, ampSyncService, AppendStatus, loggerFactory.CreateLogger<MidiConnectionViewModel>());
+        Diagnostics    = new DiagnosticsViewModel(ampSyncService, loggerProvider, () => MidiConnection.IsConnected);
+        Patch          = new PatchViewModel(katanaSession, ampSyncService, () => MidiConnection.IsConnected, AppendStatus, loggerFactory.CreateLogger<PatchViewModel>());
+        AmpEditor      = new AmpEditorViewModel(katanaSession, katanaState, ampSyncService, AppendStatus, loggerFactory.CreateLogger<AmpEditorViewModel>());
 
         syncService.Initialize(this);
 
@@ -76,11 +80,4 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncState
     // ── Private helpers ───────────────────────────────────────────────────────
 
     private void AppendStatus(string msg) => StatusMessage = msg;
-
-    private void AppendLog(string msg)
-    {
-        var line = $"[{DateTimeOffset.Now:HH:mm:ss}] {msg}";
-        Diagnostics.AppendRaw(line);
-        Console.WriteLine(line);
-    }
 }
