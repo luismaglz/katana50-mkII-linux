@@ -9,9 +9,9 @@
              mc:Ignorable="d"
              d:DesignWidth="2400"
              d:DesignHeight="480"
-             d:DataContext="{x:Static dvm:DesignMainWindowViewModel.Instance}"
+             d:DataContext="{x:Static dvm:DesignAmpEditorViewModel.Instance}"
              x:Class="Kataka.App.Views.PedalboardView"
-             x:DataType="vm:MainWindowViewModel">
+             x:DataType="vm:AmpEditorViewModel">
     <Border Classes="panel-section alt" Padding="18">
         <StackPanel Spacing="12">
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
@@ -25,7 +25,7 @@
                     <ComboBox Classes="midi-port-picker"
                               MinWidth="130"
                               ItemsSource="{x:Static vm:PedalboardViewModel.ChainPatternNames}"
-                              SelectedIndex="{Binding Pedalboard.SelectedChainPattern}" />
+                              SelectedIndex="{Binding Pedalboard.SelectedChainPattern, Mode=TwoWay}" />
                 </StackPanel>
             </Grid>
 

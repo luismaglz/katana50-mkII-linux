@@ -2,7 +2,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Kataka.App.ViewModels"
         xmlns:dvm="using:Kataka.App.ViewModels.Design"
-        xmlns:controls="using:Kataka.App.Controls"
         xmlns:views="using:Kataka.App.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -10,75 +9,17 @@
         d:DesignWidth="1320"
         d:DesignHeight="900"
         x:Class="Kataka.App.Views.MainWindow"
-        x:Name="RootWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="Kataka - Amp Panel">
-
 
     <Design.DataContext>
         <dvm:DesignMainWindowViewModel />
     </Design.DataContext>
 
     <Grid RowDefinitions="Auto,*" Margin="20" RowSpacing="18">
-        <Border Classes="transport-shell" Padding="18">
-            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="18" RowSpacing="12">
-                <StackPanel Grid.RowSpan="2" Spacing="4">
-                    <TextBlock Text="KATAKA"
-                               FontSize="28"
-                               FontWeight="Bold"
-                               LetterSpacing="3" />
-                    <TextBlock Text="Linux-first Katana amp editor"
-                               Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                </StackPanel>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="MIDI INPUT"
-                                   FontWeight="SemiBold"
-                                   Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                        <ComboBox Classes="midi-port-picker"
-                                  ItemsSource="{Binding InputPorts}"
-                                  SelectedItem="{Binding SelectedInputPort}" />
-                    </StackPanel>
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="MIDI OUTPUT"
-                                   FontWeight="SemiBold"
-                                   Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                        <ComboBox Classes="midi-port-picker"
-                                  ItemsSource="{Binding OutputPorts}"
-                                  SelectedItem="{Binding SelectedOutputPort}" />
-                    </StackPanel>
-                </StackPanel>
-
-                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Top">
-                    <Button Classes="transport-button"
-                            Content="Scan"
-                            Command="{Binding ScanCommand}" />
-                    <Button Classes="transport-button accent"
-                            Content="Connect"
-                            Command="{Binding ConnectCommand}" />
-                    <Button Classes="transport-button"
-                            Content="Disconnect"
-                            Command="{Binding DisconnectCommand}" />
-                </StackPanel>
-
-                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="4">
-                    <TextBlock Text="{Binding StatusMessage}"
-                               FontWeight="SemiBold" />
-                    <TextBlock Text="{Binding DetectionMessage}"
-                               TextWrapping="Wrap"
-                               Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                </StackPanel>
-
-                <TextBlock Grid.Row="2"
-                           Grid.Column="1"
-                           Grid.ColumnSpan="2"
-                           Text="Read sync controls targeted read-back after writes. Write sync queues knob and toggle edits and flushes them automatically."
-                           Foreground="{StaticResource KatanaSubtleTextBrush}"
-                           TextWrapping="Wrap" />
-            </Grid>
-        </Border>
+        <views:MidiTransportView />
 
         <Grid Grid.Row="1" ColumnDefinitions="*,360" ColumnSpacing="18">
             <ScrollViewer Grid.Column="0"
@@ -86,196 +27,21 @@
                           VerticalScrollBarVisibility="Auto">
                 <Border Classes="amp-shell" Padding="24">
                     <Grid RowDefinitions="Auto,Auto" RowSpacing="18">
-                        <!-- ROW 0: AMP CONTROLS | CHANNEL STRIP | DEVICE STATUS -->
+
                         <Grid ColumnDefinitions="Auto,*,300" ColumnSpacing="14">
-                            <!-- AMP CONTROLS -->
-                            <Border Classes="panel-section" Padding="16" MinWidth="340">
-                                <StackPanel Spacing="10">
-                                    <StackPanel Spacing="4">
-                                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                                            <Image Source="/Assets/amplifier.png" Width="28" Height="28"
-                                                   VerticalAlignment="Center" />
-                                            <TextBlock Text="AMP CONTROLS"
-                                                       FontSize="16"
-                                                       FontWeight="Bold"
-                                                       LetterSpacing="1.5"
-                                                       VerticalAlignment="Center" />
-                                        </StackPanel>
-                                        <TextBlock Text="{Binding AmpEditorStatus}"
-                                                   FontSize="11"
-                                                   Foreground="{StaticResource KatanaSubtleTextBrush}"
-                                                   TextWrapping="Wrap" />
-                                    </StackPanel>
-                                    <ItemsControl ItemsSource="{Binding AmpControls}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <WrapPanel Orientation="Horizontal" ItemSpacing="14" LineSpacing="14" />
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate x:DataType="vm:AmpControlViewModel">
-                                                <controls:RotaryKnob Label="{Binding DisplayName}"
-                                                                     Minimum="{Binding Minimum}"
-                                                                     Maximum="{Binding Maximum}"
-                                                                     Value="{Binding Value}" />
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                    <views:PanelView></views:PanelView>
-                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                                        <StackPanel Spacing="4">
-                                            <TextBlock Text="AMP TYPE" FontSize="10" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                            <ComboBox Classes="midi-port-picker" HorizontalAlignment="Stretch"
-                                                      ItemsSource="{x:Static vm:MainWindowViewModel.AmpTypeOptions}"
-                                                      SelectedItem="{Binding SelectedAmpType}" />
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="1" Spacing="4">
-                                            <TextBlock Text="CABINET" FontSize="10" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                            <ComboBox Classes="midi-port-picker" HorizontalAlignment="Stretch"
-                                                      ItemsSource="{x:Static vm:MainWindowViewModel.CabinetResonanceOptions}"
-                                                      SelectedItem="{Binding SelectedCabinetResonance}" />
-                                        </StackPanel>
-                                    </Grid>
-                                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                        <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource KatanaSubtleTextBrush}"
-                                                   VerticalAlignment="Center" />
-                                        <ToggleButton IsChecked="{Binding IsAmpVariation}"
-                                                      Classes="effect-toggle"
-                                                      Content="TYPE 2"
-                                                      ToolTip.Tip="Amp Variation (TYPE 1 / TYPE 2)" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-
-                            <!-- CHANNEL STRIP (inline) -->
-                            <Border Grid.Column="1" Classes="panel-section alt" Padding="16">
-                                <StackPanel Spacing="10">
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Text="CHANNEL STRIP"
-                                                   FontSize="16"
-                                                   FontWeight="Bold"
-                                                   LetterSpacing="1.5" />
-                                        <TextBlock Text="{Binding PanelControlsStatus}"
-                                                   FontSize="11"
-                                                   Foreground="{StaticResource KatanaSubtleTextBrush}"
-                                                   TextWrapping="Wrap" />
-                                    </StackPanel>
-                                    <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
-                                        <Button Classes="transport-button" Content="Load Patch"
-                                                Command="{Binding LoadPatchCommand}"
-                                                IsEnabled="{Binding CanWritePatch}"
-                                                ToolTip.Tip="Load a .tsl patch file and send it to the amp" />
-                                        <Button Classes="transport-button" Content="Save Patch"
-                                                Command="{Binding SavePatchCommand}"
-                                                IsEnabled="{Binding CanWritePatch}"
-                                                ToolTip.Tip="Save the current amp state as a .tsl patch file" />
-                                        <Button Classes="transport-button" Content="Write Patch"
-                                                Command="{Binding WritePatchCommand}"
-                                                IsEnabled="{Binding CanWritePatch}"
-                                                ToolTip.Tip="Save current settings to patch memory on the Katana" />
-                                    </WrapPanel>
-                                    <ItemsControl ItemsSource="{Binding PanelChannelOptions}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8" />
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate x:DataType="vm:PanelChannelOptionViewModel">
-                                                <ToggleButton Classes="channel-button"
-                                                              Content="{Binding DisplayName}"
-                                                              IsChecked="{Binding IsSelected}"
-                                                              Command="{Binding #RootWindow.DataContext.SelectPanelChannelCommand}"
-                                                              CommandParameter="{Binding DisplayName}" />
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                    <WrapPanel Orientation="Horizontal" ItemSpacing="14" LineSpacing="14">
-                                        <controls:RotaryKnob Label="Patch Level"
-                                                             IsEnabled="{Binding IsPatchLevelAvailable}"
-                                                             Minimum="0" Maximum="200"
-                                                             Value="{Binding PatchLevel}" />
-                                        <Border Classes="panel-section" Padding="12" MinWidth="160">
-                                            <StackPanel Spacing="8">
-                                                <TextBlock Text="TAP TEMPO" FontWeight="Bold" FontSize="12"
-                                                           LetterSpacing="1.2" />
-                                                <TextBlock Text="{Binding DelayTapStatus}"
-                                                           TextWrapping="Wrap" FontSize="11"
-                                                           Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                                <StackPanel Orientation="Horizontal" Spacing="8"
-                                                            IsVisible="{Binding DelayTimeMs, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                                    <TextBlock Text="{Binding DelayTimeMs, StringFormat='{}{0} ms'}"
-                                                               FontSize="20" FontWeight="Bold"
-                                                               Foreground="{StaticResource KatanaAccentBrush}" />
-                                                </StackPanel>
-                                                <Button Classes="transport-button accent" HorizontalAlignment="Left"
-                                                        Content="Tap Delay" Command="{Binding TapDelayCommand}" />
-                                            </StackPanel>
-                                        </Border>
-                                    </WrapPanel>
-                                </StackPanel>
-                            </Border>
-
-                            <!-- DEVICE + LIVE STATUS -->
-                            <StackPanel Grid.Column="2" Spacing="14">
-                                <Border Classes="panel-section alt" Padding="16">
-                                    <StackPanel Spacing="10">
-                                        <TextBlock Text="DEVICE" FontSize="16" FontWeight="Bold" LetterSpacing="1.5" />
-                                        <TextBlock Text="MIDI identity request to confirm the connected amp."
-                                                   TextWrapping="Wrap" FontSize="11"
-                                                   Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                        <Button Classes="transport-button accent" Content="Request identity"
-                                                HorizontalAlignment="Left" Command="{Binding RequestIdentityCommand}" />
-                                        <TextBlock Text="IDENTITY REPLY" FontSize="10" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                        <TextBlock Text="{Binding IdentityReply}" TextWrapping="Wrap" FontSize="11" />
-                                    </StackPanel>
-                                </Border>
-                                <Border Classes="panel-section" Padding="16">
-                                    <StackPanel Spacing="8">
-                                        <TextBlock Text="LIVE STATUS" FontSize="16" FontWeight="Bold"
-                                                   LetterSpacing="1.5" />
-                                        <TextBlock Text="{Binding StatusMessage}" FontWeight="SemiBold"
-                                                   TextWrapping="Wrap" />
-                                        <TextBlock Text="{Binding DetectionMessage}" TextWrapping="Wrap" FontSize="11"
-                                                   Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                                    </StackPanel>
-                                </Border>
-                            </StackPanel>
+                            <!-- <views:AmpControlsView DataContext="{Binding AmpEditor}" /> -->
+                            <!-- <views:ChannelStripView Grid.Column="1" /> -->
+                            <!-- <views:DeviceStatusView Grid.Column="2" /> -->
                         </Grid>
 
-                        <!-- ROW 1: FULL PEDALBOARD (chain selector + all pedal controls) -->
-                        <views:PedalboardView Grid.Row="1" />
+                        <!-- <views:PedalboardView Grid.Row="1" DataContext="{Binding AmpEditor}" /> -->
 
                     </Grid>
                 </Border>
             </ScrollViewer>
 
-            <Border Grid.Column="1" Classes="transport-shell" Padding="18">
-                <Grid RowDefinitions="Auto,*" RowSpacing="12">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="DIAGNOSTICS"
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   LetterSpacing="1.5" />
-                        <TextBlock
-                            Text="The log stays pinned beside the amp controls so you can watch protocol traffic without scrolling away from the panel."
-                            TextWrapping="Wrap"
-                            Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                    </StackPanel>
-
-                    <TextBox Grid.Row="1"
-                             Classes="diagnostic-log"
-                             IsReadOnly="True"
-                             Text="{Binding DiagnosticLog}"
-                             TextWrapping="Wrap"
-                             AcceptsReturn="True"
-                             VerticalAlignment="Stretch" />
-                </Grid>
-            </Border>
+            <views:DiagnosticsView Grid.Column="1" DataContext="{Binding Diagnostics}" />
         </Grid>
+
     </Grid>
 </Window>
