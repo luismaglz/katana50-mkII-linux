@@ -43,9 +43,9 @@
                                                     Minimum="0" Maximum="100"
                                                     Value="{Binding Feedback}"
                                                     LabelFontSize="12" />
-                    <controls:SmallImageRotaryKnob  Label="HI CUT"
+                    <controls:SteppedKnob           Label="HI CUT"
                                                     Description="Sets the frequency at which the high cut filter takes effect. At maximum (FLAT), the filter has no effect."
-                                                    Minimum="0" Maximum="14"
+                                                    Steps="{x:Static vm:FrequencySteps.HighCut15}"
                                                     Value="{Binding HighCut}"
                                                     LabelFontSize="12" />
                     <controls:SmallImageRotaryKnob  Label="E.LEVEL"
