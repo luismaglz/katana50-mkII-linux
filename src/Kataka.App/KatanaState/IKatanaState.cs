@@ -4,13 +4,7 @@ namespace Kataka.App.KatanaState;
 
 public interface IKatanaState
 {
-    AmpControlState PedalChain { get; }
-    BoostPedalState BoostPedal { get; }
-    ModPedalState ModPedal { get; }
-    FxPedalState FxPedal { get; }
-    DelayPedalState DelayPedal { get; }
-    Delay2PedalState Delay2Pedal { get; }
-    ReverbPedalState ReverbPedal { get; }
+    // ── Panel-mode knob positions ────────────────────────────────────────────────
     AmpControlState AmpType { get; }
     AmpControlState AmpVariation { get; }
     AmpControlState Gain { get; }
@@ -20,6 +14,26 @@ public interface IKatanaState
     AmpControlState Treble { get; }
     AmpControlState Presence { get; }
     AmpControlState CabinetResonance { get; }
+    AmpControlState PatchLevel { get; }
+
+    // ── Channel-mode stored preamp values ────────────────────────────────────────
+    PreampState Preamp { get; }
+
+    // ── Pedals ───────────────────────────────────────────────────────────────────
+    AmpControlState PedalChain { get; }
+    BoostPedalState BoostPedal { get; }
+    ModPedalState ModPedal { get; }
+    FxPedalState FxPedal { get; }
+    DelayPedalState DelayPedal { get; }
+    Delay2PedalState Delay2Pedal { get; }
+    ReverbPedalState ReverbPedal { get; }
+    HardwarePedalState HardwarePedal { get; }
+
+    // ── Ver200+ features ─────────────────────────────────────────────────────────
+    SoloEqState SoloEq { get; }
+    ContourState Contour1 { get; }
+    ContourState Contour2 { get; }
+    ContourState Contour3 { get; }
 
     /// <summary>
     ///     Returns all top-level amp control states (EQ, gain, tone) keyed by parameter key.

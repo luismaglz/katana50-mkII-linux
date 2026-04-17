@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Kataka.Domain.Midi;
 
 public sealed class KatanaParameterDefinition
@@ -34,7 +36,7 @@ public sealed class KatanaParameterDefinition
 
     public IReadOnlyList<byte> Address { get; }
 
-    public string AddressString => string.Join("-", Address);
+    public string AddressString => string.Join("-", Address.Select(b => b.ToString("X2")));
 
     public byte Minimum { get; }
 
