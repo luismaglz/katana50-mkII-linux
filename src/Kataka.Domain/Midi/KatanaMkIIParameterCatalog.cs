@@ -2,6 +2,11 @@ namespace Kataka.Domain.Midi;
 
 public static partial class KatanaMkIIParameterCatalog
 {
+    // ── Panel-mode knob positions (PRM_KNOB_POS_*, Status block 0x0650) ──────────
+    // These reflect the physical front-panel knob positions. In PANEL mode the amp
+    // drives its sound directly from these values. In CHANNEL mode the stored preamp
+    // params (PreampGain / PreampBass etc., see below) govern the sound, but the amp
+    // still pushes KNOB_POS updates when knobs are physically moved.
     public static KatanaParameterDefinition AmpGain { get; } =
         new("amp-gain", "Gain", [0x60, 0x00, 0x06, 0x51]);
 
@@ -101,7 +106,8 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition ReverbLevel { get; } =
         new("panel-reverb-level", "Reverb Level", [0x60, 0x00, 0x06, 0x5B]);
 
-    // Amp type on the front panel (KNOB_POS_TYPE, 0-4: ACOUSTIC/CLEAN/CRUNCH/LEAD/BROWN).
+    // Panel-mode amp type knob position (PRM_KNOB_POS_TYPE, 0-4: ACOUSTIC/CLEAN/CRUNCH/LEAD/BROWN).
+    // For channel-mode amp character selection (0-32) use PreampType.
     public static KatanaParameterDefinition AmpType { get; } =
         new("amp-type", "Amp Type", [0x60, 0x00, 0x06, 0x50], maximum: 4);
 
@@ -174,6 +180,92 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition PatchLevel { get; } =
         new("panel-patch-level", "Patch Level", [0x60, 0x00, 0x06, 0x4C], maximum: 200);
 
+    // ── Solo EQ (Ver200+, Mk2V2 block, patch offset 0xF10) ──────────────────────
+    public static KatanaParameterDefinition SoloEqPosition { get; } =
+        new("solo-eq-position", "Solo EQ Position", [0x60, 0x00, 0x0F, 0x10], maximum: 1);
+
+    public static KatanaParameterDefinition SoloEqSw { get; } =
+        new("solo-eq-sw", "Solo EQ", [0x60, 0x00, 0x0F, 0x11], maximum: 1);
+
+    public static KatanaParameterDefinition SoloEqLowCut { get; } =
+        new("solo-eq-low-cut", "Solo EQ Low Cut", [0x60, 0x00, 0x0F, 0x12], maximum: 17);
+
+    public static KatanaParameterDefinition SoloEqLowGain { get; } =
+        new("solo-eq-low-gain", "Solo EQ Low", [0x60, 0x00, 0x0F, 0x13], minimum: 0, maximum: 48);
+
+    public static KatanaParameterDefinition SoloEqMidFreq { get; } =
+        new("solo-eq-mid-freq", "Solo EQ Mid Freq", [0x60, 0x00, 0x0F, 0x14], maximum: 27);
+
+    public static KatanaParameterDefinition SoloEqMidQ { get; } =
+        new("solo-eq-mid-q", "Solo EQ Mid Q", [0x60, 0x00, 0x0F, 0x15], maximum: 5);
+
+    public static KatanaParameterDefinition SoloEqMidGain { get; } =
+        new("solo-eq-mid-gain", "Solo EQ Mid", [0x60, 0x00, 0x0F, 0x16], minimum: 0, maximum: 48);
+
+    public static KatanaParameterDefinition SoloEqHighGain { get; } =
+        new("solo-eq-high-gain", "Solo EQ High", [0x60, 0x00, 0x0F, 0x17], minimum: 0, maximum: 48);
+
+    public static KatanaParameterDefinition SoloEqHighCut { get; } =
+        new("solo-eq-high-cut", "Solo EQ High Cut", [0x60, 0x00, 0x0F, 0x18], maximum: 14);
+
+    public static KatanaParameterDefinition SoloEqLevel { get; } =
+        new("solo-eq-level", "Solo EQ Level", [0x60, 0x00, 0x0F, 0x19], minimum: 0, maximum: 48);
+
+    // ── Solo Delay (Ver210+, same Mk2V2 block) ───────────────────────────────────
+    public static KatanaParameterDefinition SoloDelaySw { get; } =
+        new("solo-delay-sw", "Solo Delay", [0x60, 0x00, 0x0F, 0x1A], maximum: 1);
+
+    public static KatanaParameterDefinition SoloDelayCarryover { get; } =
+        new("solo-delay-carryover", "Solo Dly Carry", [0x60, 0x00, 0x0F, 0x1B], maximum: 1);
+
+    // Solo Delay Time is INTEGER2x7 (2 bytes); address of first byte.
+    public static IReadOnlyList<byte> SoloDelayTimeAddress { get; } = [0x60, 0x00, 0x0F, 0x1C];
+
+    public static KatanaParameterDefinition SoloDelayFeedback { get; } =
+        new("solo-delay-feedback", "Solo Dly Feedback", [0x60, 0x00, 0x0F, 0x1E], maximum: 100);
+
+    public static KatanaParameterDefinition SoloDelayEffectLevel { get; } =
+        new("solo-delay-effect-level", "Solo Dly Level", [0x60, 0x00, 0x0F, 0x1F], maximum: 120);
+
+    public static KatanaParameterDefinition SoloDelayDirectLevel { get; } =
+        new("solo-delay-direct-level", "Solo Dly Direct", [0x60, 0x00, 0x0F, 0x20], maximum: 100);
+
+    public static KatanaParameterDefinition SoloDelayFilter { get; } =
+        new("solo-delay-filter", "Solo Dly Filter", [0x60, 0x00, 0x0F, 0x21], maximum: 2);
+
+    public static KatanaParameterDefinition SoloDelayHighCut { get; } =
+        new("solo-delay-high-cut", "Solo Dly Hi Cut", [0x60, 0x00, 0x0F, 0x22], maximum: 14);
+
+    public static KatanaParameterDefinition SoloDelayModSw { get; } =
+        new("solo-delay-mod-sw", "Solo Dly Mod", [0x60, 0x00, 0x0F, 0x23], maximum: 1);
+
+    public static KatanaParameterDefinition SoloDelayModRate { get; } =
+        new("solo-delay-mod-rate", "Solo Dly Mod Rate", [0x60, 0x00, 0x0F, 0x24], maximum: 100);
+
+    public static KatanaParameterDefinition SoloDelayModDepth { get; } =
+        new("solo-delay-mod-depth", "Solo Dly Mod Depth", [0x60, 0x00, 0x0F, 0x25], maximum: 100);
+
+    // ── Contour (Ver200+, patch offsets 0xF30/0xF38/0xF40) ──────────────────────
+    // Three contour blocks share the same parameter structure (prm_prop_contour).
+    // Contour(1) = 0xF30, Contour(2) = 0xF38, Contour(3) = 0xF40.
+    public static KatanaParameterDefinition Contour1Type { get; } =
+        new("contour1-type", "Contour 1 Type", [0x60, 0x00, 0x0F, 0x30], maximum: 3);
+
+    public static KatanaParameterDefinition Contour1FreqShift { get; } =
+        new("contour1-freq-shift", "Contour 1 Freq", [0x60, 0x00, 0x0F, 0x31], minimum: 0, maximum: 100);
+
+    public static KatanaParameterDefinition Contour2Type { get; } =
+        new("contour2-type", "Contour 2 Type", [0x60, 0x00, 0x0F, 0x38], maximum: 3);
+
+    public static KatanaParameterDefinition Contour2FreqShift { get; } =
+        new("contour2-freq-shift", "Contour 2 Freq", [0x60, 0x00, 0x0F, 0x39], minimum: 0, maximum: 100);
+
+    public static KatanaParameterDefinition Contour3Type { get; } =
+        new("contour3-type", "Contour 3 Type", [0x60, 0x00, 0x0F, 0x40], maximum: 3);
+
+    public static KatanaParameterDefinition Contour3FreqShift { get; } =
+        new("contour3-freq-shift", "Contour 3 Freq", [0x60, 0x00, 0x0F, 0x41], minimum: 0, maximum: 100);
+
     public static IReadOnlyList<byte> DelayTimeAddress { get; } = [0x60, 0x00, 0x05, 0x02];
 
     /// <summary>Signal chain pattern (PRM_CHAIN_PTN). Values 0–6 map to CHAIN 1 / CHAIN 2-1 / CHAIN 3-1 / CHAIN 4-1 / CHAIN 2-2 / CHAIN 3-2 / CHAIN 4-2.</summary>
@@ -182,6 +274,44 @@ public static partial class KatanaMkIIParameterCatalog
 
     /// <summary>Trigger address for saving current temp state to a patch slot (data = [0x00, slot_0based]).</summary>
     public static IReadOnlyList<byte> PatchWriteAddress { get; } = [0x7F, 0x00, 0x01, 0x04];
+
+    // ── Channel-mode (stored) preamp parameters ─────────────────────────────────
+    // In PANEL mode the amp uses knob-position values from the Status block (0x0651+).
+    // In CHANNEL mode the amp reads these stored preamp values from Patch_0 (base 0x10).
+    // BTS block: prm_prop_patch_0, Temporary patch offset 0x0010 + field offset.
+
+    /// <summary>Amp character type (PRM_PREAMP_A_TYPE). 0-32 covers all BTS amp characters.</summary>
+    public static KatanaParameterDefinition PreampType { get; } =
+        new("preamp-type", "Preamp Type", [0x60, 0x00, 0x00, 0x21], maximum: 32);
+
+    /// <summary>Gain in channel mode (PRM_PREAMP_A_GAIN). 0-120.</summary>
+    public static KatanaParameterDefinition PreampGain { get; } =
+        new("preamp-gain", "Preamp Gain", [0x60, 0x00, 0x00, 0x22], maximum: 120);
+
+    public static KatanaParameterDefinition PreampBass { get; } =
+        new("preamp-bass", "Preamp Bass", [0x60, 0x00, 0x00, 0x24]);
+
+    public static KatanaParameterDefinition PreampMiddle { get; } =
+        new("preamp-middle", "Preamp Middle", [0x60, 0x00, 0x00, 0x25]);
+
+    public static KatanaParameterDefinition PreampTreble { get; } =
+        new("preamp-treble", "Preamp Treble", [0x60, 0x00, 0x00, 0x26]);
+
+    public static KatanaParameterDefinition PreampPresence { get; } =
+        new("preamp-presence", "Preamp Presence", [0x60, 0x00, 0x00, 0x27]);
+
+    /// <summary>Preamp output level (channel mode). Not the same as the master Volume knob.</summary>
+    public static KatanaParameterDefinition PreampLevel { get; } =
+        new("preamp-level", "Preamp Level", [0x60, 0x00, 0x00, 0x28]);
+
+    public static KatanaParameterDefinition PreampBright { get; } =
+        new("preamp-bright", "Preamp Bright", [0x60, 0x00, 0x00, 0x29], maximum: 1);
+
+    public static KatanaParameterDefinition PreampSoloSw { get; } =
+        new("preamp-solo-sw", "Preamp Solo", [0x60, 0x00, 0x00, 0x2B], maximum: 1);
+
+    public static KatanaParameterDefinition PreampSoloLevel { get; } =
+        new("preamp-solo-level", "Preamp Solo Lvl", [0x60, 0x00, 0x00, 0x2C]);
 
     // ── Booster DSP params (same for all booster types) ─────────────────────────
     public static KatanaParameterDefinition BoosterDrive { get; } =

@@ -19,6 +19,9 @@ public class BoostPedalState
     /// </summary>
     public AmpControlState Variation = new(KatanaMkIIParameterCatalog.BoosterVariation);
 
+    /// <summary>Front-panel booster level knob position (PRM_KNOB_POS_BOOST).</summary>
+    public AmpControlState Level = new(KatanaMkIIParameterCatalog.BoostLevel);
+
 
     #region Pedal Parameters
 

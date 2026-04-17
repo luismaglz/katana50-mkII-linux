@@ -586,6 +586,30 @@
 | `0x00000022` | GAFC FS2FUNCTION | 0 | 9 | 4 | 0 | PRM_FS_FUNCTION_GAFC_FS2 |
 | `0x00000023` | CABINET RESONANCE | 0 | 2 | 1 | 0 | PRM_CABINET_RESONANCE |
 
+---
+
+> **Panel mode vs Channel mode**
+>
+> The Katana MkII has two operating modes that use *different address spaces* for amp controls:
+>
+> | Parameter | Panel mode address | Channel mode address |
+> |-----------|-------------------|---------------------|
+> | Amp type  | `0x60-00-06-50` (PRM_KNOB_POS_TYPE, 0-4) | `0x60-00-00-21` (PRM_PREAMP_A_TYPE, 0-32) |
+> | Gain      | `0x60-00-06-51` (PRM_KNOB_POS_GAIN)  | `0x60-00-00-22` (PRM_PREAMP_A_GAIN, 0-120) |
+> | Bass      | `0x60-00-06-53` (PRM_KNOB_POS_BASS)  | `0x60-00-00-24` (PRM_PREAMP_A_BASS) |
+> | Middle    | `0x60-00-06-54` (PRM_KNOB_POS_MIDDLE)| `0x60-00-00-25` (PRM_PREAMP_A_MIDDLE) |
+> | Treble    | `0x60-00-06-55` (PRM_KNOB_POS_TREBLE)| `0x60-00-00-26` (PRM_PREAMP_A_TREBLE) |
+> | Presence  | `0x60-00-06-56` (PRM_KNOB_POS_PRESENCE) | `0x60-00-00-27` (PRM_PREAMP_A_PRESENCE) |
+> | Level     | *(no panel knob)* | `0x60-00-00-28` (PRM_PREAMP_A_LEVEL) |
+>
+> **Panel mode**: The amp reads directly from the physical front-panel knob positions (PATCH STATUS block, 0x0650).
+> The amp pushes KNOB_POS notifications whenever a physical knob is moved, regardless of mode.
+>
+> **Channel mode**: The amp reads stored values from the Patch_0 preamp section (0x0010+) when a patch channel is selected.
+> Knob positions in the Status block do NOT reflect the active sound values in channel mode.
+
+---
+
 ## PATCH STATUS  (block base = `0x00000650`)
 
 | Offset | Name | min | max | init | ofs | PRM symbol |

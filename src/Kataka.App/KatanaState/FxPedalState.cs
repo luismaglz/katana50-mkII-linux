@@ -20,6 +20,9 @@ public class FxPedalState
     /// </summary>
     public AmpControlState Variation = new(KatanaMkIIParameterCatalog.FxVariation);
 
+    /// <summary>Front-panel FX level knob position (PRM_KNOB_POS_FX).</summary>
+    public AmpControlState Level = new(KatanaMkIIParameterCatalog.FxLevel);
+
     #region ModFxPedals State
 
     public AcGuitarSimState AcGuitarSim = new(isMod: false);

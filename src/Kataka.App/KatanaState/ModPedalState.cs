@@ -20,6 +20,9 @@ public class ModPedalState
     /// </summary>
     public AmpControlState Variation = new(KatanaMkIIParameterCatalog.ModVariation);
 
+    /// <summary>Front-panel mod level knob position (PRM_KNOB_POS_MOD).</summary>
+    public AmpControlState Level = new(KatanaMkIIParameterCatalog.ModLevel);
+
     #region ModFxPedals State
 
     public AcGuitarSimState AcGuitarSim = new(isMod: true);

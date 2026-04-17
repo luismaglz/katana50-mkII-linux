@@ -27,25 +27,20 @@ public class KatanaState : IKatanaState
         RegisterAll(Treble);
         RegisterAll(Presence);
         RegisterAll(CabinetResonance);
+        RegisterAll(PatchLevel);
         RegisterAll(PedalChain);
+        RegisterAll(Preamp);
         RegisterAll(BoostPedal);
         RegisterAll(ModPedal);
         RegisterAll(FxPedal);
         RegisterAll(DelayPedal);
         RegisterAll(Delay2Pedal);
         RegisterAll(ReverbPedal);
-    }
-
-    private void RegisterAll(object obj)
-    {
-        foreach (var field in obj.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
-        {
-            if (field.GetValue(obj) is AmpControlState state)
-                _stateFields.TryAdd(state.Parameter.AddressString, state);
-            else if (field.FieldType.Namespace?.StartsWith("Kataka") == true
-                     && field.GetValue(obj) is { } nested)
-                RegisterAll(nested);
-        }
+        RegisterAll(HardwarePedal);
+        RegisterAll(SoloEq);
+        RegisterAll(Contour1);
+        RegisterAll(Contour2);
+        RegisterAll(Contour3);
     }
 
     /// <summary>
@@ -152,13 +147,50 @@ public class KatanaState : IKatanaState
 
     public void SetState(string key, byte value)
     {
-        _logger.LogInformation("{Name} : {Value} Refreshed", key, value);
-
         if (_stateFields.TryGetValue(key, out var state))
+        {
             state.Value = value;
-
+            _logger.LogInformation("{Name} : {Value} Refreshed", key, value);
+        }
         else
+        {
             _logger.LogWarning("Received update for unknown parameter key: {Key}", key);
+        }
+    }
+
+    #region Amplifier Settings — Channel Mode (Preamp stored values)
+
+    public PreampState Preamp { get; } = new();
+
+    #endregion
+
+    #region Hardware Pedal (Wah / Pedal Bend / EVH95)
+
+    public HardwarePedalState HardwarePedal { get; } = new();
+
+    #endregion
+
+    #region Solo EQ + Solo Delay (Ver200+/Ver210+)
+
+    public SoloEqState SoloEq { get; } = new();
+
+    #endregion
+
+    private void RegisterAll(object obj)
+    {
+        // Direct AmpControlState (top-level properties on KatanaState itself)
+        if (obj is AmpControlState direct)
+        {
+            _stateFields.TryAdd(direct.Parameter.AddressString, direct);
+            return;
+        }
+
+        foreach (var field in obj.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+            if (field.GetValue(obj) is AmpControlState state)
+                _stateFields.TryAdd(state.Parameter.AddressString, state);
+            else if (field.FieldType.Namespace?.StartsWith("Kataka") == true
+                     && field.GetValue(obj) is { } nested)
+                RegisterAll(nested);
     }
 
     #region Pedals
@@ -173,27 +205,33 @@ public class KatanaState : IKatanaState
 
     #endregion
 
-    #region Amplifier Settings
+    #region Amplifier Settings — Panel Mode (KNOB_POS)
 
     public AmpControlState AmpType { get; } = new(KatanaMkIIParameterCatalog.AmpType);
     public AmpControlState AmpVariation { get; } = new(KatanaMkIIParameterCatalog.AmpVariation);
     public AmpControlState Gain { get; } = new(KatanaMkIIParameterCatalog.AmpGain);
     public AmpControlState Volume { get; } = new(KatanaMkIIParameterCatalog.AmpVolume);
-
-    #endregion
-
-    #region Equalizer Settings
-
     public AmpControlState Bass { get; } = new(KatanaMkIIParameterCatalog.AmpBass);
     public AmpControlState Middle { get; } = new(KatanaMkIIParameterCatalog.AmpMiddle);
     public AmpControlState Treble { get; } = new(KatanaMkIIParameterCatalog.AmpTreble);
+    public AmpControlState Presence { get; } = new(KatanaMkIIParameterCatalog.AmpPresence);
+    public AmpControlState CabinetResonance { get; } = new(KatanaMkIIParameterCatalog.CabinetResonance);
+
+    /// <summary>Patch output level (0-200).</summary>
+    public AmpControlState PatchLevel { get; } = new(KatanaMkIIParameterCatalog.PatchLevel, 0, 200);
 
     #endregion
 
-    #region Tone Settings
+    #region Contour (Ver200+)
 
-    public AmpControlState Presence { get; } = new(KatanaMkIIParameterCatalog.AmpPresence);
-    public AmpControlState CabinetResonance { get; } = new(KatanaMkIIParameterCatalog.CabinetResonance);
+    public ContourState Contour1 { get; } = new(KatanaMkIIParameterCatalog.Contour1Type,
+        KatanaMkIIParameterCatalog.Contour1FreqShift);
+
+    public ContourState Contour2 { get; } = new(KatanaMkIIParameterCatalog.Contour2Type,
+        KatanaMkIIParameterCatalog.Contour2FreqShift);
+
+    public ContourState Contour3 { get; } = new(KatanaMkIIParameterCatalog.Contour3Type,
+        KatanaMkIIParameterCatalog.Contour3FreqShift);
 
     #endregion
 }
