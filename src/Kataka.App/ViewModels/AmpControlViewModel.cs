@@ -1,6 +1,6 @@
 using System;
 
-using Kataka.Domain.KatanaState;
+using Kataka.App.KatanaState;
 using Kataka.Domain.Midi;
 
 using ReactiveUI;

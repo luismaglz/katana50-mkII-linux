@@ -5,12 +5,12 @@ using Avalonia.ReactiveUI;
 
 using CommunityToolkit.Mvvm.DependencyInjection;
 
+using Kataka.App.KatanaState;
 using Kataka.App.Logging;
 using Kataka.App.Services;
 using Kataka.App.ViewModels;
 using Kataka.Application.Katana;
 using Kataka.Application.Midi;
-using Kataka.Domain.KatanaState;
 using Kataka.Infrastructure.Midi;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -41,7 +41,7 @@ internal sealed class Program
 
         services.AddSingleton<IMidiTransport>(_ => DefaultMidiTransport.Create());
         services.AddSingleton<IKatanaSession, KatanaSession>();
-        services.AddSingleton<IKatanaState, KatanaState>();
+        services.AddSingleton<IKatanaState, KatanaState.KatanaState>();
         services.AddSingleton<IAmpSyncService, AmpSyncService>();
         services.AddSingleton<MainWindowViewModel>();
     }
