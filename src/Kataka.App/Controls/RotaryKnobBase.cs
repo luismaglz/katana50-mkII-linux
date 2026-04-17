@@ -63,8 +63,8 @@ public abstract class RotaryKnobBase : Control
     public static readonly StyledProperty<int?> DisplayMaximumProperty =
         AvaloniaProperty.Register<RotaryKnobBase, int?>(nameof(DisplayMaximum), null);
 
-    protected static readonly SolidColorBrush LabelBrush = new(Color.Parse("#d8d5cb"));
-    protected static readonly SolidColorBrush ValueBrush = new(Color.Parse("#ffcf66"));
+    protected static readonly SolidColorBrush LabelBrush = KatanaPalette.TextControlBrush;
+    protected static readonly SolidColorBrush ValueBrush = KatanaPalette.AccentValueBrush;
 
     private bool _isDragging;
     private Point _dragStart;

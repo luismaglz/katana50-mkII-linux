@@ -19,9 +19,9 @@ public sealed class SmallImageRotaryKnob : RotaryKnobBase
     public static readonly StyledProperty<IBrush> KnobBackgroundBrushProperty =
         AvaloniaProperty.Register<SmallImageRotaryKnob, IBrush>(
             nameof(KnobBackgroundBrush),
-            new SolidColorBrush(Color.Parse("#D9D3C1")));
+            KatanaPalette.KnobBgBrush);
 
-    private static readonly SolidColorBrush KnobShadowBrush = new(Color.Parse("#28000000"));
+    private static readonly SolidColorBrush KnobShadowBrush = KatanaPalette.KnobShadowBrush;
 
     static SmallImageRotaryKnob()
     {
@@ -66,8 +66,8 @@ public sealed class SmallImageRotaryKnob : RotaryKnobBase
                 context.DrawImage(bmp, imgRect);
             else
                 context.DrawEllipse(
-                    new SolidColorBrush(Color.Parse("#2c2f35")),
-                    new Pen(new SolidColorBrush(Color.Parse("#565b64")), 1.5),
+                    KatanaPalette.KnobFaceBrush,
+                    KatanaPalette.KnobRimPen,
                     new Point(cx, cy), ImgSize / 2, ImgSize / 2);
         }
 
