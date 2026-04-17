@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 using Avalonia.Platform.Storage;
 
+using Kataka.App.KatanaState;
 using Kataka.App.Logging;
 using Kataka.App.Services;
 using Kataka.Application.Katana;
-using Kataka.Domain.KatanaState;
 
 using Microsoft.Extensions.Logging;
 
@@ -25,11 +25,11 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncState
         syncService = ampSyncService;
 
         MidiConnection = new MidiConnectionViewModel(katanaSession, ampSyncService, AppendStatus, loggerFactory.CreateLogger<MidiConnectionViewModel>());
-        Diagnostics    = new DiagnosticsViewModel(ampSyncService, loggerProvider, () => MidiConnection.IsConnected);
-        Patch          = new PatchViewModel(katanaSession, ampSyncService, () => MidiConnection.IsConnected, AppendStatus, loggerFactory.CreateLogger<PatchViewModel>());
-        AmpEditor      = new AmpEditorViewModel(katanaSession, katanaState, ampSyncService, AppendStatus, loggerFactory.CreateLogger<AmpEditorViewModel>());
+        Diagnostics = new DiagnosticsViewModel(ampSyncService, loggerProvider, () => MidiConnection.IsConnected);
+        Patch = new PatchViewModel(katanaSession, ampSyncService, () => MidiConnection.IsConnected, AppendStatus, loggerFactory.CreateLogger<PatchViewModel>());
+        AmpEditor = new AmpEditorViewModel(katanaSession, katanaState, ampSyncService, AppendStatus, loggerFactory.CreateLogger<AmpEditorViewModel>());
 
-        syncService.Initialize(this);
+        // syncService.Initialize(this);
 
         syncService.StatusMessages.Subscribe(msg => StatusMessage = msg);
 

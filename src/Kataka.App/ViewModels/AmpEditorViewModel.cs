@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 using CommunityToolkit.Mvvm.Input;
 
+using Kataka.App.KatanaState;
 using Kataka.App.Services;
 using Kataka.Application.Katana;
-using Kataka.Domain.KatanaState;
 
 using Microsoft.Extensions.Logging;
 
@@ -137,7 +137,7 @@ public partial class AmpEditorViewModel : ViewModelBase
             {
                 UpdatePanelChannelSelection();
                 Pedalboard.SelectedChannel = v;
-                _syncService.TrackPanelChannelChange(v);
+                // _syncService.TrackPanelChannelChange(v);
             });
 
         _syncService.PanelChannelPushed
@@ -173,7 +173,7 @@ public partial class AmpEditorViewModel : ViewModelBase
             var channel = IAmpSyncState.ParsePanelChannelDisplay(SelectedPanelChannel);
             await _katanaSession.SelectPanelChannelAsync(channel);
             _logger.LogInformation("Selected panel channel: {Channel}", SelectedPanelChannel);
-            var patchLevelWritten = await _syncService.TryWritePatchLevelAsync();
+            // var patchLevelWritten = await _syncService.TryWritePatchLevelAsync();
 
             foreach (var effect in PanelEffects)
             {
@@ -194,9 +194,9 @@ public partial class AmpEditorViewModel : ViewModelBase
             }
 
             _appendStatus("Panel controls updated successfully.");
-            PanelControlsStatus = patchLevelWritten
-                ? "Panel channel, patch level, effect toggles, and effect types were written and confirmed."
-                : "Panel channel, effect toggles, and effect types were written and confirmed. Patch level mapping is still pending.";
+            // PanelControlsStatus = patchLevelWritten
+            //     ? "Panel channel, patch level, effect toggles, and effect types were written and confirmed."
+            //     : "Panel channel, effect toggles, and effect types were written and confirmed. Patch level mapping is still pending.";
         }
         catch (Exception ex)
         {

@@ -1,4 +1,4 @@
-using Kataka.Domain.KatanaState;
+using Kataka.App.KatanaState;
 
 namespace Kataka.App.ViewModels;
 
