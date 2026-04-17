@@ -129,8 +129,6 @@ public partial class AmpEditorViewModel : ViewModelBase
     [Reactive] public string PanelControlsStatus { get; set; } = "Panel controls have not been read yet.";
     [Reactive] public string PedalControlsStatus { get; set; } = "Pedal controls have not been read yet.";
 
-    internal bool SuppressChangeTracking { get; set; }
-
     internal void Initialize()
     {
         this.WhenAnyValue(x => x.SelectedPanelChannel)
@@ -138,16 +136,10 @@ public partial class AmpEditorViewModel : ViewModelBase
             {
                 UpdatePanelChannelSelection();
                 Pedalboard.SelectedChannel = v;
-                // _syncService.TrackPanelChannelChange(v);
             });
 
         _syncService.PanelChannelPushed
-            .Subscribe(displayName =>
-            {
-                SuppressChangeTracking = true;
-                SelectedPanelChannel = displayName;
-                SuppressChangeTracking = false;
-            });
+            .Subscribe(displayName => SelectedPanelChannel = displayName);
 
         UpdatePanelChannelSelection();
         Pedalboard.Refresh();
@@ -174,7 +166,6 @@ public partial class AmpEditorViewModel : ViewModelBase
             var channel = Utilities.ParsePanelChannelDisplay(SelectedPanelChannel);
             await _katanaSession.SelectPanelChannelAsync(channel);
             _logger.LogInformation("Selected panel channel: {Channel}", SelectedPanelChannel);
-            // var patchLevelWritten = await _syncService.TryWritePatchLevelAsync();
 
             foreach (var effect in PanelEffects)
             {
@@ -195,9 +186,6 @@ public partial class AmpEditorViewModel : ViewModelBase
             }
 
             _appendStatus("Panel controls updated successfully.");
-            // PanelControlsStatus = patchLevelWritten
-            //     ? "Panel channel, patch level, effect toggles, and effect types were written and confirmed."
-            //     : "Panel channel, effect toggles, and effect types were written and confirmed. Patch level mapping is still pending.";
         }
         catch (Exception ex)
         {
