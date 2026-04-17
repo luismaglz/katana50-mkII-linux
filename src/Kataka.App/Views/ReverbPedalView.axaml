@@ -63,16 +63,16 @@
 
                 <!-- Row 2: LowCut, HighCut, Density, Color -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <controls:SmallImageRotaryKnob  Label="LOW CUT"
-                                                    Description="Sets the frequency at which the low cut filter takes effect. At minimum (FLAT), the filter has no effect."
-                                                    Minimum="0" Maximum="17"
-                                                    Value="{Binding LowCut}"
-                                                    LabelFontSize="12" />
-                    <controls:SmallImageRotaryKnob  Label="HIGH CUT"
-                                                    Description="Sets the frequency at which the high cut filter takes effect. At maximum (FLAT), the filter has no effect."
-                                                    Minimum="0" Maximum="17"
-                                                    Value="{Binding HighCut}"
-                                                    LabelFontSize="12" />
+                    <controls:SteppedKnob  Label="LOW CUT"
+                                           Description="Sets the frequency at which the low cut filter takes effect. At minimum (FLAT), the filter has no effect."
+                                           Steps="{x:Static vm:FrequencySteps.LowCut18}"
+                                           Value="{Binding LowCut}"
+                                           LabelFontSize="12" />
+                    <controls:SteppedKnob  Label="HIGH CUT"
+                                           Description="Sets the frequency at which the high cut filter takes effect. At maximum (FLAT), the filter has no effect."
+                                           Steps="{x:Static vm:FrequencySteps.HighCut18}"
+                                           Value="{Binding HighCut}"
+                                           LabelFontSize="12" />
                     <controls:SmallImageRotaryKnob  Label="DENSITY"
                                                     Description="Adjusts the density of the reverb sound."
                                                     Minimum="0" Maximum="10"
