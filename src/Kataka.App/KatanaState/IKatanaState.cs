@@ -60,4 +60,7 @@ public interface IKatanaState
     /// <param name="key"></param>
     /// <param name="value"></param>
     public void SetState(string key, byte value);
+
+    /// <summary>Returns all registered parameter states keyed by AddressString (e.g. "60-00-06-52").</summary>
+    IReadOnlyDictionary<string, AmpControlState> GetAllRegisteredStates();
 }
