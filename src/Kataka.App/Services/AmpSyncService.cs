@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 
 using Kataka.App.KatanaState;
-using Kataka.App.ViewModels;
 using Kataka.Application.Katana;
 using Kataka.Domain.Midi;
 
@@ -20,38 +19,25 @@ public sealed class AmpSyncService : IAmpSyncService
 {
     private static readonly TimeSpan WriteSyncDebounce = TimeSpan.FromMilliseconds(125);
 
-    private readonly Dictionary<string, AmpControlViewModel> _ampControlsByKey = [];
-    private readonly Dictionary<string, IBasePedal> _panelEffectsByKey = [];
     private readonly Dictionary<string, (IReadOnlyList<byte> Address, byte Value)> _pendingWrites = [];
     private readonly IKatanaSession _session;
     private readonly IKatanaState _katanaState;
     private readonly SemaphoreSlim _syncGate = new(1, 1);
     private readonly DispatcherTimer _writeSyncTimer;
-
-    private Dictionary<string, AmpControlState> _domainAmpControlsByKey = [];
-    private Dictionary<string, AmpControlState> _domainPanelStatesByKey = [];
+    private readonly ILogger<AmpSyncService> _logger;
 
     private bool _suppressWrites;
     private bool _stateWritesSubscribed;
-    private string? _pendingPanelChannel;
-    private Dictionary<string, Action<byte>> _pushHandlerLookup = [];
-    // private IAmpSyncState _context = null!;
 
     // ── Observable subjects ───────────────────────────────────────────────────
 
-    private readonly Subject<IReadOnlyDictionary<string, byte>> _deviceStateSubject = new();
-    private readonly Subject<(string Key, byte Value)> _deviceParameterSubject = new();
     private readonly Subject<string> _panelChannelSubject = new();
     private readonly Subject<DeviceReadMetadata> _readCompletedSubject = new();
     private readonly Subject<string> _statusSubject = new();
 
-    public IObservable<IReadOnlyDictionary<string, byte>> DeviceStateLoaded => _deviceStateSubject;
-    public IObservable<(string Key, byte Value)> DeviceParameterPushed => _deviceParameterSubject;
     public IObservable<string> PanelChannelPushed => _panelChannelSubject;
     public IObservable<DeviceReadMetadata> ReadCompleted => _readCompletedSubject;
     public IObservable<string> StatusMessages => _statusSubject;
-
-    private readonly ILogger<AmpSyncService> _logger;
 
     // ── Construction ──────────────────────────────────────────────────────────
 
@@ -81,41 +67,19 @@ public sealed class AmpSyncService : IAmpSyncService
     {
         _session.PushNotificationReceived -= OnAmpPushNotification;
         _session.PanelChannelChanged -= OnAmpPanelChannelChanged;
-        _pushHandlerLookup.Clear();
     }
 
-    public void Shutdown()
-    {
-        _writeSyncTimer.Stop();
-    }
+    public void Shutdown() => _writeSyncTimer.Stop();
 
     public void OnConnectionChanged(bool connected)
     {
         if (!connected)
         {
-            if (_pendingWrites.Count > 0 || _pendingPanelChannel is not null)
-                _logger.LogInformation("Clearing pending sync queue after disconnect: {Pending}.", DescribePendingWrites());
+            if (_pendingWrites.Count > 0)
+                _logger.LogInformation("Clearing {Count} pending writes after disconnect.", _pendingWrites.Count);
             _pendingWrites.Clear();
-            _pendingPanelChannel = null;
         }
 
-        UpdateWriteSyncTimer();
-    }
-
-    // ── Change tracking ───────────────────────────────────────────────────────
-
-    public void QueueWrite(string key, byte value, string logMessage)
-    {
-        // Legacy API — prefer state-subscription writes via SubscribeToStateWrites.
-        // Kept for compatibility; callers must pass an address-string key.
-        if (!_session.IsConnected) return;
-        var parts = key.Split('-');
-        if (parts.Length == 4)
-        {
-            var address = parts.Select(p => Convert.ToByte(p, 16)).ToArray();
-            _pendingWrites[key] = (address, value);
-        }
-        _logger.LogInformation("Queued panel sync: {Message}.", logMessage);
         UpdateWriteSyncTimer();
     }
 
@@ -124,30 +88,20 @@ public sealed class AmpSyncService : IAmpSyncService
     public void UpdateWriteSyncTimer()
     {
         _writeSyncTimer.Stop();
-        if (_session.IsConnected && HasPendingWrites())
+        if (_session.IsConnected && _pendingWrites.Count > 0)
             _writeSyncTimer.Start();
     }
 
     // ── State queries ─────────────────────────────────────────────────────────
 
-    public bool HasPendingWrites() => _pendingWrites.Count > 0 || _pendingPanelChannel is not null;
+    public bool HasPendingWrites() => _pendingWrites.Count > 0;
 
-    public string DescribePendingWrites()
-    {
-        if (_pendingWrites.Count == 0 && _pendingPanelChannel is null) return "no pending changes";
-        var parts = new List<string>();
-        if (_pendingWrites.Count > 0) parts.Add($"{_pendingWrites.Count} writes");
-        if (_pendingPanelChannel is not null) parts.Add("channel");
-        return string.Join(", ", parts);
-    }
+    public string DescribePendingWrites() =>
+        _pendingWrites.Count == 0 ? "no pending changes" : $"{_pendingWrites.Count} writes";
 
-    public void ClearPendingWrites()
-    {
-        _pendingWrites.Clear();
-        _pendingPanelChannel = null;
-    }
+    public void ClearPendingWrites() => _pendingWrites.Clear();
 
-    // ── Public read operations ────────────────────────────────────────────────
+    // ── Read operations ───────────────────────────────────────────────────────
 
     public async Task<bool> TryRefreshAmpStateAsync()
     {
@@ -173,448 +127,6 @@ public sealed class AmpSyncService : IAmpSyncService
         {
             _logger.LogError(ex, "Full patch state read failed.");
             return false;
-        }
-    }
-
-
-    // private async Task<bool> TryReadPanelControlsAsync()
-    // {
-    //     try
-    //     {
-    //         _logger.LogInformation("Reading Katana panel controls.");
-    //
-    //         var currentChannel = await _session.ReadCurrentPanelChannelAsync();
-    //         if (currentChannel is not null)
-    //         {
-    //             var displayName = IAmpSyncState.ToPanelChannelDisplay(currentChannel.Value);
-    //             ApplyDeviceState(() =>
-    //             {
-    //                 _logger.LogInformation("Current panel channel: {Channel}", displayName);
-    //                 _panelChannelSubject.OnNext(displayName);
-    //             });
-    //         }
-    //
-    //         var parameterList = _context.PanelEffects
-    //             .SelectMany(e => e.GetSyncParameters())
-    //             .Append(KatanaMkIIParameterCatalog.AmpType)
-    //             .Append(KatanaMkIIParameterCatalog.CabinetResonance)
-    //             .Append(KatanaMkIIParameterCatalog.AmpVariation)
-    //             .Append(KatanaMkIIParameterCatalog.ChainPattern)
-    //             .ToArray();
-    //         var values = await _session.ReadParametersAsync(parameterList);
-    //
-    //         ApplyDeviceState(() =>
-    //         {
-    //             foreach (var (key, rawValue) in values)
-    //             {
-    //                 if (_domainAmpControlsByKey.TryGetValue(key, out var ampControl))
-    //                     ampControl.Value = rawValue;
-    //                 else if (_domainPanelStatesByKey.TryGetValue(key, out var panelControl))
-    //                     panelControl.Value = rawValue;
-    //             }
-    //
-    //             // ModFxPedalViewModel still uses the legacy ApplyAmpValues path.
-    //             var intValues = values.ToDictionary(kvp => kvp.Key, kvp => (int)kvp.Value, StringComparer.Ordinal);
-    //             foreach (var effect in _context.PanelEffects.OfType<ModFxPedalViewModel>())
-    //                 effect.ApplyAmpValues(intValues);
-    //
-    //             // ChainPattern drives Pedalboard directly.
-    //             if (values.TryGetValue(KatanaMkIIParameterCatalog.ChainPattern.Key, out var chainValue) &&
-    //                 chainValue < PedalboardViewModel.ChainPatternNames.Length)
-    //                 _context.Pedalboard.SelectedChainPattern = chainValue;
-    //
-    //             // Publish the full snapshot so the VM can react to any remaining derived state.
-    //             _deviceStateSubject.OnNext(values);
-    //
-    //             foreach (var effect in _context.PanelEffects)
-    //                 _logger.LogInformation("{Name}: {State} / {Variation} / {Type}", effect.DisplayName, effect.IsEnabled ? "On" : "Off", effect.Variation, effect.TypeCaption);
-    //         });
-    //
-    //         var patchLevelLoaded = await TryRefreshPatchLevelAsync();
-    //         var delayTimeMs = await TryRefreshDelayTimeAsync();
-    //         var delayTimeLoaded = delayTimeMs.HasValue;
-    //
-    //         var status = "Panel controls read successfully.";
-    //         var detail = (patchLevelLoaded, delayTimeLoaded) switch
-    //         {
-    //             (true, true) => "Panel channel, patch level, effect toggles, variation colors, effect types, and delay time were loaded.",
-    //             (true, false) => "Panel channel, patch level, effect toggles, variation colors, and effect types were loaded. Delay time refresh failed.",
-    //             (false, true) => "Panel channel, effect toggles, variation colors, effect types, and delay time were loaded. Patch level mapping is still pending.",
-    //             _ => "Panel channel, effect toggles, variation colors, and effect types were loaded. Patch level mapping is still pending, and delay time refresh failed."
-    //         };
-    //
-    //         EmitStatus(status);
-    //         _readCompletedSubject.OnNext(new DeviceReadMetadata(
-    //             delayTimeMs, delayTimeLoaded, patchLevelLoaded,
-    //             status, detail, string.Empty, string.Empty));
-    //         return true;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         EmitStatus(ex.Message);
-    //         _logger.LogError(ex, "Panel control read failed.");
-    //         _readCompletedSubject.OnNext(new DeviceReadMetadata(
-    //             null, false, false,
-    //             ex.Message, "Panel control read failed.", string.Empty, string.Empty));
-    //         return false;
-    //     }
-    // }
-
-    // private async Task<bool> TryReadPedalControlsAsync()
-    // {
-    //     try
-    //     {
-    //         _logger.LogInformation("Reading Katana pedal controls.");
-    //         var values = await _session.ReadParametersAsync(_context.PedalFx.GetReadParameters().ToArray());
-    //
-    //         ApplyDeviceState(() => _context.PedalFx.ApplyValues(values));
-    //
-    //         _logger.LogInformation("Pedal FX: {State} / {Type} / {Position} / Foot Volume {Volume}",
-    //             _context.PedalFx.IsEnabled ? "On" : "Off", _context.PedalFx.SelectedTypeOption,
-    //             _context.PedalFx.SelectedPositionOption, _context.PedalFx.FootVolume);
-    //
-    //         var status = "Pedal controls read successfully.";
-    //         var detail = _context.PedalFx.IsWahMode
-    //             ? "Pedal FX, wah controls, and foot volume were loaded."
-    //             : "Pedal FX type and foot volume were loaded. Non-wah subtype controls are not surfaced yet.";
-    //
-    //         EmitStatus(status);
-    //         _readCompletedSubject.OnNext(new DeviceReadMetadata(
-    //             null, false, false, status, string.Empty, detail, string.Empty));
-    //         return true;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         EmitStatus(ex.Message);
-    //         _logger.LogError(ex, "Pedal control read failed.");
-    //         _readCompletedSubject.OnNext(new DeviceReadMetadata(
-    //             null, false, false, ex.Message, string.Empty, "Pedal control read failed.", string.Empty));
-    //         return false;
-    //     }
-    // }
-
-    // public async Task<bool> TryWritePatchLevelAsync()
-    // {
-    //     if (!_context.PatchLevelMappingVerified) return false;
-    //     try
-    //     {
-    //         var requested = Math.Clamp(
-    //             _context.PatchLevel,
-    //             KatanaMkIIParameterCatalog.PatchLevel.Minimum,
-    //             KatanaMkIIParameterCatalog.PatchLevel.Maximum);
-    //         _context.PatchLevel = await _session.WriteParameterAsync(KatanaMkIIParameterCatalog.PatchLevel, (byte)requested);
-    //         _logger.LogInformation("Patch Level confirmed at {Level}.", _context.PatchLevel);
-    //         return true;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Patch level write failed.");
-    //         return false;
-    //     }
-    // }
-
-    // ── Change-tracking helpers ───────────────────────────────────────────────
-
-    // private void TrackPanelEffectChange(IBasePedal effect)
-    // {
-    //     if (_context.SuppressChangeTracking || !_context.ActiveWriteSync || !_context.IsConnected) return;
-    //     _pendingWrites[effect.Definition.SwitchParameter.Key] = effect.IsEnabled ? (byte)1 : (byte)0;
-    //     _logger.LogInformation("Queued panel sync: {Name} -> {State}.", effect.DisplayName, effect.IsEnabled ? "On" : "Off");
-    //     UpdateWriteSyncTimer();
-    // }
-    //
-    // private void TrackPanelEffectTypeChange(IBasePedal effect)
-    // {
-    //     if (_context.SuppressChangeTracking || !_context.ActiveWriteSync || !_context.IsConnected
-    //         || effect.Definition.TypeParameter is null) return;
-    //     if (!effect.TryGetTypeValue(effect.SelectedTypeOption, out var typeValue)) return;
-    //     _pendingWrites[effect.Definition.TypeParameter.Key] = typeValue;
-    //     _logger.LogInformation("Queued panel type sync: {Name} -> {Type}.", effect.DisplayName, effect.SelectedTypeOption);
-    //     UpdateWriteSyncTimer();
-    // }
-    //
-    // private void TrackDetailParamChange(string key, int value)
-    // {
-    //     if (_context.SuppressChangeTracking || !_context.ActiveWriteSync || !_context.IsConnected) return;
-    //     _pendingWrites[key] = (byte)Math.Clamp(value, 0, 127);
-    //     _logger.LogInformation("Queued detail param sync: {Key} -> {Value}.", key, value);
-    //     UpdateWriteSyncTimer();
-    // }
-    //
-    // private void TrackPedalChange(string? propertyName)
-    // {
-    //     if (_context.SuppressChangeTracking || !_context.ActiveWriteSync || !_context.IsConnected) return;
-    //     if (!_context.PedalFx.TryGetParameterValue(propertyName, out var parameter, out var value, out var description)) return;
-    //     _pendingWrites[parameter.Key] = value;
-    //     _logger.LogInformation("Queued pedal sync: {Name} -> {Description}.", parameter.DisplayName, description);
-    //     UpdateWriteSyncTimer();
-    // }
-
-    // private void SubscribeDomainWriteTracking(IEnumerable<AmpControlState> states)
-    // {
-    //     foreach (var state in states)
-    //     {
-    //         var captured = state;
-    //         captured.ValueChanged += () =>
-    //         {
-    //             if (_context.SuppressChangeTracking || !_context.ActiveWriteSync || !_context.IsConnected) return;
-    //             var value = Math.Clamp(captured.Value, captured.Minimum, captured.Maximum);
-    //             _pendingWrites[captured.Parameter.Key] = (byte)value;
-    //             _logger.LogInformation("Queued sync: {Name} -> {Value}.", captured.Parameter.DisplayName, value);
-    //             UpdateWriteSyncTimer();
-    //         };
-    //     }
-    // }
-
-    // ── Write flush loop ──────────────────────────────────────────────────────
-
-    // private async Task FlushPendingWritesAsync()
-    // {
-    //     if (_isShuttingDown || !_context.ActiveWriteSync || !_context.IsConnected) return;
-    //     if (!HasPendingWrites()) return;
-    //
-    //     if (!_syncGate.Wait(0))
-    //     {
-    //         _logger.LogInformation("Queued write sync is already running; the latest changes will wait for the next flush.");
-    //         return;
-    //     }
-    //
-    //     var snapshot = new Dictionary<string, byte>(StringComparer.Ordinal);
-    //     string? channelSnapshot = null;
-    //
-    //     try
-    //     {
-    //         foreach (var entry in _pendingWrites) snapshot[entry.Key] = entry.Value;
-    //         channelSnapshot = _pendingPanelChannel;
-    //         _pendingWrites.Clear();
-    //         _pendingPanelChannel = null;
-    //
-    //         var ampSnapshot = snapshot
-    //             .Where(e => _ampControlsByKey.ContainsKey(e.Key))
-    //             .ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
-    //
-    //         var panelSwitchSnapshot = snapshot
-    //             .Where(e => _panelEffectsByKey.ContainsKey(e.Key))
-    //             .ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
-    //
-    //         var panelTypeSnapshot = snapshot
-    //             .Where(e => _context.PanelEffects.Any(ef => ef.Definition.TypeParameter?.Key == e.Key))
-    //             .ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
-    //
-    //         var pedalKeys = new HashSet<string>(
-    //             _context.PedalFx.GetReadParameters().Select(p => p.Key), StringComparer.Ordinal);
-    //         var pedalSnapshot = snapshot
-    //             .Where(e => pedalKeys.Contains(e.Key))
-    //             .ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
-    //
-    //         var detailParamSnapshot = snapshot
-    //             .Where(e => !ampSnapshot.ContainsKey(e.Key) && !panelSwitchSnapshot.ContainsKey(e.Key)
-    //                         && !panelTypeSnapshot.ContainsKey(e.Key) && !pedalSnapshot.ContainsKey(e.Key))
-    //             .ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
-    //
-    //         _logger.LogInformation("Flushing queued sync: {Amp} amp, {Panel} panel, {PanelType} panel type, {Pedal} pedal, {Detail} detail, {Channel} channel change.",
-    //             ampSnapshot.Count, panelSwitchSnapshot.Count, panelTypeSnapshot.Count, pedalSnapshot.Count, detailParamSnapshot.Count, channelSnapshot is null ? "no" : "1");
-    //
-    //         await FlushPendingAmpWritesAsync(ampSnapshot);
-    //         await FlushPendingPanelWritesAsync(channelSnapshot, panelSwitchSnapshot, panelTypeSnapshot, snapshot);
-    //         await FlushPendingPedalWritesAsync(pedalSnapshot);
-    //         await FlushPendingDetailParamWritesAsync(detailParamSnapshot);
-    //
-    //         if (snapshot.Count > 0 || channelSnapshot is not null)
-    //         {
-    //             EmitStatus("Queued changes synced to the Katana.");
-    //             _logger.LogInformation("Queued changes synced to the Katana.");
-    //         }
-    //
-    //         _flushRetryCount = 0;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         foreach (var entry in snapshot) _pendingWrites[entry.Key] = entry.Value;
-    //         _pendingPanelChannel ??= channelSnapshot;
-    //         _flushRetryCount++;
-    //         var backoffMs = Math.Min(100 * (1 << _flushRetryCount), 2000);
-    //         EmitStatus(ex.Message);
-    //         _logger.LogError(ex, "Queued write sync failed (retry {Retry}, backoff {Backoff}ms). Re-queued {Pending}.", _flushRetryCount, backoffMs, DescribePendingWrites());
-    //         await Task.Delay(backoffMs);
-    //     }
-    //     finally
-    //     {
-    //         _syncGate.Release();
-    //     }
-    // }
-    //
-    // // ── Flush helpers ─────────────────────────────────────────────────────────
-    //
-    // private async Task FlushPendingAmpWritesAsync(IReadOnlyDictionary<string, byte> ampWrites)
-    // {
-    //     if (ampWrites.Count == 0) return;
-    //
-    //     var orderedParameters = ampWrites.Keys
-    //         .Select(key => _ampControlsByKey[key].Parameter)
-    //         .OrderBy(p => p.Address[0]).ThenBy(p => p.Address[1])
-    //         .ThenBy(p => p.Address[2]).ThenBy(p => p.Address[3])
-    //         .ToList();
-    //
-    //     var groupStart = 0;
-    //     while (groupStart < orderedParameters.Count)
-    //     {
-    //         var group = new List<KatanaParameterDefinition> { orderedParameters[groupStart] };
-    //         var groupIndex = groupStart + 1;
-    //         while (groupIndex < orderedParameters.Count && Utilities.CanBatchWrite(group[^1], orderedParameters[groupIndex]))
-    //         {
-    //             group.Add(orderedParameters[groupIndex]);
-    //             groupIndex++;
-    //         }
-    //         var startAddress = group[0].Address.ToArray();
-    //         var data = group.Select(p => ampWrites[p.Key]).ToArray();
-    //         _logger.LogInformation("Writing amp sync batch: {Keys}.", DescribeAmpKeys(group.Select(p => p.Key)));
-    //         await _session.WriteBlockAsync(startAddress, data);
-    //         groupStart = groupIndex;
-    //     }
-    // }
-    //
-    // private async Task FlushPendingPanelWritesAsync(
-    //     string? channel,
-    //     IReadOnlyDictionary<string, byte> panelSwitchWrites,
-    //     IReadOnlyDictionary<string, byte> panelTypeWrites,
-    //     IReadOnlyDictionary<string, byte> allWrites)
-    // {
-    //     if (!string.IsNullOrWhiteSpace(channel))
-    //     {
-    //         _logger.LogInformation("Writing queued panel channel: {Channel}.", channel);
-    //         await _session.SelectPanelChannelAsync(IAmpSyncState.ParsePanelChannelDisplay(channel));
-    //     }
-    //
-    //     foreach (var entry in panelSwitchWrites)
-    //     {
-    //         var parameter = _panelEffectsByKey[entry.Key].Definition.SwitchParameter;
-    //         _logger.LogInformation("Writing queued panel effect: {Name} -> {State}.", _panelEffectsByKey[entry.Key].DisplayName, entry.Value != 0 ? "On" : "Off");
-    //         await _session.WriteBlockAsync(parameter.Address, [entry.Value]);
-    //     }
-    //
-    //     foreach (var entry in panelTypeWrites)
-    //     {
-    //         var effect = _context.PanelEffects.First(p => p.Definition.TypeParameter?.Key == entry.Key);
-    //         _logger.LogInformation("Writing queued panel type: {Name} -> {Type}.", effect.DisplayName, effect.ToTypeOption(entry.Value));
-    //         await _session.WriteBlockAsync(effect.Definition.TypeParameter!.Address, [entry.Value]);
-    //     }
-    //
-    //     if (allWrites.TryGetValue(KatanaMkIIParameterCatalog.AmpType.Key, out var ampTypeValue))
-    //     {
-    //         _logger.LogInformation("Writing queued amp type: index {Value}.", ampTypeValue);
-    //         await _session.WriteBlockAsync(KatanaMkIIParameterCatalog.AmpType.Address, [ampTypeValue]);
-    //     }
-    //
-    //     if (allWrites.TryGetValue(KatanaMkIIParameterCatalog.CabinetResonance.Key, out var cabinetValue))
-    //     {
-    //         _logger.LogInformation("Writing queued cabinet resonance: index {Value}.", cabinetValue);
-    //         await _session.WriteBlockAsync(KatanaMkIIParameterCatalog.CabinetResonance.Address, [cabinetValue]);
-    //     }
-    //
-    //     if (allWrites.TryGetValue(KatanaMkIIParameterCatalog.AmpVariation.Key, out var ampVariationValue))
-    //     {
-    //         _logger.LogInformation("Writing queued amp variation: {Variation}.", ampVariationValue == 0 ? "TYPE 1" : "TYPE 2");
-    //         await _session.WriteBlockAsync(KatanaMkIIParameterCatalog.AmpVariation.Address, [ampVariationValue]);
-    //     }
-    //
-    //     if (allWrites.TryGetValue(KatanaMkIIParameterCatalog.ChainPattern.Key, out var chainPatternValue))
-    //     {
-    //         var name = chainPatternValue < PedalboardViewModel.ChainPatternNames.Length
-    //             ? PedalboardViewModel.ChainPatternNames[chainPatternValue]
-    //             : chainPatternValue.ToString();
-    //         _logger.LogInformation("Writing queued chain pattern: {Name}.", name);
-    //         await _session.WriteBlockAsync(KatanaMkIIParameterCatalog.ChainPattern.Address, [chainPatternValue]);
-    //     }
-    // }
-    //
-    // private async Task FlushPendingPedalWritesAsync(IReadOnlyDictionary<string, byte> pedalWrites)
-    // {
-    //     if (pedalWrites.Count == 0) return;
-    //
-    //     var orderedParameters = pedalWrites.Keys
-    //         .Select(_context.PedalFx.GetParameter)
-    //         .OrderBy(p => p.Address[0]).ThenBy(p => p.Address[1])
-    //         .ThenBy(p => p.Address[2]).ThenBy(p => p.Address[3])
-    //         .ToList();
-    //
-    //     var groupStart = 0;
-    //     while (groupStart < orderedParameters.Count)
-    //     {
-    //         var group = new List<KatanaParameterDefinition> { orderedParameters[groupStart] };
-    //         var groupIndex = groupStart + 1;
-    //         while (groupIndex < orderedParameters.Count && Utilities.CanBatchWrite(group[^1], orderedParameters[groupIndex]))
-    //         {
-    //             group.Add(orderedParameters[groupIndex]);
-    //             groupIndex++;
-    //         }
-    //         var startAddress = group[0].Address.ToArray();
-    //         var data = group.Select(p => pedalWrites[p.Key]).ToArray();
-    //         _logger.LogInformation("Writing pedal sync batch: {Keys}.", DescribePedalKeys(group.Select(p => p.Key)));
-    //         await _session.WriteBlockAsync(startAddress, data);
-    //         groupStart = groupIndex;
-    //     }
-    // }
-    //
-    // private async Task FlushPendingDetailParamWritesAsync(IReadOnlyDictionary<string, byte> detailWrites)
-    // {
-    //     if (detailWrites.Count == 0) return;
-    //
-    //     var allDefinitions = _context.PanelEffects
-    //         .SelectMany(e => e.GetSyncParameters())
-    //         .GroupBy(p => p.Key, StringComparer.Ordinal)
-    //         .ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
-    //
-    //     var orderedParameters = detailWrites.Keys
-    //         .Where(allDefinitions.ContainsKey)
-    //         .Select(k => allDefinitions[k])
-    //         .OrderBy(p => p.Address[0]).ThenBy(p => p.Address[1])
-    //         .ThenBy(p => p.Address[2]).ThenBy(p => p.Address[3])
-    //         .ToList();
-    //
-    //     foreach (var parameter in orderedParameters)
-    //     {
-    //         var value = detailWrites[parameter.Key];
-    //         _logger.LogInformation("Writing detail param: {Name} -> {Value}.", parameter.DisplayName, value);
-    //         await _session.WriteBlockAsync(parameter.Address.ToArray(), [value]);
-    //     }
-    // }
-    //
-    // private async Task<bool> TryRefreshPatchLevelAsync()
-    // {
-    //     if (!_context.PatchLevelMappingVerified) return false;
-    //     try
-    //     {
-    //         _context.PatchLevel = await _session.ReadParameterAsync(KatanaMkIIParameterCatalog.PatchLevel);
-    //         _logger.LogInformation("Patch Level reply: {Level}", _context.PatchLevel);
-    //         return true;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Patch level read failed.");
-    //         return false;
-    //     }
-    // }
-
-    private async Task<int?> TryRefreshDelayTimeAsync()
-    {
-        try
-        {
-            var data = await _session.ReadBlockAsync(KatanaMkIIParameterCatalog.DelayTimeAddress, 2);
-            var decoded = Utilities.DecodeDelayTime(data);
-            if (decoded <= 0)
-            {
-                _logger.LogInformation("Delay time reply did not contain a usable millisecond value.");
-                return null;
-            }
-
-            _logger.LogInformation("Delay time reply: {Ms} ms.", decoded);
-            return decoded;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Delay time read failed.");
-            return null;
         }
     }
 
@@ -680,26 +192,11 @@ public sealed class AmpSyncService : IAmpSyncService
 
     private void OnAmpPanelChannelChanged(object? sender, KatanaPanelChannel channel)
     {
-        var displayName = IAmpSyncState.ToPanelChannelDisplay(channel);
+        var displayName = Utilities.ToPanelChannelDisplay(channel);
         Dispatcher.UIThread.Post(() =>
         {
             _logger.LogInformation("Amp channel changed (push): {Channel}", displayName);
             _panelChannelSubject.OnNext(displayName);
         });
     }
-
-    // ── Private helpers ───────────────────────────────────────────────────────
-
-    // private void ApplyDeviceState(Action apply)
-    // {
-    //     _context.SuppressChangeTracking = true;
-    //     try { apply(); }
-    //     finally { _context.SuppressChangeTracking = false; }
-    // }
-
-    // private string DescribeAmpKeys(IEnumerable<string> keys) =>
-    //     string.Join(", ", keys.Distinct(StringComparer.Ordinal).Select(k => _ampControlsByKey[k].DisplayName));
-    //
-    // private string DescribePedalKeys(IEnumerable<string> keys) =>
-    //     string.Join(", ", keys.Distinct(StringComparer.Ordinal).Select(k => _context.PedalFx.GetParameter(k).DisplayName));
 }

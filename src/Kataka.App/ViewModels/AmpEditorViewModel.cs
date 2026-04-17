@@ -170,7 +170,7 @@ public partial class AmpEditorViewModel : ViewModelBase
         try
         {
             _logger.LogInformation("Writing Katana panel controls.");
-            var channel = IAmpSyncState.ParsePanelChannelDisplay(SelectedPanelChannel);
+            var channel = Utilities.ParsePanelChannelDisplay(SelectedPanelChannel);
             await _katanaSession.SelectPanelChannelAsync(channel);
             _logger.LogInformation("Selected panel channel: {Channel}", SelectedPanelChannel);
             // var patchLevelWritten = await _syncService.TryWritePatchLevelAsync();
