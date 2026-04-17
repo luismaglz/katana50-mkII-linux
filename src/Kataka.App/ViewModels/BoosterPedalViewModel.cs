@@ -45,7 +45,6 @@ public partial class BoosterPedalViewModel : PedalViewModel
     public bool HasTypeOptions => TypeOptions.Count > 0;
     public IBrush VariationBrush => GetVariationBrush(Variation);
 
-    // ── IBasePedal abstract overrides ─────────────────────────────────────────────
 
     public override bool IsEnabled
     {
@@ -120,8 +119,6 @@ public partial class BoosterPedalViewModel : PedalViewModel
         set => _state.BoosterDirectMix.Value = value;
     }
 
-    // ── IBasePedal sync contract ──────────────────────────────────────────────────
-
     public override bool TryGetTypeValue(string? option, out byte value)
     {
         if (option is not null && ReverseTypeTable.TryGetValue(option, out value))
@@ -132,20 +129,4 @@ public partial class BoosterPedalViewModel : PedalViewModel
 
     public override string ToTypeOption(byte rawValue) =>
         TypeTable.TryGetValue(rawValue, out var name) ? name : $"Type {rawValue}";
-
-    public override IReadOnlyList<KatanaParameterDefinition> GetSyncParameters()
-    {
-        var list = new List<KatanaParameterDefinition> { Definition.SwitchParameter };
-        if (Definition.TypeParameter is not null) list.Add(Definition.TypeParameter);
-        if (Definition.LevelParameter is not null) list.Add(Definition.LevelParameter);
-        if (Definition.VariationParameter is not null) list.Add(Definition.VariationParameter);
-        list.Add(KatanaMkIIParameterCatalog.BoosterDrive);
-        list.Add(KatanaMkIIParameterCatalog.BoosterTone);
-        list.Add(KatanaMkIIParameterCatalog.BoosterBottom);
-        list.Add(KatanaMkIIParameterCatalog.BoosterSoloSw);
-        list.Add(KatanaMkIIParameterCatalog.BoosterSoloLevel);
-        list.Add(KatanaMkIIParameterCatalog.BoosterEffectLevel);
-        list.Add(KatanaMkIIParameterCatalog.BoosterDirectMix);
-        return list;
-    }
 }

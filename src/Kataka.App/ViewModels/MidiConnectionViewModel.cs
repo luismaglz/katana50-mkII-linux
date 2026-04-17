@@ -38,7 +38,8 @@ public partial class MidiConnectionViewModel : ViewModelBase
         _logger = logger;
 
         this.WhenAnyValue(x => x.IsConnected)
-            .Subscribe(v => syncService.OnConnectionChanged(v));
+            .Subscribe(v => syncService.OnConnectionChanged(v))
+            .DisposeWith(Disposables);
     }
 
     public ObservableCollection<string> InputPorts { get; } = [];

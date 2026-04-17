@@ -28,10 +28,11 @@ public partial class MainWindowViewModel : ViewModelBase
         Patch = new PatchViewModel(katanaSession, ampSyncService, () => MidiConnection.IsConnected, AppendStatus, loggerFactory.CreateLogger<PatchViewModel>());
         AmpEditor = new AmpEditorViewModel(katanaSession, katanaState, ampSyncService, AppendStatus, loggerFactory.CreateLogger<AmpEditorViewModel>());
 
-        syncService.StatusMessages.Subscribe(msg => StatusMessage = msg);
+        syncService.StatusMessages.Subscribe(msg => StatusMessage = msg).DisposeWith(Disposables);
 
         MidiConnection.WhenAnyValue(x => x.IsConnected)
-            .Subscribe(v => Patch.CanWritePatch = v);
+            .Subscribe(v => Patch.CanWritePatch = v)
+            .DisposeWith(Disposables);
 
         AmpEditor.Initialize();
     }

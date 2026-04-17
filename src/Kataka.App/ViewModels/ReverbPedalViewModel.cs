@@ -46,7 +46,6 @@ public partial class ReverbPedalViewModel : PedalViewModel
     public bool HasTypeOptions => TypeOptions.Count > 0;
     public IBrush VariationBrush => GetVariationBrush(Variation);
 
-    // ── IBasePedal abstract overrides ─────────────────────────────────────────────
 
     public override bool IsEnabled
     {
@@ -126,8 +125,6 @@ public partial class ReverbPedalViewModel : PedalViewModel
         set => _state.DirectMix.Value = value;
     }
 
-    // ── IBasePedal sync contract ──────────────────────────────────────────────────
-
     public override bool TryGetTypeValue(string? option, out byte value)
     {
         if (option is not null && ReverseTypeTable.TryGetValue(option, out value))
@@ -138,20 +135,4 @@ public partial class ReverbPedalViewModel : PedalViewModel
 
     public override string ToTypeOption(byte rawValue) =>
         TypeTable.TryGetValue(rawValue, out var name) ? name : $"Type {rawValue}";
-
-    public override IReadOnlyList<KatanaParameterDefinition> GetSyncParameters()
-    {
-        var list = new List<KatanaParameterDefinition> { Definition.SwitchParameter };
-        if (Definition.TypeParameter is not null) list.Add(Definition.TypeParameter);
-        if (Definition.VariationParameter is not null) list.Add(Definition.VariationParameter);
-        list.Add(KatanaMkIIParameterCatalog.ReverbTime);
-        list.Add(KatanaMkIIParameterCatalog.ReverbPreDelay);
-        list.Add(KatanaMkIIParameterCatalog.ReverbLowCut);
-        list.Add(KatanaMkIIParameterCatalog.ReverbHighCut);
-        list.Add(KatanaMkIIParameterCatalog.ReverbDensity);
-        list.Add(KatanaMkIIParameterCatalog.ReverbColor);
-        list.Add(KatanaMkIIParameterCatalog.ReverbEffectLevel);
-        list.Add(KatanaMkIIParameterCatalog.ReverbDirectMix);
-        return list;
-    }
 }

@@ -7,6 +7,8 @@ namespace Kataka.App.ViewModels;
 
 public abstract class ViewModelBase : ReactiveObject
 {
+    protected CompositeDisposable Disposables { get; } = new();
+
     /// <summary>
     /// Sets <paramref name="field"/> to <paramref name="value"/>, fires PropertyChanging/Changed, and returns
     /// <c>true</c> if the value actually changed. Mirrors ObservableObject.SetProperty for legacy VMs.

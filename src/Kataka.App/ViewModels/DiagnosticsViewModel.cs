@@ -20,12 +20,12 @@ public partial class DiagnosticsViewModel : ViewModelBase
         _syncService = syncService;
         _isConnected = isConnected;
 
-        loggerProvider.LogMessages.Subscribe(AppendRaw);
+        loggerProvider.LogMessages.Subscribe(AppendRaw).DisposeWith(Disposables);
 
         syncService.ReadCompleted.Subscribe(meta =>
         {
             if (meta.AmpEditorStatus.Length > 0) AmpEditorStatus = meta.AmpEditorStatus;
-        });
+        }).DisposeWith(Disposables);
     }
 
     [Reactive] public string DiagnosticLog { get; set; } = "Diagnostic log ready.";

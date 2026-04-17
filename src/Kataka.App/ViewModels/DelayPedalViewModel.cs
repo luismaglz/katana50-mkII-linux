@@ -110,7 +110,6 @@ public partial class DelayPedalViewModel : PedalViewModel
     public bool HasVariation => _hasVariation;
     public IBrush VariationBrush => _hasVariation ? GetVariationBrush(Variation) : OffVariationBrush;
 
-    // ── IBasePedal abstract overrides ─────────────────────────────────────────────
 
     public override bool IsEnabled
     {
@@ -215,8 +214,6 @@ public partial class DelayPedalViewModel : PedalViewModel
         set => _modSw.Value = value ? 1 : 0;
     }
 
-    // ── IBasePedal sync contract ──────────────────────────────────────────────────
-
     public override bool TryGetTypeValue(string? option, out byte value)
     {
         if (option is not null && ReverseTypeTable.TryGetValue(option, out value))
@@ -227,25 +224,4 @@ public partial class DelayPedalViewModel : PedalViewModel
 
     public override string ToTypeOption(byte rawValue) =>
         TypeTable.TryGetValue(rawValue, out var name) ? name : $"Type {rawValue}";
-
-    public override IReadOnlyList<KatanaParameterDefinition> GetSyncParameters()
-    {
-        var def = Definition;
-        var list = new List<KatanaParameterDefinition> { def.SwitchParameter };
-        if (def.TypeParameter is not null) list.Add(def.TypeParameter);
-        if (def.VariationParameter is not null) list.Add(def.VariationParameter);
-        list.Add(_feedback.Parameter);
-        list.Add(_highCut.Parameter);
-        list.Add(_effectLevel.Parameter);
-        list.Add(_directMix.Parameter);
-        list.Add(_tapTime.Parameter);
-        list.Add(_modRate.Parameter);
-        list.Add(_modDepth.Parameter);
-        list.Add(_range.Parameter);
-        list.Add(_filter.Parameter);
-        list.Add(_feedbackPhase.Parameter);
-        list.Add(_delayPhase.Parameter);
-        list.Add(_modSw.Parameter);
-        return list;
-    }
 }
