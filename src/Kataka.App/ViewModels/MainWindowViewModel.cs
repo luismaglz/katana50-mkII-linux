@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 using Avalonia.Platform.Storage;
 
@@ -15,7 +14,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Kataka.App.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase, IAmpSyncState
+public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly IAmpSyncService syncService;
 
@@ -28,8 +27,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncState
         Diagnostics = new DiagnosticsViewModel(ampSyncService, loggerProvider, () => MidiConnection.IsConnected);
         Patch = new PatchViewModel(katanaSession, ampSyncService, () => MidiConnection.IsConnected, AppendStatus, loggerFactory.CreateLogger<PatchViewModel>());
         AmpEditor = new AmpEditorViewModel(katanaSession, katanaState, ampSyncService, AppendStatus, loggerFactory.CreateLogger<AmpEditorViewModel>());
-
-        // syncService.Initialize(this);
 
         syncService.StatusMessages.Subscribe(msg => StatusMessage = msg);
 
@@ -52,30 +49,6 @@ public partial class MainWindowViewModel : ViewModelBase, IAmpSyncState
     }
 
     public void Shutdown() => syncService.Shutdown();
-
-    // ── IAmpSyncState explicit interface implementation ───────────────────────
-
-    bool IAmpSyncState.IsConnected => MidiConnection.IsConnected;
-    bool IAmpSyncState.ActiveWriteSync => AmpEditor.ActiveWriteSync;
-
-    bool IAmpSyncState.SuppressChangeTracking
-    {
-        get => AmpEditor.SuppressChangeTracking;
-        set => AmpEditor.SuppressChangeTracking = value;
-    }
-
-    bool IAmpSyncState.PatchLevelMappingVerified => false;
-
-    int IAmpSyncState.PatchLevel
-    {
-        get => Patch.PatchLevel;
-        set => Patch.PatchLevel = value;
-    }
-
-    IReadOnlyList<AmpControlViewModel> IAmpSyncState.AmpControls => AmpEditor.AmpControls;
-    IReadOnlyList<IBasePedal> IAmpSyncState.PanelEffects => AmpEditor.PanelEffects;
-    PedalFxViewModel IAmpSyncState.PedalFx => AmpEditor.PedalFx;
-    PedalboardViewModel IAmpSyncState.Pedalboard => AmpEditor.Pedalboard;
 
     // ── Private helpers ───────────────────────────────────────────────────────
 

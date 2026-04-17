@@ -153,6 +153,7 @@ public partial class MidiConnectionViewModel : ViewModelBase
                 : $"Connected to selected MIDI ports: {SelectedInputPort} / {SelectedOutputPort}";
             _appendStatus("MIDI ports opened successfully.");
             _logger.LogInformation("MIDI ports opened successfully.");
+            await _syncService.TryRefreshAmpStateAsync();
         }
         catch (Exception ex)
         {
