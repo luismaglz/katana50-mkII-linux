@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 using Kataka.Domain.Midi;
 
@@ -17,15 +18,34 @@ public class KatanaState : IKatanaState
     {
         _logger = logger;
 
-        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpType.AddressString, AmpType);
-        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpVariation.AddressString, AmpVariation);
-        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpGain.AddressString, Gain);
-        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpVolume.AddressString, Volume);
-        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpBass.AddressString, Bass);
-        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpMiddle.AddressString, Middle);
-        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpTreble.AddressString, Treble);
-        _stateFields.TryAdd(KatanaMkIIParameterCatalog.AmpPresence.AddressString, Presence);
-        _stateFields.TryAdd(KatanaMkIIParameterCatalog.CabinetResonance.AddressString, CabinetResonance);
+        RegisterAll(AmpType);
+        RegisterAll(AmpVariation);
+        RegisterAll(Gain);
+        RegisterAll(Volume);
+        RegisterAll(Bass);
+        RegisterAll(Middle);
+        RegisterAll(Treble);
+        RegisterAll(Presence);
+        RegisterAll(CabinetResonance);
+        RegisterAll(PedalChain);
+        RegisterAll(BoostPedal);
+        RegisterAll(ModPedal);
+        RegisterAll(FxPedal);
+        RegisterAll(DelayPedal);
+        RegisterAll(Delay2Pedal);
+        RegisterAll(ReverbPedal);
+    }
+
+    private void RegisterAll(object obj)
+    {
+        foreach (var field in obj.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (field.GetValue(obj) is AmpControlState state)
+                _stateFields.TryAdd(state.Parameter.AddressString, state);
+            else if (field.FieldType.Namespace?.StartsWith("Kataka") == true
+                     && field.GetValue(obj) is { } nested)
+                RegisterAll(nested);
+        }
     }
 
     /// <summary>
