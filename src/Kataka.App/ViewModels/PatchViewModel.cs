@@ -10,6 +10,8 @@ using Kataka.App.Services;
 using Kataka.Application.Katana;
 using Kataka.Domain.Midi;
 
+using Microsoft.Extensions.Logging;
+
 using ReactiveUI.Fody.Helpers;
 
 namespace Kataka.App.ViewModels;
@@ -21,7 +23,7 @@ public partial class PatchViewModel : ViewModelBase
     private readonly IKatanaSession _katanaSession;
     private readonly Func<bool> _isConnected;
     private readonly Action<string> _appendStatus;
-    private readonly Action<string> _appendLog;
+    private readonly ILogger<PatchViewModel> _logger;
 
     private DateTimeOffset? _lastDelayTapAt;
 
@@ -30,12 +32,12 @@ public partial class PatchViewModel : ViewModelBase
         IAmpSyncService syncService,
         Func<bool> isConnected,
         Action<string> appendStatus,
-        Action<string> appendLog)
+        ILogger<PatchViewModel> logger)
     {
         _katanaSession = katanaSession;
         _isConnected = isConnected;
         _appendStatus = appendStatus;
-        _appendLog = appendLog;
+        _logger = logger;
 
         syncService.ReadCompleted.Subscribe(meta =>
         {
@@ -74,7 +76,7 @@ public partial class PatchViewModel : ViewModelBase
             _lastDelayTapAt = now;
             DelayTapStatus = "First tap registered. Tap again to set the delay time.";
             _appendStatus("Waiting for the second tap to calculate delay time.");
-            _appendLog("Registered first delay tap.");
+            _logger.LogInformation("Registered first delay tap.");
             return;
         }
 
@@ -84,7 +86,7 @@ public partial class PatchViewModel : ViewModelBase
 
         try
         {
-            _appendLog($"Writing tapped delay time: {tappedDelayTime} ms.");
+            _logger.LogInformation("Writing tapped delay time: {Ms} ms.", tappedDelayTime);
             await _katanaSession.WriteBlockAsync(
                 KatanaMkIIParameterCatalog.DelayTimeAddress,
                 EncodeDelayTime(tappedDelayTime));
@@ -96,9 +98,7 @@ public partial class PatchViewModel : ViewModelBase
         {
             DelayTapStatus = "Delay tap write failed.";
             _appendStatus(ex.Message);
-            _appendLog("Delay tap write failed.");
-            _appendLog(ex.ToString());
-            Console.Error.WriteLine(ex);
+            _logger.LogError(ex, "Delay tap write failed.");
         }
     }
 
@@ -113,17 +113,15 @@ public partial class PatchViewModel : ViewModelBase
 
         try
         {
-            _appendLog("Sending WRITE PATCH command to Katana.");
+            _logger.LogInformation("Sending WRITE PATCH command to Katana.");
             await _katanaSession.WriteBlockAsync(KatanaMkIIParameterCatalog.PatchWriteAddress, [0x00, 0x00]);
             _appendStatus("Patch written to Katana.");
-            _appendLog("WRITE PATCH command sent.");
+            _logger.LogInformation("WRITE PATCH command sent.");
         }
         catch (Exception ex)
         {
             _appendStatus("Patch write failed.");
-            _appendLog("Patch write command failed.");
-            _appendLog(ex.ToString());
-            Console.Error.WriteLine(ex);
+            _logger.LogError(ex, "Patch write command failed.");
         }
     }
 
@@ -148,7 +146,7 @@ public partial class PatchViewModel : ViewModelBase
         var file = files[0];
         try
         {
-            _appendLog($"Loading patch from {file.Name}...");
+            _logger.LogInformation("Loading patch from {Name}...", file.Name);
 
             string json;
             await using (var stream = await file.OpenReadAsync())
@@ -156,17 +154,16 @@ public partial class PatchViewModel : ViewModelBase
                 json = await reader.ReadToEndAsync();
 
             var patch = TslPatchSerializer.Deserialize(json);
-            _appendLog($"Patch '{patch.Name}' parsed — {patch.Blocks.Count} block(s). Sending to amp...");
+            _logger.LogInformation("Patch '{Name}' parsed — {Count} block(s). Sending to amp...", patch.Name, patch.Blocks.Count);
 
             await _katanaSession.LoadPatchAsync(patch);
-            _appendLog("Patch loaded. Refreshing display...");
+            _logger.LogInformation("Patch loaded. Refreshing display...");
             _appendStatus($"Patch '{patch.Name}' loaded.");
         }
         catch (Exception ex)
         {
             _appendStatus("Patch load failed.");
-            _appendLog($"Patch load failed: {ex.Message}");
-            Console.Error.WriteLine(ex);
+            _logger.LogError(ex, "Patch load failed.");
         }
     }
 
@@ -187,7 +184,7 @@ public partial class PatchViewModel : ViewModelBase
 
         try
         {
-            _appendLog("Reading all patch blocks from amp...");
+            _logger.LogInformation("Reading all patch blocks from amp...");
             var patchName = Path.GetFileNameWithoutExtension(file.Name);
             var patch = await _katanaSession.ReadCurrentPatchAsync(patchName);
             var json = TslPatchSerializer.Serialize(patch);
@@ -196,14 +193,13 @@ public partial class PatchViewModel : ViewModelBase
             await using var writer = new StreamWriter(stream);
             await writer.WriteAsync(json);
 
-            _appendLog($"Patch '{patch.Name}' saved to {file.Name}.");
+            _logger.LogInformation("Patch '{Name}' saved to {File}.", patch.Name, file.Name);
             _appendStatus($"Patch saved as '{file.Name}'.");
         }
         catch (Exception ex)
         {
             _appendStatus("Patch save failed.");
-            _appendLog($"Patch save failed: {ex.Message}");
-            Console.Error.WriteLine(ex);
+            _logger.LogError(ex, "Patch save failed.");
         }
     }
 

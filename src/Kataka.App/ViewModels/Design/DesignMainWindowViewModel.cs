@@ -1,6 +1,10 @@
+using Kataka.App.Logging;
 using Kataka.App.Services;
 using Kataka.App.ViewModels.Design;
 using Kataka.Domain.KatanaState;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Kataka.App.ViewModels.Design;
 
@@ -8,7 +12,12 @@ public sealed class DesignMainWindowViewModel : MainWindowViewModel
 {
     public static DesignMainWindowViewModel Instance => new();
 
-    public DesignMainWindowViewModel() : base(new NullKatanaSession(), new KatanaState(), new AmpSyncService(new NullKatanaSession(), new KatanaState()))
+    public DesignMainWindowViewModel() : base(
+        new NullKatanaSession(),
+        new KatanaState(),
+        new AmpSyncService(new NullKatanaSession(), new KatanaState(), NullLogger<AmpSyncService>.Instance),
+        NullLoggerFactory.Instance,
+        new ObservableLoggerProvider())
     {
         // IsConnected is false, so none of these will queue MIDI writes.
         AmpEditor.SelectedAmpType = "CRUNCH";
@@ -26,8 +35,9 @@ public sealed class DesignAmpEditorViewModel : AmpEditorViewModel
     public DesignAmpEditorViewModel() : base(
         new NullKatanaSession(),
         new KatanaState(),
-        new AmpSyncService(new NullKatanaSession(), new KatanaState()),
-        _ => { }, _ => { })
+        new AmpSyncService(new NullKatanaSession(), new KatanaState(), NullLogger<AmpSyncService>.Instance),
+        _ => { },
+        NullLogger<AmpEditorViewModel>.Instance)
     {
         SelectedAmpType = "CRUNCH";
         SelectedCabinetResonance = "MIDDLE";

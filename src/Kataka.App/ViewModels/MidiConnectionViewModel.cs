@@ -10,6 +10,8 @@ using Kataka.App.Services;
 using Kataka.Application.Katana;
 using Kataka.Domain.Midi;
 
+using Microsoft.Extensions.Logging;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -20,7 +22,7 @@ public partial class MidiConnectionViewModel : ViewModelBase
     private readonly IKatanaSession _katanaSession;
     private readonly IAmpSyncService _syncService;
     private readonly Action<string> _appendStatus;
-    private readonly Action<string> _appendLog;
+    private readonly ILogger<MidiConnectionViewModel> _logger;
     private readonly Dictionary<string, string> _inputPortIds = [];
     private readonly Dictionary<string, string> _outputPortIds = [];
 
@@ -28,12 +30,12 @@ public partial class MidiConnectionViewModel : ViewModelBase
         IKatanaSession katanaSession,
         IAmpSyncService syncService,
         Action<string> appendStatus,
-        Action<string> appendLog)
+        ILogger<MidiConnectionViewModel> logger)
     {
         _katanaSession = katanaSession;
         _syncService = syncService;
         _appendStatus = appendStatus;
-        _appendLog = appendLog;
+        _logger = logger;
 
         this.WhenAnyValue(x => x.IsConnected)
             .Subscribe(v => syncService.OnConnectionChanged(v));
@@ -59,7 +61,7 @@ public partial class MidiConnectionViewModel : ViewModelBase
         _appendStatus("Scanning MIDI ports...");
         DetectionMessage = "Looking for Katana input/output ports.";
         IsKatanaDetected = false;
-        _appendLog("Starting MIDI port scan.");
+        _logger.LogInformation("Starting MIDI port scan.");
         SelectedInputPort = null;
         SelectedOutputPort = null;
         InputPorts.Clear();
@@ -70,20 +72,20 @@ public partial class MidiConnectionViewModel : ViewModelBase
         try
         {
             var ports = await _katanaSession.ListPortsAsync();
-            _appendLog($"Port scan returned {ports.Count} total port(s).");
+            _logger.LogInformation("Port scan returned {Count} total port(s).", ports.Count);
 
             foreach (var port in ports.Where(p => p.Direction == MidiPortDirection.Input).OrderBy(p => p.Name))
             {
                 InputPorts.Add(port.Name);
                 _inputPortIds[port.Name] = port.Id;
-                _appendLog($"Input: {port.Name}");
+                _logger.LogInformation("Input: {Name}", port.Name);
             }
 
             foreach (var port in ports.Where(p => p.Direction == MidiPortDirection.Output).OrderBy(p => p.Name))
             {
                 OutputPorts.Add(port.Name);
                 _outputPortIds[port.Name] = port.Id;
-                _appendLog($"Output: {port.Name}");
+                _logger.LogInformation("Output: {Name}", port.Name);
             }
 
             var katanaInput = ports.FirstOrDefault(p =>
@@ -100,26 +102,24 @@ public partial class MidiConnectionViewModel : ViewModelBase
                 SelectedOutputPort = katanaOutput.Name;
                 DetectionMessage = $"Katana detected: {katanaInput.Name} / {katanaOutput.Name}";
                 _appendStatus("Katana-style MIDI ports found. You can connect to the selected pair.");
-                _appendLog("Katana-style port pair auto-selected.");
+                _logger.LogInformation("Katana-style port pair auto-selected.");
                 return;
             }
 
             DetectionMessage = "No Katana MIDI port pair was detected.";
             _appendStatus($"Scan complete. Found {InputPorts.Count} input port(s) and {OutputPorts.Count} output port(s).");
-            _appendLog("No Katana-style port pair found.");
+            _logger.LogInformation("No Katana-style port pair found.");
         }
         catch (Exception ex)
         {
             DetectionMessage = "MIDI scan failed.";
             _appendStatus(ex.Message);
-            _appendLog("MIDI scan failed.");
-            _appendLog(ex.ToString());
-            Console.Error.WriteLine(ex);
+            _logger.LogError(ex, "MIDI scan failed.");
         }
         finally
         {
             IsScanning = false;
-            _appendLog("MIDI port scan finished.");
+            _logger.LogInformation("MIDI port scan finished.");
         }
     }
 
@@ -134,7 +134,7 @@ public partial class MidiConnectionViewModel : ViewModelBase
 
         try
         {
-            _appendLog($"Opening input '{SelectedInputPort}' and output '{SelectedOutputPort}'.");
+            _logger.LogInformation("Opening input '{Input}' and output '{Output}'.", SelectedInputPort, SelectedOutputPort);
             if (!_inputPortIds.TryGetValue(SelectedInputPort, out var inputPortId))
                 throw new InvalidOperationException($"Input port '{SelectedInputPort}' is not available.");
             if (!_outputPortIds.TryGetValue(SelectedOutputPort, out var outputPortId))
@@ -152,19 +152,14 @@ public partial class MidiConnectionViewModel : ViewModelBase
                 ? $"Connected to Katana-style ports: {SelectedInputPort} / {SelectedOutputPort}"
                 : $"Connected to selected MIDI ports: {SelectedInputPort} / {SelectedOutputPort}";
             _appendStatus("MIDI ports opened successfully.");
-            _appendLog("MIDI ports opened successfully.");
-
-            _appendLog("Auto-loading amp, panel, and pedal state.");
-            await _syncService.TryRefreshAmpStateAsync();
+            _logger.LogInformation("MIDI ports opened successfully.");
         }
         catch (Exception ex)
         {
             IsConnected = false;
             DetectionMessage = "Connection failed.";
             _appendStatus(ex.Message);
-            _appendLog("Connection failed.");
-            _appendLog(ex.ToString());
-            Console.Error.WriteLine(ex);
+            _logger.LogError(ex, "Connection failed.");
         }
     }
 
@@ -182,7 +177,7 @@ public partial class MidiConnectionViewModel : ViewModelBase
         IsConnected = false;
         _appendStatus("Disconnected from the selected MIDI ports.");
         DetectionMessage = "Connection closed.";
-        _appendLog("MIDI connection closed.");
+        _logger.LogInformation("MIDI connection closed.");
     }
 
     [RelayCommand]
@@ -196,23 +191,21 @@ public partial class MidiConnectionViewModel : ViewModelBase
 
         try
         {
-            _appendLog("Sending universal device identity request.");
+            _logger.LogInformation("Sending universal device identity request.");
             var reply = await _katanaSession.RequestIdentityAsync();
             IdentityReply = reply.ToHexString();
             DetectionMessage = UniversalDeviceIdentity.IsIdentityReply(reply)
                 ? "Identity reply received."
                 : "A SysEx reply was received, but it did not match the standard identity pattern.";
             _appendStatus("Identity request completed.");
-            _appendLog($"Identity reply: {IdentityReply}");
+            _logger.LogInformation("Identity reply: {Reply}", IdentityReply);
         }
         catch (Exception ex)
         {
             IdentityReply = "Identity request failed.";
             DetectionMessage = "Identity request failed.";
             _appendStatus(ex.Message);
-            _appendLog("Identity request failed.");
-            _appendLog(ex.ToString());
-            Console.Error.WriteLine(ex);
+            _logger.LogError(ex, "Identity request failed.");
         }
     }
 }
