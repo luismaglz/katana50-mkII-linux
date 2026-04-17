@@ -54,8 +54,8 @@ public partial class AmpEditorViewModel : ViewModelBase
         foreach (var effectViewModel in new PedalViewModel[]
                  {
                      new BoosterPedalViewModel(katanaState),
-                     new ModFxPedalViewModel("mod"),
-                     new ModFxPedalViewModel("fx"),
+                     new ModFxPedalViewModel("mod", katanaState),
+                     new ModFxPedalViewModel("fx", katanaState),
                      new DelayPedalViewModel("delay", katanaState),
                      new DelayPedalViewModel("delay2", katanaState),
                      new ReverbPedalViewModel(katanaState)
