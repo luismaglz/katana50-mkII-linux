@@ -20,6 +20,11 @@ public class KatanaState : IKatanaState
 
         RegisterAll(AmpType);
         RegisterAll(AmpVariation);
+        RegisterAll(LedStateBooster);
+        RegisterAll(LedStateMod);
+        RegisterAll(LedStateFx);
+        RegisterAll(LedStateDelay);
+        RegisterAll(LedStateReverb);
         RegisterAll(Gain);
         RegisterAll(Volume);
         RegisterAll(Bass);
@@ -154,11 +159,11 @@ public class KatanaState : IKatanaState
         if (_stateFields.TryGetValue(key, out var state))
         {
             state.SetFromAmp(value);
-            _logger.LogInformation("{Name} : {Value} Refreshed", key, value);
+            _logger.LogDebug("{Name} ({Address}): {Value}", state.Parameter.DisplayName, key, value);
         }
         else
         {
-            _logger.LogDebug("Received update for untracked parameter key: {Key}", key);
+            _logger.LogDebug("Untracked: {Address}", key);
         }
     }
 
@@ -220,6 +225,11 @@ public class KatanaState : IKatanaState
 
     public AmpControlState AmpType { get; } = new(KatanaMkIIParameterCatalog.AmpType);
     public AmpControlState AmpVariation { get; } = new(KatanaMkIIParameterCatalog.AmpVariation);
+    public AmpControlState LedStateBooster { get; } = new(KatanaMkIIParameterCatalog.LedStateBooster);
+    public AmpControlState LedStateMod { get; } = new(KatanaMkIIParameterCatalog.LedStateMod);
+    public AmpControlState LedStateFx { get; } = new(KatanaMkIIParameterCatalog.LedStateFx);
+    public AmpControlState LedStateDelay { get; } = new(KatanaMkIIParameterCatalog.LedStateDelay);
+    public AmpControlState LedStateReverb { get; } = new(KatanaMkIIParameterCatalog.LedStateReverb);
     public AmpControlState Gain { get; } = new(KatanaMkIIParameterCatalog.AmpGain);
     public AmpControlState Volume { get; } = new(KatanaMkIIParameterCatalog.AmpVolume);
     public AmpControlState Bass { get; } = new(KatanaMkIIParameterCatalog.AmpBass);

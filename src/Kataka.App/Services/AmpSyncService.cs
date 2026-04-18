@@ -167,7 +167,36 @@ public sealed class AmpSyncService : IAmpSyncService
         var value = bytes.Count == 16 ? bytes[13] : bytes[12];
         _logger.LogDebug("Received {Value} on {Address}", value, addressKey);
 
+        if (addressKey == Utilities.AddressToKey(KatanaMkIIParameterCatalog.CurrentChannelAddress))
+        {
+            OnChannelChangePush(value);
+            return;
+        }
+
         _katanaState.SetState(addressKey, value);
+    }
+
+    private void OnChannelChangePush(byte channelCode)
+    {
+        KatanaPanelChannel? channel = channelCode switch
+        {
+            0 => KatanaPanelChannel.Panel,
+            1 => KatanaPanelChannel.ChA1,
+            2 => KatanaPanelChannel.ChA2,
+            5 => KatanaPanelChannel.ChB1,
+            6 => KatanaPanelChannel.ChB2,
+            _ => null
+        };
+
+        if (channel is null)
+        {
+            _logger.LogWarning("Unknown channel code in SysEx push: {Code:X2}", channelCode);
+            return;
+        }
+
+        var displayName = Utilities.ToPanelChannelDisplay(channel.Value);
+        _logger.LogInformation("Amp channel changed (SysEx): {Channel}", displayName);
+        _ = RefreshOnChannelChangeAsync(displayName);
     }
 
     private void OnAmpPanelChannelChanged(object? sender, KatanaPanelChannel channel)

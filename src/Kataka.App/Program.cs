@@ -43,7 +43,9 @@ internal sealed class Program
 
         var loggerProvider = new ObservableLoggerProvider(config);
         services.AddSingleton(loggerProvider);
-        services.AddLogging(b => b.AddProvider(loggerProvider));
+        services.AddLogging(b => b
+            .SetMinimumLevel(LogLevel.Trace)
+            .AddProvider(loggerProvider));
 
         services.AddSingleton<IMidiTransport>(_ => DefaultMidiTransport.Create());
         services.AddSingleton<IKatanaSession, KatanaSession>();
