@@ -74,7 +74,8 @@ public static partial class KatanaMkIIParameterCatalog
 
     public static KatanaParameterDefinition DelayType { get; } =
         new("panel-delay-type", "Delay Type", [0x60, 0x00, 0x05, 0x01], maximum: 10,
-            description: "Selects the delay type (Digital, Pan, Stereo, Analog, Tape Echo, Reverse, Modulate, SDE-3000).");
+            description:
+            "Selects the delay type (Digital, Pan, Stereo, Analog, Tape Echo, Reverse, Modulate, SDE-3000).");
 
     public static KatanaParameterDefinition Delay2Switch { get; } =
         new("panel-delay2-switch", "Delay 2", [0x60, 0x00, 0x05, 0x20], maximum: 1,
@@ -146,6 +147,19 @@ public static partial class KatanaMkIIParameterCatalog
         new("amp-variation", "Variation", [0x60, 0x00, 0x06, 0x5C], maximum: 1,
             description: "Toggles between TYPE 1 and TYPE 2 voicing for the selected amp character.");
 
+    // PATCH_STATUS LED states (offsets 0x0D–0x11). Values 0-3 reflect the front-panel LED
+    // visual state pushed by the amp when effects or channels change.
+    public static KatanaParameterDefinition LedStateBooster { get; } =
+        new("led-state-booster", "Booster LED", [0x60, 0x00, 0x06, 0x5D], maximum: 3);
+    public static KatanaParameterDefinition LedStateMod { get; } =
+        new("led-state-mod", "Mod LED", [0x60, 0x00, 0x06, 0x5E], maximum: 3);
+    public static KatanaParameterDefinition LedStateFx { get; } =
+        new("led-state-fx", "FX LED", [0x60, 0x00, 0x06, 0x5F], maximum: 3);
+    public static KatanaParameterDefinition LedStateDelay { get; } =
+        new("led-state-delay", "Delay LED", [0x60, 0x00, 0x06, 0x60], maximum: 3);
+    public static KatanaParameterDefinition LedStateReverb { get; } =
+        new("led-state-reverb", "Reverb LED", [0x60, 0x00, 0x06, 0x61], maximum: 3);
+
     // Cabinet resonance (0-2: LOW / MIDDLE / HIGH).
     public static KatanaParameterDefinition CabinetResonance { get; } =
         new("amp-cabinet-resonance", "Cabinet", [0x60, 0x00, 0x06, 0x43], maximum: 2,
@@ -188,7 +202,7 @@ public static partial class KatanaMkIIParameterCatalog
             description: "Adjusts the volume of the direct (dry) sound.");
 
     public static KatanaParameterDefinition PedalFxBendPitch { get; } =
-        new("pedal-fx-bend-pitch", "Pitch", [0x60, 0x00, 0x05, 0x58], minimum: 0, maximum: 48,
+        new("pedal-fx-bend-pitch", "Pitch", [0x60, 0x00, 0x05, 0x58], 0, 48,
             description: "Sets the pitch at the point where the pedal is all the way down (in semitones, −24 to +24).");
 
     public static KatanaParameterDefinition PedalFxBendPedalPosition { get; } =
@@ -245,7 +259,7 @@ public static partial class KatanaMkIIParameterCatalog
             description: "Sets the frequency at which the low cut filter begins to take effect (FLAT or 20–800 Hz).");
 
     public static KatanaParameterDefinition SoloEqLowGain { get; } =
-        new("solo-eq-low-gain", "Solo EQ Low", [0x60, 0x00, 0x0F, 0x13], minimum: 0, maximum: 48,
+        new("solo-eq-low-gain", "Solo EQ Low", [0x60, 0x00, 0x0F, 0x13], 0, 48,
             description: "Adjusts the low frequency range tone (−12 to +12 dB).");
 
     public static KatanaParameterDefinition SoloEqMidFreq { get; } =
@@ -257,11 +271,11 @@ public static partial class KatanaMkIIParameterCatalog
             description: "Adjusts the bandwidth of the mid-frequency band. Higher values narrow the affected area.");
 
     public static KatanaParameterDefinition SoloEqMidGain { get; } =
-        new("solo-eq-mid-gain", "Solo EQ Mid", [0x60, 0x00, 0x0F, 0x16], minimum: 0, maximum: 48,
+        new("solo-eq-mid-gain", "Solo EQ Mid", [0x60, 0x00, 0x0F, 0x16], 0, 48,
             description: "Adjusts the middle frequency range tone (−12 to +12 dB).");
 
     public static KatanaParameterDefinition SoloEqHighGain { get; } =
-        new("solo-eq-high-gain", "Solo EQ High", [0x60, 0x00, 0x0F, 0x17], minimum: 0, maximum: 48,
+        new("solo-eq-high-gain", "Solo EQ High", [0x60, 0x00, 0x0F, 0x17], 0, 48,
             description: "Adjusts the high frequency range tone (−12 to +12 dB).");
 
     public static KatanaParameterDefinition SoloEqHighCut { get; } =
@@ -269,7 +283,7 @@ public static partial class KatanaMkIIParameterCatalog
             description: "Sets the frequency at which the high cut filter begins to take effect (630 Hz–FLAT).");
 
     public static KatanaParameterDefinition SoloEqLevel { get; } =
-        new("solo-eq-level", "Solo EQ Level", [0x60, 0x00, 0x0F, 0x19], minimum: 0, maximum: 48,
+        new("solo-eq-level", "Solo EQ Level", [0x60, 0x00, 0x0F, 0x19], 0, 48,
             description: "Adjusts the overall volume level of the Solo EQ (−12 to +12 dB).");
 
     // ── Solo Delay (Ver210+, same Mk2V2 block) ───────────────────────────────────
@@ -286,7 +300,8 @@ public static partial class KatanaMkIIParameterCatalog
 
     public static KatanaParameterDefinition SoloDelayFeedback { get; } =
         new("solo-delay-feedback", "Solo Dly Feedback", [0x60, 0x00, 0x0F, 0x1E], maximum: 100,
-            description: "Adjusts the volume returned to the input; higher values increase the number of delay repeats.");
+            description:
+            "Adjusts the volume returned to the input; higher values increase the number of delay repeats.");
 
     public static KatanaParameterDefinition SoloDelayEffectLevel { get; } =
         new("solo-delay-effect-level", "Solo Dly Level", [0x60, 0x00, 0x0F, 0x1F], maximum: 120,
@@ -302,7 +317,8 @@ public static partial class KatanaMkIIParameterCatalog
 
     public static KatanaParameterDefinition SoloDelayHighCut { get; } =
         new("solo-delay-high-cut", "Solo Dly Hi Cut", [0x60, 0x00, 0x0F, 0x22], maximum: 14,
-            description: "Sets the frequency at which the high cut filter begins to take effect (630 Hz–12.5 kHz, FLAT).");
+            description:
+            "Sets the frequency at which the high cut filter begins to take effect (630 Hz–12.5 kHz, FLAT).");
 
     public static KatanaParameterDefinition SoloDelayModSw { get; } =
         new("solo-delay-mod-sw", "Solo Dly Mod", [0x60, 0x00, 0x0F, 0x23], maximum: 1,
@@ -324,7 +340,7 @@ public static partial class KatanaMkIIParameterCatalog
             description: "Selects the contour type (tone definition characteristics). Can also be set to custom.");
 
     public static KatanaParameterDefinition Contour1FreqShift { get; } =
-        new("contour1-freq-shift", "Contour 1 Freq", [0x60, 0x00, 0x0F, 0x31], minimum: 0, maximum: 100,
+        new("contour1-freq-shift", "Contour 1 Freq", [0x60, 0x00, 0x0F, 0x31], 0, 100,
             description: "Adjusts the frequency shift amount for Contour 1.");
 
     public static KatanaParameterDefinition Contour2Type { get; } =
@@ -332,7 +348,7 @@ public static partial class KatanaMkIIParameterCatalog
             description: "Selects the contour type for Contour 2.");
 
     public static KatanaParameterDefinition Contour2FreqShift { get; } =
-        new("contour2-freq-shift", "Contour 2 Freq", [0x60, 0x00, 0x0F, 0x39], minimum: 0, maximum: 100,
+        new("contour2-freq-shift", "Contour 2 Freq", [0x60, 0x00, 0x0F, 0x39], 0, 100,
             description: "Adjusts the frequency shift amount for Contour 2.");
 
     public static KatanaParameterDefinition Contour3Type { get; } =
@@ -340,7 +356,7 @@ public static partial class KatanaMkIIParameterCatalog
             description: "Selects the contour type for Contour 3.");
 
     public static KatanaParameterDefinition Contour3FreqShift { get; } =
-        new("contour3-freq-shift", "Contour 3 Freq", [0x60, 0x00, 0x0F, 0x41], minimum: 0, maximum: 100,
+        new("contour3-freq-shift", "Contour 3 Freq", [0x60, 0x00, 0x0F, 0x41], 0, 100,
             description: "Adjusts the frequency shift amount for Contour 3.");
 
     // ── Patch EQ — Patch_0 embedded EQ block (BTS prm_prop_patch_0 addrs 0x30–0x47) ──
@@ -349,72 +365,96 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition PatchEq1Sw { get; } =
         new("patch-eq1-sw", "EQ On/Off", [0x60, 0x00, 0x00, 0x40], maximum: 1,
             description: "Turns the Patch EQ on/off.");
+
     public static KatanaParameterDefinition PatchEq1Type { get; } =
         new("patch-eq1-type", "EQ Type", [0x60, 0x00, 0x00, 0x41], maximum: 1,
             description: "Selects the EQ type: PARAMETRIC EQ or GE-10 (graphic equalizer).");
+
     public static KatanaParameterDefinition PatchEq1LowCut { get; } =
         new("patch-eq1-low-cut", "Low Cut", [0x60, 0x00, 0x00, 0x42], maximum: 17,
             description: "Sets the frequency at which the low cut filter begins to take effect (FLAT or 20–800 Hz).");
+
     public static KatanaParameterDefinition PatchEq1LowGain { get; } =
         new("patch-eq1-low-gain", "Low Gain", [0x60, 0x00, 0x00, 0x43], maximum: 40,
             description: "Adjusts the low frequency range tone (−20 to +20 dB).");
+
     public static KatanaParameterDefinition PatchEq1LowMidFreq { get; } =
         new("patch-eq1-lomid-freq", "Low-Mid Freq", [0x60, 0x00, 0x00, 0x44], maximum: 27,
             description: "Specifies the center frequency adjusted by the Low-Mid Gain (20 Hz–10.0 kHz).");
+
     public static KatanaParameterDefinition PatchEq1LowMidQ { get; } =
         new("patch-eq1-lomid-q", "Low-Mid Q", [0x60, 0x00, 0x00, 0x45], maximum: 5,
             description: "Adjusts the bandwidth of the low-mid band. Higher values narrow the affected area.");
+
     public static KatanaParameterDefinition PatchEq1LowMidGain { get; } =
         new("patch-eq1-lomid-gain", "Low-Mid Gain", [0x60, 0x00, 0x00, 0x46], maximum: 40,
             description: "Adjusts the low-middle frequency range tone (−20 to +20 dB).");
+
     public static KatanaParameterDefinition PatchEq1HighMidFreq { get; } =
         new("patch-eq1-himid-freq", "High-Mid Freq", [0x60, 0x00, 0x00, 0x47], maximum: 27,
             description: "Specifies the center frequency adjusted by the High-Mid Gain (20 Hz–10.0 kHz).");
+
     public static KatanaParameterDefinition PatchEq1HighMidQ { get; } =
         new("patch-eq1-himid-q", "High-Mid Q", [0x60, 0x00, 0x00, 0x48], maximum: 5,
             description: "Adjusts the bandwidth of the high-mid band. Higher values narrow the affected area.");
+
     public static KatanaParameterDefinition PatchEq1HighMidGain { get; } =
         new("patch-eq1-himid-gain", "High-Mid Gain", [0x60, 0x00, 0x00, 0x49], maximum: 40,
             description: "Adjusts the high-middle frequency range tone (−20 to +20 dB).");
+
     public static KatanaParameterDefinition PatchEq1HighGain { get; } =
         new("patch-eq1-high-gain", "High Gain", [0x60, 0x00, 0x00, 0x4A], maximum: 40,
             description: "Adjusts the high frequency range tone (−20 to +20 dB).");
+
     public static KatanaParameterDefinition PatchEq1HighCut { get; } =
         new("patch-eq1-high-cut", "High Cut", [0x60, 0x00, 0x00, 0x4B], maximum: 14,
-            description: "Sets the frequency at which the high cut filter begins to take effect (630 Hz–12.5 kHz, FLAT).");
+            description:
+            "Sets the frequency at which the high cut filter begins to take effect (630 Hz–12.5 kHz, FLAT).");
+
     public static KatanaParameterDefinition PatchEq1Level { get; } =
         new("patch-eq1-level", "EQ Level", [0x60, 0x00, 0x00, 0x4C], maximum: 40,
             description: "Adjusts the overall volume level of the EQ (−20 to +20 dB).");
+
     public static KatanaParameterDefinition PatchEq1Geq31Hz { get; } =
         new("patch-eq1-geq-31hz", "31 Hz", [0x60, 0x00, 0x00, 0x4D], maximum: 48,
             description: "GE-10 graphic EQ band at 31 Hz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq1Geq62Hz { get; } =
         new("patch-eq1-geq-62hz", "62 Hz", [0x60, 0x00, 0x00, 0x4E], maximum: 48,
             description: "GE-10 graphic EQ band at 62 Hz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq1Geq125Hz { get; } =
         new("patch-eq1-geq-125hz", "125 Hz", [0x60, 0x00, 0x00, 0x4F], maximum: 48,
             description: "GE-10 graphic EQ band at 125 Hz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq1Geq250Hz { get; } =
         new("patch-eq1-geq-250hz", "250 Hz", [0x60, 0x00, 0x00, 0x50], maximum: 48,
             description: "GE-10 graphic EQ band at 250 Hz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq1Geq500Hz { get; } =
         new("patch-eq1-geq-500hz", "500 Hz", [0x60, 0x00, 0x00, 0x51], maximum: 48,
             description: "GE-10 graphic EQ band at 500 Hz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq1Geq1kHz { get; } =
         new("patch-eq1-geq-1khz", "1 kHz", [0x60, 0x00, 0x00, 0x52], maximum: 48,
             description: "GE-10 graphic EQ band at 1 kHz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq1Geq2kHz { get; } =
         new("patch-eq1-geq-2khz", "2 kHz", [0x60, 0x00, 0x00, 0x53], maximum: 48,
             description: "GE-10 graphic EQ band at 2 kHz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq1Geq4kHz { get; } =
         new("patch-eq1-geq-4khz", "4 kHz", [0x60, 0x00, 0x00, 0x54], maximum: 48,
             description: "GE-10 graphic EQ band at 4 kHz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq1Geq8kHz { get; } =
         new("patch-eq1-geq-8khz", "8 kHz", [0x60, 0x00, 0x00, 0x55], maximum: 48,
             description: "GE-10 graphic EQ band at 8 kHz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq1Geq16kHz { get; } =
         new("patch-eq1-geq-16khz", "16 kHz", [0x60, 0x00, 0x00, 0x56], maximum: 48,
             description: "GE-10 graphic EQ band at 16 kHz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq1GeqLevel { get; } =
         new("patch-eq1-geq-level", "GEQ Level", [0x60, 0x00, 0x00, 0x57], maximum: 48,
             description: "Overall output level of the GE-10 graphic EQ (−12 to +12 dB).");
@@ -423,85 +463,118 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition PatchEq2Sw { get; } =
         new("patch-eq2-sw", "EQ 2 On/Off", [0x60, 0x00, 0x00, 0x60], maximum: 1,
             description: "Turns the second Patch EQ on/off.");
+
     public static KatanaParameterDefinition PatchEq2Type { get; } =
         new("patch-eq2-type", "EQ 2 Type", [0x60, 0x00, 0x00, 0x61], maximum: 1,
             description: "Selects the EQ 2 type: PARAMETRIC EQ or GE-10 (graphic equalizer).");
+
     public static KatanaParameterDefinition PatchEq2LowCut { get; } =
         new("patch-eq2-low-cut", "EQ 2 Low Cut", [0x60, 0x00, 0x00, 0x62], maximum: 17,
             description: "Sets the frequency at which the low cut filter begins to take effect (FLAT or 20–800 Hz).");
+
     public static KatanaParameterDefinition PatchEq2LowGain { get; } =
         new("patch-eq2-low-gain", "EQ 2 Low Gain", [0x60, 0x00, 0x00, 0x63], maximum: 40,
             description: "Adjusts the low frequency range tone (−20 to +20 dB).");
+
     public static KatanaParameterDefinition PatchEq2LowMidFreq { get; } =
         new("patch-eq2-lomid-freq", "EQ 2 Low-Mid Freq", [0x60, 0x00, 0x00, 0x64], maximum: 27,
             description: "Specifies the center frequency adjusted by the Low-Mid Gain (20 Hz–10.0 kHz).");
+
     public static KatanaParameterDefinition PatchEq2LowMidQ { get; } =
         new("patch-eq2-lomid-q", "EQ 2 Low-Mid Q", [0x60, 0x00, 0x00, 0x65], maximum: 5,
             description: "Adjusts the bandwidth of the low-mid band. Higher values narrow the affected area.");
+
     public static KatanaParameterDefinition PatchEq2LowMidGain { get; } =
         new("patch-eq2-lomid-gain", "EQ 2 Low-Mid Gain", [0x60, 0x00, 0x00, 0x66], maximum: 40,
             description: "Adjusts the low-middle frequency range tone (−20 to +20 dB).");
+
     public static KatanaParameterDefinition PatchEq2HighMidFreq { get; } =
         new("patch-eq2-himid-freq", "EQ 2 High-Mid Freq", [0x60, 0x00, 0x00, 0x67], maximum: 27,
             description: "Specifies the center frequency adjusted by the High-Mid Gain (20 Hz–10.0 kHz).");
+
     public static KatanaParameterDefinition PatchEq2HighMidQ { get; } =
         new("patch-eq2-himid-q", "EQ 2 High-Mid Q", [0x60, 0x00, 0x00, 0x68], maximum: 5,
             description: "Adjusts the bandwidth of the high-mid band. Higher values narrow the affected area.");
+
     public static KatanaParameterDefinition PatchEq2HighMidGain { get; } =
         new("patch-eq2-himid-gain", "EQ 2 High-Mid Gain", [0x60, 0x00, 0x00, 0x69], maximum: 40,
             description: "Adjusts the high-middle frequency range tone (−20 to +20 dB).");
+
     public static KatanaParameterDefinition PatchEq2HighGain { get; } =
         new("patch-eq2-high-gain", "EQ 2 High Gain", [0x60, 0x00, 0x00, 0x6A], maximum: 40,
             description: "Adjusts the high frequency range tone (−20 to +20 dB).");
+
     public static KatanaParameterDefinition PatchEq2HighCut { get; } =
         new("patch-eq2-high-cut", "EQ 2 High Cut", [0x60, 0x00, 0x00, 0x6B], maximum: 14,
-            description: "Sets the frequency at which the high cut filter begins to take effect (630 Hz–12.5 kHz, FLAT).");
+            description:
+            "Sets the frequency at which the high cut filter begins to take effect (630 Hz–12.5 kHz, FLAT).");
+
     public static KatanaParameterDefinition PatchEq2Level { get; } =
         new("patch-eq2-level", "EQ 2 Level", [0x60, 0x00, 0x00, 0x6C], maximum: 40,
             description: "Adjusts the overall volume level of EQ 2 (−20 to +20 dB).");
+
     public static KatanaParameterDefinition PatchEq2Geq31Hz { get; } =
         new("patch-eq2-geq-31hz", "EQ 2 31 Hz", [0x60, 0x00, 0x00, 0x6D], maximum: 48,
             description: "GE-10 graphic EQ 2 band at 31 Hz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq2Geq62Hz { get; } =
         new("patch-eq2-geq-62hz", "EQ 2 62 Hz", [0x60, 0x00, 0x00, 0x6E], maximum: 48,
             description: "GE-10 graphic EQ 2 band at 62 Hz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq2Geq125Hz { get; } =
         new("patch-eq2-geq-125hz", "EQ 2 125 Hz", [0x60, 0x00, 0x00, 0x6F], maximum: 48,
             description: "GE-10 graphic EQ 2 band at 125 Hz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq2Geq250Hz { get; } =
         new("patch-eq2-geq-250hz", "EQ 2 250 Hz", [0x60, 0x00, 0x00, 0x70], maximum: 48,
             description: "GE-10 graphic EQ 2 band at 250 Hz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq2Geq500Hz { get; } =
         new("patch-eq2-geq-500hz", "EQ 2 500 Hz", [0x60, 0x00, 0x00, 0x71], maximum: 48,
             description: "GE-10 graphic EQ 2 band at 500 Hz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq2Geq1kHz { get; } =
         new("patch-eq2-geq-1khz", "EQ 2 1 kHz", [0x60, 0x00, 0x00, 0x72], maximum: 48,
             description: "GE-10 graphic EQ 2 band at 1 kHz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq2Geq2kHz { get; } =
         new("patch-eq2-geq-2khz", "EQ 2 2 kHz", [0x60, 0x00, 0x00, 0x73], maximum: 48,
             description: "GE-10 graphic EQ 2 band at 2 kHz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq2Geq4kHz { get; } =
         new("patch-eq2-geq-4khz", "EQ 2 4 kHz", [0x60, 0x00, 0x00, 0x74], maximum: 48,
             description: "GE-10 graphic EQ 2 band at 4 kHz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq2Geq8kHz { get; } =
         new("patch-eq2-geq-8khz", "EQ 2 8 kHz", [0x60, 0x00, 0x00, 0x75], maximum: 48,
             description: "GE-10 graphic EQ 2 band at 8 kHz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq2Geq16kHz { get; } =
         new("patch-eq2-geq-16khz", "EQ 2 16 kHz", [0x60, 0x00, 0x00, 0x76], maximum: 48,
             description: "GE-10 graphic EQ 2 band at 16 kHz (−12 to +12 dB).");
+
     public static KatanaParameterDefinition PatchEq2GeqLevel { get; } =
         new("patch-eq2-geq-level", "EQ 2 GEQ Level", [0x60, 0x00, 0x00, 0x77], maximum: 48,
             description: "Overall output level of the GE-10 graphic EQ 2 (−12 to +12 dB).");
 
     public static IReadOnlyList<byte> DelayTimeAddress { get; } = [0x60, 0x00, 0x05, 0x02];
 
-    /// <summary>Signal chain pattern (PRM_CHAIN_PTN). Values 0–6 map to CHAIN 1 / CHAIN 2-1 / CHAIN 3-1 / CHAIN 4-1 / CHAIN 2-2 / CHAIN 3-2 / CHAIN 4-2.</summary>
+    /// <summary>
+    ///     Signal chain pattern (PRM_CHAIN_PTN). Values 0–6 map to CHAIN 1 / CHAIN 2-1 / CHAIN 3-1 / CHAIN 4-1 / CHAIN
+    ///     2-2 / CHAIN 3-2 / CHAIN 4-2.
+    /// </summary>
     public static KatanaParameterDefinition ChainPattern { get; } =
         new("chain-pattern", "Chain Pattern", [0x60, 0x00, 0x06, 0x20], maximum: 6,
             description: "Selects the signal chain routing pattern: CHAIN 1, 2-1, 3-1, 4-1, 2-2, 3-2, or 4-2.");
 
     /// <summary>Trigger address for saving current temp state to a patch slot (data = [0x00, slot_0based]).</summary>
     public static IReadOnlyList<byte> PatchWriteAddress { get; } = [0x7F, 0x00, 0x01, 0x04];
+
+    /// <summary>
+    /// Address pushed by the amp when the active panel/channel changes (DT1 SysEx).
+    /// Value encoding: 0=Panel, 1=ChA1, 2=ChA2, 5=ChB1, 6=ChB2.
+    /// </summary>
+    public static IReadOnlyList<byte> CurrentChannelAddress { get; } = [0x00, 0x01, 0x00, 0x00];
 
     // ── Channel-mode (stored) preamp parameters ─────────────────────────────────
     // In PANEL mode the amp uses knob-position values from the Status block (0x0651+).
@@ -562,7 +635,8 @@ public static partial class KatanaMkIIParameterCatalog
 
     public static KatanaParameterDefinition BoosterBottom { get; } =
         new("booster-bottom", "Bottom", [0x60, 0x00, 0x00, 0x14],
-            description: "Adjusts the tone for the low frequency range. Turning left reduces the low end; turning right boosts it.");
+            description:
+            "Adjusts the tone for the low frequency range. Turning left reduces the low end; turning right boosts it.");
 
     public static KatanaParameterDefinition BoosterSoloSw { get; } =
         new("booster-solo-sw", "Solo", [0x60, 0x00, 0x00, 0x15], maximum: 1,
@@ -583,11 +657,13 @@ public static partial class KatanaMkIIParameterCatalog
     // ── Delay DSP params ─────────────────────────────────────────────────────────
     public static KatanaParameterDefinition DelayFeedback { get; } =
         new("delay-feedback", "Feedback", [0x60, 0x00, 0x05, 0x04], maximum: 100,
-            description: "Adjusts the volume returned to the input. Higher values increase the number of delay repeats.");
+            description:
+            "Adjusts the volume returned to the input. Higher values increase the number of delay repeats.");
 
     public static KatanaParameterDefinition DelayHighCut { get; } =
         new("delay-high-cut", "High Cut", [0x60, 0x00, 0x05, 0x05], maximum: 14,
-            description: "Sets the frequency at which the high cut filter begins to take effect (630 Hz–12.5 kHz, FLAT).");
+            description:
+            "Sets the frequency at which the high cut filter begins to take effect (630 Hz–12.5 kHz, FLAT).");
 
     public static KatanaParameterDefinition DelayEffectLevel { get; } =
         new("delay-effect-level", "E.Level", [0x60, 0x00, 0x05, 0x06], maximum: 120,
@@ -599,31 +675,38 @@ public static partial class KatanaMkIIParameterCatalog
 
     public static KatanaParameterDefinition DelayTapTime { get; } =
         new("delay-tap-time", "Tap Time", [0x60, 0x00, 0x05, 0x08], maximum: 100,
-            description: "Adjusts the R-channel delay time relative to L (100% = same as L). Only available for PAN type.");
+            description:
+            "Adjusts the R-channel delay time relative to L (100% = same as L). Only available for PAN type.");
 
     public static KatanaParameterDefinition DelayModRate { get; } =
         new("delay-mod-rate", "Mod Rate", [0x60, 0x00, 0x05, 0x13], maximum: 100,
-            description: "Adjusts the modulation rate of the delay sound. Only available for MODULATE and SDE-3000 types.");
+            description:
+            "Adjusts the modulation rate of the delay sound. Only available for MODULATE and SDE-3000 types.");
 
     public static KatanaParameterDefinition DelayModDepth { get; } =
         new("delay-mod-depth", "Mod Depth", [0x60, 0x00, 0x05, 0x14], maximum: 100,
-            description: "Adjusts the modulation depth of the delay sound. Only available for MODULATE and SDE-3000 types.");
+            description:
+            "Adjusts the modulation depth of the delay sound. Only available for MODULATE and SDE-3000 types.");
 
     public static KatanaParameterDefinition DelayRange { get; } =
         new("delay-range", "Range", [0x60, 0x00, 0x05, 0x15], maximum: 1,
-            description: "Switches the frequency response of the SDE-3000 delay (8kHz or 17kHz). Only for SDE-3000 type.");
+            description:
+            "Switches the frequency response of the SDE-3000 delay (8kHz or 17kHz). Only for SDE-3000 type.");
 
     public static KatanaParameterDefinition DelayFilter { get; } =
         new("delay-filter", "Filter", [0x60, 0x00, 0x05, 0x16], maximum: 1,
-            description: "Turns the filter on/off. When ON, provides a natural-sounding echo effect. Only for SDE-3000 type.");
+            description:
+            "Turns the filter on/off. When ON, provides a natural-sounding echo effect. Only for SDE-3000 type.");
 
     public static KatanaParameterDefinition DelayFeedbackPhase { get; } =
         new("delay-feedback-phase", "FB Phase", [0x60, 0x00, 0x05, 0x17], maximum: 1,
-            description: "Specifies the phase of the delay feedback. Selecting INV inverts the phase. Only for SDE-3000 type.");
+            description:
+            "Specifies the phase of the delay feedback. Selecting INV inverts the phase. Only for SDE-3000 type.");
 
     public static KatanaParameterDefinition DelayDelayPhase { get; } =
         new("delay-delay-phase", "Dly Phase", [0x60, 0x00, 0x05, 0x18], maximum: 1,
-            description: "Specifies the phase of the delay sound. Selecting INV inverts the phase. Only for SDE-3000 type.");
+            description:
+            "Specifies the phase of the delay sound. Selecting INV inverts the phase. Only for SDE-3000 type.");
 
     public static KatanaParameterDefinition DelayModSw { get; } =
         new("delay-mod-sw", "Mod SW", [0x60, 0x00, 0x05, 0x19], maximum: 1,
@@ -632,7 +715,8 @@ public static partial class KatanaMkIIParameterCatalog
     // ── Delay 2 DSP params ───────────────────────────────────────────────────────
     public static KatanaParameterDefinition Delay2Feedback { get; } =
         new("delay2-feedback", "Feedback", [0x60, 0x00, 0x05, 0x24], maximum: 100,
-            description: "Adjusts the volume returned to the input. Higher values increase the number of delay 2 repeats.");
+            description:
+            "Adjusts the volume returned to the input. Higher values increase the number of delay 2 repeats.");
 
     public static KatanaParameterDefinition Delay2HighCut { get; } =
         new("delay2-high-cut", "High Cut", [0x60, 0x00, 0x05, 0x25], maximum: 14,
@@ -693,7 +777,8 @@ public static partial class KatanaMkIIParameterCatalog
 
     public static KatanaParameterDefinition ReverbHighCut { get; } =
         new("reverb-high-cut", "High Cut", [0x60, 0x00, 0x05, 0x45], maximum: 17,
-            description: "Sets the frequency at which the high cut filter begins to take effect (630 Hz–12.5 kHz, FLAT).");
+            description:
+            "Sets the frequency at which the high cut filter begins to take effect (630 Hz–12.5 kHz, FLAT).");
 
     public static KatanaParameterDefinition ReverbDensity { get; } =
         new("reverb-density", "Density", [0x60, 0x00, 0x05, 0x46], maximum: 10,
@@ -713,16 +798,32 @@ public static partial class KatanaMkIIParameterCatalog
 
     public static IReadOnlyList<KatanaPanelEffectDefinition> PanelEffects { get; } =
     [
-        new("booster", "Booster", BoosterSwitch, variationParameter: BoosterVariation, typeParameter: BoosterType,
-            detailParameters: [BoosterDrive, BoosterTone, BoosterBottom, BoosterSoloSw, BoosterSoloLevel, BoosterEffectLevel, BoosterDirectMix]),
-        new("mod", "Mod", ModSwitch, variationParameter: ModVariation, typeParameter: ModType),
-        new("fx", "FX", FxSwitch, variationParameter: FxVariation, typeParameter: FxType),
-        new("delay", "Delay", DelaySwitch, variationParameter: DelayVariation, typeParameter: DelayType,
-            detailParameters: [DelayFeedback, DelayHighCut, DelayEffectLevel, DelayDirectMix, DelayTapTime, DelayModRate, DelayModDepth, DelayRange, DelayFilter, DelayFeedbackPhase, DelayDelayPhase, DelayModSw]),
+        new("booster", "Booster", BoosterSwitch, BoosterVariation, BoosterType,
+            detailParameters:
+            [
+                BoosterDrive, BoosterTone, BoosterBottom, BoosterSoloSw, BoosterSoloLevel, BoosterEffectLevel,
+                BoosterDirectMix
+            ]),
+        new("mod", "Mod", ModSwitch, ModVariation, ModType),
+        new("fx", "FX", FxSwitch, FxVariation, FxType),
+        new("delay", "Delay", DelaySwitch, DelayVariation, DelayType,
+            detailParameters:
+            [
+                DelayFeedback, DelayHighCut, DelayEffectLevel, DelayDirectMix, DelayTapTime, DelayModRate,
+                DelayModDepth, DelayRange, DelayFilter, DelayFeedbackPhase, DelayDelayPhase, DelayModSw
+            ]),
         new("delay2", "Delay 2", Delay2Switch, typeParameter: Delay2Type,
-            detailParameters: [Delay2Feedback, Delay2HighCut, Delay2EffectLevel, Delay2DirectMix, Delay2TapTime, Delay2ModRate, Delay2ModDepth, Delay2Range, Delay2Filter, Delay2FeedbackPhase, Delay2DelayPhase, Delay2ModSw]),
-        new("reverb", "Reverb", ReverbSwitch, variationParameter: ReverbVariation, typeParameter: ReverbType,
-            detailParameters: [ReverbTime, ReverbPreDelay, ReverbLowCut, ReverbHighCut, ReverbDensity, ReverbColor, ReverbEffectLevel, ReverbDirectMix]),
+            detailParameters:
+            [
+                Delay2Feedback, Delay2HighCut, Delay2EffectLevel, Delay2DirectMix, Delay2TapTime, Delay2ModRate,
+                Delay2ModDepth, Delay2Range, Delay2Filter, Delay2FeedbackPhase, Delay2DelayPhase, Delay2ModSw
+            ]),
+        new("reverb", "Reverb", ReverbSwitch, ReverbVariation, ReverbType,
+            detailParameters:
+            [
+                ReverbTime, ReverbPreDelay, ReverbLowCut, ReverbHighCut, ReverbDensity, ReverbColor, ReverbEffectLevel,
+                ReverbDirectMix
+            ])
     ];
 
     public static KatanaPedalFxDefinition PedalFx { get; } =
@@ -767,6 +868,6 @@ public static partial class KatanaMkIIParameterCatalog
         PedalFxEvh95Maximum,
         PedalFxEvh95EffectLevel,
         PedalFxEvh95DirectMix,
-        FootVolume,
+        FootVolume
     ];
 }
