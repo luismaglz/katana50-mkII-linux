@@ -1,5 +1,3 @@
-using System;
-
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 
@@ -21,6 +19,9 @@ internal static class KnobImageAsset
             using var stream = AssetLoader.Open(uri);
             return new Bitmap(stream);
         }
-        catch { return null; }
+        catch
+        {
+            return null;
+        }
     });
 }

@@ -46,5 +46,9 @@
       <DependentUpon>PanelView.axaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\PedalHeaderControl.axaml.cs">
+      <DependentUpon>PedalHeaderControl.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 </Project>
