@@ -5,39 +5,62 @@
              xmlns:vm="clr-namespace:Kataka.App.ViewModels"
              xmlns:dvm="clr-namespace:Kataka.App.ViewModels.Design"
              xmlns:controls="clr-namespace:Kataka.App.Controls"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:converters="clr-namespace:Kataka.App.Converters"
+             mc:Ignorable="d" d:DesignWidth="1800" d:DesignHeight="450"
              d:DataContext="{x:Static dvm:DesignPanelViewModel.Instance}"
              x:Class="Kataka.App.Views.PanelView"
              x:DataType="vm:PanelViewModel">
     <UserControl.Resources>
         <DataTemplate x:Key="AmpControlTemplate" x:DataType="vm:AmpControlViewModel">
-            <controls:RotaryKnob Label="{Binding DisplayName}"
-                                 Minimum="{Binding Minimum}"
-                                 Maximum="{Binding Maximum}"
-                                 Value="{Binding Value}" />
+            <controls:LargeImageRotaryKnob Label="{Binding DisplayName}"
+                                           Minimum="{Binding Minimum}"
+                                           Maximum="{Binding Maximum}"
+                                           Value="{Binding Value}" />
+        </DataTemplate>
+        <DataTemplate x:Key="AmpVariationControlTemplate" x:DataType="vm:AmpControlViewModel">
+            <controls:LitToggleButton Label="{Binding DisplayName}"
+                                      IsChecked="{Binding Value, Converter={x:Static converters:IntToBoolConverter.Instance}}" />
         </DataTemplate>
     </UserControl.Resources>
-
-    <Border MinWidth="160" CornerRadius="8" VerticalAlignment="Top">
-        <Border.Background>
-            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-                <GradientStop Offset="0" Color="{StaticResource ColorCardBgTop}" />
-                <GradientStop Offset="1" Color="{StaticResource ColorCardBgBottom}" />
-            </LinearGradientBrush>
-        </Border.Background>
-
-        <StackPanel Spacing="0" HorizontalAlignment="Center" Margin="12" Orientation="Horizontal">
-            <ContentControl Content="{Binding AmpType}" ContentTemplate="{StaticResource AmpControlTemplate}" />
-            <ContentControl Content="{Binding AmpVariation}" ContentTemplate="{StaticResource AmpControlTemplate}" />
-            <ContentControl Content="{Binding Gain}" ContentTemplate="{StaticResource AmpControlTemplate}" />
-            <ContentControl Content="{Binding Volume}" ContentTemplate="{StaticResource AmpControlTemplate}" />
-            <ContentControl Content="{Binding Bass}" ContentTemplate="{StaticResource AmpControlTemplate}" />
-            <ContentControl Content="{Binding Middle}" ContentTemplate="{StaticResource AmpControlTemplate}" />
-            <ContentControl Content="{Binding Treble}" ContentTemplate="{StaticResource AmpControlTemplate}" />
-            <ContentControl Content="{Binding Presence}" ContentTemplate="{StaticResource AmpControlTemplate}" />
-            <ContentControl Content="{Binding CabinetResonance}" ContentTemplate="{StaticResource AmpControlTemplate}" />
-            <ContentControl Content="{Binding PedalChain}" ContentTemplate="{StaticResource AmpControlTemplate}" />
-
+    <StackPanel Spacing="0" HorizontalAlignment="Center" Margin="12" Orientation="Horizontal">
+        <Border BorderThickness="0 0 2 0" BorderBrush="#fff">
+            <StackPanel Orientation="Vertical" Spacing="12">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                            Spacing="12">
+                    <TextBlock Text="AMPLIFIER" FontSize="24" FontWeight="SemiBold" Margin="0,0,12,0" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ContentControl Content="{Binding AmpVariation}"
+                                    ContentTemplate="{StaticResource AmpVariationControlTemplate}" />
+                    <ContentControl Content="{Binding AmpType}" ContentTemplate="{StaticResource AmpControlTemplate}" />
+                    <ContentControl Content="{Binding Gain}" ContentTemplate="{StaticResource AmpControlTemplate}" />
+                    <ContentControl Content="{Binding Volume}" ContentTemplate="{StaticResource AmpControlTemplate}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <Border BorderThickness="0 0 2 0" BorderBrush="#fff">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                            Spacing="12">
+                    <TextBlock Text="EQUALIZER" FontSize="24" FontWeight="SemiBold" Margin="0,0,12,0" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ContentControl Content="{Binding Bass}" ContentTemplate="{StaticResource AmpControlTemplate}" />
+                    <ContentControl Content="{Binding Middle}" ContentTemplate="{StaticResource AmpControlTemplate}" />
+                    <ContentControl Content="{Binding Treble}" ContentTemplate="{StaticResource AmpControlTemplate}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                        Spacing="12">
+                <TextBlock Text="TONE SETTINGS" FontSize="24" FontWeight="SemiBold" Margin="0,0,12,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <ContentControl Content="{Binding Presence}" ContentTemplate="{StaticResource AmpControlTemplate}" />
+                <ContentControl Content="{Binding CabinetResonance}"
+                                ContentTemplate="{StaticResource AmpControlTemplate}" />
+            </StackPanel>
         </StackPanel>
-    </Border>
+    </StackPanel>
 </UserControl>

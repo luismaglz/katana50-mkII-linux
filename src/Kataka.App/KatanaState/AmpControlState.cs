@@ -1,20 +1,21 @@
-using System;
-
 using Kataka.Domain.Midi;
 
 namespace Kataka.App.KatanaState;
 
 public class AmpControlState
 {
-    public AmpControlState(KatanaParameterDefinition parameter, int displayMinimum = 0, int displayMaximum = 100, string displayUnit = "", string displayName = "", string description = "")
+    private int _value;
+
+    public AmpControlState(KatanaParameterDefinition parameter, int displayMinimum = 0, int displayMaximum = 100,
+        string displayUnit = "", string displayName = "", string description = "")
     {
         Parameter = parameter;
         _value = parameter.Minimum;
         DisplayMinimum = displayMinimum;
         DisplayMaximum = displayMaximum;
         DisplayUnit = displayUnit;
-        DisplayName = displayName ?? parameter.DisplayName;
-        Description = description ?? parameter.DisplayName;
+        DisplayName = parameter.DisplayName ?? displayName;
+        Description = parameter.Description ?? description;
     }
 
     public string DisplayName { get; set; }
@@ -32,10 +33,6 @@ public class AmpControlState
 
     public string DisplayUnit { get; set; }
 
-    private int _value;
-
-    public event Action? ValueChanged;
-
     public int Value
     {
         get => _value;
@@ -47,9 +44,11 @@ public class AmpControlState
         }
     }
 
+    public event Action? ValueChanged;
+
     /// <summary>
-    /// Updates the value from an amp read or push notification without firing <see cref="ValueChanged"/>,
-    /// preventing the write-back loop.
+    ///     Updates the value from an amp read or push notification without firing <see cref="ValueChanged" />,
+    ///     preventing the write-back loop.
     /// </summary>
     public void SetFromAmp(int value) => _value = value;
 }

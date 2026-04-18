@@ -10,7 +10,8 @@ public sealed class KatanaParameterDefinition
         IReadOnlyList<byte> address,
         byte minimum = 0,
         byte maximum = 100,
-        IReadOnlyList<byte>? skippedValues = null)
+        IReadOnlyList<byte>? skippedValues = null,
+        string? description = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
@@ -28,6 +29,7 @@ public sealed class KatanaParameterDefinition
         Minimum = minimum;
         Maximum = maximum;
         SkippedValues = skippedValues?.ToArray() ?? [];
+        Description = description;
     }
 
     public string Key { get; }
@@ -43,4 +45,6 @@ public sealed class KatanaParameterDefinition
     public byte Maximum { get; }
 
     public IReadOnlyList<byte> SkippedValues { get; }
+
+    public string? Description { get; }
 }

@@ -15,7 +15,6 @@ public class PanelViewModel : ViewModelBase
         Treble = new AmpControlViewModel(katanaState.Treble);
         Presence = new AmpControlViewModel(katanaState.Presence);
         CabinetResonance = new AmpControlViewModel(katanaState.CabinetResonance);
-        PedalChain = new AmpControlViewModel(katanaState.PedalChain);
     }
 
     #region AmpControls
@@ -29,7 +28,6 @@ public class PanelViewModel : ViewModelBase
     public AmpControlViewModel Treble { get; internal set; }
     public AmpControlViewModel Presence { get; internal set; }
     public AmpControlViewModel CabinetResonance { get; internal set; }
-    public AmpControlViewModel PedalChain { get; internal set; }
 
     #endregion
 }
