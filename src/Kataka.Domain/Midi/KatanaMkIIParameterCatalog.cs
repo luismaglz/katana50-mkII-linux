@@ -266,6 +266,108 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition Contour3FreqShift { get; } =
         new("contour3-freq-shift", "Contour 3 Freq", [0x60, 0x00, 0x0F, 0x41], minimum: 0, maximum: 100);
 
+    // ── Patch EQ — Patch_0 embedded EQ block (BTS prm_prop_patch_0 addrs 0x30–0x47) ──
+    // Absolute addresses: Patch_0 base (0x10) + relative (0x30–0x47) = 0x40–0x57.
+    // Two EQ blocks exist per patch: Eq(1) at 0x40 and Eq(2) at 0x60.
+    public static KatanaParameterDefinition PatchEq1Sw { get; } =
+        new("patch-eq1-sw", "Patch EQ SW", [0x60, 0x00, 0x00, 0x40], maximum: 1);
+    public static KatanaParameterDefinition PatchEq1Type { get; } =
+        new("patch-eq1-type", "Patch EQ Type", [0x60, 0x00, 0x00, 0x41], maximum: 1);
+    public static KatanaParameterDefinition PatchEq1LowCut { get; } =
+        new("patch-eq1-low-cut", "Patch EQ Low Cut", [0x60, 0x00, 0x00, 0x42], maximum: 17);
+    public static KatanaParameterDefinition PatchEq1LowGain { get; } =
+        new("patch-eq1-low-gain", "Patch EQ Low Gain", [0x60, 0x00, 0x00, 0x43], maximum: 40);
+    public static KatanaParameterDefinition PatchEq1LowMidFreq { get; } =
+        new("patch-eq1-lomid-freq", "Patch EQ LM Freq", [0x60, 0x00, 0x00, 0x44], maximum: 27);
+    public static KatanaParameterDefinition PatchEq1LowMidQ { get; } =
+        new("patch-eq1-lomid-q", "Patch EQ LM Q", [0x60, 0x00, 0x00, 0x45], maximum: 5);
+    public static KatanaParameterDefinition PatchEq1LowMidGain { get; } =
+        new("patch-eq1-lomid-gain", "Patch EQ LM Gain", [0x60, 0x00, 0x00, 0x46], maximum: 40);
+    public static KatanaParameterDefinition PatchEq1HighMidFreq { get; } =
+        new("patch-eq1-himid-freq", "Patch EQ HM Freq", [0x60, 0x00, 0x00, 0x47], maximum: 27);
+    public static KatanaParameterDefinition PatchEq1HighMidQ { get; } =
+        new("patch-eq1-himid-q", "Patch EQ HM Q", [0x60, 0x00, 0x00, 0x48], maximum: 5);
+    public static KatanaParameterDefinition PatchEq1HighMidGain { get; } =
+        new("patch-eq1-himid-gain", "Patch EQ HM Gain", [0x60, 0x00, 0x00, 0x49], maximum: 40);
+    public static KatanaParameterDefinition PatchEq1HighGain { get; } =
+        new("patch-eq1-high-gain", "Patch EQ High Gain", [0x60, 0x00, 0x00, 0x4A], maximum: 40);
+    public static KatanaParameterDefinition PatchEq1HighCut { get; } =
+        new("patch-eq1-high-cut", "Patch EQ High Cut", [0x60, 0x00, 0x00, 0x4B], maximum: 14);
+    public static KatanaParameterDefinition PatchEq1Level { get; } =
+        new("patch-eq1-level", "Patch EQ Level", [0x60, 0x00, 0x00, 0x4C], maximum: 40);
+    public static KatanaParameterDefinition PatchEq1Geq31Hz { get; } =
+        new("patch-eq1-geq-31hz", "31Hz", [0x60, 0x00, 0x00, 0x4D], maximum: 48);
+    public static KatanaParameterDefinition PatchEq1Geq62Hz { get; } =
+        new("patch-eq1-geq-62hz", "62Hz", [0x60, 0x00, 0x00, 0x4E], maximum: 48);
+    public static KatanaParameterDefinition PatchEq1Geq125Hz { get; } =
+        new("patch-eq1-geq-125hz", "125Hz", [0x60, 0x00, 0x00, 0x4F], maximum: 48);
+    public static KatanaParameterDefinition PatchEq1Geq250Hz { get; } =
+        new("patch-eq1-geq-250hz", "250Hz", [0x60, 0x00, 0x00, 0x50], maximum: 48);
+    public static KatanaParameterDefinition PatchEq1Geq500Hz { get; } =
+        new("patch-eq1-geq-500hz", "500Hz", [0x60, 0x00, 0x00, 0x51], maximum: 48);
+    public static KatanaParameterDefinition PatchEq1Geq1kHz { get; } =
+        new("patch-eq1-geq-1khz", "1kHz", [0x60, 0x00, 0x00, 0x52], maximum: 48);
+    public static KatanaParameterDefinition PatchEq1Geq2kHz { get; } =
+        new("patch-eq1-geq-2khz", "2kHz", [0x60, 0x00, 0x00, 0x53], maximum: 48);
+    public static KatanaParameterDefinition PatchEq1Geq4kHz { get; } =
+        new("patch-eq1-geq-4khz", "4kHz", [0x60, 0x00, 0x00, 0x54], maximum: 48);
+    public static KatanaParameterDefinition PatchEq1Geq8kHz { get; } =
+        new("patch-eq1-geq-8khz", "8kHz", [0x60, 0x00, 0x00, 0x55], maximum: 48);
+    public static KatanaParameterDefinition PatchEq1Geq16kHz { get; } =
+        new("patch-eq1-geq-16khz", "16kHz", [0x60, 0x00, 0x00, 0x56], maximum: 48);
+    public static KatanaParameterDefinition PatchEq1GeqLevel { get; } =
+        new("patch-eq1-geq-level", "GEQ Level", [0x60, 0x00, 0x00, 0x57], maximum: 48);
+
+    // ── Patch Eq(2) — second EQ block (BTS prm_prop_patch_eq2 at 0x0060) ──────────
+    public static KatanaParameterDefinition PatchEq2Sw { get; } =
+        new("patch-eq2-sw", "Patch EQ2 SW", [0x60, 0x00, 0x00, 0x60], maximum: 1);
+    public static KatanaParameterDefinition PatchEq2Type { get; } =
+        new("patch-eq2-type", "Patch EQ2 Type", [0x60, 0x00, 0x00, 0x61], maximum: 1);
+    public static KatanaParameterDefinition PatchEq2LowCut { get; } =
+        new("patch-eq2-low-cut", "Patch EQ2 Low Cut", [0x60, 0x00, 0x00, 0x62], maximum: 17);
+    public static KatanaParameterDefinition PatchEq2LowGain { get; } =
+        new("patch-eq2-low-gain", "Patch EQ2 Low Gain", [0x60, 0x00, 0x00, 0x63], maximum: 40);
+    public static KatanaParameterDefinition PatchEq2LowMidFreq { get; } =
+        new("patch-eq2-lomid-freq", "Patch EQ2 LM Freq", [0x60, 0x00, 0x00, 0x64], maximum: 27);
+    public static KatanaParameterDefinition PatchEq2LowMidQ { get; } =
+        new("patch-eq2-lomid-q", "Patch EQ2 LM Q", [0x60, 0x00, 0x00, 0x65], maximum: 5);
+    public static KatanaParameterDefinition PatchEq2LowMidGain { get; } =
+        new("patch-eq2-lomid-gain", "Patch EQ2 LM Gain", [0x60, 0x00, 0x00, 0x66], maximum: 40);
+    public static KatanaParameterDefinition PatchEq2HighMidFreq { get; } =
+        new("patch-eq2-himid-freq", "Patch EQ2 HM Freq", [0x60, 0x00, 0x00, 0x67], maximum: 27);
+    public static KatanaParameterDefinition PatchEq2HighMidQ { get; } =
+        new("patch-eq2-himid-q", "Patch EQ2 HM Q", [0x60, 0x00, 0x00, 0x68], maximum: 5);
+    public static KatanaParameterDefinition PatchEq2HighMidGain { get; } =
+        new("patch-eq2-himid-gain", "Patch EQ2 HM Gain", [0x60, 0x00, 0x00, 0x69], maximum: 40);
+    public static KatanaParameterDefinition PatchEq2HighGain { get; } =
+        new("patch-eq2-high-gain", "Patch EQ2 High Gain", [0x60, 0x00, 0x00, 0x6A], maximum: 40);
+    public static KatanaParameterDefinition PatchEq2HighCut { get; } =
+        new("patch-eq2-high-cut", "Patch EQ2 High Cut", [0x60, 0x00, 0x00, 0x6B], maximum: 14);
+    public static KatanaParameterDefinition PatchEq2Level { get; } =
+        new("patch-eq2-level", "Patch EQ2 Level", [0x60, 0x00, 0x00, 0x6C], maximum: 40);
+    public static KatanaParameterDefinition PatchEq2Geq31Hz { get; } =
+        new("patch-eq2-geq-31hz", "31Hz", [0x60, 0x00, 0x00, 0x6D], maximum: 48);
+    public static KatanaParameterDefinition PatchEq2Geq62Hz { get; } =
+        new("patch-eq2-geq-62hz", "62Hz", [0x60, 0x00, 0x00, 0x6E], maximum: 48);
+    public static KatanaParameterDefinition PatchEq2Geq125Hz { get; } =
+        new("patch-eq2-geq-125hz", "125Hz", [0x60, 0x00, 0x00, 0x6F], maximum: 48);
+    public static KatanaParameterDefinition PatchEq2Geq250Hz { get; } =
+        new("patch-eq2-geq-250hz", "250Hz", [0x60, 0x00, 0x00, 0x70], maximum: 48);
+    public static KatanaParameterDefinition PatchEq2Geq500Hz { get; } =
+        new("patch-eq2-geq-500hz", "500Hz", [0x60, 0x00, 0x00, 0x71], maximum: 48);
+    public static KatanaParameterDefinition PatchEq2Geq1kHz { get; } =
+        new("patch-eq2-geq-1khz", "1kHz", [0x60, 0x00, 0x00, 0x72], maximum: 48);
+    public static KatanaParameterDefinition PatchEq2Geq2kHz { get; } =
+        new("patch-eq2-geq-2khz", "2kHz", [0x60, 0x00, 0x00, 0x73], maximum: 48);
+    public static KatanaParameterDefinition PatchEq2Geq4kHz { get; } =
+        new("patch-eq2-geq-4khz", "4kHz", [0x60, 0x00, 0x00, 0x74], maximum: 48);
+    public static KatanaParameterDefinition PatchEq2Geq8kHz { get; } =
+        new("patch-eq2-geq-8khz", "8kHz", [0x60, 0x00, 0x00, 0x75], maximum: 48);
+    public static KatanaParameterDefinition PatchEq2Geq16kHz { get; } =
+        new("patch-eq2-geq-16khz", "16kHz", [0x60, 0x00, 0x00, 0x76], maximum: 48);
+    public static KatanaParameterDefinition PatchEq2GeqLevel { get; } =
+        new("patch-eq2-geq-level", "GEQ Level", [0x60, 0x00, 0x00, 0x77], maximum: 48);
+
     public static IReadOnlyList<byte> DelayTimeAddress { get; } = [0x60, 0x00, 0x05, 0x02];
 
     /// <summary>Signal chain pattern (PRM_CHAIN_PTN). Values 0–6 map to CHAIN 1 / CHAIN 2-1 / CHAIN 3-1 / CHAIN 4-1 / CHAIN 2-2 / CHAIN 3-2 / CHAIN 4-2.</summary>

@@ -18,11 +18,11 @@ public sealed class LitToggleButton : Control
     private const double CornerRadius = 6.0;
     private const double FontSize = 12.0;
 
-    private static readonly Color DefaultOnColor = KatanaPalette.AccentLit;
-    private static readonly SolidColorBrush OffFillBrush = KatanaPalette.ControlBgBrush;
-    private static readonly Pen OffBorderPen = KatanaPalette.BorderDimPen;
-    private static readonly SolidColorBrush OffTextBrush = KatanaPalette.TextDimBrush;
-    private static readonly SolidColorBrush OnTextBrush = KatanaPalette.TextOnAccentBrush;
+    private static readonly Color DefaultOnColor = KatanaPalette.PrimaryLit;
+    private static readonly SolidColorBrush OffFillBrush = KatanaPalette.BgElevatedBrush;
+    private static readonly Pen OffBorderPen = KatanaPalette.ThinBorderPen;
+    private static readonly SolidColorBrush OffTextBrush = KatanaPalette.TextMutedBrush;
+    private static readonly SolidColorBrush OnTextBrush = KatanaPalette.TextOnPrimaryBrush;
     private static readonly SolidColorBrush TopHighlightBrush = new(Color.FromArgb(45, 255, 255, 255));
 
     public static readonly StyledProperty<bool> IsCheckedProperty =

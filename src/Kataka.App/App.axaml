@@ -11,93 +11,52 @@
     <Application.Resources>
         <ResourceDictionary>
 
-            <!-- ── Surface colors ──────────────────────────────────────────── -->
-            <Color x:Key="ColorWindowBg"    >#111317</Color>
-            <Color x:Key="ColorPanelBg"     >#17191d</Color>
-            <Color x:Key="ColorShellBg"     >#1a1d22</Color>
-            <Color x:Key="ColorSectionBg"   >#20242a</Color>
-            <Color x:Key="ColorSectionBgAlt">#252a31</Color>
-            <Color x:Key="ColorCardBgTop"   >#2e3138</Color>
-            <Color x:Key="ColorCardBgBottom">#1c1f24</Color>
-            <Color x:Key="ColorControlBg"   >#272b31</Color>
-            <Color x:Key="ColorKnobFace"    >#2c2f35</Color>
-            <Color x:Key="ColorKnobBezel"   >#0f1114</Color>
-            <Color x:Key="ColorLogBg"       >#0d0f12</Color>
+            <!-- ── Surfaces (by depth) ─────────────────────────────────────── -->
+            <Color x:Key="BgBase"     >#111317</Color>
+            <Color x:Key="BgSurface"  >#1A1D22</Color>
+            <Color x:Key="BgElevated" >#272B31</Color>
+            <Color x:Key="BgContrast" >#0D0F12</Color>
 
-            <!-- ── Border colors ────────────────────────────────────────────── -->
-            <Color x:Key="ColorBorderDim"   >#3a3f47</Color>
-            <Color x:Key="ColorBorderMid"   >#454b54</Color>
-            <Color x:Key="ColorBorderTrim"  >#4f5661</Color>
-            <Color x:Key="ColorBorderStrong">#565b64</Color>
-            <Color x:Key="ColorBorderBright">#60656e</Color>
+            <!-- ── Brand accent ─────────────────────────────────────────────── -->
+            <Color x:Key="Primary"    >#FFB741</Color>
+            <Color x:Key="PrimaryLit" >#FFCF66</Color>
 
-            <!-- ── Accent colors ─────────────────────────────────────────────── -->
-            <Color x:Key="ColorAccent"      >#ffb741</Color>
-            <Color x:Key="ColorAccentLit"   >#ffc95d</Color>
-            <Color x:Key="ColorAccentValue" >#ffcf66</Color>
-            <Color x:Key="ColorAccentBorder">#f7cf6d</Color>
-            <Color x:Key="ColorAccentMuted" >#7a5d23</Color>
-            <Color x:Key="ColorAccentSelect">#d4c87a</Color>
+            <!-- ── Semantic status ─────────────────────────────────────────── -->
+            <Color x:Key="Success"    >#3DBF6C</Color>
+            <Color x:Key="Error"      >#E05050</Color>
+            <Color x:Key="LedOn"      >#00E676</Color>
+            <Color x:Key="LedOff"     >#333333</Color>
 
-            <!-- ── Text colors ───────────────────────────────────────────────── -->
-            <Color x:Key="ColorText"        >#f2eee3</Color>
-            <Color x:Key="ColorTextControl" >#d8d5cb</Color>
-            <Color x:Key="ColorTextMuted"   >#b9b3a7</Color>
-            <Color x:Key="ColorTextDim"     >#7a8494</Color>
-            <Color x:Key="ColorTextOnAccent">#111317</Color>
-            <Color x:Key="ColorTextLight"   >#f1f1f1</Color>
+            <!-- ── Text ────────────────────────────────────────────────────── -->
+            <Color x:Key="TextMain"   >#F2EEE3</Color>
+            <Color x:Key="TextMuted"  >#7A8494</Color>
 
-            <!-- ── Status colors ─────────────────────────────────────────────── -->
-            <Color x:Key="ColorLedOn"       >#00e676</Color>
-            <Color x:Key="ColorLedOff"      >#333333</Color>
-            <Color x:Key="ColorBoost"       >#3dbf6c</Color>
-            <Color x:Key="ColorCut"         >#e05050</Color>
-            <Color x:Key="ColorDanger"      >#ff7b6b</Color>
+            <!-- ── Borders ─────────────────────────────────────────────────── -->
+            <Color x:Key="Border"     >#3A3F47</Color>
+            <Color x:Key="BorderLight">#565B64</Color>
 
-            <!-- ── Knob internals ────────────────────────────────────────────── -->
-            <Color x:Key="ColorKnobBg"      >#D9D3C1</Color>
+            <!-- ── Brushes ──────────────────────────────────────────────────── -->
+            <SolidColorBrush x:Key="BgBaseBrush"      Color="{StaticResource BgBase}"     />
+            <SolidColorBrush x:Key="BgSurfaceBrush"   Color="{StaticResource BgSurface}"  />
+            <SolidColorBrush x:Key="BgElevatedBrush"  Color="{StaticResource BgElevated}" />
+            <SolidColorBrush x:Key="BgContrastBrush"  Color="{StaticResource BgContrast}" />
+            <SolidColorBrush x:Key="PrimaryBrush"     Color="{StaticResource Primary}"    />
+            <SolidColorBrush x:Key="PrimaryLitBrush"  Color="{StaticResource PrimaryLit}" />
+            <SolidColorBrush x:Key="SuccessBrush"     Color="{StaticResource Success}"    />
+            <SolidColorBrush x:Key="ErrorBrush"       Color="{StaticResource Error}"      />
+            <SolidColorBrush x:Key="LedOnBrush"       Color="{StaticResource LedOn}"      />
+            <SolidColorBrush x:Key="LedOffBrush"      Color="{StaticResource LedOff}"     />
+            <SolidColorBrush x:Key="TextMainBrush"    Color="{StaticResource TextMain}"   />
+            <SolidColorBrush x:Key="TextMutedBrush"   Color="{StaticResource TextMuted}"  />
+            <SolidColorBrush x:Key="BorderBrush"      Color="{StaticResource Border}"     />
+            <SolidColorBrush x:Key="BorderLightBrush" Color="{StaticResource BorderLight}"/>
 
-            <!-- ── Brushes ───────────────────────────────────────────────────── -->
-            <SolidColorBrush x:Key="WindowBgBrush"     Color="{StaticResource ColorWindowBg}"    />
-            <SolidColorBrush x:Key="PanelBgBrush"      Color="{StaticResource ColorPanelBg}"     />
-            <SolidColorBrush x:Key="ShellBgBrush"      Color="{StaticResource ColorShellBg}"     />
-            <SolidColorBrush x:Key="SectionBgBrush"    Color="{StaticResource ColorSectionBg}"   />
-            <SolidColorBrush x:Key="SectionBgAltBrush" Color="{StaticResource ColorSectionBgAlt}"/>
-            <SolidColorBrush x:Key="ControlBgBrush"    Color="{StaticResource ColorControlBg}"   />
-            <SolidColorBrush x:Key="LogBgBrush"        Color="{StaticResource ColorLogBg}"       />
-            <SolidColorBrush x:Key="BorderDimBrush"    Color="{StaticResource ColorBorderDim}"   />
-            <SolidColorBrush x:Key="BorderMidBrush"    Color="{StaticResource ColorBorderMid}"   />
-            <SolidColorBrush x:Key="BorderTrimBrush"   Color="{StaticResource ColorBorderTrim}"  />
-            <SolidColorBrush x:Key="BorderStrongBrush" Color="{StaticResource ColorBorderStrong}"/>
-            <SolidColorBrush x:Key="BorderBrightBrush" Color="{StaticResource ColorBorderBright}"/>
-            <SolidColorBrush x:Key="AccentBrush"       Color="{StaticResource ColorAccent}"      />
-            <SolidColorBrush x:Key="AccentLitBrush"    Color="{StaticResource ColorAccentLit}"   />
-            <SolidColorBrush x:Key="AccentValueBrush"  Color="{StaticResource ColorAccentValue}" />
-            <SolidColorBrush x:Key="AccentBorderBrush" Color="{StaticResource ColorAccentBorder}"/>
-            <SolidColorBrush x:Key="AccentMutedBrush"  Color="{StaticResource ColorAccentMuted}" />
-            <SolidColorBrush x:Key="AccentSelectBrush" Color="{StaticResource ColorAccentSelect}"/>
-            <SolidColorBrush x:Key="TextBrush"         Color="{StaticResource ColorText}"        />
-            <SolidColorBrush x:Key="TextControlBrush"  Color="{StaticResource ColorTextControl}" />
-            <SolidColorBrush x:Key="TextMutedBrush"    Color="{StaticResource ColorTextMuted}"   />
-            <SolidColorBrush x:Key="TextDimBrush"      Color="{StaticResource ColorTextDim}"     />
-            <SolidColorBrush x:Key="TextOnAccentBrush" Color="{StaticResource ColorTextOnAccent}"/>
-            <SolidColorBrush x:Key="TextLightBrush"    Color="{StaticResource ColorTextLight}"   />
-            <SolidColorBrush x:Key="DangerBrush"       Color="{StaticResource ColorDanger}"      />
-            <SolidColorBrush x:Key="BoostBrush"        Color="{StaticResource ColorBoost}"       />
-            <SolidColorBrush x:Key="CutBrush"          Color="{StaticResource ColorCut}"         />
-            <SolidColorBrush x:Key="LedOnBrush"        Color="{StaticResource ColorLedOn}"       />
-            <SolidColorBrush x:Key="LedOffBrush"       Color="{StaticResource ColorLedOff}"      />
-
-            <!-- Legacy aliases — keep for views not yet migrated -->
-            <SolidColorBrush x:Key="KatanaPanelBrush"      Color="{StaticResource ColorPanelBg}"     />
-            <SolidColorBrush x:Key="KatanaSectionBrush"    Color="{StaticResource ColorSectionBg}"   />
-            <SolidColorBrush x:Key="KatanaSectionAltBrush" Color="{StaticResource ColorSectionBgAlt}"/>
-            <SolidColorBrush x:Key="KatanaTrimBrush"       Color="{StaticResource ColorBorderTrim}"  />
-            <SolidColorBrush x:Key="KatanaAccentBrush"     Color="{StaticResource ColorAccent}"      />
-            <SolidColorBrush x:Key="KatanaAccentMutedBrush" Color="{StaticResource ColorAccentMuted}" />
-            <SolidColorBrush x:Key="KatanaTextBrush"       Color="{StaticResource ColorText}"        />
-            <SolidColorBrush x:Key="KatanaSubtleTextBrush" Color="{StaticResource ColorTextMuted}"   />
-            <SolidColorBrush x:Key="KatanaDangerBrush"     Color="{StaticResource ColorDanger}"      />
+            <!-- ── Compat aliases (used in view files — keep until migrated) ── -->
+            <Color x:Key="ColorCardBgTop"            >#2E3138</Color>
+            <Color x:Key="ColorCardBgBottom"         >#1C1F24</Color>
+            <SolidColorBrush x:Key="KatanaAccentBrush"      Color="{StaticResource Primary}"  />
+            <SolidColorBrush x:Key="KatanaSubtleTextBrush"  Color="{StaticResource TextMuted}" />
+            <SolidColorBrush x:Key="TextLightBrush"         Color="#F1F1F1"                   />
 
         </ResourceDictionary>
     </Application.Resources>
@@ -106,47 +65,47 @@
         <FluentTheme />
 
         <Style Selector="Window">
-            <Setter Property="Background" Value="{StaticResource WindowBgBrush}" />
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+            <Setter Property="Background" Value="{StaticResource BgBaseBrush}"  />
+            <Setter Property="Foreground" Value="{StaticResource TextMainBrush}" />
         </Style>
 
         <Style Selector="Border.transport-shell">
-            <Setter Property="Background"       Value="{StaticResource ShellBgBrush}"    />
-            <Setter Property="BorderBrush"      Value="{StaticResource BorderTrimBrush}" />
+            <Setter Property="Background"       Value="{StaticResource BgSurfaceBrush}"  />
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderLightBrush}"/>
             <Setter Property="BorderThickness"  Value="1" />
             <Setter Property="CornerRadius"     Value="16" />
         </Style>
 
         <Style Selector="Border.amp-shell">
-            <Setter Property="Background"       Value="{StaticResource PanelBgBrush}"     />
-            <Setter Property="BorderBrush"      Value="{StaticResource BorderBrightBrush}"/>
+            <Setter Property="Background"       Value="{StaticResource BgBaseBrush}"     />
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderLightBrush}"/>
             <Setter Property="BorderThickness"  Value="1" />
             <Setter Property="CornerRadius"     Value="24" />
         </Style>
 
         <Style Selector="Border.panel-section">
-            <Setter Property="Background"       Value="{StaticResource SectionBgBrush}"  />
-            <Setter Property="BorderBrush"      Value="{StaticResource BorderDimBrush}"  />
+            <Setter Property="Background"       Value="{StaticResource BgSurfaceBrush}" />
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderBrush}"    />
             <Setter Property="BorderThickness"  Value="1" />
             <Setter Property="CornerRadius"     Value="18" />
         </Style>
 
         <Style Selector="Border.panel-section.alt">
-            <Setter Property="Background"       Value="{StaticResource SectionBgAltBrush}"/>
+            <Setter Property="Background"       Value="{StaticResource BgElevatedBrush}"/>
         </Style>
 
         <Style Selector="Button.transport-button">
             <Setter Property="Padding"          Value="16,10" />
-            <Setter Property="Background"       Value="{StaticResource ControlBgBrush}"  />
-            <Setter Property="BorderBrush"      Value="{StaticResource BorderTrimBrush}" />
+            <Setter Property="Background"       Value="{StaticResource BgElevatedBrush}" />
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderLightBrush}"/>
             <Setter Property="BorderThickness"  Value="1" />
-            <Setter Property="Foreground"       Value="{StaticResource TextBrush}"       />
+            <Setter Property="Foreground"       Value="{StaticResource TextMainBrush}"   />
         </Style>
 
         <Style Selector="Button.transport-button.accent">
-            <Setter Property="Background"       Value="{StaticResource AccentBrush}"      />
-            <Setter Property="BorderBrush"      Value="{StaticResource AccentBorderBrush}"/>
-            <Setter Property="Foreground"       Value="{StaticResource TextOnAccentBrush}"/>
+            <Setter Property="Background"       Value="{StaticResource PrimaryBrush}"   />
+            <Setter Property="BorderBrush"      Value="{StaticResource PrimaryLitBrush}"/>
+            <Setter Property="Foreground"       Value="{StaticResource BgBaseBrush}"    />
             <Setter Property="FontWeight"       Value="SemiBold" />
         </Style>
 
@@ -156,40 +115,40 @@
 
         <Style Selector="ToggleButton.channel-button">
             <Setter Property="Padding"          Value="14,10" />
-            <Setter Property="Background"       Value="{StaticResource ControlBgBrush}"  />
-            <Setter Property="BorderBrush"      Value="{StaticResource BorderTrimBrush}" />
+            <Setter Property="Background"       Value="{StaticResource BgElevatedBrush}" />
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderLightBrush}"/>
             <Setter Property="BorderThickness"  Value="1" />
-            <Setter Property="Foreground"       Value="{StaticResource TextBrush}"       />
+            <Setter Property="Foreground"       Value="{StaticResource TextMainBrush}"   />
             <Setter Property="MinWidth"         Value="88" />
         </Style>
 
         <Style Selector="ToggleButton.channel-button:checked">
-            <Setter Property="Background"       Value="{StaticResource AccentBrush}"      />
-            <Setter Property="BorderBrush"      Value="{StaticResource AccentBorderBrush}"/>
-            <Setter Property="Foreground"       Value="{StaticResource TextOnAccentBrush}"/>
+            <Setter Property="Background"       Value="{StaticResource PrimaryBrush}"   />
+            <Setter Property="BorderBrush"      Value="{StaticResource PrimaryLitBrush}"/>
+            <Setter Property="Foreground"       Value="{StaticResource BgBaseBrush}"    />
             <Setter Property="FontWeight"       Value="Bold" />
         </Style>
 
         <Style Selector="ToggleButton.effect-button">
             <Setter Property="Padding"          Value="18,12" />
-            <Setter Property="Background"       Value="{StaticResource ControlBgBrush}"  />
-            <Setter Property="BorderBrush"      Value="{StaticResource BorderTrimBrush}" />
+            <Setter Property="Background"       Value="{StaticResource BgElevatedBrush}" />
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderLightBrush}"/>
             <Setter Property="BorderThickness"  Value="1" />
-            <Setter Property="Foreground"       Value="{StaticResource TextBrush}"       />
+            <Setter Property="Foreground"       Value="{StaticResource TextMainBrush}"   />
             <Setter Property="MinWidth"         Value="96" />
         </Style>
 
         <Style Selector="ToggleButton.effect-button:checked">
-            <Setter Property="Background"       Value="{StaticResource AccentLitBrush}"   />
-            <Setter Property="BorderBrush"      Value="{StaticResource AccentBorderBrush}"/>
-            <Setter Property="Foreground"       Value="{StaticResource TextOnAccentBrush}"/>
+            <Setter Property="Background"       Value="{StaticResource PrimaryLitBrush}" />
+            <Setter Property="BorderBrush"      Value="{StaticResource PrimaryLitBrush}" />
+            <Setter Property="Foreground"       Value="{StaticResource BgBaseBrush}"     />
             <Setter Property="FontWeight"       Value="SemiBold" />
         </Style>
 
         <Style Selector="TextBox.diagnostic-log">
-            <Setter Property="Background"       Value="{StaticResource LogBgBrush}"      />
-            <Setter Property="BorderBrush"      Value="{StaticResource BorderMidBrush}"  />
-            <Setter Property="Foreground"       Value="{StaticResource TextBrush}"       />
+            <Setter Property="Background"       Value="{StaticResource BgContrastBrush}" />
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderBrush}"     />
+            <Setter Property="Foreground"       Value="{StaticResource TextMainBrush}"   />
         </Style>
 
         <Style Selector="Border.stompbox-card">
@@ -197,7 +156,7 @@
             <Setter Property="BorderBrush"      Value="Transparent" />
         </Style>
         <Style Selector="Border.stompbox-card.selected">
-            <Setter Property="BorderBrush"      Value="{StaticResource AccentSelectBrush}"/>
+            <Setter Property="BorderBrush"      Value="{StaticResource PrimaryLitBrush}"/>
         </Style>
     </Application.Styles>
 </Application>

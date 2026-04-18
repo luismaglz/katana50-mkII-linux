@@ -38,6 +38,8 @@ public class KatanaState : IKatanaState
         RegisterAll(ReverbPedal);
         RegisterAll(HardwarePedal);
         RegisterAll(SoloEq);
+        RegisterAll(PatchEq1);
+        RegisterAll(PatchEq2);
         RegisterAll(Contour1);
         RegisterAll(Contour2);
         RegisterAll(Contour3);
@@ -156,7 +158,7 @@ public class KatanaState : IKatanaState
         }
         else
         {
-            _logger.LogWarning("Received update for unknown parameter key: {Key}", key);
+            _logger.LogDebug("Received update for untracked parameter key: {Key}", key);
         }
     }
 
@@ -175,6 +177,13 @@ public class KatanaState : IKatanaState
     #region Solo EQ + Solo Delay (Ver200+/Ver210+)
 
     public SoloEqState SoloEq { get; } = new();
+
+    #endregion
+
+    #region Patch EQ (Eq1 in Patch_0 block, Eq2 at 0x0060)
+
+    public PatchEqState PatchEq1 { get; } = new(isEq2: false);
+    public PatchEqState PatchEq2 { get; } = new(isEq2: true);
 
     #endregion
 

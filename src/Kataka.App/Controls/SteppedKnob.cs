@@ -28,8 +28,8 @@ public sealed class SteppedKnob : RotaryKnobBase
     public static readonly StyledProperty<string[]?> StepsProperty =
         AvaloniaProperty.Register<SteppedKnob, string[]?>(nameof(Steps));
 
-    private static readonly SolidColorBrush TickActiveBrush = KatanaPalette.AccentValueBrush;
-    private static readonly SolidColorBrush TickInactiveBrush = new(KatanaPalette.BorderStrong);
+    private static readonly SolidColorBrush TickActiveBrush = KatanaPalette.PrimaryLitBrush;
+    private static readonly SolidColorBrush TickInactiveBrush = new(KatanaPalette.BorderLight);
     private static readonly SolidColorBrush KnobShadowBrush = KatanaPalette.KnobShadowBrush;
     private static readonly SolidColorBrush KnobBgBrush = KatanaPalette.KnobBgBrush;
 
@@ -137,7 +137,7 @@ public sealed class SteppedKnob : RotaryKnobBase
             else
                 context.DrawEllipse(
                     KatanaPalette.KnobFaceBrush,
-                    new Pen(new SolidColorBrush(KatanaPalette.BorderStrong), 1.5 * Scale),
+                    new Pen(new SolidColorBrush(KatanaPalette.BorderLight), 1.5 * Scale),
                     new Point(cx, cy), imgSize / 2, imgSize / 2);
         }
     }
