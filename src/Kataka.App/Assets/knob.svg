@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+    <!-- Outer knob ring -->
+    <circle cx="150" cy="150" r="144" fill="transparent" stroke="#ffb741" stroke-width="6"/>
+
+    <!-- Indicator knotch (i=0, top) -->
+    <rect x="145.5" y="3" width="9" height="45" fill="red" ry="1"/>
+
+    <!-- Regular knotches (i=1 to i=11), rotated around pivot (150, 147) -->
+    <rect x="145.5" y="3" width="9" height="36" fill="#ffb741" rx="1" transform="rotate(30, 150, 147)"/>
+    <rect x="145.5" y="3" width="9" height="36" fill="#ffb741" rx="1" transform="rotate(60, 150, 147)"/>
+    <rect x="145.5" y="3" width="9" height="36" fill="#ffb741" rx="1" transform="rotate(90, 150, 147)"/>
+    <rect x="145.5" y="3" width="9" height="36" fill="#ffb741" rx="1" transform="rotate(120, 150, 147)"/>
+    <rect x="145.5" y="3" width="9" height="36" fill="#ffb741" rx="1" transform="rotate(150, 150, 147)"/>
+    <rect x="145.5" y="3" width="9" height="36" fill="#ffb741" rx="1" transform="rotate(180, 150, 147)"/>
+    <rect x="145.5" y="3" width="9" height="36" fill="#ffb741" rx="1" transform="rotate(210, 150, 147)"/>
+    <rect x="145.5" y="3" width="9" height="36" fill="#ffb741" rx="1" transform="rotate(240, 150, 147)"/>
+    <rect x="145.5" y="3" width="9" height="36" fill="#ffb741" rx="1" transform="rotate(270, 150, 147)"/>
+    <rect x="145.5" y="3" width="9" height="36" fill="#ffb741" rx="1" transform="rotate(300, 150, 147)"/>
+    <rect x="145.5" y="3" width="9" height="36" fill="#ffb741" rx="1" transform="rotate(330, 150, 147)"/>
+
+    <!-- Cap (inner ring) -->
+    <circle cx="150" cy="150" r="80" fill="none" stroke="#ffb741" stroke-width="6"/>
+</svg>

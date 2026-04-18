@@ -1,12 +1,10 @@
-using System;
-
 using Avalonia;
 using Avalonia.Media;
 
 namespace Kataka.App.Controls;
 
 /// <summary>
-/// Small image rotary knob — 76 px image, 116 × 156 px control. No scaling.
+///     Small image rotary knob — 76 px image, 116 × 156 px control. No scaling.
 /// </summary>
 public sealed class SmallImageRotaryKnob : RotaryKnobBase
 {
@@ -23,10 +21,7 @@ public sealed class SmallImageRotaryKnob : RotaryKnobBase
 
     private static readonly SolidColorBrush KnobShadowBrush = KatanaPalette.KnobShadowBrush;
 
-    static SmallImageRotaryKnob()
-    {
-        AffectsRender<SmallImageRotaryKnob>(KnobBackgroundBrushProperty);
-    }
+    static SmallImageRotaryKnob() => AffectsRender<SmallImageRotaryKnob>(KnobBackgroundBrushProperty);
 
     public IBrush KnobBackgroundBrush
     {
@@ -45,16 +40,16 @@ public sealed class SmallImageRotaryKnob : RotaryKnobBase
         context.DrawText(labelText, new Point((bounds.Width - labelText.Width) / 2, bounds.Top));
 
         var cx = bounds.Width / 2;
-        var cy = labelText.Height + TopPad + ImgSize / 2;
-        var imgRect = new Rect(cx - ImgSize / 2, cy - ImgSize / 2, ImgSize, ImgSize);
+        var cy = labelText.Height + TopPad + (ImgSize / 2);
+        var imgRect = new Rect(cx - (ImgSize / 2), cy - (ImgSize / 2), ImgSize, ImgSize);
 
         // Subtle drop shadow behind the knob background.
-        context.DrawEllipse(KnobShadowBrush, null, new Point(cx + 1.5, cy + 2), ImgSize / 2, ImgSize / 2);
+        // context.DrawEllipse(KnobShadowBrush, null, new Point(cx + 1.5, cy + 2), ImgSize / 2, ImgSize / 2);
 
         // Fill behind transparent PNG pixels.
-        context.DrawEllipse(KnobBackgroundBrush, null, new Point(cx, cy), ImgSize / 2, ImgSize / 2);
+        // context.DrawEllipse(KnobBackgroundBrush, null, new Point(cx, cy), ImgSize / 2, ImgSize / 2);
 
-        var angleRad = KnobImageAsset.MinAngleRad + NormalizedValue * KnobImageAsset.AngleSweep * Math.PI / 180.0;
+        var angleRad = KnobImageAsset.MinAngleRad + (NormalizedValue * KnobImageAsset.AngleSweep * Math.PI / 180.0);
 
         using (context.PushTransform(
                    Matrix.CreateTranslation(-cx, -cy) *
@@ -72,6 +67,6 @@ public sealed class SmallImageRotaryKnob : RotaryKnobBase
         }
 
         var valueText = CreateText(DisplayValueText, ValueSize, FontWeight.SemiBold, ValueBrush);
-        context.DrawText(valueText, new Point((bounds.Width - valueText.Width) / 2, cy + ImgSize / 2 + BottomPad));
+        context.DrawText(valueText, new Point((bounds.Width - valueText.Width) / 2, cy + (ImgSize / 2) + BottomPad));
     }
 }

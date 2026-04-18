@@ -3,6 +3,7 @@ using System;
 using Avalonia;
 using Avalonia.ReactiveUI;
 
+
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 using Kataka.App.KatanaState;
