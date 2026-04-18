@@ -11,15 +11,15 @@
              x:DataType="vm:ModFxPedalViewModel">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.55" Label="SENS"
+            <controls:RotaryKnob Scale="0.75" Label="SENS"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding SlowGearSens}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="RISE TIME"
+            <controls:RotaryKnob Scale="0.75" Label="RISE TIME"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding SlowGearRiseTime}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="LEVEL"
+            <controls:RotaryKnob Scale="0.75" Label="LEVEL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding SlowGearLevel}"
                                  LabelFontSize="11" />

@@ -11,15 +11,15 @@
              x:DataType="vm:ModFxPedalViewModel">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.55" Label="RANGE"
+            <controls:RotaryKnob Scale="0.75" Label="RANGE"
                                  Minimum="0" Maximum="3"
                                  Value="{Binding OctaveRange}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="E.LEVEL"
+            <controls:RotaryKnob Scale="0.75" Label="E.LEVEL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding OctaveEffectLevel}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="DIRECT MIX"
+            <controls:RotaryKnob Scale="0.75" Label="DIRECT MIX"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding OctaveDirectMix}"
                                  LabelFontSize="11" />

@@ -41,6 +41,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public DiagnosticsViewModel Diagnostics { get; }
     public PatchViewModel Patch { get; }
     public AmpEditorViewModel AmpEditor { get; }
+    public PaletteEditorViewModel PaletteEditor { get; } = new();
 
     [Reactive] public string StatusMessage { get; set; } = "Ready to scan for MIDI devices.";
 

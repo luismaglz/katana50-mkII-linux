@@ -11,19 +11,19 @@
              x:DataType="vm:ModFxPedalViewModel">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.55" Label="MANUAL"
+            <controls:RotaryKnob Scale="0.75" Label="MANUAL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding Flanger117EManual}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="WIDTH"
+            <controls:RotaryKnob Scale="0.75" Label="WIDTH"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding Flanger117EWidth}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="SPEED"
+            <controls:RotaryKnob Scale="0.75" Label="SPEED"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding Flanger117ESpeed}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="REGEN"
+            <controls:RotaryKnob Scale="0.75" Label="REGEN"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding Flanger117ERegen}"
                                  LabelFontSize="11" />

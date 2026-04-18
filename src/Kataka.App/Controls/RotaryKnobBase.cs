@@ -63,6 +63,42 @@ public abstract class RotaryKnobBase : Control
     public static readonly StyledProperty<int?> DisplayMaximumProperty =
         AvaloniaProperty.Register<RotaryKnobBase, int?>(nameof(DisplayMaximum), null);
 
+    public static readonly StyledProperty<Color> AccentColorProperty =
+        AvaloniaProperty.Register<RotaryKnobBase, Color>(nameof(AccentColor), KatanaPalette.PrimaryLit);
+
+    public static readonly StyledProperty<Color> FaceColorProperty =
+        AvaloniaProperty.Register<RotaryKnobBase, Color>(nameof(FaceColor), KatanaPalette.KnobBg);
+
+    public static readonly StyledProperty<Color> BezelColorProperty =
+        AvaloniaProperty.Register<RotaryKnobBase, Color>(nameof(BezelColor), KatanaPalette.BgBase);
+
+    public static readonly StyledProperty<Color> TrackColorProperty =
+        AvaloniaProperty.Register<RotaryKnobBase, Color>(nameof(TrackColor), Color.FromArgb(55, 255, 255, 255));
+
+    public Color AccentColor
+    {
+        get => GetValue(AccentColorProperty);
+        set => SetValue(AccentColorProperty, value);
+    }
+
+    public Color FaceColor
+    {
+        get => GetValue(FaceColorProperty);
+        set => SetValue(FaceColorProperty, value);
+    }
+
+    public Color BezelColor
+    {
+        get => GetValue(BezelColorProperty);
+        set => SetValue(BezelColorProperty, value);
+    }
+
+    public Color TrackColor
+    {
+        get => GetValue(TrackColorProperty);
+        set => SetValue(TrackColorProperty, value);
+    }
+
     protected static readonly SolidColorBrush LabelBrush = KatanaPalette.TextMainBrush;
     protected static readonly SolidColorBrush ValueBrush = KatanaPalette.PrimaryLitBrush;
 
@@ -70,13 +106,28 @@ public abstract class RotaryKnobBase : Control
     private Point _dragStart;
     private int _dragStartValue;
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        RuntimePaletteService.Changed += OnPaletteChanged;
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        RuntimePaletteService.Changed -= OnPaletteChanged;
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void OnPaletteChanged() => InvalidateVisual();
+
     static RotaryKnobBase()
     {
         AffectsRender<RotaryKnobBase>(
             LabelProperty, LabelFontSizeProperty,
             MinimumProperty, MaximumProperty, ValueProperty,
             ScaleProperty, IsBipolarProperty,
-            DisplayMinimumProperty, DisplayMaximumProperty);
+            DisplayMinimumProperty, DisplayMaximumProperty,
+            AccentColorProperty, FaceColorProperty, BezelColorProperty, TrackColorProperty);
         AffectsMeasure<RotaryKnobBase>(ScaleProperty);
         FocusableProperty.OverrideDefaultValue<RotaryKnobBase>(true);
 

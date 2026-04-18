@@ -11,15 +11,15 @@
              x:DataType="vm:ModFxPedalViewModel">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.55" Label="RATE"
+            <controls:RotaryKnob Scale="0.75" Label="RATE"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding UniVRate}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="DEPTH"
+            <controls:RotaryKnob Scale="0.75" Label="DEPTH"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding UniVDepth}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="LEVEL"
+            <controls:RotaryKnob Scale="0.75" Label="LEVEL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding UniVLevel}"
                                  LabelFontSize="11" />

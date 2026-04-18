@@ -38,45 +38,45 @@
 
                 <!-- Row 1: Feedback, HiCut, E.Level, D.Mix -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <controls:SmallImageRotaryKnob  Label="FEEDBACK"
-                                                    Description="Adjusts the volume returned to the input. Higher values increase the number of delay repeats."
-                                                    Minimum="0" Maximum="100"
-                                                    Value="{Binding Feedback}"
-                                                    LabelFontSize="12" />
-                    <controls:SteppedKnob           Label="HI CUT"
-                                                    Description="Sets the frequency at which the high cut filter takes effect. At maximum (FLAT), the filter has no effect."
-                                                    Steps="{x:Static vm:FrequencySteps.HighCut15}"
-                                                    Value="{Binding HighCut}"
-                                                    LabelFontSize="12" />
-                    <controls:SmallImageRotaryKnob  Label="E.LEVEL"
-                                                    Description="Adjusts the volume of the delay (effect) sound."
-                                                    Minimum="0" Maximum="120"
-                                                    Value="{Binding EffectLevel}"
-                                                    LabelFontSize="12" />
-                    <controls:SmallImageRotaryKnob  Label="D.MIX"
-                                                    Description="Adjusts the volume of the direct (dry) sound."
-                                                    Minimum="0" Maximum="100"
-                                                    Value="{Binding DirectMix}"
-                                                    LabelFontSize="12" />
+                    <controls:RotaryKnobV2 Label="FEEDBACK" Scale="0.75"
+                                           Description="Adjusts the volume returned to the input. Higher values increase the number of delay repeats."
+                                           Minimum="0" Maximum="100"
+                                           Value="{Binding Feedback}"
+                                           LabelFontSize="12" />
+                    <controls:SteppedKnobV2 Label="HI CUT" Scale="0.75"
+                                            Description="Sets the frequency at which the high cut filter takes effect. At maximum (FLAT), the filter has no effect."
+                                            Steps="{x:Static vm:FrequencySteps.HighCut15}"
+                                            Value="{Binding HighCut}"
+                                            LabelFontSize="12" />
+                    <controls:RotaryKnobV2 Label="E.LEVEL" Scale="0.75"
+                                           Description="Adjusts the volume of the delay (effect) sound."
+                                           Minimum="0" Maximum="120"
+                                           Value="{Binding EffectLevel}"
+                                           LabelFontSize="12" />
+                    <controls:RotaryKnobV2 Label="D.MIX" Scale="0.75"
+                                           Description="Adjusts the volume of the direct (dry) sound."
+                                           Minimum="0" Maximum="100"
+                                           Value="{Binding DirectMix}"
+                                           LabelFontSize="12" />
                 </StackPanel>
 
                 <!-- Row 2: TapTime, ModRate, ModDepth -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <controls:SmallImageRotaryKnob  Label="TAP TIME"
-                                                    Description="Adjusts the delay time of the right channel relative to the left channel (100%). Only active when TYPE is PAN."
-                                                    Minimum="0" Maximum="100"
-                                                    Value="{Binding TapTime}"
-                                                    LabelFontSize="12" />
-                    <controls:SmallImageRotaryKnob  Label="MOD RATE"
-                                                    Description="Adjusts the modulation rate of the delay sound. Only active when TYPE is MODULATE or SDE-3000."
-                                                    Minimum="0" Maximum="100"
-                                                    Value="{Binding ModRate}"
-                                                    LabelFontSize="12" />
-                    <controls:SmallImageRotaryKnob  Label="MOD DEPTH"
-                                                    Description="Adjusts the modulation depth of the delay sound. Only active when TYPE is MODULATE or SDE-3000."
-                                                    Minimum="0" Maximum="100"
-                                                    Value="{Binding ModDepth}"
-                                                    LabelFontSize="12" />
+                    <controls:RotaryKnobV2 Label="TAP TIME" Scale="0.75"
+                                           Description="Adjusts the delay time of the right channel relative to the left channel (100%). Only active when TYPE is PAN."
+                                           Minimum="0" Maximum="100"
+                                           Value="{Binding TapTime}"
+                                           LabelFontSize="12" />
+                    <controls:RotaryKnobV2 Label="MOD RATE" Scale="0.75"
+                                           Description="Adjusts the modulation rate of the delay sound. Only active when TYPE is MODULATE or SDE-3000."
+                                           Minimum="0" Maximum="100"
+                                           Value="{Binding ModRate}"
+                                           LabelFontSize="12" />
+                    <controls:RotaryKnobV2 Label="MOD DEPTH" Scale="0.75"
+                                           Description="Adjusts the modulation depth of the delay sound. Only active when TYPE is MODULATE or SDE-3000."
+                                           Minimum="0" Maximum="100"
+                                           Value="{Binding ModDepth}"
+                                           LabelFontSize="12" />
                 </StackPanel>
 
                 <!-- Toggles row 1: Range, Filter, ModSw -->

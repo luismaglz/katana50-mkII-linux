@@ -15,8 +15,8 @@ internal static class KatanaPalette
     public static readonly Color BgContrast = Color.Parse("#0D0F12"); // Log, inset areas
 
     // ── Brand accent ─────────────────────────────────────────────────────────
-    public static readonly Color Primary = Color.Parse("#FFB741"); // Main amber
-    public static readonly Color PrimaryLit = Color.Parse("#FFCF66"); // Lit / active state
+    public static readonly Color Primary = Color.Parse("#57984F"); // Main amber
+    public static readonly Color PrimaryLit = Color.Parse("#57984F"); // Lit / active state
 
     // ── Semantic status ──────────────────────────────────────────────────────
     public static readonly Color Success = Color.Parse("#3DBF6C"); // Boost

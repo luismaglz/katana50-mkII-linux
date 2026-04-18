@@ -11,31 +11,31 @@
              x:DataType="vm:ModFxPedalViewModel">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.55" Label="SELECTOR"
+            <controls:RotaryKnob Scale="0.75" Label="SELECTOR"
                                  Minimum="0" Maximum="1"
                                  Value="{Binding DC30Selector}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="INPUT VOL"
+            <controls:RotaryKnob Scale="0.75" Label="INPUT VOL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding DC30InputVolume}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="CHORUS INTENSITY"
+            <controls:RotaryKnob Scale="0.75" Label="CHORUS INTENSITY"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding DC30ChorusIntensity}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="ECHO INTENSITY"
+            <controls:RotaryKnob Scale="0.75" Label="ECHO INTENSITY"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding DC30EchoIntensity}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="ECHO VOL"
+            <controls:RotaryKnob Scale="0.75" Label="ECHO VOL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding DC30EchoVolume}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="TONE"
+            <controls:RotaryKnob Scale="0.75" Label="TONE"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding DC30Tone}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="OUTPUT"
+            <controls:RotaryKnob Scale="0.75" Label="OUTPUT"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding DC30Output}"
                                  LabelFontSize="11" />

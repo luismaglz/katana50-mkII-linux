@@ -16,12 +16,18 @@
                                    Maximum="{Binding Maximum}"
                                    Value="{Binding Value}" />
         </DataTemplate>
-        <DataTemplate x:Key="SteppedAmpControlTemplate" x:DataType="vm:AmpControlViewModel">
+        <DataTemplate x:Key="CabinetControlTemplate" x:DataType="vm:AmpControlViewModel">
             <controls:SteppedKnobV2 Label="{Binding DisplayName}"
                                     Minimum="{Binding Minimum}"
                                     Maximum="{Binding Maximum}"
                                     Steps="{x:Static vm:PanelViewModel.CabinetResonanceOptions}"
-                                    Scale="1.2"
+                                    Value="{Binding Value}" />
+        </DataTemplate>
+        <DataTemplate x:Key="AmpTypeControlTemplate" x:DataType="vm:AmpControlViewModel">
+            <controls:SteppedKnobV2 Label="{Binding DisplayName}"
+                                    Minimum="{Binding Minimum}"
+                                    Maximum="{Binding Maximum}"
+                                    Steps="{x:Static vm:PanelViewModel.AmpTypeOptions}"
                                     Value="{Binding Value}" />
         </DataTemplate>
     </UserControl.Resources>
@@ -33,6 +39,8 @@
                     <TextBlock Text="AMPLIFIER" FontSize="24" FontWeight="SemiBold" Margin="0,0,12,0" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
+                    <ContentControl Content="{Binding AmpType}"
+                                    ContentTemplate="{StaticResource AmpTypeControlTemplate}" />
                     <ContentControl Content="{Binding Gain}" ContentTemplate="{StaticResource AmpControlTemplate}" />
                     <ContentControl Content="{Binding Volume}" ContentTemplate="{StaticResource AmpControlTemplate}" />
                 </StackPanel>
@@ -59,7 +67,7 @@
             <StackPanel Orientation="Horizontal">
                 <ContentControl Content="{Binding Presence}" ContentTemplate="{StaticResource AmpControlTemplate}" />
                 <ContentControl Content="{Binding CabinetResonance}"
-                                ContentTemplate="{StaticResource SteppedAmpControlTemplate}" />
+                                ContentTemplate="{StaticResource CabinetControlTemplate}" />
             </StackPanel>
         </StackPanel>
     </StackPanel>

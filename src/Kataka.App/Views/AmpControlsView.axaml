@@ -21,7 +21,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:AmpControlViewModel">
-                        <controls:RotaryKnob Label="{Binding DisplayName}"
+                        <controls:RotaryKnobV2 Label="{Binding DisplayName}"
                                              Minimum="{Binding Minimum}"
                                              Maximum="{Binding Maximum}"
                                              Value="{Binding Value}" />
