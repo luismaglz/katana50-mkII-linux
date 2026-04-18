@@ -11,7 +11,8 @@
              d:DesignHeight="480"
              d:DataContext="{x:Static dvm:DesignAmpEditorViewModel.Instance}"
              x:Class="Kataka.App.Views.PedalboardView"
-             x:DataType="vm:AmpEditorViewModel">
+             x:DataType="vm:AmpEditorViewModel"
+             x:CompileBindings="False">
     <Border Classes="panel-section alt" Padding="18">
         <StackPanel Spacing="12">
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
@@ -38,7 +39,8 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:PedalboardItemViewModel">
+                        <DataTemplate x:DataType="vm:PedalboardItemViewModel"
+             x:CompileBindings="False">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
 
                                 <!-- Signal cable between items -->

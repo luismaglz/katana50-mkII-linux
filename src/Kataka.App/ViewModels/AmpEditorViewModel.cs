@@ -65,7 +65,7 @@ public partial class AmpEditorViewModel : ViewModelBase
         }
 
         foreach (var channel in PanelChannels)
-            PanelChannelOptions.Add(new PanelChannelOptionViewModel(channel));
+            PanelChannelOptions.Add(new PanelChannelOptionViewModel(channel) { SelectCommand = SelectPanelChannelCommand });
 
         var panelEffectsByDefinitionKey = PanelEffects.ToDictionary(e => e.Definition.Key);
         Pedalboard = new PedalboardViewModel(panelEffectsByDefinitionKey, SelectedPanelChannel);

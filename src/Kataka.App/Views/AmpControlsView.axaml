@@ -9,7 +9,8 @@
              mc:Ignorable="d"
              d:DataContext="{x:Static dvm:DesignAmpEditorViewModel.Instance}"
              x:Class="Kataka.App.Views.AmpControlsView"
-             x:DataType="vm:AmpEditorViewModel">
+             x:DataType="vm:AmpEditorViewModel"
+             x:CompileBindings="False">
 
     <Border Classes="panel-section" Padding="16" MinWidth="340">
         <StackPanel Spacing="10">
@@ -20,11 +21,12 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:AmpControlViewModel">
+                    <DataTemplate x:DataType="vm:AmpControlViewModel"
+                                  x:CompileBindings="False">
                         <controls:RotaryKnobV2 Label="{Binding DisplayName}"
-                                             Minimum="{Binding Minimum}"
-                                             Maximum="{Binding Maximum}"
-                                             Value="{Binding Value}" />
+                                               Minimum="{Binding Minimum}"
+                                               Maximum="{Binding Maximum}"
+                                               Value="{Binding Value}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

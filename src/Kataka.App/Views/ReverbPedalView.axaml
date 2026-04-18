@@ -10,7 +10,8 @@
              d:DesignHeight="520"
              d:DataContext="{x:Static dvm:DesignReverbPedalViewModel.Instance}"
              x:Class="Kataka.App.Views.ReverbPedalView"
-             x:DataType="vm:ReverbPedalViewModel">
+             x:DataType="vm:ReverbPedalViewModel"
+             x:CompileBindings="False">
 
     <Border MinWidth="160" CornerRadius="8" VerticalAlignment="Top">
         <Border.Background>

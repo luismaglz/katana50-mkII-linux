@@ -1,14 +1,12 @@
-using System;
-
 using Avalonia;
 using Avalonia.Media;
 
 namespace Kataka.App.Controls;
 
 /// <summary>
-/// Arc-fill rotary knob (Scale-aware). A dim full-sweep track ring surrounds the knob
-/// face; a bright amber arc fills from minimum up to the current value. This gives an
-/// at-a-glance level readout without needing to read the pointer angle.
+///     Arc-fill rotary knob (Scale-aware). A dim full-sweep track ring surrounds the knob
+///     face; a bright amber arc fills from minimum up to the current value. This gives an
+///     at-a-glance level readout without needing to read the pointer angle.
 /// </summary>
 public sealed class RotaryKnobV2 : RotaryKnobBase
 {
@@ -52,10 +50,14 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
         context.DrawText(labelText, new Point((bounds.Width - labelText.Width) / 2, bounds.Top));
 
         var accentColor = IsSet(AccentColorProperty) ? AccentColor : RuntimePaletteService.Accent;
-        var trackColor  = IsSet(TrackColorProperty)  ? TrackColor  : Color.FromArgb(55, accentColor.R, accentColor.G, accentColor.B);
-        var faceColor   = IsSet(FaceColorProperty)   ? FaceColor   : RuntimePaletteService.KnobFace;
-        var bezelColor  = IsSet(BezelColorProperty)  ? BezelColor  : RuntimePaletteService.BgBase;
+        var trackColor = IsSet(TrackColorProperty)
+            ? TrackColor
+            : Color.FromArgb(55, accentColor.R, accentColor.G, accentColor.B);
+        var faceColor = IsSet(FaceColorProperty) ? FaceColor : RuntimePaletteService.KnobFace;
+        var bezelColor = IsSet(BezelColorProperty) ? BezelColor : RuntimePaletteService.BgBase;
         var accentBrush = new SolidColorBrush(accentColor);
+
+        var debugColor = new SolidColorBrush(Color.FromArgb(100, 255, 0, 0));
 
         // Full-sweep dim arc track
         DrawArcStroke(context, cx, cy, arcR, StartDeg, StartDeg + SweepDeg,
@@ -64,26 +66,36 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
         // Filled arc up to current value
         if (NormalizedValue > 0.005)
         {
-            var endDeg = StartDeg + NormalizedValue * SweepDeg;
+            var endDeg = StartDeg + (NormalizedValue * SweepDeg);
             DrawArcStroke(context, cx, cy, arcR, StartDeg, endDeg,
                 new Pen(new SolidColorBrush(Color.FromArgb(45, accentColor.R, accentColor.G, accentColor.B)),
-                    arcThick + 4 * s, lineCap: PenLineCap.Round));
+                    arcThick + (4 * s), lineCap: PenLineCap.Round));
             DrawArcStroke(context, cx, cy, arcR, StartDeg, endDeg,
                 new Pen(accentBrush, arcThick, lineCap: PenLineCap.Round));
         }
 
-        // Bezel + face
-        context.DrawEllipse(new SolidColorBrush(bezelColor), null, new Point(cx, cy), knobR + 4 * s, knobR + 4 * s);
+        // Bezel + face TOP and TOP COLOR
+        context.DrawEllipse(new SolidColorBrush(bezelColor), null, new Point(cx, cy), knobR + (4 * s), knobR + (4 * s));
         context.DrawEllipse(new SolidColorBrush(faceColor),
             new Pen(new SolidColorBrush(KatanaPalette.BorderLight), 1.5 * s),
             new Point(cx, cy), knobR, knobR);
 
         // Pointer
-        var angleRad = DegreesToRadians(StartDeg + NormalizedValue * SweepDeg);
-        var pointerLen = knobR * 0.68;
-        var tip = new Point(cx + Math.Cos(angleRad) * pointerLen, cy + Math.Sin(angleRad) * pointerLen);
-        context.DrawLine(new Pen(accentBrush, 3.0 * s, lineCap: PenLineCap.Round), new Point(cx, cy), tip);
-        context.DrawEllipse(accentBrush, null, new Point(cx, cy), 3.5 * s, 3.5 * s);
+        var angleRad = DegreesToRadians(StartDeg + (NormalizedValue * SweepDeg));
+        var indicatorEnd = knobR * 0.9;
+        var indicatorStart = knobR * 0.5;
+        var tipCx = cx + (Math.Cos(angleRad) * indicatorEnd);
+        var tipCy = cy + (Math.Sin(angleRad) * indicatorEnd);
+        var tip = new Point(tipCx, tipCy);
+        var endTipCx = cx + (Math.Cos(angleRad) * indicatorStart);
+        var endTipCy = cy + (Math.Sin(angleRad) * indicatorStart);
+        var endTip = new Point(endTipCx, endTipCy);
+        // Indicator Line
+        context.DrawLine(new Pen(accentBrush, 3.0 * s, lineCap: PenLineCap.Round), tip, endTip);
+        // context.DrawLine(new Pen(accentBrush, 3.0 * s, lineCap: PenLineCap.Round), endTip, tip);
+
+        // Center Dot
+        // context.DrawEllipse(accentBrush, null, new Point(cx, cy), 3.5 * s, 3.5 * s);
 
         var valueText = CreateText(DisplayValueText, valueFontSize, FontWeight.SemiBold, accentBrush);
         context.DrawText(valueText, new Point(
@@ -99,8 +111,8 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
 
         var startRad = DegreesToRadians(startDeg);
         var endRad = DegreesToRadians(startDeg + sweep);
-        var startPt = new Point(cx + r * Math.Cos(startRad), cy + r * Math.Sin(startRad));
-        var endPt = new Point(cx + r * Math.Cos(endRad), cy + r * Math.Sin(endRad));
+        var startPt = new Point(cx + (r * Math.Cos(startRad)), cy + (r * Math.Sin(startRad)));
+        var endPt = new Point(cx + (r * Math.Cos(endRad)), cy + (r * Math.Sin(endRad)));
 
         var geo = new StreamGeometry();
         using (var gctx = geo.Open())
@@ -108,6 +120,7 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
             gctx.BeginFigure(startPt, false);
             gctx.ArcTo(endPt, new Size(r, r), 0, sweep > 180, SweepDirection.Clockwise);
         }
+
         ctx.DrawGeometry(null, pen, geo);
     }
 }
