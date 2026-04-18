@@ -119,7 +119,7 @@ public partial class AmpEditorViewModel : ViewModelBase
     [Reactive] public string SelectedCabinetResonance { get; set; } = "MIDDLE";
     [Reactive] public bool IsAmpVariation { get; set; } = false;
     [Reactive] public string SelectedPanelChannel { get; set; } = "Panel";
-[Reactive] public string PanelControlsStatus { get; set; } = "Panel controls have not been read yet.";
+    [Reactive] public string PanelControlsStatus { get; set; } = "Panel controls have not been read yet.";
     [Reactive] public string PedalControlsStatus { get; set; } = "Pedal controls have not been read yet.";
 
     internal void Initialize()
