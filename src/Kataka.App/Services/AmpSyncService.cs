@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Subjects;
-using System.Threading;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 
 using Avalonia.Threading;
 
@@ -18,24 +13,20 @@ namespace Kataka.App.Services;
 
 public sealed class AmpSyncService : IAmpSyncService
 {
-    private readonly IKatanaSession _session;
     private readonly IKatanaState _katanaState;
     private readonly ILogger<AmpSyncService> _logger;
-
-    private bool _stateWritesSubscribed;
-
-    private Channel<(IReadOnlyList<byte> Address, byte Value)>? _writeChannel;
-    private CancellationTokenSource? _writeCts;
 
     // ── Observable subjects ───────────────────────────────────────────────────
 
     private readonly Subject<string> _panelChannelSubject = new();
     private readonly Subject<DeviceReadMetadata> _readCompletedSubject = new();
+    private readonly IKatanaSession _session;
     private readonly Subject<string> _statusSubject = new();
 
-    public IObservable<string> PanelChannelPushed => _panelChannelSubject;
-    public IObservable<DeviceReadMetadata> ReadCompleted => _readCompletedSubject;
-    public IObservable<string> StatusMessages => _statusSubject;
+    private bool _stateWritesSubscribed;
+
+    private Channel<(IReadOnlyList<byte> Address, byte Value)>? _writeChannel;
+    private CancellationTokenSource? _writeCts;
 
     // ── Construction ──────────────────────────────────────────────────────────
 
@@ -45,6 +36,10 @@ public sealed class AmpSyncService : IAmpSyncService
         _katanaState = katanaState;
         _logger = logger;
     }
+
+    public IObservable<string> PanelChannelPushed => _panelChannelSubject;
+    public IObservable<DeviceReadMetadata> ReadCompleted => _readCompletedSubject;
+    public IObservable<string> StatusMessages => _statusSubject;
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -66,6 +61,28 @@ public sealed class AmpSyncService : IAmpSyncService
     {
         if (!connected)
             StopWriteLoop();
+    }
+
+    // ── Read operations ───────────────────────────────────────────────────────
+
+    public async Task<bool> TryRefreshAmpStateAsync()
+    {
+        try
+        {
+            _logger.LogInformation("Seeding KatanaState from full patch read.");
+            var allStates = await _session.ReadAllPatchStatesAsync();
+            _katanaState.SetStates(allStates);
+
+            SubscribeToStateWrites();
+            StartWriteLoop();
+            _logger.LogInformation("KatanaState seeded. Write loop started.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Full patch state read failed.");
+            return false;
+        }
     }
 
     // ── Write loop ────────────────────────────────────────────────────────────
@@ -111,28 +128,8 @@ public sealed class AmpSyncService : IAmpSyncService
                 }
             }
         }
-        catch (OperationCanceledException) { }
-    }
-
-    // ── Read operations ───────────────────────────────────────────────────────
-
-    public async Task<bool> TryRefreshAmpStateAsync()
-    {
-        try
+        catch (OperationCanceledException)
         {
-            _logger.LogInformation("Seeding KatanaState from full patch read.");
-            var allStates = await _session.ReadAllPatchStatesAsync();
-            _katanaState.SetStates(allStates);
-
-            SubscribeToStateWrites();
-            StartWriteLoop();
-            _logger.LogInformation("KatanaState seeded. Write loop started.");
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Full patch state read failed.");
-            return false;
         }
     }
 
@@ -146,7 +143,7 @@ public sealed class AmpSyncService : IAmpSyncService
         foreach (var (_, state) in _katanaState.GetAllRegisteredStates())
         {
             var captured = state;
-            captured.ValueChanged += () => OnDomainStateChanged(captured);
+            captured.WriteRequested += () => OnDomainStateChanged(captured);
         }
     }
 
@@ -161,11 +158,14 @@ public sealed class AmpSyncService : IAmpSyncService
     private void OnAmpPushNotification(object? sender, SysExMessage message)
     {
         var bytes = message.Bytes;
+        _logger.LogDebug("Received push notification: {Bytes}", string.Join(" ", bytes.Select(b => b.ToString("X2"))));
+
         if (bytes[7] != 0x12) return;
         if (bytes.Count != 15 && bytes.Count != 16) return;
 
         var addressKey = Utilities.AddressToKey([bytes[8], bytes[9], bytes[10], bytes[11]]);
         var value = bytes.Count == 16 ? bytes[13] : bytes[12];
+        _logger.LogDebug("Received {Value} on {Address}", value, addressKey);
 
         _katanaState.SetState(addressKey, value);
     }
@@ -173,10 +173,14 @@ public sealed class AmpSyncService : IAmpSyncService
     private void OnAmpPanelChannelChanged(object? sender, KatanaPanelChannel channel)
     {
         var displayName = Utilities.ToPanelChannelDisplay(channel);
-        Dispatcher.UIThread.Post(() =>
-        {
-            _logger.LogInformation("Amp channel changed (push): {Channel}", displayName);
-            _panelChannelSubject.OnNext(displayName);
-        });
+        _logger.LogInformation("Amp channel changed (push): {Channel}", displayName);
+
+        _ = RefreshOnChannelChangeAsync(displayName);
+    }
+
+    private async Task RefreshOnChannelChangeAsync(string displayName)
+    {
+        await TryRefreshAmpStateAsync();
+        Dispatcher.UIThread.Post(() => _panelChannelSubject.OnNext(displayName));
     }
 }

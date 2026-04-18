@@ -35,8 +35,11 @@ public partial class DiagnosticsViewModel : ViewModelBase
     {
         DiagnosticLog = DiagnosticLog == "Diagnostic log ready."
             ? line
-            : $"{DiagnosticLog}{Environment.NewLine}{line}";
+            : $"{line}{Environment.NewLine}{DiagnosticLog}";
     }
+
+    [RelayCommand]
+    private void ClearLog() => DiagnosticLog = "Diagnostic log ready.";
 
     [RelayCommand]
     private async Task ReadAmpControlsAsync() =>

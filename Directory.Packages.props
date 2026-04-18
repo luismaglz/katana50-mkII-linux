@@ -1,0 +1,34 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <MicrosoftExtensionsVersion>10.0.6</MicrosoftExtensionsVersion>
+  </PropertyGroup>
+
+  <ItemGroup Label="Avalonia">
+    <PackageVersion Include="Avalonia" Version="12.0.0"/>
+    <PackageVersion Include="Avalonia.Desktop" Version="12.0.0"/>
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.0.0"/>
+    <PackageVersion Include="Avalonia.ReactiveUI" Version="11.3.9"/>
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.0.0"/>
+    <PackageVersion Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.0"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Microsoft.Extensions">
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftExtensionsVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.Logging.Configuration" Version="$(MicrosoftExtensionsVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Other">
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.1"/>
+    <PackageVersion Include="Fody" Version="6.9.3"/>
+    <PackageVersion Include="ReactiveUI" Version="20.1.1"/>
+    <PackageVersion Include="ReactiveUI.Fody" Version="19.5.41"/>
+    <PackageVersion Include="Svg.Controls.Skia.Avalonia" Version="12.0.0.3"/>
+    <PackageVersion Include="Svg.Skia" Version="4.3.0"/>
+    <PackageVersion Include="Tmds.DBus.Protocol" Version="0.92.0"/>
+  </ItemGroup>
+</Project>

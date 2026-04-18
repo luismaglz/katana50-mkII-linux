@@ -41,14 +41,23 @@ public class AmpControlState
             if (_value == value) return;
             _value = value;
             ValueChanged?.Invoke();
+            WriteRequested?.Invoke();
         }
     }
 
     public event Action? ValueChanged;
 
+    /// <summary>Fires when the user sets <see cref="Value"/>. Subscribe here for write-back to amp.</summary>
+    public event Action? WriteRequested;
+
     /// <summary>
-    ///     Updates the value from an amp read or push notification without firing <see cref="ValueChanged" />,
-    ///     preventing the write-back loop.
+    ///     Updates the value from an amp read or push notification. Fires <see cref="ValueChanged"/> for UI
+    ///     but NOT <see cref="WriteRequested"/>, breaking the circular write-back loop.
     /// </summary>
-    public void SetFromAmp(int value) => _value = value;
+    public void SetFromAmp(int value)
+    {
+        if (_value == value) return;
+        _value = value;
+        ValueChanged?.Invoke();
+    }
 }

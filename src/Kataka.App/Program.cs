@@ -1,8 +1,5 @@
-using System;
-
 using Avalonia;
 using Avalonia.ReactiveUI;
-
 
 using CommunityToolkit.Mvvm.DependencyInjection;
 
@@ -14,6 +11,7 @@ using Kataka.Application.Katana;
 using Kataka.Application.Midi;
 using Kataka.Infrastructure.Midi;
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -36,9 +34,16 @@ internal sealed class Program
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        var loggerProvider = new ObservableLoggerProvider();
+        var config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        services.AddSingleton<IConfiguration>(config);
+
+        var loggerProvider = new ObservableLoggerProvider(config);
         services.AddSingleton(loggerProvider);
-        services.AddLogging(b => b.AddProvider(loggerProvider).SetMinimumLevel(LogLevel.Debug));
+        services.AddLogging(b => b.AddProvider(loggerProvider));
 
         services.AddSingleton<IMidiTransport>(_ => DefaultMidiTransport.Create());
         services.AddSingleton<IKatanaSession, KatanaSession>();
