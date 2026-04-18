@@ -15,11 +15,11 @@ internal static class KnobImageAsset
     {
         try
         {
-            var primary = ToHex(KatanaPalette.Primary);
-            var indicator = ToHex(KatanaPalette.PrimaryLit);
+            var primary = ToHex(KatanaPalette.Border);
+            var indicator = ToHex(KatanaPalette.Error);
 
             using var stream = AssetLoader.Open(new Uri("avares://Kataka.App/Assets/knob.svg"));
-            using var reader = new System.IO.StreamReader(stream);
+            using var reader = new StreamReader(stream);
             var svg = reader.ReadToEnd()
                 .Replace("{{COLOR_PRIMARY}}", primary)
                 .Replace("{{COLOR_INDICATOR}}", indicator);

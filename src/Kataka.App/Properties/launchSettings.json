@@ -4,7 +4,6 @@
     "Kataka.App": {
       "commandName": "Project",
       "environmentVariables": {
-        
       }
     },
     "Kataka.App (dotnet watch)": {
