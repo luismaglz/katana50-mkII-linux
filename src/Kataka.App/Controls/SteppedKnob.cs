@@ -71,12 +71,27 @@ public sealed class SteppedKnob : RotaryKnobBase
 
         var cy = labelText.Height + topPad + imgSize / 2;
 
-        DrawTicks(context, steps, cx, cy, tickInner, tickOuter);
+        DrawTicks(context, steps, cx, cy, tickInner, tickOuter, s);
 
         context.DrawEllipse(KnobShadowBrush, null, new Point(cx + 1.5 * s, cy + 2 * s), imgSize / 2, imgSize / 2);
         context.DrawEllipse(KnobBgBrush, null, new Point(cx, cy), imgSize / 2, imgSize / 2);
 
-        DrawRotatedKnob(context, cx, cy, imgSize);
+        var angleRad = KnobImageAsset.MinAngleRad + NormalizedValue * KnobImageAsset.AngleSweep * Math.PI / 180.0;
+        var imgRect = new Rect(cx - imgSize / 2, cy - imgSize / 2, imgSize, imgSize);
+
+        using (context.PushTransform(
+            Matrix.CreateTranslation(-cx, -cy) *
+            Matrix.CreateRotation(angleRad) *
+            Matrix.CreateTranslation(cx, cy)))
+        {
+            var bmp = KnobImageAsset.Bitmap.Value;
+            if (bmp is not null)
+                context.DrawImage(bmp, imgRect);
+            else
+                context.DrawEllipse(KatanaPalette.KnobFaceBrush,
+                    new Pen(new SolidColorBrush(KatanaPalette.BorderLight), 1.5 * s),
+                    new Point(cx, cy), imgSize / 2, imgSize / 2);
+        }
 
         var valueLabel = (steps is not null && Value >= 0 && Value < steps.Length)
             ? steps[Value]
@@ -84,8 +99,6 @@ public sealed class SteppedKnob : RotaryKnobBase
         var valueText = CreateText(valueLabel, valueFontSize, FontWeight.SemiBold, ValueBrush);
         context.DrawText(valueText, new Point((bounds.Width - valueText.Width) / 2, cy + imgSize / 2 + bottomPad));
     }
-
-    // ── Private helpers ───────────────────────────────────────────────────────
 
     private void SyncRangeToSteps()
     {
@@ -98,7 +111,7 @@ public sealed class SteppedKnob : RotaryKnobBase
     }
 
     private void DrawTicks(DrawingContext context, string[]? steps, double cx, double cy,
-        double tickInner, double tickOuter)
+        double tickInner, double tickOuter, double s)
     {
         if (steps is null || steps.Length < 2) return;
 
@@ -114,31 +127,9 @@ public sealed class SteppedKnob : RotaryKnobBase
             var p2 = new Point(cx + sin * tickOuter, cy + cos * tickOuter);
 
             var isSelected = i == Value;
-            var s = Scale;
             context.DrawLine(
                 new Pen(isSelected ? TickActiveBrush : TickInactiveBrush, isSelected ? 2.0 * s : 1.2 * s),
                 p1, p2);
-        }
-    }
-
-    private void DrawRotatedKnob(DrawingContext context, double cx, double cy, double imgSize)
-    {
-        var angleRad = KnobImageAsset.MinAngleRad + NormalizedValue * KnobImageAsset.AngleSweep * Math.PI / 180.0;
-        var imgRect = new Rect(cx - imgSize / 2, cy - imgSize / 2, imgSize, imgSize);
-
-        using (context.PushTransform(
-                   Matrix.CreateTranslation(-cx, -cy) *
-                   Matrix.CreateRotation(angleRad) *
-                   Matrix.CreateTranslation(cx, cy)))
-        {
-            var bmp = KnobImageAsset.Bitmap.Value;
-            if (bmp is not null)
-                context.DrawImage(bmp, imgRect);
-            else
-                context.DrawEllipse(
-                    KatanaPalette.KnobFaceBrush,
-                    new Pen(new SolidColorBrush(KatanaPalette.BorderLight), 1.5 * Scale),
-                    new Point(cx, cy), imgSize / 2, imgSize / 2);
         }
     }
 }
