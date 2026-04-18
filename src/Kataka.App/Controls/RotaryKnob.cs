@@ -10,9 +10,9 @@ namespace Kataka.App.Controls;
 public class RotaryKnob : RotaryKnobBase
 {
     private static readonly SolidColorBrush FaceBrush = KatanaPalette.KnobFaceBrush;
-    private static readonly SolidColorBrush BezelBrush = new(KatanaPalette.KnobBezel);
-    private static readonly SolidColorBrush TickBrush = new(KatanaPalette.BorderStrong);
-    private static readonly SolidColorBrush CenterTickBrush = KatanaPalette.AccentValueBrush;
+    private static readonly SolidColorBrush BezelBrush = KatanaPalette.BgBaseBrush;
+    private static readonly SolidColorBrush TickBrush = new(KatanaPalette.BorderLight);
+    private static readonly SolidColorBrush CenterTickBrush = KatanaPalette.PrimaryLitBrush;
 
     protected override Size MeasureOverride(Size availableSize)
     {
@@ -36,8 +36,8 @@ public class RotaryKnob : RotaryKnobBase
         var center = new Point(bounds.Width / 2, labelText.Height + 20 * s + radius);
 
         DrawTicks(context, center, radius + 4 * s, s);
-        context.DrawEllipse(BezelBrush, new Pen(new SolidColorBrush(KatanaPalette.KnobBezel), 2 * s), center, radius + 8 * s, radius + 8 * s);
-        context.DrawEllipse(FaceBrush, new Pen(new SolidColorBrush(KatanaPalette.BorderStrong), 1.5 * s), center, radius, radius);
+        context.DrawEllipse(BezelBrush, new Pen(new SolidColorBrush(KatanaPalette.BgBase), 2 * s), center, radius + 8 * s, radius + 8 * s);
+        context.DrawEllipse(FaceBrush, new Pen(new SolidColorBrush(KatanaPalette.BorderLight), 1.5 * s), center, radius, radius);
 
         var angle = DegreesToRadians(135 + (NormalizedValue * 270));
         var indicatorLength = radius * 0.68;

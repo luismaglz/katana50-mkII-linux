@@ -34,15 +34,15 @@ public class EqBandSlider : Control
         AvaloniaProperty.Register<EqBandSlider, double>(nameof(Scale), 1.0);
 
     // ── Colours ───────────────────────────────────────────────────────────────
-    private static readonly SolidColorBrush TrackBrush = KatanaPalette.ShellBgBrush;
-    private static readonly SolidColorBrush TrackBorderBrush = new(KatanaPalette.BorderDim);
-    private static readonly SolidColorBrush CentreBrush = new(KatanaPalette.BorderStrong);
-    private static readonly SolidColorBrush BoostBrush = KatanaPalette.BoostBrush;
-    private static readonly SolidColorBrush CutBrush = KatanaPalette.CutBrush;
-    private static readonly SolidColorBrush NeutralBrush = new(KatanaPalette.BorderStrong);
-    private static readonly SolidColorBrush ThumbBrush = KatanaPalette.TextControlBrush;
-    private static readonly SolidColorBrush LabelBrush = KatanaPalette.TextDimBrush;
-    private static readonly SolidColorBrush ValueBrush = KatanaPalette.AccentValueBrush;
+    private static readonly SolidColorBrush TrackBrush = KatanaPalette.BgSurfaceBrush;
+    private static readonly SolidColorBrush TrackBorderBrush = new(KatanaPalette.Border);
+    private static readonly SolidColorBrush CentreBrush = new(KatanaPalette.BorderLight);
+    private static readonly SolidColorBrush BoostBrush = KatanaPalette.SuccessBrush;
+    private static readonly SolidColorBrush CutBrush = KatanaPalette.ErrorBrush;
+    private static readonly SolidColorBrush NeutralBrush = new(KatanaPalette.BorderLight);
+    private static readonly SolidColorBrush ThumbBrush = KatanaPalette.TextMainBrush;
+    private static readonly SolidColorBrush LabelBrush = KatanaPalette.TextMutedBrush;
+    private static readonly SolidColorBrush ValueBrush = KatanaPalette.PrimaryLitBrush;
 
     private bool _isDragging;
     private double _dragStartY;
