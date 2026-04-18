@@ -11,31 +11,31 @@
              x:DataType="vm:ModFxPedalViewModel">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.55" Label="MODE"
+            <controls:RotaryKnob Scale="0.75" Label="MODE"
                                  Minimum="0" Maximum="1"
                                  Value="{Binding AutoWahMode}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="FREQ"
+            <controls:RotaryKnob Scale="0.75" Label="FREQ"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding AutoWahFreq}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="PEAK"
+            <controls:RotaryKnob Scale="0.75" Label="PEAK"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding AutoWahPeak}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="RATE"
+            <controls:RotaryKnob Scale="0.75" Label="RATE"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding AutoWahRate}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="DEPTH"
+            <controls:RotaryKnob Scale="0.75" Label="DEPTH"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding AutoWahDepth}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="DIRECT MIX"
+            <controls:RotaryKnob Scale="0.75" Label="DIRECT MIX"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding AutoWahDirectMix}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="E.LEVEL"
+            <controls:RotaryKnob Scale="0.75" Label="E.LEVEL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding AutoWahEffectLevel}"
                                  LabelFontSize="11" />

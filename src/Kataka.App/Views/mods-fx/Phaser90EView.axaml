@@ -11,11 +11,11 @@
              x:DataType="vm:ModFxPedalViewModel">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.55" Label="SCRIPT"
+            <controls:RotaryKnob Scale="0.75" Label="SCRIPT"
                                  Minimum="0" Maximum="1"
                                  Value="{Binding Phaser90EScript}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="SPEED"
+            <controls:RotaryKnob Scale="0.75" Label="SPEED"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding Phaser90ESpeed}"
                                  LabelFontSize="11" />

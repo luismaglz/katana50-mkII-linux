@@ -11,27 +11,27 @@
              x:DataType="vm:ModFxPedalViewModel">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.55" Label="WAH TYPE"
+            <controls:RotaryKnob Scale="0.75" Label="WAH TYPE"
                                  Minimum="0" Maximum="5"
                                  Value="{Binding PedalWahType}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="PEDAL POS"
+            <controls:RotaryKnob Scale="0.75" Label="PEDAL POS"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding PedalWahPedalPosition}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="PEDAL MIN"
+            <controls:RotaryKnob Scale="0.75" Label="PEDAL MIN"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding PedalWahPedalMin}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="PEDAL MAX"
+            <controls:RotaryKnob Scale="0.75" Label="PEDAL MAX"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding PedalWahPedalMax}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="E.LEVEL"
+            <controls:RotaryKnob Scale="0.75" Label="E.LEVEL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding PedalWahEffectLevel}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="DIRECT MIX"
+            <controls:RotaryKnob Scale="0.75" Label="DIRECT MIX"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding PedalWahDirectMix}"
                                  LabelFontSize="11" />

@@ -11,35 +11,35 @@
              x:DataType="vm:ModFxPedalViewModel">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.55" Label="MODE"
+            <controls:RotaryKnob Scale="0.75" Label="MODE"
                                  Minimum="0" Maximum="1"
                                  Value="{Binding HumanizerMode}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="VOWEL 1"
+            <controls:RotaryKnob Scale="0.75" Label="VOWEL 1"
                                  Minimum="0" Maximum="4"
                                  Value="{Binding HumanizerVowel1}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="VOWEL 2"
+            <controls:RotaryKnob Scale="0.75" Label="VOWEL 2"
                                  Minimum="0" Maximum="4"
                                  Value="{Binding HumanizerVowel2}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="SENS"
+            <controls:RotaryKnob Scale="0.75" Label="SENS"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding HumanizerSens}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="RATE"
+            <controls:RotaryKnob Scale="0.75" Label="RATE"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding HumanizerRate}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="DEPTH"
+            <controls:RotaryKnob Scale="0.75" Label="DEPTH"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding HumanizerDepth}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="MANUAL"
+            <controls:RotaryKnob Scale="0.75" Label="MANUAL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding HumanizerManual}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="LEVEL"
+            <controls:RotaryKnob Scale="0.75" Label="LEVEL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding HumanizerLevel}"
                                  LabelFontSize="11" />

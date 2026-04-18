@@ -11,23 +11,23 @@
              x:DataType="vm:ModFxPedalViewModel">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.55" Label="TYPE"
+            <controls:RotaryKnob Scale="0.75" Label="TYPE"
                                  Minimum="0" Maximum="6"
                                  Value="{Binding CompType}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="SUSTAIN"
+            <controls:RotaryKnob Scale="0.75" Label="SUSTAIN"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding CompSustain}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="ATTACK"
+            <controls:RotaryKnob Scale="0.75" Label="ATTACK"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding CompAttack}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="TONE"
+            <controls:RotaryKnob Scale="0.75" Label="TONE"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding CompTone}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="LEVEL"
+            <controls:RotaryKnob Scale="0.75" Label="LEVEL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding CompLevel}"
                                  LabelFontSize="11" />

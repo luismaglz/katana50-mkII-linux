@@ -36,36 +36,36 @@
                 </StackPanel>
                 <!-- Variation color -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                    <controls:SmallImageRotaryKnob Label="E.LEVEL"
-                                                   Minimum="0" Maximum="100"
-                                                   Value="{Binding EffectLevel}"
-                                                   LabelFontSize="12"/>
-                    <controls:SmallImageRotaryKnob  Label="DRIVE"
-                                                    Minimum="0" Maximum="120"
-                                                    Value="{Binding Drive}"
-                                                    LabelFontSize="12"/>
-                    <controls:SmallImageRotaryKnob Label="TONE"
-                                                   Minimum="0" Maximum="100"
-                                                   DisplayMinimum="-50" DisplayMaximum="50"
-                                                   Value="{Binding Tone}"
-                                                   LabelFontSize="12"/>
+                    <controls:RotaryKnobV2 Label="E.LEVEL" Scale="0.75"
+                                           Minimum="0" Maximum="100"
+                                           Value="{Binding EffectLevel}"
+                                           LabelFontSize="12" />
+                    <controls:RotaryKnobV2 Label="DRIVE" Scale="0.75"
+                                           Minimum="0" Maximum="120"
+                                           Value="{Binding Drive}"
+                                           LabelFontSize="12" />
+                    <controls:RotaryKnobV2 Label="TONE" Scale="0.75"
+                                           Minimum="0" Maximum="100"
+                                           DisplayMinimum="-50" DisplayMaximum="50"
+                                           Value="{Binding Tone}"
+                                           LabelFontSize="12" />
 
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
 
-                    <controls:SmallImageRotaryKnob Label="BOTTOM"
-                                                   Minimum="0" Maximum="100"
-                                                   DisplayMinimum="-50" DisplayMaximum="50"
-                                                   Value="{Binding Bottom}"
-                                                   LabelFontSize="12"/>
-                    <controls:SmallImageRotaryKnob Label="D.MIX"
-                                                   Minimum="0" Maximum="100"
-                                                   Value="{Binding DirectMix}"
-                                                   LabelFontSize="12"/>
-                    <controls:SmallImageRotaryKnob Label="SOLO LVL"
-                                                   Minimum="0" Maximum="100"
-                                                   Value="{Binding SoloLevel}"
-                                                   LabelFontSize="12"/>
+                    <controls:RotaryKnobV2 Label="BOTTOM" Scale="0.75"
+                                           Minimum="0" Maximum="100"
+                                           DisplayMinimum="-50" DisplayMaximum="50"
+                                           Value="{Binding Bottom}"
+                                           LabelFontSize="12" />
+                    <controls:RotaryKnobV2 Label="D.MIX" Scale="0.75"
+                                           Minimum="0" Maximum="100"
+                                           Value="{Binding DirectMix}"
+                                           LabelFontSize="12" />
+                    <controls:RotaryKnobV2 Label="SOLO LVL" Scale="0.75"
+                                           Minimum="0" Maximum="100"
+                                           Value="{Binding SoloLevel}"
+                                           LabelFontSize="12" />
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="30">
                     <ToggleButton Classes="effect-button"

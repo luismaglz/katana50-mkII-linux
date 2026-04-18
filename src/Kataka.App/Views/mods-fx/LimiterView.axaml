@@ -11,27 +11,27 @@
              x:DataType="vm:ModFxPedalViewModel">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.55" Label="TYPE"
+            <controls:RotaryKnob Scale="0.75" Label="TYPE"
                                  Minimum="0" Maximum="2"
                                  Value="{Binding LimiterType}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="ATTACK"
+            <controls:RotaryKnob Scale="0.75" Label="ATTACK"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding LimiterAttack}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="THRESHOLD"
+            <controls:RotaryKnob Scale="0.75" Label="THRESHOLD"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding LimiterThreshold}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="RATIO"
+            <controls:RotaryKnob Scale="0.75" Label="RATIO"
                                  Minimum="0" Maximum="17"
                                  Value="{Binding LimiterRatio}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="RELEASE"
+            <controls:RotaryKnob Scale="0.75" Label="RELEASE"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding LimiterRelease}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.55" Label="LEVEL"
+            <controls:RotaryKnob Scale="0.75" Label="LEVEL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding LimiterLevel}"
                                  LabelFontSize="11" />

@@ -24,9 +24,6 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
     private const double StartDeg = 135.0;
     private const double SweepDeg = 270.0;
 
-    private static readonly SolidColorBrush FaceBrush = KatanaPalette.KnobBgBrush;
-    private static readonly SolidColorBrush BezelBrush = KatanaPalette.BgBaseBrush;
-    private static readonly SolidColorBrush ArcTrackBrush = new(Color.FromArgb(55, 255, 255, 255));
 
     protected override Size MeasureOverride(Size availableSize)
     {
@@ -54,25 +51,30 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
 
         context.DrawText(labelText, new Point((bounds.Width - labelText.Width) / 2, bounds.Top));
 
+        var accentColor = IsSet(AccentColorProperty) ? AccentColor : RuntimePaletteService.Accent;
+        var trackColor  = IsSet(TrackColorProperty)  ? TrackColor  : Color.FromArgb(55, accentColor.R, accentColor.G, accentColor.B);
+        var faceColor   = IsSet(FaceColorProperty)   ? FaceColor   : RuntimePaletteService.KnobFace;
+        var bezelColor  = IsSet(BezelColorProperty)  ? BezelColor  : RuntimePaletteService.BgBase;
+        var accentBrush = new SolidColorBrush(accentColor);
+
         // Full-sweep dim arc track
         DrawArcStroke(context, cx, cy, arcR, StartDeg, StartDeg + SweepDeg,
-            new Pen(ArcTrackBrush, arcThick, lineCap: PenLineCap.Round));
+            new Pen(new SolidColorBrush(trackColor), arcThick, lineCap: PenLineCap.Round));
 
         // Filled arc up to current value
         if (NormalizedValue > 0.005)
         {
             var endDeg = StartDeg + NormalizedValue * SweepDeg;
-            var c = KatanaPalette.PrimaryLit;
             DrawArcStroke(context, cx, cy, arcR, StartDeg, endDeg,
-                new Pen(new SolidColorBrush(Color.FromArgb(45, c.R, c.G, c.B)),
+                new Pen(new SolidColorBrush(Color.FromArgb(45, accentColor.R, accentColor.G, accentColor.B)),
                     arcThick + 4 * s, lineCap: PenLineCap.Round));
             DrawArcStroke(context, cx, cy, arcR, StartDeg, endDeg,
-                new Pen(KatanaPalette.PrimaryLitBrush, arcThick, lineCap: PenLineCap.Round));
+                new Pen(accentBrush, arcThick, lineCap: PenLineCap.Round));
         }
 
         // Bezel + face
-        context.DrawEllipse(BezelBrush, null, new Point(cx, cy), knobR + 4 * s, knobR + 4 * s);
-        context.DrawEllipse(FaceBrush,
+        context.DrawEllipse(new SolidColorBrush(bezelColor), null, new Point(cx, cy), knobR + 4 * s, knobR + 4 * s);
+        context.DrawEllipse(new SolidColorBrush(faceColor),
             new Pen(new SolidColorBrush(KatanaPalette.BorderLight), 1.5 * s),
             new Point(cx, cy), knobR, knobR);
 
@@ -80,10 +82,10 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
         var angleRad = DegreesToRadians(StartDeg + NormalizedValue * SweepDeg);
         var pointerLen = knobR * 0.68;
         var tip = new Point(cx + Math.Cos(angleRad) * pointerLen, cy + Math.Sin(angleRad) * pointerLen);
-        context.DrawLine(new Pen(ValueBrush, 3.0 * s, lineCap: PenLineCap.Round), new Point(cx, cy), tip);
-        context.DrawEllipse(ValueBrush, null, new Point(cx, cy), 3.5 * s, 3.5 * s);
+        context.DrawLine(new Pen(accentBrush, 3.0 * s, lineCap: PenLineCap.Round), new Point(cx, cy), tip);
+        context.DrawEllipse(accentBrush, null, new Point(cx, cy), 3.5 * s, 3.5 * s);
 
-        var valueText = CreateText(DisplayValueText, valueFontSize, FontWeight.SemiBold, ValueBrush);
+        var valueText = CreateText(DisplayValueText, valueFontSize, FontWeight.SemiBold, accentBrush);
         context.DrawText(valueText, new Point(
             (bounds.Width - valueText.Width) / 2,
             cy + arcR + bottomPad));

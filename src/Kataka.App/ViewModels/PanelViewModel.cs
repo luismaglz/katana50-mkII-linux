@@ -18,6 +18,7 @@ public class PanelViewModel : ViewModelBase
     }
 
     public static string[] CabinetResonanceOptions { get; } = ["LOW", "MIDDLE", "HIGH"];
+    public static string[] AmpTypeOptions { get; } = ["ACOUSTIC", "CLEAN", "CRUNCH", "LEAD", "BROWN"];
 
     #region AmpControls
 
