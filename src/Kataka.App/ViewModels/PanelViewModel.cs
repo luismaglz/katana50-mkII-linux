@@ -17,6 +17,8 @@ public class PanelViewModel : ViewModelBase
         CabinetResonance = new AmpControlViewModel(katanaState.CabinetResonance);
     }
 
+    public static string[] CabinetResonanceOptions { get; } = ["LOW", "MIDDLE", "HIGH"];
+
     #region AmpControls
 
     public AmpControlViewModel AmpType { get; internal set; }

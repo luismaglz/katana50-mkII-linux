@@ -13,17 +13,6 @@
 
     <Border Classes="panel-section" Padding="16" MinWidth="340">
         <StackPanel Spacing="10">
-            <StackPanel Spacing="4">
-                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                    <Image Source="/Assets/amplifier.png" Width="28" Height="28"
-                           VerticalAlignment="Center" />
-                    <TextBlock Text="AMP CONTROLS"
-                               FontSize="16"
-                               FontWeight="Bold"
-                               LetterSpacing="1.5"
-                               VerticalAlignment="Center" />
-                </StackPanel>
-            </StackPanel>
             <ItemsControl ItemsSource="{Binding AmpControls}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -40,7 +29,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
             <views:PanelView DataContext="{Binding Panel}" />
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                 <StackPanel Spacing="4">
                     <TextBlock Text="AMP TYPE" FontSize="10" FontWeight="SemiBold"
                                Foreground="{StaticResource KatanaSubtleTextBrush}" />
@@ -48,7 +37,13 @@
                               ItemsSource="{x:Static vm:AmpEditorViewModel.AmpTypeOptions}"
                               SelectedItem="{Binding SelectedAmpType}" />
                 </StackPanel>
-                <StackPanel Grid.Column="1" Spacing="4">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Bottom">
+                    <ToggleButton IsChecked="{Binding IsAmpVariation}"
+                                  Classes="effect-toggle"
+                                  Content="VARIATION"
+                                  ToolTip.Tip="Amp Variation (TYPE 1 / TYPE 2)" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="4">
                     <TextBlock Text="CABINET" FontSize="10" FontWeight="SemiBold"
                                Foreground="{StaticResource KatanaSubtleTextBrush}" />
                     <ComboBox Classes="midi-port-picker" HorizontalAlignment="Stretch"
@@ -56,15 +51,7 @@
                               SelectedItem="{Binding SelectedCabinetResonance}" />
                 </StackPanel>
             </Grid>
-            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <TextBlock Text="VARIATION" FontSize="10" FontWeight="SemiBold"
-                           Foreground="{StaticResource KatanaSubtleTextBrush}"
-                           VerticalAlignment="Center" />
-                <ToggleButton IsChecked="{Binding IsAmpVariation}"
-                              Classes="effect-toggle"
-                              Content="TYPE 2"
-                              ToolTip.Tip="Amp Variation (TYPE 1 / TYPE 2)" />
-            </StackPanel>
+
         </StackPanel>
     </Border>
 </UserControl>

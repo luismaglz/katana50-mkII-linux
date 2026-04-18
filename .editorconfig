@@ -13,6 +13,13 @@ charset = utf-8
 [*.{xml,json,csproj,sln,props,targets}]
 indent_size = 2
 
+# Avalonia/XAML files
+[*.{axaml,xaml}]
+indent_size = 4
+resharper_xml_attribute_wrap = always
+resharper_xml_attribute_alignment_mode = align_on_first_attribute
+resharper_xml_space_before_self_closing = true
+
 # C# files
 [*.cs]
 
