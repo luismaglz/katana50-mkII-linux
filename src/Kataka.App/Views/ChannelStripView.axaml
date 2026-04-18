@@ -9,6 +9,7 @@
              d:DataContext="{x:Static dvm:DesignMainWindowViewModel.Instance}"
              x:Class="Kataka.App.Views.ChannelStripView"
              x:DataType="vm:MainWindowViewModel"
+             x:CompileBindings="False"
              x:Name="RootControl">
 
     <Border Classes="panel-section alt" Padding="16">
@@ -48,7 +49,7 @@
                         <ToggleButton Classes="channel-button"
                                       Content="{Binding DisplayName}"
                                       IsChecked="{Binding IsSelected}"
-                                      Command="{Binding #RootControl.DataContext.AmpEditor.SelectPanelChannelCommand}"
+                                      Command="{Binding SelectCommand}"
                                       CommandParameter="{Binding DisplayName}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

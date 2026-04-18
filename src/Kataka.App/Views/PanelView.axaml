@@ -8,7 +8,8 @@
              mc:Ignorable="d" d:DesignWidth="1800" d:DesignHeight="450"
              d:DataContext="{x:Static dvm:DesignPanelViewModel.Instance}"
              x:Class="Kataka.App.Views.PanelView"
-             x:DataType="vm:PanelViewModel">
+             x:DataType="vm:PanelViewModel"
+             x:CompileBindings="False">
     <UserControl.Resources>
         <DataTemplate x:Key="AmpControlTemplate" x:DataType="vm:AmpControlViewModel">
             <controls:RotaryKnobV2 Label="{Binding DisplayName}"

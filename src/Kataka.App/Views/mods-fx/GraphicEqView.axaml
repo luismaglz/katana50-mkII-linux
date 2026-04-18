@@ -8,7 +8,8 @@
              mc:Ignorable="d"
              d:DataContext="{x:Static dvm:DesignModFxPedalViewModel.Instance}"
              x:Class="Kataka.App.Views.ModsFx.GraphicEqView"
-             x:DataType="vm:ModFxPedalViewModel">
+             x:DataType="vm:ModFxPedalViewModel"
+             x:CompileBindings="False">
     <!-- Bands 0–40, centre 20 = 0 dB.  Sliders show offset (+/-20). -->
     <StackPanel Spacing="4">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="2">

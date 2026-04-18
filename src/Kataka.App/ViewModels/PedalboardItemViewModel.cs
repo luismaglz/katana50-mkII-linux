@@ -34,11 +34,11 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
     public bool IsDelay2 => Family is "delay2";
     public bool IsReverb => Family is "reverb";
 
-    // Typed ViewModel accessors — each pedal view's DataContext is bound to its specific type.
-    public BoosterPedalViewModel? BoosterPedal => PanelEffect as BoosterPedalViewModel;
-    public ModFxPedalViewModel? ModFxPedal => PanelEffect as ModFxPedalViewModel;
-    public DelayPedalViewModel? DelayPedal => PanelEffect as DelayPedalViewModel;
-    public ReverbPedalViewModel? ReverbPedal => PanelEffect as ReverbPedalViewModel;
+    // Typed ViewModel accessors — only accessed when the corresponding IsXxx guard is true.
+    public BoosterPedalViewModel BoosterPedal => (PanelEffect as BoosterPedalViewModel)!;
+    public ModFxPedalViewModel ModFxPedal => (PanelEffect as ModFxPedalViewModel)!;
+    public DelayPedalViewModel DelayPedal => (PanelEffect as DelayPedalViewModel)!;
+    public ReverbPedalViewModel ReverbPedal => (PanelEffect as ReverbPedalViewModel)!;
 
     // Visual family: "boost", "mod", "fx", "delay", "delay2", "reverb", "amp", "io"
     public string Family { get; init; } = "io";

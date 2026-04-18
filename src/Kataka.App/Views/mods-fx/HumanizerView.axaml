@@ -8,7 +8,8 @@
              mc:Ignorable="d"
              d:DataContext="{x:Static dvm:DesignModFxPedalViewModel.Instance}"
              x:Class="Kataka.App.Views.ModsFx.HumanizerView"
-             x:DataType="vm:ModFxPedalViewModel">
+             x:DataType="vm:ModFxPedalViewModel"
+             x:CompileBindings="False">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnob Scale="0.75" Label="MODE"

@@ -11,7 +11,8 @@
              d:DesignHeight="420"
              d:DataContext="{x:Static dvm:DesignModFxPedalViewModel.Instance}"
              x:Class="Kataka.App.Views.ModFxPedalView"
-             x:DataType="vm:ModFxPedalViewModel">
+             x:DataType="vm:ModFxPedalViewModel"
+             x:CompileBindings="False">
 
     <Border MinWidth="200" CornerRadius="8" VerticalAlignment="Top">
         <Border.Background>

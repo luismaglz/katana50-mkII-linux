@@ -10,7 +10,8 @@
              d:DesignHeight="520"
              d:DataContext="{x:Static dvm:DesignDelayPedalViewModel.Instance}"
              x:Class="Kataka.App.Views.DelayPedalView"
-             x:DataType="vm:DelayPedalViewModel">
+             x:DataType="vm:DelayPedalViewModel"
+             x:CompileBindings="False">
 
     <Border MinWidth="160" CornerRadius="8" VerticalAlignment="Top">
         <Border.Background>

@@ -10,7 +10,8 @@
              d:DesignHeight="440"
              d:DataContext="{x:Static dvm:DesignBoosterPedalViewModel.Instance}"
              x:Class="Kataka.App.Views.BoosterPedalView"
-             x:DataType="vm:BoosterPedalViewModel">
+             x:DataType="vm:BoosterPedalViewModel"
+             x:CompileBindings="False">
 
     <Border MinWidth="160" CornerRadius="8" VerticalAlignment="Top">
         <Border.Background>

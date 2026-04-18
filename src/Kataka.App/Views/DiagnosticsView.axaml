@@ -7,7 +7,8 @@
              mc:Ignorable="d"
              d:DataContext="{x:Static dvm:DesignDiagnosticsViewModel.Instance}"
              x:Class="Kataka.App.Views.DiagnosticsView"
-             x:DataType="vm:DiagnosticsViewModel">
+             x:DataType="vm:DiagnosticsViewModel"
+             x:CompileBindings="False">
 
     <Border Classes="transport-shell" Padding="18">
         <Grid RowDefinitions="Auto,*" RowSpacing="12">

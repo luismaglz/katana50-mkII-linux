@@ -7,7 +7,8 @@
              mc:Ignorable="d"
              d:DataContext="{x:Static dvm:DesignMainWindowViewModel.Instance}"
              x:Class="Kataka.App.Views.DeviceStatusView"
-             x:DataType="vm:MainWindowViewModel">
+             x:DataType="vm:MainWindowViewModel"
+             x:CompileBindings="False">
 
     <StackPanel Spacing="14">
         <Border Classes="panel-section alt" Padding="16">
