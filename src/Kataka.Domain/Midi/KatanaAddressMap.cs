@@ -281,7 +281,455 @@ public static class KatanaAddressMap
         public const uint Type      = 0x00;
         public const uint FreqShift = 0x01;
     }
+    // prm_prop_sys_power_adjust
+    public static class SysPowerAdjustParams
+    {
+        public const uint SysHalfPowerAdjustEditor = 0x00000000;
+    }
 
+    // prm_prop_sys_lineout_custom
+    public static class SysLineoutCustomParams
+    {
+        public const uint SysLineoutCustomSw = 0x00000000;
+        public const uint SysLineoutCustomSelect = 0x00000001;
+    }
+
+    // prm_prop_sys_lineout_custom_setting
+    public static class SysLineoutCustomSettingParams
+    {
+        public const uint SysLineoutM1MicType = 0x00000000;
+        public const uint SysLineoutM1MicDistance = 0x00000001;
+        public const uint SysLineoutM1MicPosition = 0x00000002;
+    }
+
+    // prm_prop_sys_gafc_function
+    public static class SysGafcFunctionParams
+    {
+        public const uint SysGafcFuncSw1 = 0x00000000;
+        public const uint SysGafcFuncSw2 = 0x00000001;
+        public const uint SysGafcFuncSw3 = 0x00000002;
+        public const uint SysGafcFuncSw4 = 0x00000003;
+        public const uint SysGafcFuncSw5 = 0x00000004;
+    }
+
+    // prm_prop_patch_eq2
+    public static class PatchEq2Params
+    {
+        public const uint EqSw = 0x00000000;
+        public const uint EqType = 0x00000001;
+        public const uint EqLowCut = 0x00000002;
+        public const uint EqLowGain = 0x00000003;
+        public const uint EqLowmidFreq = 0x00000004;
+        public const uint EqLowmidQ = 0x00000005;
+        public const uint EqLowmidGain = 0x00000006;
+        public const uint EqHighmidFreq = 0x00000007;
+        public const uint EqHighmidQ = 0x00000008;
+        public const uint EqHighmidGain = 0x00000009;
+        public const uint EqHighGain = 0x0000000a;
+        public const uint EqHighCut = 0x0000000b;
+        public const uint EqLevel = 0x0000000c;
+        public const uint EqGeqBand1 = 0x0000000d;
+        public const uint EqGeqBand2 = 0x0000000e;
+        public const uint EqGeqBand3 = 0x0000000f;
+        public const uint EqGeqBand4 = 0x00000010;
+        public const uint EqGeqBand5 = 0x00000011;
+        public const uint EqGeqBand6 = 0x00000012;
+        public const uint EqGeqBand7 = 0x00000013;
+        public const uint EqGeqBand8 = 0x00000014;
+        public const uint EqGeqBand9 = 0x00000015;
+        public const uint EqGeqBand10 = 0x00000016;
+        public const uint EqGeqLevel = 0x00000017;
+    }
+
+    // prm_prop_patch_fx
+    public static class PatchFxParams
+    {
+        public const uint Fx1Sw = 0x00000000;
+        public const uint Fx1Fxtype = 0x00000001;
+        public const uint Fx1TwahMode = 0x00000002;
+        public const uint Fx1TwahPolarity = 0x00000003;
+        public const uint Fx1TwahSens = 0x00000004;
+        public const uint Fx1TwahFreq = 0x00000005;
+        public const uint Fx1TwahPeak = 0x00000006;
+        public const uint Fx1TwahDLevel = 0x00000007;
+        public const uint Fx1TwahLevel = 0x00000008;
+        public const uint Fx1AwahMode = 0x00000009;
+        public const uint Fx1AwahFreq = 0x0000000a;
+        public const uint Fx1AwahPeak = 0x0000000b;
+        public const uint Fx1AwahRate = 0x0000000c;
+        public const uint Fx1AwahDepth = 0x0000000d;
+        public const uint Fx1AwahDLevel = 0x0000000e;
+        public const uint Fx1AwahLevel = 0x0000000f;
+        public const uint Fx1SubwahType = 0x00000010;
+        public const uint Fx1SubwahPdlpos = 0x00000011;
+        public const uint Fx1SubwahMin = 0x00000012;
+        public const uint Fx1SubwahMax = 0x00000013;
+        public const uint Fx1SubwahELevel = 0x00000014;
+        public const uint Fx1SubwahDLevel = 0x00000015;
+        public const uint Fx1AdcompType = 0x00000016;
+        public const uint Fx1AdcompSustain = 0x00000017;
+        public const uint Fx1AdcompAttack = 0x00000018;
+        public const uint Fx1AdcompTone = 0x00000019;
+        public const uint Fx1AdcompLevel = 0x0000001a;
+        public const uint Fx1LimiterType = 0x0000001b;
+        public const uint Fx1LimiterAttack = 0x0000001c;
+        public const uint Fx1LimiterThreshold = 0x0000001d;
+        public const uint Fx1LimiterRatio = 0x0000001e;
+        public const uint Fx1LimiterRelease = 0x0000001f;
+        public const uint Fx1LimiterLevel = 0x00000020;
+        public const uint Fx1GeqBand1 = 0x00000021;
+        public const uint Fx1GeqBand2 = 0x00000022;
+        public const uint Fx1GeqBand3 = 0x00000023;
+        public const uint Fx1GeqBand4 = 0x00000024;
+        public const uint Fx1GeqBand5 = 0x00000025;
+        public const uint Fx1GeqBand6 = 0x00000026;
+        public const uint Fx1GeqBand7 = 0x00000027;
+        public const uint Fx1GeqBand8 = 0x00000028;
+        public const uint Fx1GeqBand9 = 0x00000029;
+        public const uint Fx1GeqBand10 = 0x0000002a;
+        public const uint Fx1GeqLevel = 0x0000002b;
+        public const uint Fx1PeqLowCut = 0x0000002c;
+        public const uint Fx1PeqLowGain = 0x0000002d;
+        public const uint Fx1PeqLowmidFreq = 0x0000002e;
+        public const uint Fx1PeqLowmidQ = 0x0000002f;
+        public const uint Fx1PeqLowmidGain = 0x00000030;
+        public const uint Fx1PeqHighmidFreq = 0x00000031;
+        public const uint Fx1PeqHighmidQ = 0x00000032;
+        public const uint Fx1PeqHighmidGain = 0x00000033;
+        public const uint Fx1PeqHighGain = 0x00000034;
+        public const uint Fx1PeqHighCut = 0x00000035;
+        public const uint Fx1PeqLevel = 0x00000036;
+        public const uint Fx1GtrsimType = 0x00000037;
+        public const uint Fx1GtrsimLow = 0x00000038;
+        public const uint Fx1GtrsimHigh = 0x00000039;
+        public const uint Fx1GtrsimLevel = 0x0000003a;
+        public const uint Fx1GtrsimBody = 0x0000003b;
+        public const uint Fx1SlowgearSens = 0x0000003c;
+        public const uint Fx1SlowgearRisetime = 0x0000003d;
+        public const uint Fx1SlowgearLevel = 0x0000003e;
+        public const uint Fx1WavesynWave = 0x0000003f;
+        public const uint Fx1WavesynCutoff = 0x00000040;
+        public const uint Fx1WavesynResonance = 0x00000041;
+        public const uint Fx1WavesynFltSens = 0x00000042;
+        public const uint Fx1WavesynFltDecay = 0x00000043;
+        public const uint Fx1WavesynFltDepth = 0x00000044;
+        public const uint Fx1WavesynSynLevel = 0x00000045;
+        public const uint Fx1WavesynDLevel = 0x00000046;
+        public const uint Fx1OctaveRange = 0x00000047;
+        public const uint Fx1OctaveLevel = 0x00000048;
+        public const uint Fx1OctaveDLevel = 0x00000049;
+        public const uint Fx1PitchshiftVoice = 0x0000004a;
+        public const uint Fx1PitchshiftMode1 = 0x0000004b;
+        public const uint Fx1PitchshiftPitch1 = 0x0000004c;
+        public const uint Fx1PitchshiftFine1 = 0x0000004d;
+        public const uint Fx1PitchshiftPredelay1 = 0x0000004e;
+        public const uint Fx1PitchshiftLevel1 = 0x00000050;
+        public const uint Fx1PitchshiftMode2 = 0x00000051;
+        public const uint Fx1PitchshiftPitch2 = 0x00000052;
+        public const uint Fx1PitchshiftFine2 = 0x00000053;
+        public const uint Fx1PitchshiftPredelay2 = 0x00000054;
+        public const uint Fx1PitchshiftLevel2 = 0x00000056;
+        public const uint Fx1PitchshiftFeedback = 0x00000057;
+        public const uint Fx1PitchshiftDLevel = 0x00000058;
+        public const uint Fx1HarmonistVoice = 0x00000059;
+        public const uint Fx1HarmonistHarmony1 = 0x0000005a;
+        public const uint Fx1HarmonistPredelay1 = 0x0000005b;
+        public const uint Fx1HarmonistLevel1 = 0x0000005d;
+        public const uint Fx1HarmonistHarmony2 = 0x0000005e;
+        public const uint Fx1HarmonistPredelay2 = 0x0000005f;
+        public const uint Fx1HarmonistLevel2 = 0x00000061;
+        public const uint Fx1HarmonistFeedback = 0x00000062;
+        public const uint Fx1HarmonistDLevel = 0x00000063;
+        public const uint Fx1HarmonistV1Harm1 = 0x00000064;
+        public const uint Fx1HarmonistV1Harm2 = 0x00000065;
+        public const uint Fx1HarmonistV1Harm3 = 0x00000066;
+        public const uint Fx1HarmonistV1Harm4 = 0x00000067;
+        public const uint Fx1HarmonistV1Harm5 = 0x00000068;
+        public const uint Fx1HarmonistV1Harm6 = 0x00000069;
+        public const uint Fx1HarmonistV1Harm7 = 0x0000006a;
+        public const uint Fx1HarmonistV1Harm8 = 0x0000006b;
+        public const uint Fx1HarmonistV1Harm9 = 0x0000006c;
+        public const uint Fx1HarmonistV1Harm10 = 0x0000006d;
+        public const uint Fx1HarmonistV1Harm11 = 0x0000006e;
+        public const uint Fx1HarmonistV1Harm12 = 0x0000006f;
+        public const uint Fx1HarmonistV2Harm1 = 0x00000070;
+        public const uint Fx1HarmonistV2Harm2 = 0x00000071;
+        public const uint Fx1HarmonistV2Harm3 = 0x00000072;
+        public const uint Fx1HarmonistV2Harm4 = 0x00000073;
+        public const uint Fx1HarmonistV2Harm5 = 0x00000074;
+        public const uint Fx1HarmonistV2Harm6 = 0x00000075;
+        public const uint Fx1HarmonistV2Harm7 = 0x00000076;
+        public const uint Fx1HarmonistV2Harm8 = 0x00000077;
+        public const uint Fx1HarmonistV2Harm9 = 0x00000078;
+        public const uint Fx1HarmonistV2Harm10 = 0x00000079;
+        public const uint Fx1HarmonistV2Harm11 = 0x0000007a;
+        public const uint Fx1HarmonistV2Harm12 = 0x0000007b;
+        public const uint Fx1AcprocessType = 0x0000007c;
+        public const uint Fx1AcprocessBass = 0x0000007d;
+        public const uint Fx1AcprocessMid = 0x0000007e;
+        public const uint Fx1AcprocessMidF = 0x0000007f;
+        public const uint Fx1AcprocessTreble = 0x00000100;
+        public const uint Fx1AcprocessPresence = 0x00000101;
+        public const uint Fx1AcprocessLevel = 0x00000102;
+        public const uint Fx1PhaserType = 0x00000103;
+        public const uint Fx1PhaserRate = 0x00000104;
+        public const uint Fx1PhaserDepth = 0x00000105;
+        public const uint Fx1PhaserManual = 0x00000106;
+        public const uint Fx1PhaserResonance = 0x00000107;
+        public const uint Fx1PhaserSteprate = 0x00000108;
+        public const uint Fx1PhaserELevel = 0x00000109;
+        public const uint Fx1PhaserDLevel = 0x0000010a;
+        public const uint Fx1FlangerRate = 0x0000010b;
+        public const uint Fx1FlangerDepth = 0x0000010c;
+        public const uint Fx1FlangerManual = 0x0000010d;
+        public const uint Fx1FlangerResonance = 0x0000010e;
+        public const uint Addr_0000010f = 0x0000010f;
+        public const uint Fx1FlangerLowcut = 0x00000110;
+        public const uint Fx1FlangerELevel = 0x00000111;
+        public const uint Fx1FlangerDLevel = 0x00000112;
+        public const uint Fx1TremoloWaveshape = 0x00000113;
+        public const uint Fx1TremoloRate = 0x00000114;
+        public const uint Fx1TremoloDepth = 0x00000115;
+        public const uint Fx1TremoloLevel = 0x00000116;
+        public const uint Addr_00000117 = 0x00000117;
+        public const uint Addr_00000118 = 0x00000118;
+        public const uint Fx1RotaryRateFast = 0x00000119;
+        public const uint Addr_0000011a = 0x0000011a;
+        public const uint Addr_0000011b = 0x0000011b;
+        public const uint Fx1RotaryDepth = 0x0000011c;
+        public const uint Fx1RotaryLevel = 0x0000011d;
+        public const uint Fx1UniVRate = 0x0000011e;
+        public const uint Fx1UniVDepth = 0x0000011f;
+        public const uint Fx1UniVLevel = 0x00000120;
+        public const uint Fx1SlicerPattern = 0x00000121;
+        public const uint Fx1SlicerRate = 0x00000122;
+        public const uint Fx1SlicerTrigsens = 0x00000123;
+        public const uint Fx1SlicerEffectLevel = 0x00000124;
+        public const uint Fx1SlicerDirectLevel = 0x00000125;
+        public const uint Fx1VibratoRate = 0x00000126;
+        public const uint Fx1VibratoDepth = 0x00000127;
+        public const uint Addr_00000128 = 0x00000128;
+        public const uint Addr_00000129 = 0x00000129;
+        public const uint Fx1VibratoLevel = 0x0000012a;
+        public const uint Fx1RingmodMode = 0x0000012b;
+        public const uint Fx1RingmodFreq = 0x0000012c;
+        public const uint Fx1RingmodELevel = 0x0000012d;
+        public const uint Fx1RingmodDLevel = 0x0000012e;
+        public const uint Fx1HumanizerMode = 0x0000012f;
+        public const uint Fx1HumanizerVowel1 = 0x00000130;
+        public const uint Fx1HumanizerVowel2 = 0x00000131;
+        public const uint Fx1HumanizerSens = 0x00000132;
+        public const uint Fx1HumanizerRate = 0x00000133;
+        public const uint Fx1HumanizerDepth = 0x00000134;
+        public const uint Fx1HumanizerManual = 0x00000135;
+        public const uint Fx1HumanizerLevel = 0x00000136;
+        public const uint Fx12 = 0x00000137;
+        public const uint Fx12_00000138_1 = 0x00000138;
+        public const uint Fx12_00000139_1 = 0x00000139;
+        public const uint Fx12_0000013a_1 = 0x0000013a;
+        public const uint Fx12_0000013b_1 = 0x0000013b;
+        public const uint Fx12_0000013c_1 = 0x0000013c;
+        public const uint Fx12_0000013d_1 = 0x0000013d;
+        public const uint Fx12_0000013e_1 = 0x0000013e;
+        public const uint Fx12_0000013f_1 = 0x0000013f;
+        public const uint Fx12_00000140_1 = 0x00000140;
+        public const uint Fx1AcsimTop = 0x00000141;
+        public const uint Fx1AcsimBody = 0x00000142;
+        public const uint Fx1AcsimLow = 0x00000143;
+        public const uint Addr_00000144 = 0x00000144;
+        public const uint Fx1AcsimLevel = 0x00000145;
+        public const uint Fx1EvhPhaserScript = 0x00000146;
+        public const uint Fx1EvhPhaserSpeed = 0x00000147;
+        public const uint Fx1EvhFlangerManual = 0x00000148;
+        public const uint Fx1EvhFlangerWidth = 0x00000149;
+        public const uint Fx1EvhFlangerSpeed = 0x0000014a;
+        public const uint Fx1EvhFlangerRegen = 0x0000014b;
+        public const uint Fx1EvhWahPedalPos = 0x0000014c;
+        public const uint Fx1EvhWahPedalMin = 0x0000014d;
+        public const uint Fx1EvhWahPedalMax = 0x0000014e;
+        public const uint Fx1EvhWahEffectLevel = 0x0000014f;
+        public const uint Fx1EvhWahDirectMix = 0x00000150;
+        public const uint Fx1Dc30Selector = 0x00000151;
+        public const uint Fx1Dc30InputVolume = 0x00000152;
+        public const uint Fx1Dc30ChorusIntensity = 0x00000153;
+        public const uint Fx1Dc30EchoRepeatRate = 0x00000154;
+        public const uint Fx1Dc30EchoIntensity = 0x00000156;
+        public const uint Fx1Dc30EchoVolume = 0x00000157;
+        public const uint Fx1Dc30Tone = 0x00000158;
+        public const uint Fx1Dc30Output = 0x00000159;
+        public const uint Fx1HeavyOctave1octLevel = 0x0000015a;
+        public const uint Fx1HeavyOctave2octLevel = 0x0000015b;
+        public const uint Fx1HeavyOctaveDirectLevel = 0x0000015c;
+        public const uint Fx1PedalBendPitchMax = 0x0000015d;
+        public const uint Fx1PedalBendPedalPosition = 0x0000015e;
+        public const uint Fx1PedalBendEffectLevel = 0x0000015f;
+        public const uint Fx1PedalBendDirectMix = 0x00000160;
+    }
+
+    // prm_prop_patch_assign
+    public static class PatchAssignParams
+    {
+        public const uint KnobAssignBooster = 0x00000000;
+        public const uint KnobAssignDelay = 0x00000001;
+        public const uint KnobAssignReverb = 0x00000002;
+        public const uint KnobAssignChorus = 0x00000003;
+        public const uint KnobAssignFlanger = 0x00000004;
+        public const uint KnobAssignPhaser = 0x00000005;
+        public const uint KnobAssignUniV = 0x00000006;
+        public const uint KnobAssignTremolo = 0x00000007;
+        public const uint KnobAssignVibrato = 0x00000008;
+        public const uint KnobAssignRotary = 0x00000009;
+        public const uint KnobAssignRingMod = 0x0000000a;
+        public const uint KnobAssignSlowGear = 0x0000000b;
+        public const uint KnobAssignSlicer = 0x0000000c;
+        public const uint KnobAssignComp = 0x0000000d;
+        public const uint KnobAssignLimiter = 0x0000000e;
+        public const uint KnobAssignTWah = 0x0000000f;
+        public const uint KnobAssignAutoWah = 0x00000010;
+        public const uint KnobAssignPedalWah = 0x00000011;
+        public const uint KnobAssignGeq = 0x00000012;
+        public const uint KnobAssignPeq = 0x00000013;
+        public const uint KnobAssignGuitarSim = 0x00000014;
+        public const uint KnobAssignAcGuitarSim = 0x00000015;
+        public const uint KnobAssignAcProcessor = 0x00000016;
+        public const uint KnobAssignWaveSynth = 0x00000017;
+        public const uint KnobAssignOctave = 0x00000018;
+        public const uint KnobAssignPitchShifter = 0x00000019;
+        public const uint KnobAssignHarmonist = 0x0000001a;
+        public const uint KnobAssignHumanizer = 0x0000001b;
+        public const uint KnobAssignEvhPhaser = 0x0000001c;
+        public const uint KnobAssignEvhFlanger = 0x0000001d;
+        public const uint KnobAssignEvhWah = 0x0000001e;
+        public const uint KnobAssignDc30 = 0x0000001f;
+        public const uint KnobAssignHeavyOct = 0x00000020;
+        public const uint KnobAssignPedalBend = 0x00000021;
+    }
+
+    // prm_prop_patch_assign_minmax
+    public static class PatchAssignMinmaxParams
+    {
+        public const uint ExpPedalAssignBoosterMin = 0x00000000;
+        public const uint ExpPedalAssignBoosterMax = 0x00000001;
+        public const uint ExpPedalAssignDelayMin = 0x00000002;
+        public const uint ExpPedalAssignDelayMax = 0x00000004;
+        public const uint ExpPedalAssignReverbMin = 0x00000006;
+        public const uint ExpPedalAssignReverbMax = 0x00000008;
+        public const uint ExpPedalAssignChorusMin = 0x0000000a;
+        public const uint ExpPedalAssignChorusMax = 0x0000000b;
+        public const uint ExpPedalAssignFlangerMin = 0x0000000c;
+        public const uint ExpPedalAssignFlangerMax = 0x0000000d;
+        public const uint ExpPedalAssignPhaserMin = 0x0000000e;
+        public const uint ExpPedalAssignPhaserMax = 0x0000000f;
+        public const uint ExpPedalAssignUniVMin = 0x00000010;
+        public const uint ExpPedalAssignUniVMax = 0x00000011;
+        public const uint ExpPedalAssignTremoloMin = 0x00000012;
+        public const uint ExpPedalAssignTremoloMax = 0x00000013;
+        public const uint ExpPedalAssignVibratoMin = 0x00000014;
+        public const uint ExpPedalAssignVibratoMax = 0x00000015;
+        public const uint ExpPedalAssignRotaryMin = 0x00000016;
+        public const uint ExpPedalAssignRotaryMax = 0x00000017;
+        public const uint ExpPedalAssignRingModMin = 0x00000018;
+        public const uint ExpPedalAssignRingModMax = 0x00000019;
+        public const uint ExpPedalAssignSlowGearMin = 0x0000001a;
+        public const uint ExpPedalAssignSlowGearMax = 0x0000001b;
+        public const uint ExpPedalAssignSlicerMin = 0x0000001c;
+        public const uint ExpPedalAssignSlicerMax = 0x0000001d;
+        public const uint ExpPedalAssignCompMin = 0x0000001e;
+        public const uint ExpPedalAssignCompMax = 0x0000001f;
+        public const uint ExpPedalAssignLimiterMin = 0x00000020;
+        public const uint ExpPedalAssignLimiterMax = 0x00000021;
+        public const uint ExpPedalAssignTWahMin = 0x00000022;
+        public const uint ExpPedalAssignTWahMax = 0x00000023;
+        public const uint ExpPedalAssignAutoWahMin = 0x00000024;
+        public const uint ExpPedalAssignAutoWahMax = 0x00000025;
+        public const uint ExpPedalAssignPedalWahMin = 0x00000026;
+        public const uint ExpPedalAssignPedalWahMax = 0x00000027;
+        public const uint ExpPedalAssignGeqMin = 0x00000028;
+        public const uint ExpPedalAssignGeqMax = 0x00000029;
+        public const uint ExpPedalAssignPeqMin = 0x0000002a;
+        public const uint ExpPedalAssignPeqMax = 0x0000002b;
+        public const uint ExpPedalAssignGuitarSimMin = 0x0000002c;
+        public const uint ExpPedalAssignGuitarSimMax = 0x0000002d;
+        public const uint ExpPedalAssignAcGuitarSimMin = 0x0000002e;
+        public const uint ExpPedalAssignAcGuitarSimMax = 0x0000002f;
+        public const uint ExpPedalAssignAcProcessorMin = 0x00000030;
+        public const uint ExpPedalAssignAcProcessorMax = 0x00000031;
+        public const uint ExpPedalAssignWaveSynthMin = 0x00000032;
+        public const uint ExpPedalAssignWaveSynthMax = 0x00000033;
+        public const uint ExpPedalAssignOctaveMin = 0x00000034;
+        public const uint ExpPedalAssignOctaveMax = 0x00000035;
+        public const uint ExpPedalAssignPitchShifterMin = 0x00000036;
+        public const uint ExpPedalAssignPitchShifterMax = 0x00000038;
+        public const uint ExpPedalAssignHarmonistMin = 0x0000003a;
+        public const uint ExpPedalAssignHarmonistMax = 0x0000003c;
+        public const uint ExpPedalAssignHumanizerMin = 0x0000003e;
+        public const uint ExpPedalAssignHumanizerMax = 0x0000003f;
+        public const uint ExpPedalAssignEvhPhaserMin = 0x00000040;
+        public const uint ExpPedalAssignEvhPhaserMax = 0x00000041;
+        public const uint ExpPedalAssignEvhFlangerMin = 0x00000042;
+        public const uint ExpPedalAssignEvhFlangerMax = 0x00000043;
+        public const uint ExpPedalAssignEvhWahMin = 0x00000044;
+        public const uint ExpPedalAssignEvhWahMax = 0x00000045;
+        public const uint ExpPedalAssignDc30Min = 0x00000046;
+        public const uint ExpPedalAssignDc30Max = 0x00000048;
+        public const uint ExpPedalAssignHeavyOctMin = 0x0000004a;
+        public const uint ExpPedalAssignHeavyOctMax = 0x0000004b;
+        public const uint ExpPedalAssignPedalBendMin = 0x0000004c;
+        public const uint ExpPedalAssignPedalBendMax = 0x0000004d;
+    }
+
+    // prm_prop_patch_ctrl_assign
+    public static class PatchCtrlAssignParams
+    {
+        public const uint PedalFunctionGafcExp3 = 0x00000000;
+        public const uint PedalFunctionGafcExExp1 = 0x00000001;
+        public const uint PedalFunctionGafcExExp2 = 0x00000002;
+        public const uint PedalFunctionGafcExExp3 = 0x00000003;
+        public const uint FsFunctionGafcFs3 = 0x00000004;
+        public const uint FsFunctionGafcExFs1 = 0x00000005;
+        public const uint FsFunctionGafcExFs2 = 0x00000006;
+        public const uint FsFunctionGafcExFs3 = 0x00000007;
+    }
+
+    // prm_prop_patch_fs_assign
+    public static class PatchFsAssignParams
+    {
+        public const uint FsFunctionFs1Tip = 0x00000000;
+        public const uint FsFunctionFs1Ring = 0x00000001;
+    }
+
+    // prm_prop_mk2_v2
+    public static class Mk2V2Params
+    {
+        public const uint PositionSoloEq = 0x00000000;
+        public const uint SoloEqSw = 0x00000001;
+        public const uint SoloEqLowCut = 0x00000002;
+        public const uint SoloEqLowGain = 0x00000003;
+        public const uint SoloEqMidFreq = 0x00000004;
+        public const uint SoloEqMidQ = 0x00000005;
+        public const uint SoloEqMidGain = 0x00000006;
+        public const uint SoloEqHighGain = 0x00000007;
+        public const uint SoloEqHighCut = 0x00000008;
+        public const uint SoloEqLevel = 0x00000009;
+        public const uint SoloDelaySw = 0x0000000a;
+        public const uint SoloDelayCarryover = 0x0000000b;
+        public const uint SoloDelayTime = 0x0000000c;
+        public const uint SoloDelayFeedback = 0x0000000e;
+        public const uint SoloDelayEffectLevel = 0x0000000f;
+        public const uint SoloDelayDirectLevel = 0x00000010;
+        public const uint SoloDelayFilter = 0x00000011;
+        public const uint SoloDelayHighCut = 0x00000012;
+        public const uint SoloDelayModSw = 0x00000013;
+        public const uint SoloDelayModRate = 0x00000014;
+        public const uint SoloDelayModDepth = 0x00000015;
+    }
+
+    // prm_prop_status
+    public static class StatusParams
+    {
+        public const uint ExpPedalAssignBoosterMin = 0x00000000;
+        public const uint V = 0x00000001;
+    }
     // ── Address computation helper ──────────────────────────────────────────────
     /// <summary>
     /// Computes the 4-byte Roland SysEx address from the three address components.
