@@ -4,8 +4,5 @@ namespace Kataka.App.Views.ModsFx;
 
 public partial class WaveSynthView : UserControl
 {
-    public WaveSynthView()
-    {
-        InitializeComponent();
-    }
+    public WaveSynthView() => InitializeComponent();
 }

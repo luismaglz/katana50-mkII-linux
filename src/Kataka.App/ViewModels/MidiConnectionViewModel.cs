@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 
 using CommunityToolkit.Mvvm.Input;
 
@@ -19,12 +15,12 @@ namespace Kataka.App.ViewModels;
 
 public partial class MidiConnectionViewModel : ViewModelBase
 {
-    private readonly IKatanaSession _katanaSession;
-    private readonly IAmpSyncService _syncService;
     private readonly Action<string> _appendStatus;
-    private readonly ILogger<MidiConnectionViewModel> _logger;
     private readonly Dictionary<string, string> _inputPortIds = [];
+    private readonly IKatanaSession _katanaSession;
+    private readonly ILogger<MidiConnectionViewModel> _logger;
     private readonly Dictionary<string, string> _outputPortIds = [];
+    private readonly IAmpSyncService _syncService;
 
     public MidiConnectionViewModel(
         IKatanaSession katanaSession,
@@ -108,7 +104,8 @@ public partial class MidiConnectionViewModel : ViewModelBase
             }
 
             DetectionMessage = "No Katana MIDI port pair was detected.";
-            _appendStatus($"Scan complete. Found {InputPorts.Count} input port(s) and {OutputPorts.Count} output port(s).");
+            _appendStatus(
+                $"Scan complete. Found {InputPorts.Count} input port(s) and {OutputPorts.Count} output port(s).");
             _logger.LogInformation("No Katana-style port pair found.");
         }
         catch (Exception ex)
@@ -135,7 +132,8 @@ public partial class MidiConnectionViewModel : ViewModelBase
 
         try
         {
-            _logger.LogInformation("Opening input '{Input}' and output '{Output}'.", SelectedInputPort, SelectedOutputPort);
+            _logger.LogInformation("Opening input '{Input}' and output '{Output}'.", SelectedInputPort,
+                SelectedOutputPort);
             if (!_inputPortIds.TryGetValue(SelectedInputPort, out var inputPortId))
                 throw new InvalidOperationException($"Input port '{SelectedInputPort}' is not available.");
             if (!_outputPortIds.TryGetValue(SelectedOutputPort, out var outputPortId))

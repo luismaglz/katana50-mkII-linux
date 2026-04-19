@@ -4,8 +4,5 @@ namespace Kataka.App.Views;
 
 public partial class DeviceStatusView : UserControl
 {
-    public DeviceStatusView()
-    {
-        InitializeComponent();
-    }
+    public DeviceStatusView() => InitializeComponent();
 }

@@ -8,19 +8,63 @@ namespace Kataka.App.Controls;
 
 public static class RuntimePaletteService
 {
-    public static event Action? Changed;
-
     private static Color _accent = KatanaPalette.PrimaryLit;
     private static Color _knobFace = KatanaPalette.KnobBg;
     private static Color _bgBase = KatanaPalette.BgBase;
     private static Color _bgSurface = KatanaPalette.BgSurface;
     private static Color _bgElevated = KatanaPalette.BgElevated;
 
-    public static Color Accent { get => _accent; set { _accent = value; Publish(); } }
-    public static Color KnobFace { get => _knobFace; set { _knobFace = value; Publish(); } }
-    public static Color BgBase { get => _bgBase; set { _bgBase = value; Publish(); } }
-    public static Color BgSurface { get => _bgSurface; set { _bgSurface = value; Publish(); } }
-    public static Color BgElevated { get => _bgElevated; set { _bgElevated = value; Publish(); } }
+    public static Color Accent
+    {
+        get => _accent;
+        set
+        {
+            _accent = value;
+            Publish();
+        }
+    }
+
+    public static Color KnobFace
+    {
+        get => _knobFace;
+        set
+        {
+            _knobFace = value;
+            Publish();
+        }
+    }
+
+    public static Color BgBase
+    {
+        get => _bgBase;
+        set
+        {
+            _bgBase = value;
+            Publish();
+        }
+    }
+
+    public static Color BgSurface
+    {
+        get => _bgSurface;
+        set
+        {
+            _bgSurface = value;
+            Publish();
+        }
+    }
+
+    public static Color BgElevated
+    {
+        get => _bgElevated;
+        set
+        {
+            _bgElevated = value;
+            Publish();
+        }
+    }
+
+    public static event Action? Changed;
 
     private static void Publish()
     {
@@ -29,6 +73,7 @@ public static class RuntimePaletteService
             Dispatcher.UIThread.Post(Publish);
             return;
         }
+
         ApplyToResources();
         Changed?.Invoke();
     }

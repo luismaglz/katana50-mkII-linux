@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using Avalonia.Media;
 
 using Kataka.App.KatanaState;
@@ -11,38 +7,39 @@ using ReactiveUI;
 
 namespace Kataka.App.ViewModels;
 
-public partial class DelayPedalViewModel : PedalViewModel
+public class DelayPedalViewModel : PedalViewModel
 {
     private static readonly IReadOnlyDictionary<byte, string> TypeTable = KatanaTypeNameTables.DelayTypes;
+
     private static readonly IReadOnlyDictionary<string, byte> ReverseTypeTable =
         TypeTable.ToDictionary(kvp => kvp.Value, kvp => kvp.Key, StringComparer.OrdinalIgnoreCase);
 
+    private readonly AmpControlState _delayPhase;
+    private readonly AmpControlState _directMix;
+    private readonly AmpControlState _effectLevel;
+
     // Domain state fields — resolved from KatanaState based on slot
     private readonly AmpControlState _enabledState;
-    private readonly AmpControlState _typeState;
-    private readonly AmpControlState? _variationState;  // null for delay2
-    private readonly AmpControlState? _levelState;      // null for delay2
     private readonly AmpControlState _feedback;
-    private readonly AmpControlState _highCut;
-    private readonly AmpControlState _effectLevel;
-    private readonly AmpControlState _directMix;
-    private readonly AmpControlState _tapTime;
-    private readonly AmpControlState _modRate;
-    private readonly AmpControlState _modDepth;
-    private readonly AmpControlState _range;
-    private readonly AmpControlState _filter;
     private readonly AmpControlState _feedbackPhase;
-    private readonly AmpControlState _delayPhase;
-    private readonly AmpControlState _modSw;
+    private readonly AmpControlState _filter;
 
-    private readonly bool _hasVariation;
+    private readonly AmpControlState _highCut;
+    private readonly AmpControlState? _levelState; // null for delay2
+    private readonly AmpControlState _modDepth;
+    private readonly AmpControlState _modRate;
+    private readonly AmpControlState _modSw;
+    private readonly AmpControlState _range;
+    private readonly AmpControlState _tapTime;
+    private readonly AmpControlState _typeState;
+    private readonly AmpControlState? _variationState; // null for delay2
 
     public DelayPedalViewModel(string slot, IKatanaState katanaState) : base(
         KatanaMkIIParameterCatalog.PanelEffects.First(e => e.Key == slot))
     {
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
 
-        bool isSlot1 = string.Equals(slot, "delay", StringComparison.Ordinal);
+        var isSlot1 = string.Equals(slot, "delay", StringComparison.Ordinal);
         if (isSlot1)
         {
             var s = katanaState.DelayPedal;
@@ -62,7 +59,7 @@ public partial class DelayPedalViewModel : PedalViewModel
             _feedbackPhase = s.FeedbackPhase;
             _delayPhase = s.DelayPhase;
             _modSw = s.ModSw;
-            _hasVariation = true;
+            HasVariation = true;
         }
         else
         {
@@ -83,12 +80,20 @@ public partial class DelayPedalViewModel : PedalViewModel
             _feedbackPhase = s.FeedbackPhase;
             _delayPhase = s.DelayPhase;
             _modSw = s.ModSw;
-            _hasVariation = false;
+            HasVariation = false;
         }
 
         _enabledState.ValueChanged += () => this.RaisePropertyChanged(nameof(IsEnabled));
-        _typeState.ValueChanged += () => { this.RaisePropertyChanged(nameof(SelectedTypeOption)); this.RaisePropertyChanged(nameof(TypeCaption)); };
-        _variationState?.ValueChanged += () => { this.RaisePropertyChanged(nameof(Variation)); this.RaisePropertyChanged(nameof(VariationBrush)); };
+        _typeState.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(SelectedTypeOption));
+            this.RaisePropertyChanged(nameof(TypeCaption));
+        };
+        _variationState?.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(Variation));
+            this.RaisePropertyChanged(nameof(VariationBrush));
+        };
         _feedback.ValueChanged += () => this.RaisePropertyChanged(nameof(Feedback));
         _highCut.ValueChanged += () => this.RaisePropertyChanged(nameof(HighCut));
         _effectLevel.ValueChanged += () => this.RaisePropertyChanged(nameof(EffectLevel));
@@ -105,9 +110,11 @@ public partial class DelayPedalViewModel : PedalViewModel
 
     /// <summary> View-only properties ────────────────────────────────────────────────────── </summary>
     public IReadOnlyList<string> TypeOptions { get; }
+
     public bool HasTypeOptions => TypeOptions.Count > 0;
-    public bool HasVariation => _hasVariation;
-    public IBrush VariationBrush => _hasVariation ? GetVariationBrush(Variation) : OffVariationBrush;
+    public bool HasVariation { get; }
+
+    public IBrush VariationBrush => HasVariation ? GetVariationBrush(Variation) : OffVariationBrush;
 
 
     public override bool IsEnabled

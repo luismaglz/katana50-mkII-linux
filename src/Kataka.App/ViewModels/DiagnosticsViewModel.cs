@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 using CommunityToolkit.Mvvm.Input;
 
 using Kataka.App.Logging;
@@ -12,10 +9,11 @@ namespace Kataka.App.ViewModels;
 
 public partial class DiagnosticsViewModel : ViewModelBase
 {
-    private readonly IAmpSyncService _syncService;
     private readonly Func<bool> _isConnected;
+    private readonly IAmpSyncService _syncService;
 
-    public DiagnosticsViewModel(IAmpSyncService syncService, ObservableLoggerProvider loggerProvider, Func<bool> isConnected)
+    public DiagnosticsViewModel(IAmpSyncService syncService, ObservableLoggerProvider loggerProvider,
+        Func<bool> isConnected)
     {
         _syncService = syncService;
         _isConnected = isConnected;

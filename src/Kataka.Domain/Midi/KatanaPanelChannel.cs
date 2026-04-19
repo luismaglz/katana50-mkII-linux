@@ -7,5 +7,5 @@ public enum KatanaPanelChannel
     ChA1,
     ChA2,
     ChB1,
-    ChB2,
+    ChB2
 }

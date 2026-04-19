@@ -7,8 +7,6 @@ namespace Kataka.App.ViewModels.Design;
 
 public sealed class DesignDiagnosticsViewModel : DiagnosticsViewModel
 {
-    public static DesignDiagnosticsViewModel Instance => new();
-
     public DesignDiagnosticsViewModel()
         : base(
             new AmpSyncService(
@@ -21,4 +19,6 @@ public sealed class DesignDiagnosticsViewModel : DiagnosticsViewModel
         DiagnosticLog = "Design-time diagnostic log.";
         AmpEditorStatus = "Design-time status.";
     }
+
+    public static DesignDiagnosticsViewModel Instance => new();
 }

@@ -4,6 +4,11 @@ namespace Kataka.App.KatanaState.FxPedals;
 
 public class UniVState
 {
+    public AmpControlState Depth;
+    public AmpControlState Level;
+
+    public AmpControlState Rate;
+
     public UniVState(bool isMod)
     {
         var p = isMod ? KatanaMkIIParameterCatalog.ModUniVParams : KatanaMkIIParameterCatalog.FxUniVParams;
@@ -11,8 +16,4 @@ public class UniVState
         Depth = new AmpControlState(p[1], description: "Adjusts the depth of the UNI-V effect.");
         Level = new AmpControlState(p[2], description: "Adjusts the volume.");
     }
-
-    public AmpControlState Rate;
-    public AmpControlState Depth;
-    public AmpControlState Level;
 }

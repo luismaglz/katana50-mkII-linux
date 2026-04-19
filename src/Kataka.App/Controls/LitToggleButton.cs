@@ -8,11 +8,17 @@ using Avalonia.Media;
 
 namespace Kataka.App.Controls;
 
-public enum LabelPosition { Top, Bottom, Left, Right }
+public enum LabelPosition
+{
+    Top,
+    Bottom,
+    Left,
+    Right
+}
 
 /// <summary>
-/// Small toggle button with an inset lit indicator. Label sits outside the button body.
-/// Set <see cref="ButtonWidth"/>/<see cref="ButtonHeight"/> and <see cref="LabelPosition"/>.
+///     Small toggle button with an inset lit indicator. Label sits outside the button body.
+///     Set <see cref="ButtonWidth" />/<see cref="ButtonHeight" /> and <see cref="LabelPosition" />.
 /// </summary>
 public sealed class LitToggleButton : Control
 {
@@ -26,7 +32,7 @@ public sealed class LitToggleButton : Control
 
     private static readonly Color DefaultOnColor = KatanaPalette.PrimaryLit;
     private static readonly SolidColorBrush ButtonBodyBrush = new(Color.Parse("#1a1a1a"));
-    private static readonly Pen ButtonBorderPen = new(new SolidColorBrush(Color.Parse("#444444")), 1.0);
+    private static readonly Pen ButtonBorderPen = new(new SolidColorBrush(Color.Parse("#444444")));
     private static readonly SolidColorBrush InsetOffBrush = new(Color.Parse("#0d0d0d"));
     private static readonly SolidColorBrush TopHighlightBrush = new(Color.FromArgb(40, 255, 255, 255));
 
@@ -123,6 +129,7 @@ public sealed class LitToggleButton : Control
             IsChecked = !IsChecked;
             e.Handled = true;
         }
+
         base.OnPointerPressed(e);
     }
 
@@ -133,6 +140,7 @@ public sealed class LitToggleButton : Control
             IsChecked = !IsChecked;
             e.Handled = true;
         }
+
         base.OnKeyDown(e);
     }
 

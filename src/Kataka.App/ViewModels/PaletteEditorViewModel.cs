@@ -7,10 +7,10 @@ namespace Kataka.App.ViewModels;
 public class PaletteEditorViewModel : ViewModelBase
 {
     private string _accentHex;
-    private string _knobFaceHex;
     private string _bgBaseHex;
-    private string _bgSurfaceHex;
     private string _bgElevatedHex;
+    private string _bgSurfaceHex;
+    private string _knobFaceHex;
 
     public PaletteEditorViewModel()
     {
@@ -32,39 +32,60 @@ public class PaletteEditorViewModel : ViewModelBase
     {
         get => _accentHex;
         set => SetColor(ref _accentHex, value, nameof(AccentHex),
-            c => { RuntimePaletteService.Accent = c; AccentSwatch.Color = c; });
+            c =>
+            {
+                RuntimePaletteService.Accent = c;
+                AccentSwatch.Color = c;
+            });
     }
 
     public string KnobFaceHex
     {
         get => _knobFaceHex;
         set => SetColor(ref _knobFaceHex, value, nameof(KnobFaceHex),
-            c => { RuntimePaletteService.KnobFace = c; KnobFaceSwatch.Color = c; });
+            c =>
+            {
+                RuntimePaletteService.KnobFace = c;
+                KnobFaceSwatch.Color = c;
+            });
     }
 
     public string BgBaseHex
     {
         get => _bgBaseHex;
         set => SetColor(ref _bgBaseHex, value, nameof(BgBaseHex),
-            c => { RuntimePaletteService.BgBase = c; BgBaseSwatch.Color = c; });
+            c =>
+            {
+                RuntimePaletteService.BgBase = c;
+                BgBaseSwatch.Color = c;
+            });
     }
 
     public string BgSurfaceHex
     {
         get => _bgSurfaceHex;
         set => SetColor(ref _bgSurfaceHex, value, nameof(BgSurfaceHex),
-            c => { RuntimePaletteService.BgSurface = c; BgSurfaceSwatch.Color = c; });
+            c =>
+            {
+                RuntimePaletteService.BgSurface = c;
+                BgSurfaceSwatch.Color = c;
+            });
     }
 
     public string BgElevatedHex
     {
         get => _bgElevatedHex;
         set => SetColor(ref _bgElevatedHex, value, nameof(BgElevatedHex),
-            c => { RuntimePaletteService.BgElevated = c; BgElevatedSwatch.Color = c; });
+            c =>
+            {
+                RuntimePaletteService.BgElevated = c;
+                BgElevatedSwatch.Color = c;
+            });
     }
 
     /// <summary> Swatch brushes (mutated in-place so bound controls re-render) ───────── </summary>
     public SolidColorBrush AccentSwatch { get; }
+
     public SolidColorBrush KnobFaceSwatch { get; }
     public SolidColorBrush BgBaseSwatch { get; }
     public SolidColorBrush BgSurfaceSwatch { get; }
@@ -80,7 +101,10 @@ public class PaletteEditorViewModel : ViewModelBase
             if (!hex.StartsWith('#')) hex = '#' + hex;
             apply(Color.Parse(hex));
         }
-        catch { /* partial / invalid hex — ignore */ }
+        catch
+        {
+            /* partial / invalid hex — ignore */
+        }
     }
 
     private static string ToHex(Color c) => $"#{c.R:X2}{c.G:X2}{c.B:X2}";

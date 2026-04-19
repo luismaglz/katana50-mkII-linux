@@ -1,5 +1,3 @@
-using System;
-
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Kataka.App.ViewModels;
@@ -11,8 +9,7 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
     public string DisplayName { get; init; } = string.Empty;
 
     // Mutable so the AMP node can reflect channel changes without rebuilding the collection.
-    [ObservableProperty]
-    public partial string Detail { get; set; } = string.Empty;
+    [ObservableProperty] public partial string Detail { get; set; } = string.Empty;
 
     public bool IsEndpoint { get; init; }
 
@@ -46,13 +43,13 @@ public sealed partial class PedalboardItemViewModel : ObservableObject
     // Card accent color based on family.
     public string FamilyAccentColor => Family switch
     {
-        "booster" => "#e8960a",  // amber
-        "mod" => "#3dbf6c",  // green
-        "fx" => "#3a9fdf",  // blue
-        "delay" => "#30cfc0",  // cyan
+        "booster" => "#e8960a", // amber
+        "mod" => "#3dbf6c", // green
+        "fx" => "#3a9fdf", // blue
+        "delay" => "#30cfc0", // cyan
         "delay2" => "#30cfc0",
-        "reverb" => "#a86fcb",  // purple
-        "amp" => "#c0392b",  // red
-        _ => "#607080",  // slate for input/output
+        "reverb" => "#a86fcb", // purple
+        "amp" => "#c0392b", // red
+        _ => "#607080" // slate for input/output
     };
 }

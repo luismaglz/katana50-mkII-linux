@@ -1,5 +1,3 @@
-using System;
-
 using Kataka.App.KatanaState;
 using Kataka.Domain.Midi;
 

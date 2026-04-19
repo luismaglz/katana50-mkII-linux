@@ -6,7 +6,7 @@ namespace Kataka.Application.Katana;
 public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 {
     private static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(2);
-    private static readonly int MidiBytesPerSecond = 3125;           // MIDI 1.0 wire speed at 31250 baud
+    private static readonly int MidiBytesPerSecond = 3125; // MIDI 1.0 wire speed at 31250 baud
     private static readonly TimeSpan DeviceInterval = TimeSpan.FromMilliseconds(20); // BTS ProductSetting.interval
 
     // Special address for the Boss editor communication mode flag.
@@ -17,8 +17,8 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     private static readonly byte[] CurrentChannelAddress = [0x00, 0x01, 0x00, 0x00];
     private static readonly byte[] CurrentChannelSize = [0x00, 0x00, 0x00, 0x02];
     private readonly IMidiTransport midiTransport = midiTransport;
-    private IMidiConnection? activeConnection;
     private DateTimeOffset _nextSendAllowedAt = DateTimeOffset.MinValue;
+    private IMidiConnection? activeConnection;
 
     public bool IsConnected => activeConnection is not null;
 
@@ -31,7 +31,8 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     public Task<IReadOnlyList<MidiPortDescriptor>> ListPortsAsync(CancellationToken cancellationToken = default) =>
         midiTransport.ListPortsAsync(cancellationToken);
 
-    public async Task ConnectAsync(string inputPortId, string outputPortId, CancellationToken cancellationToken = default)
+    public async Task ConnectAsync(string inputPortId, string outputPortId,
+        CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(inputPortId);
         ArgumentException.ThrowIfNullOrWhiteSpace(outputPortId);
@@ -45,15 +46,12 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 
         // Tell the amp to start sending unsolicited DT1 messages whenever any parameter changes.
         // This mirrors the BTS startCommunication() handshake (EDITOR_COMMUNICATION_MODE = 1).
-        await WriteEditorCommunicationModeAsync(enable: true, cancellationToken);
+        await WriteEditorCommunicationModeAsync(true, cancellationToken);
     }
 
     public async Task DisconnectAsync()
     {
-        if (activeConnection is null)
-        {
-            return;
-        }
+        if (activeConnection is null) return;
 
         // Unsubscribe before disposing to prevent callbacks on a dead connection.
         activeConnection.PushNotificationReceived -= OnConnectionPushNotification;
@@ -62,7 +60,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         // Tell the amp to stop sending push notifications before closing the port.
         try
         {
-            await WriteEditorCommunicationModeAsync(enable: false, CancellationToken.None);
+            await WriteEditorCommunicationModeAsync(false, CancellationToken.None);
         }
         catch
         {
@@ -82,14 +80,12 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 
     public async Task<KatanaPanelChannel?> ReadCurrentPanelChannelAsync(CancellationToken cancellationToken = default)
     {
-        var request = RolandSysExBuilder.BuildDataRequest1(0x00, [0x00, 0x00, 0x00, 0x33], CurrentChannelAddress, CurrentChannelSize);
+        var request = RolandSysExBuilder.BuildDataRequest1(0x00, [0x00, 0x00, 0x00, 0x33], CurrentChannelAddress,
+            CurrentChannelSize);
         await EnforcePacingAsync(request.Bytes.Count, cancellationToken);
         var reply = await RequireConnection().RequestAsync(request, DefaultRequestTimeout, cancellationToken);
 
-        if (!TryParseCurrentPanelChannel(reply, out var channel))
-        {
-            return null;
-        }
+        if (!TryParseCurrentPanelChannel(reply, out var channel)) return null;
 
         return channel;
     }
@@ -100,7 +96,8 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         await RequireConnection().SendProgramChangeAsync(ToProgramChange(channel), cancellationToken);
     }
 
-    public async Task<byte> ReadParameterAsync(KatanaParameterDefinition parameter, CancellationToken cancellationToken = default)
+    public async Task<byte> ReadParameterAsync(KatanaParameterDefinition parameter,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(parameter);
 
@@ -124,9 +121,8 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
             var reply = await RequireConnection().RequestAsync(request, DefaultRequestTimeout, cancellationToken);
 
             if (!KatanaMkIIProtocol.TryParseParameterBlockReply(startAddress, group.Length, reply, out var data))
-            {
-                throw new InvalidOperationException("A batched Katana parameter reply did not match the expected MKII format.");
-            }
+                throw new InvalidOperationException(
+                    "A batched Katana parameter reply did not match the expected MKII format.");
 
             foreach (var parameter in group.Parameters)
             {
@@ -164,9 +160,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         var reply = await RequireConnection().RequestAsync(request, DefaultRequestTimeout, cancellationToken);
 
         if (!KatanaMkIIProtocol.TryParseParameterBlockReply(address, length, reply, out var data))
-        {
             throw new InvalidOperationException("A Katana data block reply did not match the expected MKII format.");
-        }
 
         return data;
     }
@@ -212,7 +206,8 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         return patch;
     }
 
-    public async Task<IReadOnlyDictionary<string, byte>> ReadAllPatchStatesAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyDictionary<string, byte>> ReadAllPatchStatesAsync(
+        CancellationToken cancellationToken = default)
     {
         var result = new Dictionary<string, byte>(StringComparer.Ordinal);
         const int chunkSize = 64;
@@ -269,6 +264,8 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         }
     }
 
+    public async ValueTask DisposeAsync() => await DisconnectAsync();
+
     private static byte[] AddOffset(byte[] baseAddr, int offset)
     {
         var full = ((baseAddr[0] << 24) | (baseAddr[1] << 16) | (baseAddr[2] << 8) | baseAddr[3]) + offset;
@@ -276,34 +273,26 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         [
             (byte)((full >> 24) & 0x7F),
             (byte)((full >> 16) & 0x7F),
-            (byte)((full >> 8)  & 0x7F),
-            (byte)( full        & 0x7F),
+            (byte)((full >> 8) & 0x7F),
+            (byte)(full & 0x7F)
         ];
     }
 
-    public async ValueTask DisposeAsync()
-    {
-        await DisconnectAsync();
-    }
-
-    private IMidiConnection RequireConnection()
-    {
-        return activeConnection ?? throw new InvalidOperationException("No Katana MIDI connection is currently open.");
-    }
+    private IMidiConnection RequireConnection() => activeConnection ??
+                                                   throw new InvalidOperationException(
+                                                       "No Katana MIDI connection is currently open.");
 
     /// <summary>
-    /// Forwards unsolicited DT1 push messages from the active connection to session subscribers.
+    ///     Forwards unsolicited DT1 push messages from the active connection to session subscribers.
     /// </summary>
-    private void OnConnectionPushNotification(object? sender, SysExMessage message)
-    {
+    private void OnConnectionPushNotification(object? sender, SysExMessage message) =>
         PushNotificationReceived?.Invoke(this, message);
-    }
 
     /// <summary>
-    /// Translates an incoming Program Change byte to a <see cref="KatanaPanelChannel"/> and
-    /// fires <see cref="PanelChannelChanged"/>. The Katana uses Program Change to report
-    /// which channel button the user pressed on the front panel.
-    /// The PC encoding differs from the SysEx memory encoding — it mirrors <see cref="ToProgramChange"/>.
+    ///     Translates an incoming Program Change byte to a <see cref="KatanaPanelChannel" /> and
+    ///     fires <see cref="PanelChannelChanged" />. The Katana uses Program Change to report
+    ///     which channel button the user pressed on the front panel.
+    ///     The PC encoding differs from the SysEx memory encoding — it mirrors <see cref="ToProgramChange" />.
     /// </summary>
     private void OnConnectionProgramChange(object? sender, byte program)
     {
@@ -312,9 +301,9 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     }
 
     /// <summary>
-    /// Writes the EDITOR_COMMUNICATION_MODE flag to the amp.
-    /// When enabled (value 1), the amp sends unsolicited DT1 messages for all live parameter changes.
-    /// When disabled (value 0), the amp stops sending push notifications.
+    ///     Writes the EDITOR_COMMUNICATION_MODE flag to the amp.
+    ///     When enabled (value 1), the amp sends unsolicited DT1 messages for all live parameter changes.
+    ///     When disabled (value 0), the amp stops sending push notifications.
     /// </summary>
     private async Task WriteEditorCommunicationModeAsync(bool enable, CancellationToken cancellationToken)
     {
@@ -326,8 +315,8 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     }
 
     /// <summary>
-    /// Enforces BTS-style byte-rate inter-message pacing before every MIDI send or request.
-    /// Formula: delay = ceil(msgBytes * 1000 / 3125) + 20ms (Boss ProductSetting.interval).
+    ///     Enforces BTS-style byte-rate inter-message pacing before every MIDI send or request.
+    ///     Formula: delay = ceil(msgBytes * 1000 / 3125) + 20ms (Boss ProductSetting.interval).
     /// </summary>
     private async Task EnforcePacingAsync(int messageBytes, CancellationToken ct = default)
     {
@@ -338,7 +327,8 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         _nextSendAllowedAt = DateTimeOffset.UtcNow + TimeSpan.FromMilliseconds(byteRateMs) + DeviceInterval;
     }
 
-    private static IReadOnlyList<ParameterReadGroup> CreateReadGroups(IReadOnlyList<KatanaParameterDefinition> parameters)
+    private static IReadOnlyList<ParameterReadGroup> CreateReadGroups(
+        IReadOnlyList<KatanaParameterDefinition> parameters)
     {
         var ordered = parameters
             .DistinctBy(parameter => parameter.Key)
@@ -376,9 +366,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
             bytes[10] != 0x00 ||
             bytes[11] != 0x00 ||
             bytes[^1] != 0xF7)
-        {
             return false;
-        }
 
         return TryMapCurrentChannelCode(bytes[13], out channel);
     }
@@ -392,7 +380,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
             2 => KatanaPanelChannel.ChA2,
             5 => KatanaPanelChannel.ChB1,
             6 => KatanaPanelChannel.ChB2,
-            _ => KatanaPanelChannel.Panel,
+            _ => KatanaPanelChannel.Panel
         };
 
         return code is 0 or 1 or 2 or 5 or 6;
@@ -407,15 +395,15 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
             KatanaPanelChannel.Panel => 4,
             KatanaPanelChannel.ChB1 => 5,
             KatanaPanelChannel.ChB2 => 6,
-            _ => throw new ArgumentOutOfRangeException(nameof(channel), channel, "Unsupported Katana panel channel."),
+            _ => throw new ArgumentOutOfRangeException(nameof(channel), channel, "Unsupported Katana panel channel.")
         };
     }
 
     /// <summary>
-    /// Maps an incoming MIDI Program Change byte to a <see cref="KatanaPanelChannel"/>.
-    /// This is the exact inverse of <see cref="ToProgramChange"/>; the encoding differs
-    /// from the SysEx address-memory encoding used by <see cref="TryMapCurrentChannelCode"/>.
-    /// Values: 0=ChA1, 1=ChA2, 4=Panel, 5=ChB1, 6=ChB2.
+    ///     Maps an incoming MIDI Program Change byte to a <see cref="KatanaPanelChannel" />.
+    ///     This is the exact inverse of <see cref="ToProgramChange" />; the encoding differs
+    ///     from the SysEx address-memory encoding used by <see cref="TryMapCurrentChannelCode" />.
+    ///     Values: 0=ChA1, 1=ChA2, 4=Panel, 5=ChB1, 6=ChB2.
     /// </summary>
     private static bool TryMapProgramChangeToChannel(byte program, out KatanaPanelChannel channel)
     {
@@ -426,7 +414,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
             4 => KatanaPanelChannel.Panel,
             5 => KatanaPanelChannel.ChB1,
             6 => KatanaPanelChannel.ChB2,
-            _ => KatanaPanelChannel.Panel,
+            _ => KatanaPanelChannel.Panel
         };
 
         return program is 0 or 1 or 4 or 5 or 6;
@@ -439,7 +427,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         private const int MaximumSpanLength = 32;
         private readonly List<KatanaParameterDefinition> parameters = [];
         private readonly byte[] prefix = new byte[3];
-        private byte startOffset;
+        private readonly byte startOffset;
         private byte endOffset;
 
         public ParameterReadGroup(KatanaParameterDefinition parameter)

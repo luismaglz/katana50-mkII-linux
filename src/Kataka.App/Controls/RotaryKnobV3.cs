@@ -1,16 +1,14 @@
-using System;
-
 using Avalonia;
 using Avalonia.Media;
 
 namespace Kataka.App.Controls;
 
 /// <summary>
-/// Rotary knob where grip notches are part of the rotating face.
-/// 12 evenly-spaced notches are carved around the rim; one notch at the 12 o'clock
-/// position is a different color — it acts as the position indicator and sweeps with
-/// the knob. Static reference ticks on the outside give a scale to read against.
-/// Scale-aware, same footprint as RotaryKnob.
+///     Rotary knob where grip notches are part of the rotating face.
+///     12 evenly-spaced notches are carved around the rim; one notch at the 12 o'clock
+///     position is a different color — it acts as the position indicator and sweeps with
+///     the knob. Static reference ticks on the outside give a scale to read against.
+///     Scale-aware, same footprint as RotaryKnob.
 /// </summary>
 public sealed class RotaryKnobV3 : RotaryKnobBase
 {
@@ -37,12 +35,13 @@ public sealed class RotaryKnobV3 : RotaryKnobBase
 
         var s = Scale;
         var bounds = Bounds.Deflate(4 * s);
-        var labelText = CreateText(Label.ToUpperInvariant(), LabelFontSize > 0 ? LabelFontSize : 12 * s, FontWeight.Bold, LabelBrush);
+        var labelText = CreateText(Label.ToUpperInvariant(), LabelFontSize > 0 ? LabelFontSize : 12 * s,
+            FontWeight.Bold, LabelBrush);
         context.DrawText(labelText, new Point((bounds.Width - labelText.Width) / 2, bounds.Top));
 
-        var diameter = Math.Min(bounds.Width - 12 * s, bounds.Height - labelText.Height - 56 * s);
+        var diameter = Math.Min(bounds.Width - (12 * s), bounds.Height - labelText.Height - (56 * s));
         var r = diameter / 2;
-        var center = new Point(bounds.Width / 2, labelText.Height + 20 * s + r);
+        var center = new Point(bounds.Width / 2, labelText.Height + (20 * s) + r);
 
         /// <summary> Static reference ticks (outside the knob) ────────────────────────── </summary>
         DrawRefTicks(context, center, r, s);
@@ -50,14 +49,14 @@ public sealed class RotaryKnobV3 : RotaryKnobBase
         /// <summary> Static bezel ring ───────────────────────────────────────────────── </summary>
         context.DrawEllipse(BezelBrush,
             new Pen(new SolidColorBrush(KatanaPalette.BgBase), 2 * s),
-            center, r + 8 * s, r + 8 * s);
+            center, r + (8 * s), r + (8 * s));
 
         /// <summary> Rotating knob face + grip notches ───────────────────────────────── </summary>
-        var rotationRad = DegreesToRadians(-135.0 + NormalizedValue * SweepDeg);
+        var rotationRad = DegreesToRadians(-135.0 + (NormalizedValue * SweepDeg));
         using (context.PushTransform(
-            Matrix.CreateTranslation(-center.X, -center.Y) *
-            Matrix.CreateRotation(rotationRad) *
-            Matrix.CreateTranslation(center.X, center.Y)))
+                   Matrix.CreateTranslation(-center.X, -center.Y) *
+                   Matrix.CreateRotation(rotationRad) *
+                   Matrix.CreateTranslation(center.X, center.Y)))
         {
             // Face
             context.DrawEllipse(FaceBrush,
@@ -75,15 +74,15 @@ public sealed class RotaryKnobV3 : RotaryKnobBase
                 // Indicator notch: at 270° (top = 12 o'clock in unrotated space)
                 var isIndicator = angleDeg == 270.0;
 
-                var outer = r - 1.5 * s;
-                var inner = isIndicator ? r - 14 * s : r - 8 * s;
+                var outer = r - (1.5 * s);
+                var inner = isIndicator ? r - (14 * s) : r - (8 * s);
                 var thickness = isIndicator ? 2.5 * s : 1.5 * s;
                 var brush = isIndicator ? IndicatorBrush : GripBrush;
 
                 context.DrawLine(
                     new Pen(brush, thickness, lineCap: PenLineCap.Round),
-                    new Point(center.X + cos * inner, center.Y + sin * inner),
-                    new Point(center.X + cos * outer, center.Y + sin * outer));
+                    new Point(center.X + (cos * inner), center.Y + (sin * inner)),
+                    new Point(center.X + (cos * outer), center.Y + (sin * outer)));
             }
         }
 
@@ -91,7 +90,7 @@ public sealed class RotaryKnobV3 : RotaryKnobBase
         var valueText = CreateText(DisplayValueText, 14 * s, FontWeight.SemiBold, ValueBrush);
         context.DrawText(valueText, new Point(
             (bounds.Width - valueText.Width) / 2,
-            center.Y + r + 14 * s));
+            center.Y + r + (14 * s)));
     }
 
     private void DrawRefTicks(DrawingContext context, Point center, double r, double s)
@@ -99,20 +98,20 @@ public sealed class RotaryKnobV3 : RotaryKnobBase
         for (var i = 0; i <= 10; i++)
         {
             var isCenterTick = IsEffectivelyBipolar && i == 5;
-            var angleDeg = StartDeg + i * (SweepDeg / 10);
+            var angleDeg = StartDeg + (i * (SweepDeg / 10));
             var angleRad = DegreesToRadians(angleDeg);
             var cos = Math.Cos(angleRad);
             var sin = Math.Sin(angleRad);
 
-            var outer = r + 12 * s;
-            var inner = r + 5 * s;
+            var outer = r + (12 * s);
+            var inner = r + (5 * s);
             var pen = isCenterTick
                 ? new Pen(RefTickCenterBrush, 2.5 * s, lineCap: PenLineCap.Round)
                 : new Pen(RefTickBrush, 1.5 * s, lineCap: PenLineCap.Round);
 
             context.DrawLine(pen,
-                new Point(center.X + cos * inner, center.Y + sin * inner),
-                new Point(center.X + cos * outer, center.Y + sin * outer));
+                new Point(center.X + (cos * inner), center.Y + (sin * inner)),
+                new Point(center.X + (cos * outer), center.Y + (sin * outer)));
         }
     }
 }

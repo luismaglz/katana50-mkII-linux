@@ -3,7 +3,6 @@ namespace Kataka.Domain.Midi;
 /// <summary>Auto-generated: static partial class KatanaMkIIParameterCatalog</summary>
 public static partial class KatanaMkIIParameterCatalog
 {
-    /// <summary> Global EQ (System block) ───────────────────────────────────────────────── </summary>
     // Three independently-stored EQ banks. GlobalEqSelect picks which bank is active.
     // Addresses: System(0x00) + SysEqN block offset + parameter offset.
 

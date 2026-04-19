@@ -8,7 +8,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Kataka.App.ViewModels;
 
-public partial class AmpEditorViewModel : ViewModelBase
+public class AmpEditorViewModel : ViewModelBase
 {
     private readonly IKatanaState _katanaState;
 

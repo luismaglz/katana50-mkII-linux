@@ -16,6 +16,7 @@ public sealed class AmpSyncService : IAmpSyncService
 
     /// <summary> Observable subjects ─────────────────────────────────────────────────── </summary>
     private readonly Subject<string> _panelChannelSubject = new();
+
     private readonly Subject<DeviceReadMetadata> _readCompletedSubject = new();
     private readonly IKatanaSession _session;
     private readonly Subject<string> _statusSubject = new();

@@ -4,8 +4,5 @@ namespace Kataka.App.Views.ModsFx;
 
 public partial class HarmonistView : UserControl
 {
-    public HarmonistView()
-    {
-        InitializeComponent();
-    }
+    public HarmonistView() => InitializeComponent();
 }

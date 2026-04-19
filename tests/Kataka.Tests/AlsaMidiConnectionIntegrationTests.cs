@@ -5,16 +5,16 @@ using Kataka.Infrastructure.Midi;
 namespace Kataka.Tests;
 
 /// <summary>
-/// Integration tests that require a Boss Katana MkII to be physically connected via USB.
-/// Run with: dotnet test --filter "Category=Integration"
+///     Integration tests that require a Boss Katana MkII to be physically connected via USB.
+///     Run with: dotnet test --filter "Category=Integration"
 /// </summary>
 [Trait("Category", "Integration")]
 public sealed class AlsaMidiConnectionIntegrationTests : IAsyncLifetime
 {
     private const string KatanaPortName = "KATANA MIDI 1";
+    private IMidiConnection _connection = null!;
 
     private AmidiTransport _transport = null!;
-    private IMidiConnection _connection = null!;
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -25,28 +25,25 @@ public sealed class AlsaMidiConnectionIntegrationTests : IAsyncLifetime
         var ports = await _transport.ListPortsAsync();
 
         var input = ports.FirstOrDefault(p =>
-            p.Direction == MidiPortDirection.Input &&
-            p.Name.Contains(KatanaPortName, StringComparison.OrdinalIgnoreCase))
-            ?? throw new InvalidOperationException(
-                $"No KATANA MIDI input found. Ensure the amp is connected. Available ports: " +
-                string.Join(", ", ports.Select(p => p.Name)));
+                        p.Direction == MidiPortDirection.Input &&
+                        p.Name.Contains(KatanaPortName, StringComparison.OrdinalIgnoreCase))
+                    ?? throw new InvalidOperationException(
+                        "No KATANA MIDI input found. Ensure the amp is connected. Available ports: " +
+                        string.Join(", ", ports.Select(p => p.Name)));
 
         var output = ports.FirstOrDefault(p =>
-            p.Direction == MidiPortDirection.Output &&
-            p.Name.Contains(KatanaPortName, StringComparison.OrdinalIgnoreCase))
-            ?? throw new InvalidOperationException(
-                $"No KATANA MIDI output found. Available ports: " +
-                string.Join(", ", ports.Select(p => p.Name)));
+                         p.Direction == MidiPortDirection.Output &&
+                         p.Name.Contains(KatanaPortName, StringComparison.OrdinalIgnoreCase))
+                     ?? throw new InvalidOperationException(
+                         "No KATANA MIDI output found. Available ports: " +
+                         string.Join(", ", ports.Select(p => p.Name)));
 
         _connection = await _transport.OpenAsync(input.Id, output.Id);
     }
 
     public async Task DisposeAsync()
     {
-        if (_connection is not null)
-        {
-            await _connection.DisposeAsync();
-        }
+        if (_connection is not null) await _connection.DisposeAsync();
     }
 
     // ── Port discovery ────────────────────────────────────────────────────────
@@ -110,7 +107,8 @@ public sealed class AlsaMidiConnectionIntegrationTests : IAsyncLifetime
         var request = KatanaMkIIProtocol.CreateParameterReadRequest(KatanaMkIIParameterCatalog.AmpGain);
         var reply = await _connection.RequestAsync(request, TimeSpan.FromSeconds(5));
 
-        var parsed = KatanaMkIIProtocol.TryParseParameterReply(KatanaMkIIParameterCatalog.AmpGain, reply, out var value);
+        var parsed =
+            KatanaMkIIProtocol.TryParseParameterReply(KatanaMkIIParameterCatalog.AmpGain, reply, out var value);
 
         Assert.True(parsed, "TryParseParameterReply returned false — reply may be malformed.");
         // Gain is 0-100 on the Katana
@@ -128,18 +126,15 @@ public sealed class AlsaMidiConnectionIntegrationTests : IAsyncLifetime
         _connection.PushNotificationReceived += (_, msg) =>
         {
             received.Add(msg);
-            if (received.Count >= 1)
-            {
-                tcs.TrySetResult(true);
-            }
+            if (received.Count >= 1) tcs.TrySetResult(true);
         };
 
         // Writing EDITOR_COMMUNICATION_MODE = 1 tells the amp to push live parameter changes.
         var editorModeOn = RolandSysExBuilder.BuildDataSet1(
-            deviceId: 0x00,
-            modelId: [0x00, 0x00, 0x00, 0x33],
-            address: [0x7F, 0x00, 0x00, 0x01],
-            data: [0x01]);
+            0x00,
+            [0x00, 0x00, 0x00, 0x33],
+            [0x7F, 0x00, 0x00, 0x01],
+            [0x01]);
 
         await _connection.SendAsync(editorModeOn);
 
@@ -152,19 +147,16 @@ public sealed class AlsaMidiConnectionIntegrationTests : IAsyncLifetime
 
         // Disable editor mode on the way out
         var editorModeOff = RolandSysExBuilder.BuildDataSet1(
-            deviceId: 0x00,
-            modelId: [0x00, 0x00, 0x00, 0x33],
-            address: [0x7F, 0x00, 0x00, 0x01],
-            data: [0x00]);
+            0x00,
+            [0x00, 0x00, 0x00, 0x33],
+            [0x7F, 0x00, 0x00, 0x01],
+            [0x00]);
         await _connection.SendAsync(editorModeOff);
 
         Assert.True(gotPush,
             $"Expected at least one push notification from the amp within 5s, but received {received.Count}.");
 
-        foreach (var msg in received)
-        {
-            AssertValidDt1(msg);
-        }
+        foreach (var msg in received) AssertValidDt1(msg);
     }
 
     [Fact]
@@ -173,12 +165,9 @@ public sealed class AlsaMidiConnectionIntegrationTests : IAsyncLifetime
         // Fire 6 sequential reads — validates framing doesn't break across multiple round-trips
         var parameters = new[]
         {
-            KatanaMkIIParameterCatalog.AmpGain,
-            KatanaMkIIParameterCatalog.AmpVolume,
-            KatanaMkIIParameterCatalog.AmpBass,
-            KatanaMkIIParameterCatalog.AmpMiddle,
-            KatanaMkIIParameterCatalog.AmpTreble,
-            KatanaMkIIParameterCatalog.AmpPresence,
+            KatanaMkIIParameterCatalog.AmpGain, KatanaMkIIParameterCatalog.AmpVolume,
+            KatanaMkIIParameterCatalog.AmpBass, KatanaMkIIParameterCatalog.AmpMiddle,
+            KatanaMkIIParameterCatalog.AmpTreble, KatanaMkIIParameterCatalog.AmpPresence
         };
 
         var exception = await Record.ExceptionAsync(async () =>
@@ -199,9 +188,9 @@ public sealed class AlsaMidiConnectionIntegrationTests : IAsyncLifetime
     private static void AssertValidDt1(SysExMessage msg)
     {
         var bytes = msg.Bytes;
-        Assert.Equal(0xF0, bytes[0]);              // SysEx start
-        Assert.Equal(0x41, bytes[1]);              // Roland manufacturer ID
-        Assert.Equal(0x12, bytes[7]);              // DT1 command
+        Assert.Equal(0xF0, bytes[0]); // SysEx start
+        Assert.Equal(0x41, bytes[1]); // Roland manufacturer ID
+        Assert.Equal(0x12, bytes[7]); // DT1 command
         Assert.Equal(0xF7, bytes[bytes.Count - 1]); // SysEx end
         Assert.True(bytes.Count >= 15, $"DT1 reply too short: {bytes.Count} bytes");
     }

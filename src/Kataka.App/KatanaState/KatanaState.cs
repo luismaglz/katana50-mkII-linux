@@ -18,11 +18,6 @@ public partial class KatanaState : IKatanaState
         RegisterGlobalEq();
     }
 
-    partial void RegisterPanelMode();
-    partial void RegisterChannelMode();
-    partial void RegisterPedals();
-    partial void RegisterGlobalEq();
-
     public IReadOnlyDictionary<string, AmpControlState> GetAmpControlsByKey() =>
         new Dictionary<string, AmpControlState>(StringComparer.Ordinal)
         {
@@ -57,6 +52,11 @@ public partial class KatanaState : IKatanaState
             _logger.LogDebug("Untracked: {Address}", key);
         }
     }
+
+    partial void RegisterPanelMode();
+    partial void RegisterChannelMode();
+    partial void RegisterPedals();
+    partial void RegisterGlobalEq();
 
     private void RegisterAll(object obj)
     {

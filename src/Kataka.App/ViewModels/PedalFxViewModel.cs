@@ -7,7 +7,7 @@ using ReactiveUI;
 
 namespace Kataka.App.ViewModels;
 
-public partial class PedalFxViewModel : ViewModelBase
+public class PedalFxViewModel : ViewModelBase
 {
     private const int BendPitchWireOffset = 24;
     private readonly HardwarePedalState _state;
@@ -24,10 +24,9 @@ public partial class PedalFxViewModel : ViewModelBase
 
         foreach (var value in Enumerable.Range(
                      KatanaMkIIParameterCatalog.PedalFxWahType.Minimum,
-                     KatanaMkIIParameterCatalog.PedalFxWahType.Maximum - KatanaMkIIParameterCatalog.PedalFxWahType.Minimum + 1))
-        {
+                     KatanaMkIIParameterCatalog.PedalFxWahType.Maximum -
+                     KatanaMkIIParameterCatalog.PedalFxWahType.Minimum + 1))
             WahTypeOptions.Add(ToWahTypeOption((byte)value));
-        }
 
         _state.EnabledState.ValueChanged += () => this.RaisePropertyChanged(nameof(IsEnabled));
         _state.Type.ValueChanged += () =>
@@ -69,19 +68,28 @@ public partial class PedalFxViewModel : ViewModelBase
     public string SelectedTypeOption
     {
         get => ToPedalTypeOption((byte)_state.Type.Value);
-        set { if (TryParsePedalTypeOption(value, out var v)) _state.Type.Value = v; }
+        set
+        {
+            if (TryParsePedalTypeOption(value, out var v)) _state.Type.Value = v;
+        }
     }
 
     public string SelectedPositionOption
     {
         get => ToPositionOption((byte)_state.Position.Value);
-        set { if (TryParsePositionOption(value, out var v)) _state.Position.Value = v; }
+        set
+        {
+            if (TryParsePositionOption(value, out var v)) _state.Position.Value = v;
+        }
     }
 
     public string SelectedWahTypeOption
     {
         get => ToWahTypeOption((byte)_state.WahType.Value);
-        set { if (TryParseWahTypeOption(value, out var v)) _state.WahType.Value = v; }
+        set
+        {
+            if (TryParseWahTypeOption(value, out var v)) _state.WahType.Value = v;
+        }
     }
 
     public int PedalPosition
@@ -183,14 +191,14 @@ public partial class PedalFxViewModel : ViewModelBase
         0 => "0 - Wah",
         1 => "1 - Pedal Bend",
         2 => "2 - EVH WAH95",
-        _ => $"{value} - Value {value}",
+        _ => $"{value} - Value {value}"
     };
 
     public static string ToPositionOption(byte value) => value switch
     {
         0 => "Input",
         1 => "Post Amp",
-        _ => $"Value {value}",
+        _ => $"Value {value}"
     };
 
     public static string ToWahTypeOption(byte value) =>
@@ -202,16 +210,12 @@ public partial class PedalFxViewModel : ViewModelBase
     public static bool TryParseWahTypeOption(string? option, out byte value)
     {
         if (!string.IsNullOrWhiteSpace(option))
-        {
             foreach (var kvp in KatanaTypeNameTables.PedalWahTypes)
-            {
                 if (kvp.Value.Equals(option, StringComparison.Ordinal))
                 {
                     value = kvp.Key;
                     return true;
                 }
-            }
-        }
 
         value = 0;
         const string Prefix = "Type ";
@@ -225,9 +229,9 @@ public partial class PedalFxViewModel : ViewModelBase
     {
         value = option switch
         {
-            "Input" => (byte)0,
-            "Post Amp" => (byte)1,
-            _ => (byte)0,
+            "Input" => 0,
+            "Post Amp" => 1,
+            _ => 0
         };
         return option is "Input" or "Post Amp";
     }
