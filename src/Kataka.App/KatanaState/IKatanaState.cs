@@ -36,6 +36,7 @@ public interface IKatanaState
 
     /// <summary> Ver200+ features ───────────────────────────────────────────────────────── </summary>
     SoloEqState SoloEq { get; }
+    GlobalEqState GlobalEq { get; }
 
     ContourState Contour1 { get; }
     ContourState Contour2 { get; }

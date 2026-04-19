@@ -28,10 +28,11 @@
                 <Border Classes="amp-shell" Padding="24">
                     <Grid RowDefinitions="Auto,Auto" RowSpacing="18">
 
-                        <Grid ColumnDefinitions="Auto,*,300" ColumnSpacing="14">
+                        <Grid ColumnDefinitions="Auto,Auto,*,300" ColumnSpacing="14">
                             <views:AmpControlsView DataContext="{Binding AmpEditor}" />
-                            <views:ChannelStripView Grid.Column="1" />
-                            <views:DeviceStatusView Grid.Column="2" />
+                            <views:GlobalEqView DataContext="{Binding GlobalEq}" Grid.Column="1" />
+                            <views:ChannelStripView Grid.Column="2" />
+                            <views:DeviceStatusView Grid.Column="3" />
                         </Grid>
 
                         <views:PedalboardView Grid.Row="1" DataContext="{Binding AmpEditor}" />

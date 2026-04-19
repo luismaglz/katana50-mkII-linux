@@ -27,6 +27,7 @@ public class MainWindowViewModel : ViewModelBase
         Patch = new PatchViewModel(katanaSession, ampSyncService, () => MidiConnection.IsConnected, AppendStatus,
             loggerFactory.CreateLogger<PatchViewModel>());
         AmpEditor = new AmpEditorViewModel(katanaState, ampSyncService);
+        GlobalEq = new GlobalEqViewModel(katanaState);
 
         syncService.StatusMessages.Subscribe(msg => StatusMessage = msg).DisposeWith(Disposables);
 
@@ -39,6 +40,7 @@ public class MainWindowViewModel : ViewModelBase
     public DiagnosticsViewModel Diagnostics { get; }
     public PatchViewModel Patch { get; }
     public AmpEditorViewModel AmpEditor { get; }
+    public GlobalEqViewModel GlobalEq { get; }
     public PaletteEditorViewModel PaletteEditor { get; } = new();
 
     [Reactive] public string StatusMessage { get; set; } = "Ready to scan for MIDI devices.";
