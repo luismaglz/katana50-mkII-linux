@@ -72,6 +72,28 @@ public sealed class AmpSyncService : IAmpSyncService
             if (channel.HasValue)
                 _katanaState.SelectedChannel = channel.Value;
 
+            // Also read System-level Global EQ parameters (not included in ReadAllPatchStatesAsync)
+            try
+            {
+                var catalogType = typeof(KatanaMkIIParameterCatalog);
+                var defs = catalogType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+                    .Where(f => f.Name.StartsWith("GlobalEq"))
+                    .Select(f => f.GetValue(null))
+                    .OfType<KatanaParameterDefinition>()
+                    .ToList();
+
+                if (defs.Count > 0)
+                {
+                    _logger.LogInformation("Reading {Count} Global EQ parameters from amp.", defs.Count);
+                    var sysValues = await _session.ReadParametersAsync(defs);
+                    _katanaState.SetStates(sysValues);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to read Global EQ parameters during seed.");
+            }
+
             SubscribeToStateWrites();
             StartWriteLoop();
             _logger.LogInformation("KatanaState seeded. Write loop started.");
@@ -158,6 +180,7 @@ public sealed class AmpSyncService : IAmpSyncService
     private void OnDomainStateChanged(AmpControlState state)
     {
         if (!_session.IsConnected) return;
+        _logger.LogDebug("Domain state change: {Address} -> {Value}", state.Parameter.AddressString, state.Value);
         _writeChannel?.Writer.TryWrite((state.Parameter.Address, (byte)state.Value));
     }
 
