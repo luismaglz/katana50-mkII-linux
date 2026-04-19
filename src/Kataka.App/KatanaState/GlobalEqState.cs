@@ -4,7 +4,10 @@ namespace Kataka.App.KatanaState;
 
 public class GlobalEqState
 {
-    // Selector: which bank is active (0..2)
+    /// <summary>Master on/off switch (PRM_SYS_EQ_SW) — shared across all banks.</summary>
+    public AmpControlState Sw = new(KatanaMkIIParameterCatalog.GlobalEqSw);
+
+    /// <summary>Selector: which bank is active (0=bank1, 1=bank2, 2=bank3).</summary>
     public AmpControlState Select = new(KatanaMkIIParameterCatalog.GlobalEqSelect,
         description: "Selects which Global EQ bank is active (0=bank1,1=bank2,2=bank3)");
 
@@ -15,7 +18,6 @@ public class GlobalEqState
     public GlobalEqState()
     {
         // Bank 1
-        Bank1.Sw = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq1Sw);
         Bank1.Type = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq1Type);
         Bank1.Position = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq1Position);
         Bank1.LowCut = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq1LowCut);
@@ -42,7 +44,6 @@ public class GlobalEqState
         Bank1.GeqLevel = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq1GeqLevel);
 
         // Bank 2
-        Bank2.Sw = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq2Sw);
         Bank2.Type = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq2Type);
         Bank2.Position = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq2Position);
         Bank2.LowCut = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq2LowCut);
@@ -69,7 +70,6 @@ public class GlobalEqState
         Bank2.GeqLevel = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq2GeqLevel);
 
         // Bank 3
-        Bank3.Sw = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq3Sw);
         Bank3.Type = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq3Type);
         Bank3.Position = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq3Position);
         Bank3.LowCut = new AmpControlState(KatanaMkIIParameterCatalog.GlobalEq3LowCut);
@@ -98,7 +98,6 @@ public class GlobalEqState
 
     public class EqBankState
     {
-        public AmpControlState? Sw;
         public AmpControlState? Type;
         public AmpControlState? Position;
         public AmpControlState? LowCut;

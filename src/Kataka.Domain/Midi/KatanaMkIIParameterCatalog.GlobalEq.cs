@@ -5,6 +5,19 @@ public static partial class KatanaMkIIParameterCatalog
 {
     // Three independently-stored EQ banks. GlobalEqSelect picks which bank is active.
     // Addresses: System(0x00) + SysEqN block offset + parameter offset.
+    // NOTE: The multi-bank EQ (banks 1/2/3 at 0x30/0x50/0x70) has no per-bank SW.
+    //       The single master EQ SW lives in prm_prop_system at System + Main + EqSw(0x10).
+
+    /// <summary>
+    ///     Master on/off for the system EQ (PRM_SYS_EQ_SW). Lives in prm_prop_system at
+    ///     System + Main(0x00) + 0x10. Shared across all three banks.
+    /// </summary>
+    public static KatanaParameterDefinition GlobalEqSw { get; } =
+        new("global-eq-sw", "Global EQ On/Off",
+            KatanaAddressMap.ComputeAddress(KatanaAddressMap.System,
+                KatanaAddressMap.SystemBlocks.Main, KatanaAddressMap.SystemMainParams.EqSw),
+            maximum: 1,
+            description: "Master on/off switch for the Global EQ (PRM_SYS_EQ_SW). Shared by all banks.");
 
     /// <summary>Parameter definition for Global Eq Select.</summary>
     public static KatanaParameterDefinition GlobalEqSelect { get; } =
@@ -15,12 +28,6 @@ public static partial class KatanaMkIIParameterCatalog
             description: "Selects which Global EQ bank is active (0=bank 1, 1=bank 2, 2=bank 3).");
 
     /// <summary> Global EQ Bank 1 (SysEq1, block 0x0030) ───────────────────────────────── </summary>
-    public static KatanaParameterDefinition GlobalEq1Sw { get; } =
-        new("global-eq1-sw", "Global EQ On/Off",
-            KatanaAddressMap.ComputeAddress(KatanaAddressMap.System,
-                KatanaAddressMap.SystemBlocks.GlobalEq1, KatanaAddressMap.SystemMainParams.EqSw),
-            maximum: 1,
-            description: "Turns Global EQ bank 1 on/off.");
 
     /// <summary>Parameter definition for Global Eq 1 Type.</summary>
     public static KatanaParameterDefinition GlobalEq1Type { get; } =
@@ -204,11 +211,6 @@ public static partial class KatanaMkIIParameterCatalog
             maximum: 48, description: "Overall output level of the GE-10 graphic EQ (-24 to +24 dB).");
 
     /// <summary> Global EQ Bank 2 (SysEq2, block 0x0050) ───────────────────────────────── </summary>
-    public static KatanaParameterDefinition GlobalEq2Sw { get; } =
-        new("global-eq2-sw", "Global EQ 2 On/Off",
-            KatanaAddressMap.ComputeAddress(KatanaAddressMap.System,
-                KatanaAddressMap.SystemBlocks.GlobalEq2, KatanaAddressMap.SystemMainParams.EqSw),
-            maximum: 1, description: "Turns Global EQ bank 2 on/off.");
 
     /// <summary>Parameter definition for Global Eq 2 Type.</summary>
     public static KatanaParameterDefinition GlobalEq2Type { get; } =
@@ -379,11 +381,6 @@ public static partial class KatanaMkIIParameterCatalog
             maximum: 48, description: "Overall output level of GE-10 graphic EQ bank 2 (-24 to +24 dB).");
 
     /// <summary> Global EQ Bank 3 (SysEq3, block 0x0070) ───────────────────────────────── </summary>
-    public static KatanaParameterDefinition GlobalEq3Sw { get; } =
-        new("global-eq3-sw", "Global EQ 3 On/Off",
-            KatanaAddressMap.ComputeAddress(KatanaAddressMap.System,
-                KatanaAddressMap.SystemBlocks.GlobalEq3, KatanaAddressMap.SystemMainParams.EqSw),
-            maximum: 1, description: "Turns Global EQ bank 3 on/off.");
 
     /// <summary>Parameter definition for Global Eq 3 Type.</summary>
     public static KatanaParameterDefinition GlobalEq3Type { get; } =

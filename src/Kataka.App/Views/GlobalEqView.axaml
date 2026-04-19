@@ -3,14 +3,13 @@
              xmlns:vm="using:Kataka.App.ViewModels"
              xmlns:controls="using:Kataka.App.Controls"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d"
              x:Class="Kataka.App.Views.GlobalEqView"
              x:DataType="vm:GlobalEqViewModel"
              x:CompileBindings="False">
 
     <StackPanel Spacing="6">
         <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-            <CheckBox Content="EQ On" IsChecked="{Binding ActiveBank.IsOn}" />
+            <CheckBox Content="EQ On" IsChecked="{Binding IsOn}" />
             <ComboBox SelectedIndex="{Binding ActiveBank.Type.Value}" Width="160">
                 <ComboBoxItem Content="Parametric" />
                 <ComboBoxItem Content="Graphic EQ" />

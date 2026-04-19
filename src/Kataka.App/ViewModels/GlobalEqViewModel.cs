@@ -17,6 +17,7 @@ public class GlobalEqViewModel : ViewModelBase
 
     public GlobalEqViewModel(IKatanaState katanaState)
     {
+        Sw = new AmpControlViewModel(katanaState.GlobalEq.Sw);
         Bank1 = new EqBankViewModel(katanaState.GlobalEq.Bank1);
         Bank2 = new EqBankViewModel(katanaState.GlobalEq.Bank2);
         Bank3 = new EqBankViewModel(katanaState.GlobalEq.Bank3);
@@ -27,6 +28,19 @@ public class GlobalEqViewModel : ViewModelBase
         // fires only ValueChanged, never WriteRequested).
         katanaState.GlobalEq.Select.ValueChanged +=
             () => ActiveBank = BankVmFor(katanaState.GlobalEq.Select.Value);
+
+        // Boolean wrapper for IsOn — stays in sync with Sw.Value without write-back.
+        katanaState.GlobalEq.Sw.ValueChanged += () => this.RaisePropertyChanged(nameof(IsOn));
+    }
+
+    /// <summary>Master EQ on/off (PRM_SYS_EQ_SW) — shared across all banks.</summary>
+    public AmpControlViewModel Sw { get; }
+
+    /// <summary>Boolean wrapper over <see cref="Sw" />.Value for CheckBox binding.</summary>
+    public bool IsOn
+    {
+        get => Sw.Value != 0;
+        set => Sw.Value = value ? 1 : 0;
     }
 
     public EqBankViewModel Bank1 { get; }
@@ -58,7 +72,6 @@ public class EqBankViewModel : ViewModelBase
 {
     public EqBankViewModel(GlobalEqState.EqBankState bank)
     {
-        Sw = new AmpControlViewModel(bank.Sw!);
         Type = new AmpControlViewModel(bank.Type!);
         Geq31Hz = new AmpControlViewModel(bank.Geq31Hz!);
         Geq62Hz = new AmpControlViewModel(bank.Geq62Hz!);
@@ -71,13 +84,8 @@ public class EqBankViewModel : ViewModelBase
         Geq8kHz = new AmpControlViewModel(bank.Geq8kHz!);
         Geq16kHz = new AmpControlViewModel(bank.Geq16kHz!);
         GeqLevel = new AmpControlViewModel(bank.GeqLevel!);
-
-        // Convenience bool for IsChecked binding — reads Sw.Value, raises its own
-        // PropertyChanged so the CheckBox stays in sync without any write-back loop.
-        bank.Sw!.ValueChanged += () => this.RaisePropertyChanged(nameof(IsOn));
     }
 
-    public AmpControlViewModel Sw { get; }
     public AmpControlViewModel Type { get; }
     public AmpControlViewModel Geq31Hz { get; }
     public AmpControlViewModel Geq62Hz { get; }
@@ -90,11 +98,4 @@ public class EqBankViewModel : ViewModelBase
     public AmpControlViewModel Geq8kHz { get; }
     public AmpControlViewModel Geq16kHz { get; }
     public AmpControlViewModel GeqLevel { get; }
-
-    /// <summary>Boolean wrapper over <see cref="Sw" />.Value for CheckBox binding.</summary>
-    public bool IsOn
-    {
-        get => Sw.Value != 0;
-        set => Sw.Value = value ? 1 : 0;
-    }
 }

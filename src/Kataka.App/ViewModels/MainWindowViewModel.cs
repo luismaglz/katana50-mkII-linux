@@ -28,6 +28,7 @@ public class MainWindowViewModel : ViewModelBase
             loggerFactory.CreateLogger<PatchViewModel>());
         AmpEditor = new AmpEditorViewModel(katanaState, ampSyncService);
         GlobalEq = new GlobalEqViewModel(katanaState);
+        PedalboardMiniMap = new PedalboardMiniMapViewModel(katanaState);
 
         syncService.StatusMessages.Subscribe(msg => StatusMessage = msg).DisposeWith(Disposables);
 
@@ -40,6 +41,8 @@ public class MainWindowViewModel : ViewModelBase
     public DiagnosticsViewModel Diagnostics { get; }
     public PatchViewModel Patch { get; }
     public AmpEditorViewModel AmpEditor { get; }
+
+    public PedalboardMiniMapViewModel PedalboardMiniMap { get; }
     public GlobalEqViewModel GlobalEq { get; }
     public PaletteEditorViewModel PaletteEditor { get; } = new();
 
