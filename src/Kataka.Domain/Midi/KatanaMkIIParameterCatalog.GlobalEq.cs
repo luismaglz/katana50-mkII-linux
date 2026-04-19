@@ -17,7 +17,7 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition GlobalEq1Sw { get; } =
         new("global-eq1-sw", "Global EQ On/Off",
             KatanaAddressMap.ComputeAddress(KatanaAddressMap.System,
-                KatanaAddressMap.SystemBlocks.GlobalEq1, KatanaAddressMap.GlobalEqParams.Sw),
+                KatanaAddressMap.SystemBlocks.GlobalEq1, KatanaAddressMap.SystemMainParams.EqSw),
             maximum: 1,
             description: "Turns Global EQ bank 1 on/off.");
 
@@ -182,7 +182,7 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition GlobalEq2Sw { get; } =
         new("global-eq2-sw", "Global EQ 2 On/Off",
             KatanaAddressMap.ComputeAddress(KatanaAddressMap.System,
-                KatanaAddressMap.SystemBlocks.GlobalEq2, KatanaAddressMap.GlobalEqParams.Sw),
+                KatanaAddressMap.SystemBlocks.GlobalEq2, KatanaAddressMap.SystemMainParams.EqSw),
             maximum: 1, description: "Turns Global EQ bank 2 on/off.");
 
     public static KatanaParameterDefinition GlobalEq2Type { get; } =
@@ -333,7 +333,7 @@ public static partial class KatanaMkIIParameterCatalog
     public static KatanaParameterDefinition GlobalEq3Sw { get; } =
         new("global-eq3-sw", "Global EQ 3 On/Off",
             KatanaAddressMap.ComputeAddress(KatanaAddressMap.System,
-                KatanaAddressMap.SystemBlocks.GlobalEq3, KatanaAddressMap.GlobalEqParams.Sw),
+                KatanaAddressMap.SystemBlocks.GlobalEq3, KatanaAddressMap.SystemMainParams.EqSw),
             maximum: 1, description: "Turns Global EQ bank 3 on/off.");
 
     public static KatanaParameterDefinition GlobalEq3Type { get; } =
