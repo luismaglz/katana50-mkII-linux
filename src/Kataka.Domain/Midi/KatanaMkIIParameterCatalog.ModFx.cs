@@ -1,5 +1,6 @@
 namespace Kataka.Domain.Midi;
 
+/// <summary>Auto-generated: static partial class KatanaMkIIParameterCatalog</summary>
 public static partial class KatanaMkIIParameterCatalog
 {
     // Address helper: slotBase is 0x01 for Mod, 0x03 for FX.
@@ -12,10 +13,12 @@ public static partial class KatanaMkIIParameterCatalog
         byte minimum = 0, byte maximum = 100) =>
         new(key, display, ModFxAddr(slotBase, sectionRel), minimum, maximum);
 
-    // ── CHORUS (2×2 Chorus, type index 0) ────────────────────────────────────────
+    /// <summary> CHORUS (2×2 Chorus, type index 0) ──────────────────────────────────────── </summary>
     // BTS section: PRM_FX1_2x2CHORUS, addrs 0x0137–0x0140
 
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> ModChorusParams { get; } = Bu...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModChorusParams { get; } = BuildChorusParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxChorusParams { get; } = Bui...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxChorusParams { get; } = BuildChorusParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildChorusParams(byte slot)
@@ -36,10 +39,12 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── FLANGER (type index 1) ────────────────────────────────────────────────────
+    /// <summary> FLANGER (type index 1) ──────────────────────────────────────────────────── </summary>
     // BTS section: PRM_FX1_FLANGER, addrs 0x010B–0x0112 (skip 0x010F which is empty)
 
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> ModFlangerParams { get; } = B...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModFlangerParams { get; } = BuildFlangerParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxFlangerParams { get; } = Bu...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxFlangerParams { get; } = BuildFlangerParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildFlangerParams(byte slot)
@@ -57,9 +62,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── PHASER (type index 2) ─────────────────────────────────────────────────────
-
+    /// <summary> PHASER (type index 2) ───────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModPhaserParams { get; } = BuildPhaserParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxPhaserParams { get; } = Bui...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxPhaserParams { get; } = BuildPhaserParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildPhaserParams(byte slot)
@@ -78,9 +83,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── T.WAH (type index 12) ─────────────────────────────────────────────────────
-
+    /// <summary> T.WAH (type index 12) ───────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModTWahParams { get; } = BuildTWahParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxTWahParams { get; } = Build...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxTWahParams { get; } = BuildTWahParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildTWahParams(byte slot)
@@ -98,9 +103,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── AUTO WAH (type index 13) ──────────────────────────────────────────────────
-
+    /// <summary> AUTO WAH (type index 13) ────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModAutoWahParams { get; } = BuildAutoWahParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxAutoWahParams { get; } = Bu...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxAutoWahParams { get; } = BuildAutoWahParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildAutoWahParams(byte slot)
@@ -118,9 +123,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── PEDAL WAH (type index 14) ─────────────────────────────────────────────────
-
+    /// <summary> PEDAL WAH (type index 14) ───────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModPedalWahParams { get; } = BuildPedalWahParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxPedalWahParams { get; } = B...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxPedalWahParams { get; } = BuildPedalWahParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildPedalWahParams(byte slot)
@@ -137,9 +142,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── COMP (type index 10) ──────────────────────────────────────────────────────
-
+    /// <summary> COMP (type index 10) ────────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModCompParams { get; } = BuildCompParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxCompParams { get; } = Build...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxCompParams { get; } = BuildCompParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildCompParams(byte slot)
@@ -155,9 +160,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── LIMITER (type index 11) ───────────────────────────────────────────────────
-
+    /// <summary> LIMITER (type index 11) ─────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModLimiterParams { get; } = BuildLimiterParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxLimiterParams { get; } = Bu...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxLimiterParams { get; } = BuildLimiterParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildLimiterParams(byte slot)
@@ -174,9 +179,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── GRAPHIC EQ (type index 15) ────────────────────────────────────────────────
-
+    /// <summary> GRAPHIC EQ (type index 15) ──────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModGraphicEqParams { get; } = BuildGraphicEqParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxGraphicEqParams { get; } = ...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxGraphicEqParams { get; } = BuildGraphicEqParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildGraphicEqParams(byte slot)
@@ -198,9 +203,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── PARAMETRIC EQ (type index 16) ─────────────────────────────────────────────
-
+    /// <summary> PARAMETRIC EQ (type index 16) ───────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModParametricEqParams { get; } = BuildParametricEqParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxParametricEqParams { get; }...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxParametricEqParams { get; } = BuildParametricEqParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildParametricEqParams(byte slot)
@@ -222,9 +227,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── GUITAR SIM (type index 17) ────────────────────────────────────────────────
-
+    /// <summary> GUITAR SIM (type index 17) ──────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModGuitarSimParams { get; } = BuildGuitarSimParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxGuitarSimParams { get; } = ...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxGuitarSimParams { get; } = BuildGuitarSimParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildGuitarSimParams(byte slot)
@@ -240,9 +245,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── SLOW GEAR (type index 8) ──────────────────────────────────────────────────
-
+    /// <summary> SLOW GEAR (type index 8) ────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModSlowGearParams { get; } = BuildSlowGearParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxSlowGearParams { get; } = B...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxSlowGearParams { get; } = BuildSlowGearParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildSlowGearParams(byte slot)
@@ -256,9 +261,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── WAVE SYNTH (type index 20) ────────────────────────────────────────────────
-
+    /// <summary> WAVE SYNTH (type index 20) ──────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModWaveSynthParams { get; } = BuildWaveSynthParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxWaveSynthParams { get; } = ...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxWaveSynthParams { get; } = BuildWaveSynthParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildWaveSynthParams(byte slot)
@@ -277,9 +282,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── OCTAVE (type index 21) ────────────────────────────────────────────────────
-
+    /// <summary> OCTAVE (type index 21) ──────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModOctaveParams { get; } = BuildOctaveParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxOctaveParams { get; } = Bui...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxOctaveParams { get; } = BuildOctaveParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildOctaveParams(byte slot)
@@ -293,9 +298,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── PITCH SHIFTER (type index 23) ─────────────────────────────────────────────
-
+    /// <summary> PITCH SHIFTER (type index 23) ───────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModPitchShifterParams { get; } = BuildPitchShifterParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxPitchShifterParams { get; }...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxPitchShifterParams { get; } = BuildPitchShifterParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildPitchShifterParams(byte slot)
@@ -317,9 +322,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── HARMONIST (type index 24) ─────────────────────────────────────────────────
-
+    /// <summary> HARMONIST (type index 24) ───────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModHarmonistParams { get; } = BuildHarmonistParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxHarmonistParams { get; } = ...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxHarmonistParams { get; } = BuildHarmonistParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildHarmonistParams(byte slot)
@@ -337,9 +342,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── AC.GUITAR SIM (type index 18) ────────────────────────────────────────────
-
+    /// <summary> AC.GUITAR SIM (type index 18) ──────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModAcGuitarSimParams { get; } = BuildAcGuitarSimParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxAcGuitarSimParams { get; } ...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxAcGuitarSimParams { get; } = BuildAcGuitarSimParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildAcGuitarSimParams(byte slot)
@@ -354,9 +359,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── AC.PROCESSOR (type index 19) ─────────────────────────────────────────────
-
+    /// <summary> AC.PROCESSOR (type index 19) ───────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModAcProcessorParams { get; } = BuildAcProcessorParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxAcProcessorParams { get; } ...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxAcProcessorParams { get; } = BuildAcProcessorParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildAcProcessorParams(byte slot)
@@ -374,9 +379,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── TREMOLO (type index 4) ────────────────────────────────────────────────────
-
+    /// <summary> TREMOLO (type index 4) ──────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModTremoloParams { get; } = BuildTremoloParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxTremoloParams { get; } = Bu...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxTremoloParams { get; } = BuildTremoloParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildTremoloParams(byte slot)
@@ -391,9 +396,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── UNI-V (type index 3) ──────────────────────────────────────────────────────
-
+    /// <summary> UNI-V (type index 3) ────────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModUniVParams { get; } = BuildUniVParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxUniVParams { get; } = Build...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxUniVParams { get; } = BuildUniVParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildUniVParams(byte slot)
@@ -407,9 +412,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── SLICER (type index 9) ─────────────────────────────────────────────────────
-
+    /// <summary> SLICER (type index 9) ───────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModSlicerParams { get; } = BuildSlicerParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxSlicerParams { get; } = Bui...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxSlicerParams { get; } = BuildSlicerParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildSlicerParams(byte slot)
@@ -425,9 +430,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── VIBRATO (type index 5) ────────────────────────────────────────────────────
-
+    /// <summary> VIBRATO (type index 5) ──────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModVibratoParams { get; } = BuildVibratoParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxVibratoParams { get; } = Bu...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxVibratoParams { get; } = BuildVibratoParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildVibratoParams(byte slot)
@@ -441,9 +446,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── HUMANIZER (type index 25) ─────────────────────────────────────────────────
-
+    /// <summary> HUMANIZER (type index 25) ───────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModHumanizerParams { get; } = BuildHumanizerParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxHumanizerParams { get; } = ...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxHumanizerParams { get; } = BuildHumanizerParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildHumanizerParams(byte slot)
@@ -462,9 +467,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── ROTARY (type index 6) ─────────────────────────────────────────────────────
-
+    /// <summary> ROTARY (type index 6) ───────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModRotaryParams { get; } = BuildRotaryParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxRotaryParams { get; } = Bui...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxRotaryParams { get; } = BuildRotaryParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildRotaryParams(byte slot)
@@ -478,9 +483,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── RING MOD (type index 7) ───────────────────────────────────────────────────
-
+    /// <summary> RING MOD (type index 7) ─────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModRingModParams { get; } = BuildRingModParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxRingModParams { get; } = Bu...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxRingModParams { get; } = BuildRingModParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildRingModParams(byte slot)
@@ -495,9 +500,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── PHASER 90E (type index 26) ────────────────────────────────────────────────
-
+    /// <summary> PHASER 90E (type index 26) ──────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModPhaser90EParams { get; } = BuildPhaser90EParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxPhaser90EParams { get; } = ...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxPhaser90EParams { get; } = BuildPhaser90EParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildPhaser90EParams(byte slot)
@@ -510,9 +515,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── FLANGER 117E (type index 27) ──────────────────────────────────────────────
-
+    /// <summary> FLANGER 117E (type index 27) ────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModFlanger117EParams { get; } = BuildFlanger117EParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxFlanger117EParams { get; } ...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxFlanger117EParams { get; } = BuildFlanger117EParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildFlanger117EParams(byte slot)
@@ -527,9 +532,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── WAH 95E (type index 28) ───────────────────────────────────────────────────
-
+    /// <summary> WAH 95E (type index 28) ─────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModWah95EParams { get; } = BuildWah95EParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxWah95EParams { get; } = Bui...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxWah95EParams { get; } = BuildWah95EParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildWah95EParams(byte slot)
@@ -545,9 +550,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── DC-30 (type index 29) ─────────────────────────────────────────────────────
-
+    /// <summary> DC-30 (type index 29) ───────────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModDC30Params { get; } = BuildDC30Params(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxDC30Params { get; } = Build...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxDC30Params { get; } = BuildDC30Params(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildDC30Params(byte slot)
@@ -565,9 +570,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── HEAVY OCTAVE (type index 22) ─────────────────────────────────────────────
-
+    /// <summary> HEAVY OCTAVE (type index 22) ───────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModHeavyOctaveParams { get; } = BuildHeavyOctaveParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxHeavyOctaveParams { get; } ...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxHeavyOctaveParams { get; } = BuildHeavyOctaveParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildHeavyOctaveParams(byte slot)
@@ -581,9 +586,9 @@ public static partial class KatanaMkIIParameterCatalog
         ];
     }
 
-    // ── PEDAL BEND (type index 30) ────────────────────────────────────────────────
-
+    /// <summary> PEDAL BEND (type index 30) ──────────────────────────────────────────────── </summary>
     public static IReadOnlyList<KatanaParameterDefinition> ModPedalBendParams { get; } = BuildPedalBendParams(0x01);
+    /// <summary>Auto-generated: static IReadOnlyList<KatanaParameterDefinition> FxPedalBendParams { get; } = ...</summary>
     public static IReadOnlyList<KatanaParameterDefinition> FxPedalBendParams { get; } = BuildPedalBendParams(0x03);
 
     private static IReadOnlyList<KatanaParameterDefinition> BuildPedalBendParams(byte slot)

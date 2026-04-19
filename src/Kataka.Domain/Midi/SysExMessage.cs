@@ -2,8 +2,10 @@ using System.Collections.ObjectModel;
 
 namespace Kataka.Domain.Midi;
 
+/// <summary>Auto-generated: sealed class SysExMessage</summary>
 public sealed class SysExMessage
 {
+    /// <summary>Auto-generated: SysExMessage(IEnumerable<byte> bytes)</summary>
     public SysExMessage(IEnumerable<byte> bytes)
     {
         ArgumentNullException.ThrowIfNull(bytes);
@@ -27,8 +29,10 @@ public sealed class SysExMessage
         Bytes = Array.AsReadOnly(buffer);
     }
 
+    /// <summary>Auto-generated: ReadOnlyCollection<byte> Bytes { get; }</summary>
     public ReadOnlyCollection<byte> Bytes { get; }
 
+    /// <summary>Auto-generated: string ToHexString(string separator = " ") =></summary>
     public string ToHexString(string separator = " ") =>
         string.Join(separator, Bytes.Select(value => value.ToString("X2")));
 }

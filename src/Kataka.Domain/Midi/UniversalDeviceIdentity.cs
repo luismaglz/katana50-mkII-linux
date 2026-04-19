@@ -1,11 +1,14 @@
 namespace Kataka.Domain.Midi;
 
+/// <summary>UniversalDeviceIdentity - auto-generated summary.</summary>
 public static class UniversalDeviceIdentity
 {
     private static readonly byte[] IdentityRequestBytes = [0xF0, 0x7E, 0x00, 0x06, 0x01, 0xF7];
 
+    /// <summary>Auto-generated: static SysExMessage CreateIdentityRequest() => new(IdentityRequestBytes);</summary>
     public static SysExMessage CreateIdentityRequest() => new(IdentityRequestBytes);
 
+    /// <summary>Auto-generated: static bool IsIdentityReply(SysExMessage message)</summary>
     public static bool IsIdentityReply(SysExMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);

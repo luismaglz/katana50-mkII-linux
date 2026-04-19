@@ -4,8 +4,7 @@ namespace Kataka.App.Services;
 
 public interface IAmpSyncService
 {
-    // ── Observable outputs (device → app) ────────────────────────────────────
-
+    /// <summary> Observable outputs (device → app) ──────────────────────────────────── </summary>
     /// <summary>Fires when the amp signals a panel-channel change.</summary>
     IObservable<string> PanelChannelPushed { get; }
 
@@ -15,8 +14,7 @@ public interface IAmpSyncService
     /// <summary>Human-readable status lines for the VM's StatusMessage property.</summary>
     IObservable<string> StatusMessages { get; }
 
-    // ── Lifecycle ─────────────────────────────────────────────────────────────
-
+    /// <summary> Lifecycle ───────────────────────────────────────────────────────────── </summary>
     /// <summary>Subscribes to amp push events. Call after connect.</summary>
     void Activate();
 
@@ -29,8 +27,7 @@ public interface IAmpSyncService
     /// <summary>Starts or stops the write loop based on connection state.</summary>
     void OnConnectionChanged(bool connected);
 
-    // ── Read operations ───────────────────────────────────────────────────────
-
+    /// <summary> Read operations ─────────────────────────────────────────────────────── </summary>
     /// <summary>Reads the full patch from the amp and seeds KatanaState. Also wires write-back subscriptions.</summary>
     Task<bool> TryRefreshAmpStateAsync();
 

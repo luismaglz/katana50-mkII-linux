@@ -9,6 +9,7 @@ namespace Kataka.Domain.Midi;
 public static class KatanaTypeNameTables
 {
     // Source: BTS booster-type-select-box. Sequential, no skips. Max 22.
+    /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> BoosterTypes { get; } =</summary>
     public static IReadOnlyDictionary<byte, string> BoosterTypes { get; } =
         new Dictionary<byte, string>
         {
@@ -38,6 +39,7 @@ public static class KatanaTypeNameTables
         };
 
     // Source: BTS modfx-fx-type-select-box (shared for Mod and FX). Sequential, no skips. Max 30.
+    /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> ModFxTypes { get; } =</summary>
     public static IReadOnlyDictionary<byte, string> ModFxTypes { get; } =
         new Dictionary<byte, string>
         {
@@ -75,6 +77,7 @@ public static class KatanaTypeNameTables
         };
 
     // Source: BTS delay-delay1-type-select-box. Sequential, no skips. Max 7.
+    /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> DelayTypes { get; } =</summary>
     public static IReadOnlyDictionary<byte, string> DelayTypes { get; } =
         new Dictionary<byte, string>
         {
@@ -89,6 +92,7 @@ public static class KatanaTypeNameTables
         };
 
     // Source: BTS reverb-type-select-box. Sequential, no skips. Max 6.
+    /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> ReverbTypes { get; } =</summary>
     public static IReadOnlyDictionary<byte, string> ReverbTypes { get; } =
         new Dictionary<byte, string>
         {
@@ -102,6 +106,7 @@ public static class KatanaTypeNameTables
         };
 
     // Source: BTS pedalwah-type-select-box. Sequential, no skips. Max 5.
+    /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> PedalWahTypes { get; } =</summary>
     public static IReadOnlyDictionary<byte, string> PedalWahTypes { get; } =
         new Dictionary<byte, string>
         {
@@ -114,6 +119,7 @@ public static class KatanaTypeNameTables
         };
 
     // Source: BTS pedalfx-type-select-box first three entries (pedal expression types). Max 2.
+    /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> PedalFxTypes { get; } =</summary>
     public static IReadOnlyDictionary<byte, string> PedalFxTypes { get; } =
         new Dictionary<byte, string>
         {

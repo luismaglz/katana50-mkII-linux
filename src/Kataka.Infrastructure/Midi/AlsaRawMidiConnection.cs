@@ -85,8 +85,7 @@ internal sealed partial class AlsaRawMidiConnection : IMidiConnection
         _listenerThread.Start();
     }
 
-    // ── IMidiConnection ───────────────────────────────────────────────────────
-
+    /// <summary> IMidiConnection ─────────────────────────────────────────────────────── </summary>
     public async Task SendAsync(SysExMessage message, CancellationToken cancellationToken = default)
     {
         var bytes = message.Bytes.ToArray();
@@ -179,8 +178,7 @@ internal sealed partial class AlsaRawMidiConnection : IMidiConnection
         await _log.DisposeAsync().ConfigureAwait(false);
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────────
-
+    /// <summary> Private helpers ─────────────────────────────────────────────────────── </summary>
     private void WriteRaw(byte[] bytes)
     {
         var fd = _fd;

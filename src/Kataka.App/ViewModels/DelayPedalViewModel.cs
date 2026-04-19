@@ -103,8 +103,7 @@ public partial class DelayPedalViewModel : PedalViewModel
         _modSw.ValueChanged += () => this.RaisePropertyChanged(nameof(ModSwOn));
     }
 
-    // ── View-only properties ──────────────────────────────────────────────────────
-
+    /// <summary> View-only properties ────────────────────────────────────────────────────── </summary>
     public IReadOnlyList<string> TypeOptions { get; }
     public bool HasTypeOptions => TypeOptions.Count > 0;
     public bool HasVariation => _hasVariation;
@@ -140,8 +139,7 @@ public partial class DelayPedalViewModel : PedalViewModel
 
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
-    // ── Delay-specific controls ───────────────────────────────────────────────────
-
+    /// <summary> Delay-specific controls ─────────────────────────────────────────────────── </summary>
     public int Feedback
     {
         get => _feedback.Value;

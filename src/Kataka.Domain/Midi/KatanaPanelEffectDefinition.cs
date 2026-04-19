@@ -1,7 +1,9 @@
 namespace Kataka.Domain.Midi;
 
+/// <summary>Auto-generated: sealed class KatanaPanelEffectDefinition</summary>
 public sealed class KatanaPanelEffectDefinition
 {
+    /// <summary>Auto-generated: KatanaPanelEffectDefinition(</summary>
     public KatanaPanelEffectDefinition(
         string key,
         string displayName,
@@ -24,16 +26,22 @@ public sealed class KatanaPanelEffectDefinition
         DetailParameters = detailParameters ?? [];
     }
 
+    /// <summary>Auto-generated: string Key { get; }</summary>
     public string Key { get; }
 
+    /// <summary>Auto-generated: string DisplayName { get; }</summary>
     public string DisplayName { get; }
 
+    /// <summary>Auto-generated: KatanaParameterDefinition SwitchParameter { get; }</summary>
     public KatanaParameterDefinition SwitchParameter { get; }
 
+    /// <summary>Auto-generated: KatanaParameterDefinition? VariationParameter { get; }</summary>
     public KatanaParameterDefinition? VariationParameter { get; }
 
+    /// <summary>Auto-generated: KatanaParameterDefinition? TypeParameter { get; }</summary>
     public KatanaParameterDefinition? TypeParameter { get; }
 
+    /// <summary>Auto-generated: KatanaParameterDefinition? LevelParameter { get; }</summary>
     public KatanaParameterDefinition? LevelParameter { get; }
 
     /// <summary>

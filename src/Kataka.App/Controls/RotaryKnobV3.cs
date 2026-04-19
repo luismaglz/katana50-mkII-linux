@@ -44,15 +44,15 @@ public sealed class RotaryKnobV3 : RotaryKnobBase
         var r = diameter / 2;
         var center = new Point(bounds.Width / 2, labelText.Height + 20 * s + r);
 
-        // ── Static reference ticks (outside the knob) ──────────────────────────
+        /// <summary> Static reference ticks (outside the knob) ────────────────────────── </summary>
         DrawRefTicks(context, center, r, s);
 
-        // ── Static bezel ring ─────────────────────────────────────────────────
+        /// <summary> Static bezel ring ───────────────────────────────────────────────── </summary>
         context.DrawEllipse(BezelBrush,
             new Pen(new SolidColorBrush(KatanaPalette.BgBase), 2 * s),
             center, r + 8 * s, r + 8 * s);
 
-        // ── Rotating knob face + grip notches ─────────────────────────────────
+        /// <summary> Rotating knob face + grip notches ───────────────────────────────── </summary>
         var rotationRad = DegreesToRadians(-135.0 + NormalizedValue * SweepDeg);
         using (context.PushTransform(
             Matrix.CreateTranslation(-center.X, -center.Y) *
@@ -87,7 +87,7 @@ public sealed class RotaryKnobV3 : RotaryKnobBase
             }
         }
 
-        // ── Value text (static) ────────────────────────────────────────────────
+        /// <summary> Value text (static) ──────────────────────────────────────────────── </summary>
         var valueText = CreateText(DisplayValueText, 14 * s, FontWeight.SemiBold, ValueBrush);
         context.DrawText(valueText, new Point(
             (bounds.Width - valueText.Width) / 2,

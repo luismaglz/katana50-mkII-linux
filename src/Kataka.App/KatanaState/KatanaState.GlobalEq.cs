@@ -2,7 +2,7 @@ namespace Kataka.App.KatanaState;
 
 public partial class KatanaState
 {
-    // ── Global EQ (System block) ─────────────────────────────────────────────────
+    /// <summary> Global EQ (System block) ───────────────────────────────────────────────── </summary>
     // Stub — uncomment when GlobalEqState class is implemented.
     // public GlobalEqState GlobalEq { get; } = new();
 

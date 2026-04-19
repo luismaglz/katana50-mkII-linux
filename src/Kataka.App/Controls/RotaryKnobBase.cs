@@ -135,8 +135,7 @@ public abstract class RotaryKnobBase : Control
         DescriptionProperty.Changed.AddClassHandler<RotaryKnobBase>((k, _) => k.UpdateTooltip());
     }
 
-    // ── Properties ────────────────────────────────────────────────────────────
-
+    /// <summary> Properties ──────────────────────────────────────────────────────────── </summary>
     public string Label
     {
         get => GetValue(LabelProperty);
@@ -212,8 +211,7 @@ public abstract class RotaryKnobBase : Control
     protected bool IsEffectivelyBipolar =>
         (HasDisplayRange && DisplayMinimum!.Value < 0 && DisplayMaximum!.Value > 0) || IsBipolar;
 
-    // ── Helpers for subclasses ─────────────────────────────────────────────────
-
+    /// <summary> Helpers for subclasses ───────────────────────────────────────────────── </summary>
     /// <summary>Value normalised to [0, 1] across [Minimum, Maximum].</summary>
     protected double NormalizedValue =>
         Maximum == Minimum
@@ -267,8 +265,7 @@ public abstract class RotaryKnobBase : Control
 
     protected static double DegreesToRadians(double degrees) => degrees * (Math.PI / 180.0);
 
-    // ── Tooltip ───────────────────────────────────────────────────────────────
-
+    /// <summary> Tooltip ─────────────────────────────────────────────────────────────── </summary>
     private void UpdateTooltip()
     {
         var label = Label;
@@ -300,8 +297,7 @@ public abstract class RotaryKnobBase : Control
         ToolTip.SetTip(this, panel);
     }
 
-    // ── Interaction ───────────────────────────────────────────────────────────
-
+    /// <summary> Interaction ─────────────────────────────────────────────────────────── </summary>
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);

@@ -39,8 +39,7 @@ public partial class BoosterPedalViewModel : PedalViewModel
         _state.BoosterDirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(DirectMix));
     }
 
-    // ── View-only properties ──────────────────────────────────────────────────────
-
+    /// <summary> View-only properties ────────────────────────────────────────────────────── </summary>
     public IReadOnlyList<string> TypeOptions { get; }
     public bool HasTypeOptions => TypeOptions.Count > 0;
     public IBrush VariationBrush => GetVariationBrush(Variation);
@@ -75,8 +74,7 @@ public partial class BoosterPedalViewModel : PedalViewModel
 
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
-    // ── Booster-specific controls ─────────────────────────────────────────────────
-
+    /// <summary> Booster-specific controls ───────────────────────────────────────────────── </summary>
     public int Drive
     {
         get => _state.Drive.Value;

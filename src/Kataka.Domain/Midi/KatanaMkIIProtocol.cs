@@ -2,6 +2,7 @@ using System.Linq;
 
 namespace Kataka.Domain.Midi;
 
+/// <summary>KatanaMkIIProtocol - auto-generated summary.</summary>
 public static class KatanaMkIIProtocol
 {
     private static readonly byte[] ModelId = [0x00, 0x00, 0x00, 0x33];
@@ -11,12 +12,14 @@ public static class KatanaMkIIProtocol
     private const byte DeviceId = 0x00;
     private const byte DataSetCommand = 0x12;
 
+    /// <summary>Auto-generated: static SysExMessage CreateParameterReadRequest(KatanaParameterDefinition para...</summary>
     public static SysExMessage CreateParameterReadRequest(KatanaParameterDefinition parameter)
     {
         ArgumentNullException.ThrowIfNull(parameter);
         return CreateDataReadRequest(parameter.Address, 1);
     }
 
+    /// <summary>Auto-generated: static SysExMessage CreateParameterWriteRequest(KatanaParameterDefinition par...</summary>
     public static SysExMessage CreateParameterWriteRequest(KatanaParameterDefinition parameter, byte value)
     {
         ArgumentNullException.ThrowIfNull(parameter);
@@ -32,6 +35,7 @@ public static class KatanaMkIIProtocol
         return CreateDataWriteRequest(parameter.Address, [value]);
     }
 
+    /// <summary>Auto-generated: static SysExMessage CreateDataReadRequest(IReadOnlyList<byte> address, int le...</summary>
     public static SysExMessage CreateDataReadRequest(IReadOnlyList<byte> address, int length)
     {
         ArgumentNullException.ThrowIfNull(address);
@@ -49,6 +53,7 @@ public static class KatanaMkIIProtocol
         return RolandSysExBuilder.BuildDataRequest1(DeviceId, ModelId, address, [0x00, 0x00, 0x00, (byte)length]);
     }
 
+    /// <summary>Auto-generated: static SysExMessage CreateDataWriteRequest(IReadOnlyList<byte> address, IRead...</summary>
     public static SysExMessage CreateDataWriteRequest(IReadOnlyList<byte> address, IReadOnlyList<byte> data)
     {
         ArgumentNullException.ThrowIfNull(address);
@@ -72,6 +77,7 @@ public static class KatanaMkIIProtocol
         return RolandSysExBuilder.BuildDataSet1(DeviceId, ModelId, address, data);
     }
 
+    /// <summary>Auto-generated: static bool TryParseParameterReply(</summary>
     public static bool TryParseParameterReply(
         KatanaParameterDefinition parameter,
         SysExMessage message,
@@ -88,6 +94,7 @@ public static class KatanaMkIIProtocol
         return true;
     }
 
+    /// <summary>Auto-generated: static bool TryParseParameterBlockReply(</summary>
     public static bool TryParseParameterBlockReply(
         IReadOnlyList<byte> address,
         int expectedLength,

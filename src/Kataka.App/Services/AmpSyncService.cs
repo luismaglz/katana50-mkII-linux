@@ -14,8 +14,7 @@ public sealed class AmpSyncService : IAmpSyncService
     private readonly IKatanaState _katanaState;
     private readonly ILogger<AmpSyncService> _logger;
 
-    // ── Observable subjects ───────────────────────────────────────────────────
-
+    /// <summary> Observable subjects ─────────────────────────────────────────────────── </summary>
     private readonly Subject<string> _panelChannelSubject = new();
     private readonly Subject<DeviceReadMetadata> _readCompletedSubject = new();
     private readonly IKatanaSession _session;
@@ -26,8 +25,7 @@ public sealed class AmpSyncService : IAmpSyncService
     private Channel<(IReadOnlyList<byte> Address, byte Value)>? _writeChannel;
     private CancellationTokenSource? _writeCts;
 
-    // ── Construction ──────────────────────────────────────────────────────────
-
+    /// <summary> Construction ────────────────────────────────────────────────────────── </summary>
     public AmpSyncService(IKatanaSession session, IKatanaState katanaState, ILogger<AmpSyncService> logger)
     {
         _session = session;
@@ -39,8 +37,7 @@ public sealed class AmpSyncService : IAmpSyncService
     public IObservable<DeviceReadMetadata> ReadCompleted => _readCompletedSubject;
     public IObservable<string> StatusMessages => _statusSubject;
 
-    // ── Lifecycle ─────────────────────────────────────────────────────────────
-
+    /// <summary> Lifecycle ───────────────────────────────────────────────────────────── </summary>
     public void Activate()
     {
         _session.PushNotificationReceived += OnAmpPushNotification;
@@ -61,8 +58,7 @@ public sealed class AmpSyncService : IAmpSyncService
             StopWriteLoop();
     }
 
-    // ── Read operations ───────────────────────────────────────────────────────
-
+    /// <summary> Read operations ─────────────────────────────────────────────────────── </summary>
     public async Task<bool> TryRefreshAmpStateAsync()
     {
         try
@@ -98,8 +94,7 @@ public sealed class AmpSyncService : IAmpSyncService
         await TryRefreshAmpStateAsync();
     }
 
-    // ── Write loop ────────────────────────────────────────────────────────────
-
+    /// <summary> Write loop ──────────────────────────────────────────────────────────── </summary>
     private void StartWriteLoop()
     {
         StopWriteLoop();
@@ -146,8 +141,7 @@ public sealed class AmpSyncService : IAmpSyncService
         }
     }
 
-    // ── State write-back ──────────────────────────────────────────────────────
-
+    /// <summary> State write-back ────────────────────────────────────────────────────── </summary>
     private void SubscribeToStateWrites()
     {
         if (_stateWritesSubscribed) return;
@@ -166,8 +160,7 @@ public sealed class AmpSyncService : IAmpSyncService
         _writeChannel?.Writer.TryWrite((state.Parameter.Address, (byte)state.Value));
     }
 
-    // ── Push notification infrastructure ─────────────────────────────────────
-
+    /// <summary> Push notification infrastructure ───────────────────────────────────── </summary>
     private void OnAmpPushNotification(object? sender, SysExMessage message)
     {
         var bytes = message.Bytes;

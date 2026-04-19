@@ -4,7 +4,7 @@ namespace Kataka.App.KatanaState;
 
 public partial class KatanaState
 {
-    // ── Panel-mode knob positions (Temporary + PatchStatus block) ───────────────
+    /// <summary> Panel-mode knob positions (Temporary + PatchStatus block) ─────────────── </summary>
     public AmpControlState AmpType { get; } = new(KatanaMkIIParameterCatalog.AmpType);
     public AmpControlState AmpVariation { get; } = new(KatanaMkIIParameterCatalog.AmpVariation);
     public AmpControlState LedStateBooster { get; } = new(KatanaMkIIParameterCatalog.LedStateBooster);
