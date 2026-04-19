@@ -1,3 +1,5 @@
+using Kataka.Domain.Midi;
+
 namespace Kataka.App.KatanaState;
 
 public class GlobalEqState
