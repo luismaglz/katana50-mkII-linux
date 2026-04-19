@@ -26,8 +26,7 @@ public class MainWindowViewModel : ViewModelBase
         Diagnostics = new DiagnosticsViewModel(ampSyncService, loggerProvider, () => MidiConnection.IsConnected);
         Patch = new PatchViewModel(katanaSession, ampSyncService, () => MidiConnection.IsConnected, AppendStatus,
             loggerFactory.CreateLogger<PatchViewModel>());
-        AmpEditor = new AmpEditorViewModel(katanaSession, katanaState, ampSyncService, AppendStatus,
-            loggerFactory.CreateLogger<AmpEditorViewModel>());
+        AmpEditor = new AmpEditorViewModel(katanaState, ampSyncService);
 
         syncService.StatusMessages.Subscribe(msg => StatusMessage = msg).DisposeWith(Disposables);
 
