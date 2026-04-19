@@ -6,7 +6,7 @@
 
 #3C3F40
 
-Ah, seeing the source code completely changes the context! Now I see exactly what you are doing. You are working with Roland/BOSS MIDI System Exclusive (SysEx) addressing for the Katana amplifier. 
+Ah, seeing the source code completely changes the context! Now I see exactly what you are doing. You are working with Roland/BOSS MIDI System Exclusive (SysEx) addressing for the Katana amplifier.
 
 With this context, the two addresses from your previous question **are related, but they were actually pointing to two entirely different "Gain" knobs.**
 
@@ -19,7 +19,7 @@ Here is the exact formula for how `address_map.js` translates into the byte arra
 To get the 4-byte array used in the C# catalog, you must add three hex values together:
 **Base Address + Block Offset + Parameter Offset = Absolute Address**
 
-Once you have the Absolute Address, you simply split it into 4 bytes. 
+Once you have the Absolute Address, you simply split it into 4 bytes.
 
 Let's break down exactly how this works using your files so you can map the missing values.
 
@@ -42,7 +42,7 @@ Look at the individual parameter lists, like `prm_prop_patch_0` or `prm_prop_pat
 In your first question, you combined the parameter offset for **Preamp Gain** with the final byte array for **Panel Amp Gain**. Here is how the math actually works out for both.
 
 **Example A: Preamp Gain (The stored patch value)**
-If you look inside `prm_prop_patch_0`, you will find your `0x12` address: 
+If you look inside `prm_prop_patch_0`, you will find your `0x12` address:
 `{ addr:0x00000012 ... name:'GAIN' }` // PRM_PREAMP_A_GAIN
 
 Let's calculate the absolute address:
@@ -81,9 +81,53 @@ When you want to add a new parameter to your C# catalog, follow these steps:
 1.  Find the parameter you want in `address_map.js` (e.g., `TREMOLO DEPTH` is `0x00000115` inside `prm_prop_patch_fx`).
 2.  Find the block offset for `prm_prop_patch_fx`. In the `Patch` list, `Fx(1)` is at `0x00000100`.
 3.  Add the Temporary Base (`0x60000000`), the Block (`0x00000100`), and the Parameter (`0x00000115`).
-4.  Your final hex is `0x60000215`. 
+4.  Your final hex is `0x60000215`.
 5.  Split it into your C# byte array: `[0x60, 0x00, 0x02, 0x15]`.
 
 *(Note: Roland SysEx uses 7-bit math, so addresses jump from `0x7F` to `0x100`. The script handles this with the `nibbled` function, but standard hexadecimal addition works perfectly for constructing these 4-byte arrays).*
 
 Which specific effects block or parameters are you looking to map next? I'd be happy to help you calculate the first few to make sure the formula is working for you.
+
+```js
+/**
+ * Calculates the Roland SysEx 4-byte address array for a given parameter.
+ * * @param {number} baseAddress - The root memory area (e.g., 0x60000000 for Temporary patch)
+ * @param {number} blockOffset - The offset of the functional block (e.g., 0x00000100 for Fx1)
+ * @param {number} parameterOffset - The specific parameter address from the map (e.g., 0x00000115)
+ * @returns {string} The formatted byte array string for C#
+ */
+function getKatanaAddress(baseAddress, blockOffset, parameterOffset) {
+    // 1. Calculate the absolute address
+    const absoluteAddress = baseAddress + blockOffset + parameterOffset;
+
+    // 2. Extract the 4 individual bytes using bitwise shifts
+    const byte1 = (absoluteAddress >>> 24) & 0xFF;
+    const byte2 = (absoluteAddress >>> 16) & 0xFF;
+    const byte3 = (absoluteAddress >>> 8) & 0xFF;
+    const byte4 = absoluteAddress & 0xFF;
+
+    // 3. Helper to format a single byte as "0xXX"
+    const toHex = (byte) => `0x${byte.toString(16).padStart(2, '0').toUpperCase()}`;
+
+    // 4. Return the formatted C# array string
+    return `[${toHex(byte1)}, ${toHex(byte2)}, ${toHex(byte3)}, ${toHex(byte4)}]`;
+}
+
+// ==========================================
+// TEST CASES (Based on your files)
+// ==========================================
+
+const BASE_TEMPORARY = 0x60000000;
+
+// Example 1: Preamp Gain (Block: Patch_0 0x10, Param: 0x12)
+console.log("Preamp Gain:  ", getKatanaAddress(BASE_TEMPORARY, 0x00000010, 0x00000012));
+// Expected output: [0x60, 0x00, 0x00, 0x22]
+
+// Example 2: Panel Amp Gain (Block: Status 0x650, Param: 0x01)
+console.log("Panel Amp Gain:", getKatanaAddress(BASE_TEMPORARY, 0x00000650, 0x00000001));
+// Expected output: [0x60, 0x00, 0x06, 0x51]
+
+// Example 3: Tremolo Depth (Block: Fx(1) 0x100, Param: 0x115)
+console.log("Tremolo Depth: ", getKatanaAddress(BASE_TEMPORARY, 0x00000100, 0x00000115));
+// Expected output: [0x60, 0x00, 0x02, 0x15]
+```
