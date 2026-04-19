@@ -131,3 +131,48 @@ console.log("Panel Amp Gain:", getKatanaAddress(BASE_TEMPORARY, 0x00000650, 0x00
 console.log("Tremolo Depth: ", getKatanaAddress(BASE_TEMPORARY, 0x00000100, 0x00000115));
 // Expected output: [0x60, 0x00, 0x02, 0x15]
 ```
+
+These three addresses represent the "levels" of memory inside the amp. To understand them, think of the Katana like a computer: **System** is the OS settings, **Temporary** is the RAM (what you are currently hearing), and **Status** is the hardware monitor.
+
+Here is the breakdown of what each one specifically does on your amp:
+
+---
+
+### 1. Temporary (`0x60000000`) - "The Live Sound"
+This is the most important one. It is the **Active Edit Buffer**.
+* **What it is:** Whatever sound is coming out of your speaker right now is defined by the values in this memory block.
+* **When you change a knob:** The amp updates the value in this `0x60000000` range immediately.
+* **Banks & Panel:** It doesn't matter if you are on CH1, CH2, or Panel mode—the amp always uses the "Temporary" buffer to make sound.
+    * When you click **CH1**, the amp *copies* the saved data from the CH1 storage into this Temporary buffer.
+    * When you click **Panel**, the amp *copies* the current physical positions of the knobs into this Temporary buffer.
+
+
+
+### 2. Status (`0x7F010200`) - "The Physical State"
+This address doesn't control the sound directly; it reports what the physical hardware is doing.
+* **The Hardware Monitor:** This block tells you which button is currently lit up (CH1, CH2, Panel) and the actual physical rotation of the pots on the top of the amp.
+* **Why it exists:** In your C# code, you saw `AmpGain` at `0x60000651`. This is in the Status block. This tells your software, "The user just physically turned the Gain knob to 50." Your software can then use that info to update a UI slider.
+* **Bank Switching:** If you want to know *which* button the user just pressed on the amp, you watch the `Status` block.
+
+### 3. System (`0x00000000`) - "The Global Brain"
+These settings are "Set and Forget." They do not change when you switch patches or banks.
+* **Global EQ:** If you want to cut the bass for every single patch at once because the room is boomy, you change the Global EQ in the **System** block.
+* **USB/Audio:** USB Input/Output levels and "Line Out Air Feel" (Rec/Live/Blend) live here.
+* **Hardware Config:** MIDI channels, Footswitch settings, and the Knob Mode (Immediate vs. Catch-up).
+
+---
+
+### Summary Comparison Table
+
+| Address Root | Purpose | Does it change with Patches? |
+| :--- | :--- | :--- |
+| **System** (`0x00`) | Global hardware settings (USB, Global EQ) | **No.** Stays the same for all patches. |
+| **Temporary** (`0x60`) | The sound you are hearing right now. | **Yes.** It is overwritten every time you switch. |
+| **Status** (`0x7F`) | Hardware feedback (Lights, Button presses). | **N/A.** It reports the current hardware state. |
+
+### How this helps you with your C# Catalog:
+* If you want to **edit the current sound** (change the Gain, turn on a Booster): Use **Temporary** (`0x60...`).
+* If you want to **monitor the user** (see if they switched to CH2): Use **Status** (`0x7F...`).
+* If you want to **set the Global EQ**: Use **System** (`0x00...`).
+
+**Note on Saved Banks:** The actual saved "CH1" or "CH2" patches live in the `0x10000000` range (User Patches). You generally don't edit those directly while playing. You edit the **Temporary** buffer, and then send a "Write" command to save that buffer into one of the `0x10...` slots.
