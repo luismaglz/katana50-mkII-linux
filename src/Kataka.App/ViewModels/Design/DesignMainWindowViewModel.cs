@@ -16,8 +16,6 @@ public sealed class DesignMainWindowViewModel : MainWindowViewModel
         NullLoggerFactory.Instance,
         new ObservableLoggerProvider())
     {
-        // IsConnected is false, so none of these will queue MIDI writes.
-        AmpEditor.Pedalboard.SelectedChainPattern = 2;
     }
 
     public static DesignMainWindowViewModel Instance => new();
@@ -26,14 +24,12 @@ public sealed class DesignMainWindowViewModel : MainWindowViewModel
 public sealed class DesignAmpEditorViewModel : AmpEditorViewModel
 {
     public DesignAmpEditorViewModel() : base(
-        new NullKatanaSession(),
         new KatanaState.KatanaState(NullLogger<KatanaState.KatanaState>.Instance),
         new AmpSyncService(new NullKatanaSession(),
             new KatanaState.KatanaState(NullLogger<KatanaState.KatanaState>.Instance),
-            NullLogger<AmpSyncService>.Instance),
-        _ => { },
-        NullLogger<AmpEditorViewModel>.Instance) =>
-        Pedalboard.SelectedChainPattern = 2;
+            NullLogger<AmpSyncService>.Instance))
+    {
+    }
 
     public static DesignAmpEditorViewModel Instance => new();
 }

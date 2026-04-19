@@ -1,21 +1,21 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
+using Kataka.App.KatanaState;
 using Kataka.Domain.Midi;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 namespace Kataka.App.ViewModels;
 
 public partial class PedalFxViewModel : ViewModelBase
 {
     private const int BendPitchWireOffset = 24;
+    private readonly HardwarePedalState _state;
 
-    public PedalFxViewModel()
+    public PedalFxViewModel(IKatanaState katanaState)
     {
+        _state = katanaState.HardwarePedal;
+
         TypeOptions.Add(ToPedalTypeOption(0));
         TypeOptions.Add(ToPedalTypeOption(1));
         TypeOptions.Add(ToPedalTypeOption(2));
@@ -29,397 +29,178 @@ public partial class PedalFxViewModel : ViewModelBase
             WahTypeOptions.Add(ToWahTypeOption((byte)value));
         }
 
-        SelectedTypeOption = TypeOptions[0];
-        SelectedPositionOption = PositionOptions[0];
-        SelectedWahTypeOption = WahTypeOptions[0];
-        PedalPosition = KatanaMkIIParameterCatalog.PedalFxWahPedalPosition.Minimum;
-        PedalMinimum = KatanaMkIIParameterCatalog.PedalFxWahPedalMinimum.Minimum;
-        PedalMaximum = KatanaMkIIParameterCatalog.PedalFxWahPedalMaximum.Maximum;
-        EffectLevel = KatanaMkIIParameterCatalog.PedalFxWahEffectLevel.Maximum;
-        DirectMix = KatanaMkIIParameterCatalog.PedalFxWahDirectMix.Minimum;
-        BendPitch = 12;
-        BendPosition = 50;
-        BendEffectLevel = 100;
-        BendDirectMix = 0;
-        Evh95Position = 100;
-        Evh95Minimum = 0;
-        Evh95Maximum = 100;
-        Evh95EffectLevel = 100;
-        Evh95DirectMix = 0;
-        FootVolume = KatanaMkIIParameterCatalog.FootVolume.Maximum;
-
-        this.WhenAnyValue(x => x.SelectedTypeOption)
-            .Subscribe(_ =>
-            {
-                this.RaisePropertyChanged(nameof(IsWahMode));
-                this.RaisePropertyChanged(nameof(IsBendMode));
-                this.RaisePropertyChanged(nameof(IsEvh95Mode));
-            });
+        _state.EnabledState.ValueChanged += () => this.RaisePropertyChanged(nameof(IsEnabled));
+        _state.Type.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(SelectedTypeOption));
+            this.RaisePropertyChanged(nameof(IsWahMode));
+            this.RaisePropertyChanged(nameof(IsBendMode));
+            this.RaisePropertyChanged(nameof(IsEvh95Mode));
+        };
+        _state.Position.ValueChanged += () => this.RaisePropertyChanged(nameof(SelectedPositionOption));
+        _state.WahType.ValueChanged += () => this.RaisePropertyChanged(nameof(SelectedWahTypeOption));
+        _state.WahPedalPosition.ValueChanged += () => this.RaisePropertyChanged(nameof(PedalPosition));
+        _state.WahMinimum.ValueChanged += () => this.RaisePropertyChanged(nameof(PedalMinimum));
+        _state.WahMaximum.ValueChanged += () => this.RaisePropertyChanged(nameof(PedalMaximum));
+        _state.WahEffectLevel.ValueChanged += () => this.RaisePropertyChanged(nameof(EffectLevel));
+        _state.WahDirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(DirectMix));
+        _state.BendPitch.ValueChanged += () => this.RaisePropertyChanged(nameof(BendPitch));
+        _state.BendPedalPosition.ValueChanged += () => this.RaisePropertyChanged(nameof(BendPosition));
+        _state.BendEffectLevel.ValueChanged += () => this.RaisePropertyChanged(nameof(BendEffectLevel));
+        _state.BendDirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(BendDirectMix));
+        _state.Evh95Position.ValueChanged += () => this.RaisePropertyChanged(nameof(Evh95Position));
+        _state.Evh95Minimum.ValueChanged += () => this.RaisePropertyChanged(nameof(Evh95Minimum));
+        _state.Evh95Maximum.ValueChanged += () => this.RaisePropertyChanged(nameof(Evh95Maximum));
+        _state.Evh95EffectLevel.ValueChanged += () => this.RaisePropertyChanged(nameof(Evh95EffectLevel));
+        _state.Evh95DirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(Evh95DirectMix));
+        _state.FootVolume.ValueChanged += () => this.RaisePropertyChanged(nameof(FootVolume));
     }
 
     public ObservableCollection<string> TypeOptions { get; } = [];
-
     public ObservableCollection<string> PositionOptions { get; } = [];
-
     public ObservableCollection<string> WahTypeOptions { get; } = [];
 
-    [Reactive]
-    public bool IsEnabled { get; set; }
-
-    [Reactive]
-    public string SelectedTypeOption { get; set; }
-
-    [Reactive]
-    public string SelectedPositionOption { get; set; }
-
-    [Reactive]
-    public string SelectedWahTypeOption { get; set; }
-
-    [Reactive]
-    public int PedalPosition { get; set; }
-
-    [Reactive]
-    public int PedalMinimum { get; set; }
-
-    [Reactive]
-    public int PedalMaximum { get; set; }
-
-    [Reactive]
-    public int EffectLevel { get; set; }
-
-    [Reactive]
-    public int DirectMix { get; set; }
-
-    [Reactive]
-    public int BendPitch { get; set; }
-
-    [Reactive]
-    public int BendPosition { get; set; }
-
-    [Reactive]
-    public int BendEffectLevel { get; set; }
-
-    [Reactive]
-    public int BendDirectMix { get; set; }
-
-    [Reactive]
-    public int Evh95Position { get; set; }
-
-    [Reactive]
-    public int Evh95Minimum { get; set; }
-
-    [Reactive]
-    public int Evh95Maximum { get; set; }
-
-    [Reactive]
-    public int Evh95EffectLevel { get; set; }
-
-    [Reactive]
-    public int Evh95DirectMix { get; set; }
-
-    [Reactive]
-    public int FootVolume { get; set; }
-
-    public bool IsWahMode => TryParsePedalTypeOption(SelectedTypeOption, out var value) && value == 0;
-
-    public bool IsBendMode => TryParsePedalTypeOption(SelectedTypeOption, out var value) && value == 1;
-
-    public bool IsEvh95Mode => TryParsePedalTypeOption(SelectedTypeOption, out var value) && value == 2;
-
-    public IReadOnlyList<KatanaParameterDefinition> GetReadParameters()
+    public bool IsEnabled
     {
-        return KatanaMkIIParameterCatalog.PedalFxReadParameters;
+        get => _state.EnabledState.Value != 0;
+        set => _state.EnabledState.Value = value ? 1 : 0;
     }
 
-    public IReadOnlyList<KatanaParameterDefinition> GetManualWriteParameters()
+    public string SelectedTypeOption
     {
-        var parameters = new List<KatanaParameterDefinition>
-        {
-            KatanaMkIIParameterCatalog.PedalFxSwitch,
-            KatanaMkIIParameterCatalog.PedalFxType,
-            KatanaMkIIParameterCatalog.PedalFxPosition,
-            KatanaMkIIParameterCatalog.FootVolume,
-        };
-
-        if (IsWahMode)
-        {
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxWahType);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxWahPedalPosition);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxWahPedalMinimum);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxWahPedalMaximum);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxWahEffectLevel);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxWahDirectMix);
-        }
-        else if (IsBendMode)
-        {
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxBendPitch);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxBendPedalPosition);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxBendEffectLevel);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxBendDirectMix);
-        }
-        else if (IsEvh95Mode)
-        {
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxEvh95Position);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxEvh95Minimum);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxEvh95Maximum);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxEvh95EffectLevel);
-            parameters.Add(KatanaMkIIParameterCatalog.PedalFxEvh95DirectMix);
-        }
-
-        return parameters;
+        get => ToPedalTypeOption((byte)_state.Type.Value);
+        set { if (TryParsePedalTypeOption(value, out var v)) _state.Type.Value = v; }
     }
 
-    public KatanaParameterDefinition GetParameter(string key)
+    public string SelectedPositionOption
     {
-        return key switch
-        {
-            "pedal-fx-switch" => KatanaMkIIParameterCatalog.PedalFxSwitch,
-            "pedal-fx-type" => KatanaMkIIParameterCatalog.PedalFxType,
-            "pedal-fx-position" => KatanaMkIIParameterCatalog.PedalFxPosition,
-            "pedal-fx-wah-type" => KatanaMkIIParameterCatalog.PedalFxWahType,
-            "pedal-fx-wah-position" => KatanaMkIIParameterCatalog.PedalFxWahPedalPosition,
-            "pedal-fx-wah-min" => KatanaMkIIParameterCatalog.PedalFxWahPedalMinimum,
-            "pedal-fx-wah-max" => KatanaMkIIParameterCatalog.PedalFxWahPedalMaximum,
-            "pedal-fx-wah-effect-level" => KatanaMkIIParameterCatalog.PedalFxWahEffectLevel,
-            "pedal-fx-wah-direct-mix" => KatanaMkIIParameterCatalog.PedalFxWahDirectMix,
-            "pedal-fx-bend-pitch" => KatanaMkIIParameterCatalog.PedalFxBendPitch,
-            "pedal-fx-bend-position" => KatanaMkIIParameterCatalog.PedalFxBendPedalPosition,
-            "pedal-fx-bend-effect-level" => KatanaMkIIParameterCatalog.PedalFxBendEffectLevel,
-            "pedal-fx-bend-direct-mix" => KatanaMkIIParameterCatalog.PedalFxBendDirectMix,
-            "pedal-fx-evh95-position" => KatanaMkIIParameterCatalog.PedalFxEvh95Position,
-            "pedal-fx-evh95-min" => KatanaMkIIParameterCatalog.PedalFxEvh95Minimum,
-            "pedal-fx-evh95-max" => KatanaMkIIParameterCatalog.PedalFxEvh95Maximum,
-            "pedal-fx-evh95-effect-level" => KatanaMkIIParameterCatalog.PedalFxEvh95EffectLevel,
-            "pedal-fx-evh95-direct-mix" => KatanaMkIIParameterCatalog.PedalFxEvh95DirectMix,
-            "pedal-fx-foot-volume" => KatanaMkIIParameterCatalog.FootVolume,
-            _ => throw new KeyNotFoundException($"Unknown pedal parameter key '{key}'."),
-        };
+        get => ToPositionOption((byte)_state.Position.Value);
+        set { if (TryParsePositionOption(value, out var v)) _state.Position.Value = v; }
     }
 
-    public void ApplyValues(IReadOnlyDictionary<string, byte> values)
+    public string SelectedWahTypeOption
     {
-        IsEnabled = values[KatanaMkIIParameterCatalog.PedalFxSwitch.Key] != 0;
-        SelectedTypeOption = ToPedalTypeOption(values[KatanaMkIIParameterCatalog.PedalFxType.Key]);
-        SelectedPositionOption = ToPositionOption(values[KatanaMkIIParameterCatalog.PedalFxPosition.Key]);
-        SelectedWahTypeOption = ToWahTypeOption(values[KatanaMkIIParameterCatalog.PedalFxWahType.Key]);
-        PedalPosition = values[KatanaMkIIParameterCatalog.PedalFxWahPedalPosition.Key];
-        PedalMinimum = values[KatanaMkIIParameterCatalog.PedalFxWahPedalMinimum.Key];
-        PedalMaximum = values[KatanaMkIIParameterCatalog.PedalFxWahPedalMaximum.Key];
-        EffectLevel = values[KatanaMkIIParameterCatalog.PedalFxWahEffectLevel.Key];
-        DirectMix = values[KatanaMkIIParameterCatalog.PedalFxWahDirectMix.Key];
-        BendPitch = (int)values[KatanaMkIIParameterCatalog.PedalFxBendPitch.Key] - BendPitchWireOffset;
-        BendPosition = values[KatanaMkIIParameterCatalog.PedalFxBendPedalPosition.Key];
-        BendEffectLevel = values[KatanaMkIIParameterCatalog.PedalFxBendEffectLevel.Key];
-        BendDirectMix = values[KatanaMkIIParameterCatalog.PedalFxBendDirectMix.Key];
-        Evh95Position = values[KatanaMkIIParameterCatalog.PedalFxEvh95Position.Key];
-        Evh95Minimum = values[KatanaMkIIParameterCatalog.PedalFxEvh95Minimum.Key];
-        Evh95Maximum = values[KatanaMkIIParameterCatalog.PedalFxEvh95Maximum.Key];
-        Evh95EffectLevel = values[KatanaMkIIParameterCatalog.PedalFxEvh95EffectLevel.Key];
-        Evh95DirectMix = values[KatanaMkIIParameterCatalog.PedalFxEvh95DirectMix.Key];
-        FootVolume = values[KatanaMkIIParameterCatalog.FootVolume.Key];
+        get => ToWahTypeOption((byte)_state.WahType.Value);
+        set { if (TryParseWahTypeOption(value, out var v)) _state.WahType.Value = v; }
     }
 
-    public bool TryGetCurrentValue(string parameterKey, out byte value)
+    public int PedalPosition
     {
-        value = 0;
-        switch (parameterKey)
-        {
-            case "pedal-fx-switch":
-                value = IsEnabled ? (byte)1 : (byte)0;
-                return true;
-            case "pedal-fx-type":
-                return TryParsePedalTypeOption(SelectedTypeOption, out value);
-            case "pedal-fx-position":
-                return TryParsePositionOption(SelectedPositionOption, out value);
-            case "pedal-fx-wah-type":
-                return TryParseWahTypeOption(SelectedWahTypeOption, out value);
-            case "pedal-fx-wah-position":
-                value = (byte)Math.Clamp(PedalPosition, KatanaMkIIParameterCatalog.PedalFxWahPedalPosition.Minimum, KatanaMkIIParameterCatalog.PedalFxWahPedalPosition.Maximum);
-                return true;
-            case "pedal-fx-wah-min":
-                value = (byte)Math.Clamp(PedalMinimum, KatanaMkIIParameterCatalog.PedalFxWahPedalMinimum.Minimum, KatanaMkIIParameterCatalog.PedalFxWahPedalMinimum.Maximum);
-                return true;
-            case "pedal-fx-wah-max":
-                value = (byte)Math.Clamp(PedalMaximum, KatanaMkIIParameterCatalog.PedalFxWahPedalMaximum.Minimum, KatanaMkIIParameterCatalog.PedalFxWahPedalMaximum.Maximum);
-                return true;
-            case "pedal-fx-wah-effect-level":
-                value = (byte)Math.Clamp(EffectLevel, KatanaMkIIParameterCatalog.PedalFxWahEffectLevel.Minimum, KatanaMkIIParameterCatalog.PedalFxWahEffectLevel.Maximum);
-                return true;
-            case "pedal-fx-wah-direct-mix":
-                value = (byte)Math.Clamp(DirectMix, KatanaMkIIParameterCatalog.PedalFxWahDirectMix.Minimum, KatanaMkIIParameterCatalog.PedalFxWahDirectMix.Maximum);
-                return true;
-            case "pedal-fx-bend-pitch":
-                value = (byte)Math.Clamp(BendPitch + BendPitchWireOffset, 0, 48);
-                return true;
-            case "pedal-fx-bend-position":
-                value = (byte)Math.Clamp(BendPosition, 0, 100);
-                return true;
-            case "pedal-fx-bend-effect-level":
-                value = (byte)Math.Clamp(BendEffectLevel, 0, 100);
-                return true;
-            case "pedal-fx-bend-direct-mix":
-                value = (byte)Math.Clamp(BendDirectMix, 0, 100);
-                return true;
-            case "pedal-fx-evh95-position":
-                value = (byte)Math.Clamp(Evh95Position, 0, 100);
-                return true;
-            case "pedal-fx-evh95-min":
-                value = (byte)Math.Clamp(Evh95Minimum, 0, 100);
-                return true;
-            case "pedal-fx-evh95-max":
-                value = (byte)Math.Clamp(Evh95Maximum, 0, 100);
-                return true;
-            case "pedal-fx-evh95-effect-level":
-                value = (byte)Math.Clamp(Evh95EffectLevel, 0, 100);
-                return true;
-            case "pedal-fx-evh95-direct-mix":
-                value = (byte)Math.Clamp(Evh95DirectMix, 0, 100);
-                return true;
-            case "pedal-fx-foot-volume":
-                value = (byte)Math.Clamp(FootVolume, KatanaMkIIParameterCatalog.FootVolume.Minimum, KatanaMkIIParameterCatalog.FootVolume.Maximum);
-                return true;
-            default:
-                return false;
-        }
+        get => _state.WahPedalPosition.Value;
+        set => _state.WahPedalPosition.Value = value;
     }
 
-    public bool TryGetParameterValue(string? propertyName, out KatanaParameterDefinition parameter, out byte value, out string description)
+    public int PedalMinimum
     {
-        parameter = KatanaMkIIParameterCatalog.PedalFxSwitch;
-        value = 0;
-        description = string.Empty;
-
-        switch (propertyName)
-        {
-            case nameof(IsEnabled):
-                parameter = KatanaMkIIParameterCatalog.PedalFxSwitch;
-                value = IsEnabled ? (byte)1 : (byte)0;
-                description = IsEnabled ? "On" : "Off";
-                return true;
-            case nameof(SelectedTypeOption):
-                parameter = KatanaMkIIParameterCatalog.PedalFxType;
-                description = SelectedTypeOption;
-                return TryParsePedalTypeOption(SelectedTypeOption, out value);
-            case nameof(SelectedPositionOption):
-                parameter = KatanaMkIIParameterCatalog.PedalFxPosition;
-                description = SelectedPositionOption;
-                return TryParsePositionOption(SelectedPositionOption, out value);
-            case nameof(SelectedWahTypeOption):
-                parameter = KatanaMkIIParameterCatalog.PedalFxWahType;
-                description = SelectedWahTypeOption;
-                return TryParseWahTypeOption(SelectedWahTypeOption, out value);
-            case nameof(PedalPosition):
-                parameter = KatanaMkIIParameterCatalog.PedalFxWahPedalPosition;
-                value = (byte)Math.Clamp(PedalPosition, parameter.Minimum, parameter.Maximum);
-                description = value.ToString();
-                return true;
-            case nameof(PedalMinimum):
-                parameter = KatanaMkIIParameterCatalog.PedalFxWahPedalMinimum;
-                value = (byte)Math.Clamp(PedalMinimum, parameter.Minimum, parameter.Maximum);
-                description = value.ToString();
-                return true;
-            case nameof(PedalMaximum):
-                parameter = KatanaMkIIParameterCatalog.PedalFxWahPedalMaximum;
-                value = (byte)Math.Clamp(PedalMaximum, parameter.Minimum, parameter.Maximum);
-                description = value.ToString();
-                return true;
-            case nameof(EffectLevel):
-                parameter = KatanaMkIIParameterCatalog.PedalFxWahEffectLevel;
-                value = (byte)Math.Clamp(EffectLevel, parameter.Minimum, parameter.Maximum);
-                description = value.ToString();
-                return true;
-            case nameof(DirectMix):
-                parameter = KatanaMkIIParameterCatalog.PedalFxWahDirectMix;
-                value = (byte)Math.Clamp(DirectMix, parameter.Minimum, parameter.Maximum);
-                description = value.ToString();
-                return true;
-            case nameof(BendPitch):
-                parameter = KatanaMkIIParameterCatalog.PedalFxBendPitch;
-                value = (byte)Math.Clamp(BendPitch + BendPitchWireOffset, 0, 48);
-                description = BendPitch >= 0 ? $"+{BendPitch}" : BendPitch.ToString();
-                return true;
-            case nameof(BendPosition):
-                parameter = KatanaMkIIParameterCatalog.PedalFxBendPedalPosition;
-                value = (byte)Math.Clamp(BendPosition, 0, 100);
-                description = value.ToString();
-                return true;
-            case nameof(BendEffectLevel):
-                parameter = KatanaMkIIParameterCatalog.PedalFxBendEffectLevel;
-                value = (byte)Math.Clamp(BendEffectLevel, 0, 100);
-                description = value.ToString();
-                return true;
-            case nameof(BendDirectMix):
-                parameter = KatanaMkIIParameterCatalog.PedalFxBendDirectMix;
-                value = (byte)Math.Clamp(BendDirectMix, 0, 100);
-                description = value.ToString();
-                return true;
-            case nameof(Evh95Position):
-                parameter = KatanaMkIIParameterCatalog.PedalFxEvh95Position;
-                value = (byte)Math.Clamp(Evh95Position, 0, 100);
-                description = value.ToString();
-                return true;
-            case nameof(Evh95Minimum):
-                parameter = KatanaMkIIParameterCatalog.PedalFxEvh95Minimum;
-                value = (byte)Math.Clamp(Evh95Minimum, 0, 100);
-                description = value.ToString();
-                return true;
-            case nameof(Evh95Maximum):
-                parameter = KatanaMkIIParameterCatalog.PedalFxEvh95Maximum;
-                value = (byte)Math.Clamp(Evh95Maximum, 0, 100);
-                description = value.ToString();
-                return true;
-            case nameof(Evh95EffectLevel):
-                parameter = KatanaMkIIParameterCatalog.PedalFxEvh95EffectLevel;
-                value = (byte)Math.Clamp(Evh95EffectLevel, 0, 100);
-                description = value.ToString();
-                return true;
-            case nameof(Evh95DirectMix):
-                parameter = KatanaMkIIParameterCatalog.PedalFxEvh95DirectMix;
-                value = (byte)Math.Clamp(Evh95DirectMix, 0, 100);
-                description = value.ToString();
-                return true;
-            case nameof(FootVolume):
-                parameter = KatanaMkIIParameterCatalog.FootVolume;
-                value = (byte)Math.Clamp(FootVolume, KatanaMkIIParameterCatalog.FootVolume.Minimum, KatanaMkIIParameterCatalog.FootVolume.Maximum);
-                description = value.ToString();
-                return true;
-            default:
-                return false;
-        }
+        get => _state.WahMinimum.Value;
+        set => _state.WahMinimum.Value = value;
     }
 
-    public static string ToPedalTypeOption(byte value)
+    public int PedalMaximum
     {
-        return value switch
-        {
-            0 => "0 - Wah",
-            1 => "1 - Pedal Bend",
-            2 => "2 - EVH WAH95",
-            _ => $"{value} - Value {value}",
-        };
+        get => _state.WahMaximum.Value;
+        set => _state.WahMaximum.Value = value;
     }
 
-    public static string ToPositionOption(byte value)
+    public int EffectLevel
     {
-        return value switch
-        {
-            0 => "Input",
-            1 => "Post Amp",
-            _ => $"Value {value}",
-        };
+        get => _state.WahEffectLevel.Value;
+        set => _state.WahEffectLevel.Value = value;
     }
+
+    public int DirectMix
+    {
+        get => _state.WahDirectMix.Value;
+        set => _state.WahDirectMix.Value = value;
+    }
+
+    public int BendPitch
+    {
+        get => _state.BendPitch.Value - BendPitchWireOffset;
+        set => _state.BendPitch.Value = value + BendPitchWireOffset;
+    }
+
+    public int BendPosition
+    {
+        get => _state.BendPedalPosition.Value;
+        set => _state.BendPedalPosition.Value = value;
+    }
+
+    public int BendEffectLevel
+    {
+        get => _state.BendEffectLevel.Value;
+        set => _state.BendEffectLevel.Value = value;
+    }
+
+    public int BendDirectMix
+    {
+        get => _state.BendDirectMix.Value;
+        set => _state.BendDirectMix.Value = value;
+    }
+
+    public int Evh95Position
+    {
+        get => _state.Evh95Position.Value;
+        set => _state.Evh95Position.Value = value;
+    }
+
+    public int Evh95Minimum
+    {
+        get => _state.Evh95Minimum.Value;
+        set => _state.Evh95Minimum.Value = value;
+    }
+
+    public int Evh95Maximum
+    {
+        get => _state.Evh95Maximum.Value;
+        set => _state.Evh95Maximum.Value = value;
+    }
+
+    public int Evh95EffectLevel
+    {
+        get => _state.Evh95EffectLevel.Value;
+        set => _state.Evh95EffectLevel.Value = value;
+    }
+
+    public int Evh95DirectMix
+    {
+        get => _state.Evh95DirectMix.Value;
+        set => _state.Evh95DirectMix.Value = value;
+    }
+
+    public int FootVolume
+    {
+        get => _state.FootVolume.Value;
+        set => _state.FootVolume.Value = value;
+    }
+
+    public bool IsWahMode => _state.Type.Value == 0;
+    public bool IsBendMode => _state.Type.Value == 1;
+    public bool IsEvh95Mode => _state.Type.Value == 2;
+
+    public static string ToPedalTypeOption(byte value) => value switch
+    {
+        0 => "0 - Wah",
+        1 => "1 - Pedal Bend",
+        2 => "2 - EVH WAH95",
+        _ => $"{value} - Value {value}",
+    };
+
+    public static string ToPositionOption(byte value) => value switch
+    {
+        0 => "Input",
+        1 => "Post Amp",
+        _ => $"Value {value}",
+    };
 
     public static string ToWahTypeOption(byte value) =>
         KatanaTypeNameTables.PedalWahTypes.TryGetValue(value, out var name) ? name : $"Type {value}";
 
-    public static bool TryParsePedalTypeOption(string? option, out byte value)
-    {
-        return TryParseLeadingByte(option, out value);
-    }
+    public static bool TryParsePedalTypeOption(string? option, out byte value) =>
+        TryParseLeadingByte(option, out value);
 
     public static bool TryParseWahTypeOption(string? option, out byte value)
     {
-        // First try reverse-lookup in name table.
         if (!string.IsNullOrWhiteSpace(option))
         {
             foreach (var kvp in KatanaTypeNameTables.PedalWahTypes)
@@ -432,13 +213,10 @@ public partial class PedalFxViewModel : ViewModelBase
             }
         }
 
-        // Fallback: legacy "Type N" format.
         value = 0;
         const string Prefix = "Type ";
         if (string.IsNullOrWhiteSpace(option) || !option.StartsWith(Prefix, StringComparison.Ordinal))
-        {
             return false;
-        }
 
         return byte.TryParse(option[Prefix.Length..], out value);
     }
@@ -451,22 +229,15 @@ public partial class PedalFxViewModel : ViewModelBase
             "Post Amp" => (byte)1,
             _ => (byte)0,
         };
-
         return option is "Input" or "Post Amp";
     }
 
     private static bool TryParseLeadingByte(string? option, out byte value)
     {
         value = 0;
-        if (string.IsNullOrWhiteSpace(option))
-        {
-            return false;
-        }
-
+        if (string.IsNullOrWhiteSpace(option)) return false;
         var separatorIndex = option.IndexOf(' ');
-        var candidate = separatorIndex < 0
-            ? option
-            : option[..separatorIndex];
+        var candidate = separatorIndex < 0 ? option : option[..separatorIndex];
         return byte.TryParse(candidate, out value);
     }
 }

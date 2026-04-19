@@ -1,8 +1,6 @@
 using System.Reactive.Subjects;
 using System.Threading.Channels;
 
-using Avalonia.Threading;
-
 using Kataka.App.KatanaState;
 using Kataka.Application.Katana;
 using Kataka.Domain.Midi;
@@ -221,7 +219,7 @@ public sealed class AmpSyncService : IAmpSyncService
 
     private async Task RefreshOnChannelChangeAsync(KatanaPanelChannel channel)
     {
+        _katanaState.SelectedChannel = channel;
         await TryRefreshAmpStateAsync();
-        Dispatcher.UIThread.Post(() => { _katanaState.SelectedChannel = channel; });
     }
 }

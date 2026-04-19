@@ -35,6 +35,8 @@ public class PedalboardViewModel : ViewModelBase
     private readonly IKatanaState _katanaState;
     private readonly IReadOnlyDictionary<string, PedalViewModel> _pedalsByKey;
     private PedalboardItemViewModel? _ampItem;
+    private int _lastRenderedChain = -1;
+    private KatanaPanelChannel _lastRenderedChannel;
 
     public PedalboardViewModel(
         IKatanaState katanaState,
@@ -43,11 +45,17 @@ public class PedalboardViewModel : ViewModelBase
         _katanaState = katanaState;
         _pedalsByKey = pedalsByKey;
 
-        _katanaState.SelectedChannelChanged += newChannel => { SelectedChannel = newChannel; };
+        _katanaState.SelectedChannelChanged += newChannel =>
+        {
+            SelectedChannel = newChannel;
+            Refresh();
+        };
 
-        this.WhenAnyValue(x => x.SelectedChainPattern)
-            .Subscribe(_ => Refresh())
-            .DisposeWith(Disposables);
+        _katanaState.PedalChain.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(SelectedChainPattern));
+            Refresh();
+        };
     }
 
     public static string[] ChainPatternNames { get; } =
@@ -57,10 +65,24 @@ public class PedalboardViewModel : ViewModelBase
 
     [Reactive] public KatanaPanelChannel SelectedChannel { get; set; } = KatanaPanelChannel.Panel;
 
-    [Reactive] public int SelectedChainPattern { get; set; } = 2;
+    public int SelectedChainPattern
+    {
+        get => _katanaState.PedalChain.Value;
+        set
+        {
+            _katanaState.PedalChain.Value = value;
+            this.RaisePropertyChanged();
+        }
+    }
 
     private void Refresh()
     {
+        var chain = _katanaState.PedalChain.Value;
+        var channel = SelectedChannel;
+        if (chain == _lastRenderedChain && channel == _lastRenderedChannel) return;
+        _lastRenderedChain = chain;
+        _lastRenderedChannel = channel;
+
         var items = new List<PedalboardItemViewModel>
         {
             new()
