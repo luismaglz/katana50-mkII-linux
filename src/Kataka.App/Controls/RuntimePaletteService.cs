@@ -16,11 +16,11 @@ public static class RuntimePaletteService
     private static Color _bgSurface = KatanaPalette.BgSurface;
     private static Color _bgElevated = KatanaPalette.BgElevated;
 
-    public static Color Accent     { get => _accent;      set { _accent = value;      Publish(); } }
-    public static Color KnobFace   { get => _knobFace;    set { _knobFace = value;    Publish(); } }
-    public static Color BgBase     { get => _bgBase;      set { _bgBase = value;      Publish(); } }
-    public static Color BgSurface  { get => _bgSurface;   set { _bgSurface = value;   Publish(); } }
-    public static Color BgElevated { get => _bgElevated;  set { _bgElevated = value;  Publish(); } }
+    public static Color Accent { get => _accent; set { _accent = value; Publish(); } }
+    public static Color KnobFace { get => _knobFace; set { _knobFace = value; Publish(); } }
+    public static Color BgBase { get => _bgBase; set { _bgBase = value; Publish(); } }
+    public static Color BgSurface { get => _bgSurface; set { _bgSurface = value; Publish(); } }
+    public static Color BgElevated { get => _bgElevated; set { _bgElevated = value; Publish(); } }
 
     private static void Publish()
     {
@@ -38,12 +38,12 @@ public static class RuntimePaletteService
         var res = AvaloniaApplication.Current?.Resources;
         if (res is null) return;
 
-        SetBrush(res, "PrimaryLitBrush",   _accent);
-        SetBrush(res, "PrimaryBrush",       _accent);
-        SetBrush(res, "KatanaAccentBrush",  _accent);
-        SetBrush(res, "BgBaseBrush",        _bgBase);
-        SetBrush(res, "BgSurfaceBrush",     _bgSurface);
-        SetBrush(res, "BgElevatedBrush",    _bgElevated);
+        SetBrush(res, "PrimaryLitBrush", _accent);
+        SetBrush(res, "PrimaryBrush", _accent);
+        SetBrush(res, "KatanaAccentBrush", _accent);
+        SetBrush(res, "BgBaseBrush", _bgBase);
+        SetBrush(res, "BgSurfaceBrush", _bgSurface);
+        SetBrush(res, "BgElevatedBrush", _bgElevated);
     }
 
     private static void SetBrush(IResourceDictionary res, string key, Color color)

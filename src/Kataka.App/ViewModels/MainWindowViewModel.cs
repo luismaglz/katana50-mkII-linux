@@ -1,5 +1,3 @@
-using System;
-
 using Avalonia.Platform.Storage;
 
 using Kataka.App.KatanaState;
@@ -14,7 +12,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Kataka.App.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public class MainWindowViewModel : ViewModelBase
 {
     private readonly IAmpSyncService syncService;
 
@@ -23,18 +21,19 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         syncService = ampSyncService;
 
-        MidiConnection = new MidiConnectionViewModel(katanaSession, ampSyncService, AppendStatus, loggerFactory.CreateLogger<MidiConnectionViewModel>());
+        MidiConnection = new MidiConnectionViewModel(katanaSession, ampSyncService, AppendStatus,
+            loggerFactory.CreateLogger<MidiConnectionViewModel>());
         Diagnostics = new DiagnosticsViewModel(ampSyncService, loggerProvider, () => MidiConnection.IsConnected);
-        Patch = new PatchViewModel(katanaSession, ampSyncService, () => MidiConnection.IsConnected, AppendStatus, loggerFactory.CreateLogger<PatchViewModel>());
-        AmpEditor = new AmpEditorViewModel(katanaSession, katanaState, ampSyncService, AppendStatus, loggerFactory.CreateLogger<AmpEditorViewModel>());
+        Patch = new PatchViewModel(katanaSession, ampSyncService, () => MidiConnection.IsConnected, AppendStatus,
+            loggerFactory.CreateLogger<PatchViewModel>());
+        AmpEditor = new AmpEditorViewModel(katanaSession, katanaState, ampSyncService, AppendStatus,
+            loggerFactory.CreateLogger<AmpEditorViewModel>());
 
         syncService.StatusMessages.Subscribe(msg => StatusMessage = msg).DisposeWith(Disposables);
 
         MidiConnection.WhenAnyValue(x => x.IsConnected)
             .Subscribe(v => Patch.CanWritePatch = v)
             .DisposeWith(Disposables);
-
-        AmpEditor.Initialize();
     }
 
     public MidiConnectionViewModel MidiConnection { get; }

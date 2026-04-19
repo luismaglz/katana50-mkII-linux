@@ -1,5 +1,4 @@
-using System;
-using System.Threading.Tasks;
+using Kataka.Domain.Midi;
 
 namespace Kataka.App.Services;
 
@@ -34,4 +33,6 @@ public interface IAmpSyncService
 
     /// <summary>Reads the full patch from the amp and seeds KatanaState. Also wires write-back subscriptions.</summary>
     Task<bool> TryRefreshAmpStateAsync();
+
+    Task SelectChannelAsync(KatanaPanelChannel channel);
 }
