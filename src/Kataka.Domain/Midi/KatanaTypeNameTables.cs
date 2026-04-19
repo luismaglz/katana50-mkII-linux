@@ -1,10 +1,10 @@
 namespace Kataka.Domain.Midi;
 
 /// <summary>
-/// Type name lookup tables for Katana MK2 effect type parameters.
-/// Source: BOSS TONE STUDIO for KATANA MkII app (layout.div select-box option lists).
-/// Keys are wire byte values; values are human-readable display names.
-/// Byte values not present in a table fall back to "Type N" formatting.
+///     Type name lookup tables for Katana MK2 effect type parameters.
+///     Source: BOSS TONE STUDIO for KATANA MkII app (layout.div select-box option lists).
+///     Keys are wire byte values; values are human-readable display names.
+///     Byte values not present in a table fall back to "Type N" formatting.
 /// </summary>
 public static class KatanaTypeNameTables
 {
@@ -35,7 +35,7 @@ public static class KatanaTypeNameTables
             [19] = "OCT FUZZ",
             [20] = "HM-2",
             [21] = "METAL CORE",
-            [22] = "CENTA OD",
+            [22] = "CENTA OD"
         };
 
     // Source: BTS modfx-fx-type-select-box (shared for Mod and FX). Sequential, no skips. Max 30.
@@ -73,7 +73,7 @@ public static class KatanaTypeNameTables
             [27] = "FLANGER 117E",
             [28] = "WAH 95E",
             [29] = "DC-30",
-            [30] = "PEDAL BEND",
+            [30] = "PEDAL BEND"
         };
 
     // Source: BTS delay-delay1-type-select-box. Sequential, no skips. Max 7.
@@ -88,7 +88,7 @@ public static class KatanaTypeNameTables
             [4] = "TAPE ECHO",
             [5] = "REVERSE",
             [6] = "MODULATE",
-            [7] = "SDE-3000",
+            [7] = "SDE-3000"
         };
 
     // Source: BTS reverb-type-select-box. Sequential, no skips. Max 6.
@@ -102,7 +102,7 @@ public static class KatanaTypeNameTables
             [3] = "SPRING",
             [4] = "MODULATE",
             [5] = "SFX",
-            [6] = "GATE",
+            [6] = "GATE"
         };
 
     // Source: BTS pedalwah-type-select-box. Sequential, no skips. Max 5.
@@ -115,18 +115,13 @@ public static class KatanaTypeNameTables
             [2] = "FAT WAH",
             [3] = "LIGHT WAH",
             [4] = "7STRING WAH",
-            [5] = "RESO WAH",
+            [5] = "RESO WAH"
         };
 
     // Source: BTS pedalfx-type-select-box first three entries (pedal expression types). Max 2.
     /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> PedalFxTypes { get; } =</summary>
     public static IReadOnlyDictionary<byte, string> PedalFxTypes { get; } =
-        new Dictionary<byte, string>
-        {
-            [0] = "PEDAL WAH",
-            [1] = "PEDAL BEND",
-            [2] = "WAH 95E",
-        };
+        new Dictionary<byte, string> { [0] = "PEDAL WAH", [1] = "PEDAL BEND", [2] = "WAH 95E" };
 
     /// <summary>Returns the type name lookup table for a parameter key, or null if none.</summary>
     public static IReadOnlyDictionary<byte, string>? GetTableForKey(string parameterKey) =>
@@ -138,6 +133,6 @@ public static class KatanaTypeNameTables
             "panel-delay-type" => DelayTypes,
             "panel-delay2-type" => DelayTypes,
             "panel-reverb-type" => ReverbTypes,
-            _ => null,
+            _ => null
         };
 }

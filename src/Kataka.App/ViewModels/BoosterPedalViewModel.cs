@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using Avalonia.Media;
 
 using Kataka.App.KatanaState;
@@ -11,12 +7,13 @@ using ReactiveUI;
 
 namespace Kataka.App.ViewModels;
 
-public partial class BoosterPedalViewModel : PedalViewModel
+public class BoosterPedalViewModel : PedalViewModel
 {
     private static readonly KatanaPanelEffectDefinition OwnDefinition =
         KatanaMkIIParameterCatalog.PanelEffects.First(e => e.Key == "booster");
 
     private static readonly IReadOnlyDictionary<byte, string> TypeTable = KatanaTypeNameTables.BoosterTypes;
+
     private static readonly IReadOnlyDictionary<string, byte> ReverseTypeTable =
         TypeTable.ToDictionary(kvp => kvp.Value, kvp => kvp.Key, StringComparer.OrdinalIgnoreCase);
 
@@ -28,8 +25,16 @@ public partial class BoosterPedalViewModel : PedalViewModel
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
 
         _state.EnabledState.ValueChanged += () => this.RaisePropertyChanged(nameof(IsEnabled));
-        _state.Type.ValueChanged += () => { this.RaisePropertyChanged(nameof(SelectedTypeOption)); this.RaisePropertyChanged(nameof(TypeCaption)); };
-        _state.Variation.ValueChanged += () => { this.RaisePropertyChanged(nameof(Variation)); this.RaisePropertyChanged(nameof(VariationBrush)); };
+        _state.Type.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(SelectedTypeOption));
+            this.RaisePropertyChanged(nameof(TypeCaption));
+        };
+        _state.Variation.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(Variation));
+            this.RaisePropertyChanged(nameof(VariationBrush));
+        };
         _state.Drive.ValueChanged += () => this.RaisePropertyChanged(nameof(Drive));
         _state.Tone.ValueChanged += () => this.RaisePropertyChanged(nameof(Tone));
         _state.Bottom.ValueChanged += () => this.RaisePropertyChanged(nameof(Bottom));
@@ -41,6 +46,7 @@ public partial class BoosterPedalViewModel : PedalViewModel
 
     /// <summary> View-only properties ────────────────────────────────────────────────────── </summary>
     public IReadOnlyList<string> TypeOptions { get; }
+
     public bool HasTypeOptions => TypeOptions.Count > 0;
     public IBrush VariationBrush => GetVariationBrush(Variation);
 

@@ -4,6 +4,11 @@ namespace Kataka.App.KatanaState.FxPedals;
 
 public class OctaveState
 {
+    public AmpControlState DirectMix;
+    public AmpControlState EffectLevel;
+
+    public AmpControlState Range;
+
     public OctaveState(bool isMod)
     {
         var p = isMod ? KatanaMkIIParameterCatalog.ModOctaveParams : KatanaMkIIParameterCatalog.FxOctaveParams;
@@ -11,8 +16,4 @@ public class OctaveState
         EffectLevel = new AmpControlState(p[1], description: "Adjusts the volume of the sound one octave lower.");
         DirectMix = new AmpControlState(p[2], description: "Adjusts the volume of the direct sound.");
     }
-
-    public AmpControlState Range;
-    public AmpControlState EffectLevel;
-    public AmpControlState DirectMix;
 }

@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
-
 using Avalonia.Platform.Storage;
 
 using CommunityToolkit.Mvvm.Input;
@@ -19,10 +15,10 @@ namespace Kataka.App.ViewModels;
 public partial class PatchViewModel : ViewModelBase
 {
     private static readonly TimeSpan TapResetThreshold = TimeSpan.FromSeconds(2.5);
+    private readonly Action<string> _appendStatus;
+    private readonly Func<bool> _isConnected;
 
     private readonly IKatanaSession _katanaSession;
-    private readonly Func<bool> _isConnected;
-    private readonly Action<string> _appendStatus;
     private readonly ILogger<PatchViewModel> _logger;
 
     private DateTimeOffset? _lastDelayTapAt;
@@ -128,7 +124,11 @@ public partial class PatchViewModel : ViewModelBase
     [RelayCommand]
     private async Task LoadPatchAsync()
     {
-        if (StorageProvider is null) { _appendStatus("File dialog not available."); return; }
+        if (StorageProvider is null)
+        {
+            _appendStatus("File dialog not available.");
+            return;
+        }
 
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
@@ -151,10 +151,13 @@ public partial class PatchViewModel : ViewModelBase
             string json;
             await using (var stream = await file.OpenReadAsync())
             using (var reader = new StreamReader(stream))
+            {
                 json = await reader.ReadToEndAsync();
+            }
 
             var patch = TslPatchSerializer.Deserialize(json);
-            _logger.LogInformation("Patch '{Name}' parsed — {Count} block(s). Sending to amp...", patch.Name, patch.Blocks.Count);
+            _logger.LogInformation("Patch '{Name}' parsed — {Count} block(s). Sending to amp...", patch.Name,
+                patch.Blocks.Count);
 
             await _katanaSession.LoadPatchAsync(patch);
             _logger.LogInformation("Patch loaded. Refreshing display...");
@@ -170,7 +173,11 @@ public partial class PatchViewModel : ViewModelBase
     [RelayCommand]
     private async Task SavePatchAsync()
     {
-        if (StorageProvider is null) { _appendStatus("File dialog not available."); return; }
+        if (StorageProvider is null)
+        {
+            _appendStatus("File dialog not available.");
+            return;
+        }
 
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
@@ -206,6 +213,6 @@ public partial class PatchViewModel : ViewModelBase
     private static byte[] EncodeDelayTime(int milliseconds)
     {
         var clamped = Math.Clamp(milliseconds, 1, 2000);
-        return [(byte)(clamped >> 7 & 0x0F), (byte)(clamped & 0x7F)];
+        return [(byte)((clamped >> 7) & 0x0F), (byte)(clamped & 0x7F)];
     }
 }

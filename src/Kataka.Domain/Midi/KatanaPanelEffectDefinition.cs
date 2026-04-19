@@ -45,8 +45,8 @@ public sealed class KatanaPanelEffectDefinition
     public KatanaParameterDefinition? LevelParameter { get; }
 
     /// <summary>
-    /// Per-effect DSP parameters (Drive, Tone, Feedback, Time, etc.) polled and written
-    /// in addition to the top-level switch/type/level parameters.
+    ///     Per-effect DSP parameters (Drive, Tone, Feedback, Time, etc.) polled and written
+    ///     in addition to the top-level switch/type/level parameters.
     /// </summary>
     public IReadOnlyList<KatanaParameterDefinition> DetailParameters { get; }
 }

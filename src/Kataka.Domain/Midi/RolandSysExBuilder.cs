@@ -12,20 +12,16 @@ public static class RolandSysExBuilder
         byte deviceId,
         IReadOnlyList<byte> modelId,
         IReadOnlyList<byte> address,
-        IReadOnlyList<byte> size)
-    {
-        return Build(deviceId, modelId, DataRequestCommand, address.Concat(size).ToArray());
-    }
+        IReadOnlyList<byte> size) =>
+        Build(deviceId, modelId, DataRequestCommand, address.Concat(size).ToArray());
 
     /// <summary>Auto-generated: static SysExMessage BuildDataSet1(</summary>
     public static SysExMessage BuildDataSet1(
         byte deviceId,
         IReadOnlyList<byte> modelId,
         IReadOnlyList<byte> address,
-        IReadOnlyList<byte> data)
-    {
-        return Build(deviceId, modelId, DataSetCommand, address.Concat(data).ToArray());
-    }
+        IReadOnlyList<byte> data) =>
+        Build(deviceId, modelId, DataSetCommand, address.Concat(data).ToArray());
 
     private static SysExMessage Build(
         byte deviceId,
@@ -37,23 +33,17 @@ public static class RolandSysExBuilder
         ArgumentNullException.ThrowIfNull(addressAndData);
 
         if (modelId.Count == 0)
-        {
             throw new ArgumentException("Model ID must contain at least one byte.", nameof(modelId));
-        }
 
         if (addressAndData.Count == 0)
-        {
             throw new ArgumentException("Address/data payload must contain at least one byte.", nameof(addressAndData));
-        }
 
         var payload = addressAndData.ToArray();
         var checksum = RolandChecksum.Calculate(payload);
 
         var bytes = new List<byte>(2 + 1 + 1 + modelId.Count + 1 + payload.Length + 2)
         {
-            0xF0,
-            RolandManufacturerId,
-            deviceId,
+            0xF0, RolandManufacturerId, deviceId
         };
 
         bytes.AddRange(modelId);

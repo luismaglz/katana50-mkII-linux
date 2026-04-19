@@ -8,12 +8,9 @@ using Kataka.App.Views;
 
 namespace Kataka.App;
 
-public partial class App : Avalonia.Application
+public class App : Avalonia.Application
 {
-    public override void Initialize()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
     {

@@ -4,11 +4,13 @@ namespace Kataka.App.KatanaState;
 
 public partial class KatanaState
 {
-    /// <summary> Channel-mode stored preamp values (Temporary + Patch0 / Mk2V2 blocks) ─── </summary>
-    public PreampState Preamp { get; } = new();
-    public SoloEqState SoloEq { get; } = new();
     public PatchEqState PatchEq1 { get; } = new();
     public PatchEqState PatchEq2 { get; } = new(true);
+
+    /// <summary> Channel-mode stored preamp values (Temporary + Patch0 / Mk2V2 blocks) ─── </summary>
+    public PreampState Preamp { get; } = new();
+
+    public SoloEqState SoloEq { get; } = new();
 
     public ContourState Contour1 { get; } = new(KatanaMkIIParameterCatalog.Contour1Type,
         KatanaMkIIParameterCatalog.Contour1FreqShift);

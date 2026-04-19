@@ -4,6 +4,11 @@ namespace Kataka.App.KatanaState.FxPedals;
 
 public class VibratoState
 {
+    public AmpControlState Depth;
+    public AmpControlState Level;
+
+    public AmpControlState Rate;
+
     public VibratoState(bool isMod)
     {
         var p = isMod ? KatanaMkIIParameterCatalog.ModVibratoParams : KatanaMkIIParameterCatalog.FxVibratoParams;
@@ -11,8 +16,4 @@ public class VibratoState
         Depth = new AmpControlState(p[1], description: "Adjusts the depth of the vibrato.");
         Level = new AmpControlState(p[2], description: "Adjusts the volume.");
     }
-
-    public AmpControlState Rate;
-    public AmpControlState Depth;
-    public AmpControlState Level;
 }

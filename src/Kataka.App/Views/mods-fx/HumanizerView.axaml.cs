@@ -4,8 +4,5 @@ namespace Kataka.App.Views.ModsFx;
 
 public partial class HumanizerView : UserControl
 {
-    public HumanizerView()
-    {
-        InitializeComponent();
-    }
+    public HumanizerView() => InitializeComponent();
 }

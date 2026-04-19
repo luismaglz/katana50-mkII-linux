@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-
 using Avalonia.Media;
 
 using Kataka.App.KatanaState;
@@ -11,49 +8,60 @@ using ReactiveUI;
 
 namespace Kataka.App.ViewModels;
 
-public partial class ModFxPedalViewModel : PedalViewModel
+public class ModFxPedalViewModel : PedalViewModel
 {
     private static readonly IReadOnlyDictionary<byte, string> TypeTable = KatanaTypeNameTables.ModFxTypes;
+
     private static readonly IReadOnlyDictionary<string, byte> ReverseTypeTable =
         TypeTable.ToDictionary(kvp => kvp.Value, kvp => kvp.Key, StringComparer.OrdinalIgnoreCase);
 
-    /// <summary> Slot-level state ───────────────────────────────────────────────────────── </summary>
-    private readonly AmpControlState _enabledState;
-    private readonly AmpControlState _typeState;
-    private readonly AmpControlState _variationState;
+    private readonly AcGuitarSimState _acGuitarSim;
+    private readonly AcProcessorState _acProcessor;
+    private readonly AutoWahState _autoWah;
 
     /// <summary> Per-effect state ───────────────────────────────────────────────────────── </summary>
     private readonly ChorusState _chorus;
-    private readonly FlangerState _flanger;
-    private readonly PhaserState _phaser;
-    private readonly UniVState _uniV;
-    private readonly TremoloState _tremolo;
-    private readonly VibratoState _vibrato;
-    private readonly RotaryState _rotary;
-    private readonly RingModState _ringMod;
-    private readonly SlowGearState _slowGear;
-    private readonly SlicerState _slicer;
+
     private readonly CompState _comp;
-    private readonly LimiterState _limiter;
-    private readonly TWahState _tWah;
-    private readonly AutoWahState _autoWah;
-    private readonly PedalWahState _pedalWah;
-    private readonly GraphicEqState _graphicEq;
-    private readonly ParametricEQState _parametricEq;
-    private readonly GuitarSimState _guitarSim;
-    private readonly AcGuitarSimState _acGuitarSim;
-    private readonly AcProcessorState _acProcessor;
-    private readonly WaveSynthState _waveSynth;
-    private readonly OctaveState _octave;
-    private readonly HeavyOctaveState _heavyOctave;
-    private readonly PitchShifterState _pitchShifter;
-    private readonly HarmonistState _harmonist;
-    private readonly HumanizerState _humanizer;
-    private readonly Phaser90EState _phaser90E;
-    private readonly Flanger117EState _flanger117E;
-    private readonly Wah95EState _wah95E;
     private readonly DC30State _dc30;
+
+    /// <summary> Slot-level state ───────────────────────────────────────────────────────── </summary>
+    private readonly AmpControlState _enabledState;
+
+    private readonly FlangerState _flanger;
+    private readonly Flanger117EState _flanger117E;
+    private readonly GraphicEqState _graphicEq;
+    private readonly GuitarSimState _guitarSim;
+    private readonly HarmonistState _harmonist;
+    private readonly HeavyOctaveState _heavyOctave;
+    private readonly HumanizerState _humanizer;
+    private readonly LimiterState _limiter;
+    private readonly OctaveState _octave;
+    private readonly ParametricEQState _parametricEq;
     private readonly PedalBendState _pedalBend;
+    private readonly PedalWahState _pedalWah;
+    private readonly PhaserState _phaser;
+    private readonly Phaser90EState _phaser90E;
+    private readonly PitchShifterState _pitchShifter;
+    private readonly RingModState _ringMod;
+    private readonly RotaryState _rotary;
+    private readonly SlicerState _slicer;
+    private readonly SlowGearState _slowGear;
+    private readonly TremoloState _tremolo;
+    private readonly TWahState _tWah;
+    private readonly AmpControlState _typeState;
+    private readonly UniVState _uniV;
+    private readonly AmpControlState _variationState;
+    private readonly VibratoState _vibrato;
+    private readonly Wah95EState _wah95E;
+    private readonly WaveSynthState _waveSynth;
+
+    // Tracks type index for IsTypeXxx view switching.
+    private int _selectedTypeIndex;
+
+    private string? _selectedTypeOption;
+
+    private string _variation = "N/A";
 
     public ModFxPedalViewModel(string slot, IKatanaState katanaState) : base(
         KatanaMkIIParameterCatalog.PanelEffects.First(e => e.Key == slot))
@@ -366,11 +374,10 @@ public partial class ModFxPedalViewModel : PedalViewModel
 
     /// <summary> Common view properties ──────────────────────────────────────────────────── </summary>
     public IReadOnlyList<string> TypeOptions { get; }
+
     public bool HasTypeOptions => TypeOptions.Count > 0;
     public IBrush VariationBrush => GetVariationBrush(Variation);
 
-    // Tracks type index for IsTypeXxx view switching.
-    private int _selectedTypeIndex;
     public int SelectedTypeIndex
     {
         get => _selectedTypeIndex;
@@ -450,7 +457,6 @@ public partial class ModFxPedalViewModel : PedalViewModel
         set => _enabledState.Value = value ? 1 : 0;
     }
 
-    private string? _selectedTypeOption;
     public override string? SelectedTypeOption
     {
         get => _selectedTypeOption;
@@ -466,7 +472,6 @@ public partial class ModFxPedalViewModel : PedalViewModel
         }
     }
 
-    private string _variation = "N/A";
     public override string Variation
     {
         get => _variation;
@@ -481,6 +486,1123 @@ public partial class ModFxPedalViewModel : PedalViewModel
 
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
+    /// <summary> CHORUS params ───────────────────────────────────────────────────────────── </summary>
+    public int ChorusXoverFreq
+    {
+        get => _chorus.XoverFreq.Value;
+        set => _chorus.XoverFreq.Value = value;
+    }
+
+    public int ChorusLowRate
+    {
+        get => _chorus.LowRate.Value;
+        set => _chorus.LowRate.Value = value;
+    }
+
+    public int ChorusLowDepth
+    {
+        get => _chorus.LowDepth.Value;
+        set => _chorus.LowDepth.Value = value;
+    }
+
+    public int ChorusLowPreDelay
+    {
+        get => _chorus.LowPreDelay.Value;
+        set => _chorus.LowPreDelay.Value = value;
+    }
+
+    public int ChorusLowLevel
+    {
+        get => _chorus.LowLevel.Value;
+        set => _chorus.LowLevel.Value = value;
+    }
+
+    public int ChorusHighRate
+    {
+        get => _chorus.HighRate.Value;
+        set => _chorus.HighRate.Value = value;
+    }
+
+    public int ChorusHighDepth
+    {
+        get => _chorus.HighDepth.Value;
+        set => _chorus.HighDepth.Value = value;
+    }
+
+    public int ChorusHighPreDelay
+    {
+        get => _chorus.HighPreDelay.Value;
+        set => _chorus.HighPreDelay.Value = value;
+    }
+
+    public int ChorusHighLevel
+    {
+        get => _chorus.HighLevel.Value;
+        set => _chorus.HighLevel.Value = value;
+    }
+
+    public int ChorusDirectMix
+    {
+        get => _chorus.DirectMix.Value;
+        set => _chorus.DirectMix.Value = value;
+    }
+
+    /// <summary> FLANGER params ──────────────────────────────────────────────────────────── </summary>
+    public int FlangerRate
+    {
+        get => _flanger.Rate.Value;
+        set => _flanger.Rate.Value = value;
+    }
+
+    public int FlangerDepth
+    {
+        get => _flanger.Depth.Value;
+        set => _flanger.Depth.Value = value;
+    }
+
+    public int FlangerManual
+    {
+        get => _flanger.Manual.Value;
+        set => _flanger.Manual.Value = value;
+    }
+
+    public int FlangerResonance
+    {
+        get => _flanger.Resonance.Value;
+        set => _flanger.Resonance.Value = value;
+    }
+
+    public int FlangerLowCut
+    {
+        get => _flanger.LowCut.Value;
+        set => _flanger.LowCut.Value = value;
+    }
+
+    public int FlangerEffectLevel
+    {
+        get => _flanger.EffectLevel.Value;
+        set => _flanger.EffectLevel.Value = value;
+    }
+
+    public int FlangerDirectMix
+    {
+        get => _flanger.DirectMix.Value;
+        set => _flanger.DirectMix.Value = value;
+    }
+
+    /// <summary> PHASER params ───────────────────────────────────────────────────────────── </summary>
+    public int PhaserType
+    {
+        get => _phaser.Type.Value;
+        set => _phaser.Type.Value = value;
+    }
+
+    public int PhaserRate
+    {
+        get => _phaser.Rate.Value;
+        set => _phaser.Rate.Value = value;
+    }
+
+    public int PhaserDepth
+    {
+        get => _phaser.Depth.Value;
+        set => _phaser.Depth.Value = value;
+    }
+
+    public int PhaserManual
+    {
+        get => _phaser.Manual.Value;
+        set => _phaser.Manual.Value = value;
+    }
+
+    public int PhaserResonance
+    {
+        get => _phaser.Resonance.Value;
+        set => _phaser.Resonance.Value = value;
+    }
+
+    public int PhaserStepRate
+    {
+        get => _phaser.StepRate.Value;
+        set => _phaser.StepRate.Value = value;
+    }
+
+    public int PhaserEffectLevel
+    {
+        get => _phaser.EffectLevel.Value;
+        set => _phaser.EffectLevel.Value = value;
+    }
+
+    public int PhaserDirectMix
+    {
+        get => _phaser.DirectMix.Value;
+        set => _phaser.DirectMix.Value = value;
+    }
+
+    /// <summary> UNI-V params ────────────────────────────────────────────────────────────── </summary>
+    public int UniVRate
+    {
+        get => _uniV.Rate.Value;
+        set => _uniV.Rate.Value = value;
+    }
+
+    public int UniVDepth
+    {
+        get => _uniV.Depth.Value;
+        set => _uniV.Depth.Value = value;
+    }
+
+    public int UniVLevel
+    {
+        get => _uniV.Level.Value;
+        set => _uniV.Level.Value = value;
+    }
+
+    /// <summary> TREMOLO params ──────────────────────────────────────────────────────────── </summary>
+    public int TremoloWaveShape
+    {
+        get => _tremolo.WaveShape.Value;
+        set => _tremolo.WaveShape.Value = value;
+    }
+
+    public int TremoloRate
+    {
+        get => _tremolo.Rate.Value;
+        set => _tremolo.Rate.Value = value;
+    }
+
+    public int TremoloDepth
+    {
+        get => _tremolo.Depth.Value;
+        set => _tremolo.Depth.Value = value;
+    }
+
+    public int TremoloLevel
+    {
+        get => _tremolo.Level.Value;
+        set => _tremolo.Level.Value = value;
+    }
+
+    /// <summary> VIBRATO params ──────────────────────────────────────────────────────────── </summary>
+    public int VibratoRate
+    {
+        get => _vibrato.Rate.Value;
+        set => _vibrato.Rate.Value = value;
+    }
+
+    public int VibratoDepth
+    {
+        get => _vibrato.Depth.Value;
+        set => _vibrato.Depth.Value = value;
+    }
+
+    public int VibratoLevel
+    {
+        get => _vibrato.Level.Value;
+        set => _vibrato.Level.Value = value;
+    }
+
+    /// <summary> ROTARY params ───────────────────────────────────────────────────────────── </summary>
+    public int RotaryRateFast
+    {
+        get => _rotary.RateFast.Value;
+        set => _rotary.RateFast.Value = value;
+    }
+
+    public int RotaryDepth
+    {
+        get => _rotary.Depth.Value;
+        set => _rotary.Depth.Value = value;
+    }
+
+    public int RotaryLevel
+    {
+        get => _rotary.Level.Value;
+        set => _rotary.Level.Value = value;
+    }
+
+    /// <summary> RING MOD params ─────────────────────────────────────────────────────────── </summary>
+    public int RingModMode
+    {
+        get => _ringMod.Mode.Value;
+        set => _ringMod.Mode.Value = value;
+    }
+
+    public int RingModFrequency
+    {
+        get => _ringMod.Frequency.Value;
+        set => _ringMod.Frequency.Value = value;
+    }
+
+    public int RingModEffectLevel
+    {
+        get => _ringMod.EffectLevel.Value;
+        set => _ringMod.EffectLevel.Value = value;
+    }
+
+    public int RingModDirectMix
+    {
+        get => _ringMod.DirectMix.Value;
+        set => _ringMod.DirectMix.Value = value;
+    }
+
+    /// <summary> SLOW GEAR params ────────────────────────────────────────────────────────── </summary>
+    public int SlowGearSens
+    {
+        get => _slowGear.Sens.Value;
+        set => _slowGear.Sens.Value = value;
+    }
+
+    public int SlowGearRiseTime
+    {
+        get => _slowGear.RiseTime.Value;
+        set => _slowGear.RiseTime.Value = value;
+    }
+
+    public int SlowGearLevel
+    {
+        get => _slowGear.Level.Value;
+        set => _slowGear.Level.Value = value;
+    }
+
+    /// <summary> SLICER params ───────────────────────────────────────────────────────────── </summary>
+    public int SlicerPattern
+    {
+        get => _slicer.Pattern.Value;
+        set => _slicer.Pattern.Value = value;
+    }
+
+    public int SlicerRate
+    {
+        get => _slicer.Rate.Value;
+        set => _slicer.Rate.Value = value;
+    }
+
+    public int SlicerTriggerSens
+    {
+        get => _slicer.TriggerSens.Value;
+        set => _slicer.TriggerSens.Value = value;
+    }
+
+    public int SlicerEffectLevel
+    {
+        get => _slicer.EffectLevel.Value;
+        set => _slicer.EffectLevel.Value = value;
+    }
+
+    public int SlicerDirectMix
+    {
+        get => _slicer.DirectMix.Value;
+        set => _slicer.DirectMix.Value = value;
+    }
+
+    /// <summary> COMP params ─────────────────────────────────────────────────────────────── </summary>
+    public int CompType
+    {
+        get => _comp.Type.Value;
+        set => _comp.Type.Value = value;
+    }
+
+    public int CompSustain
+    {
+        get => _comp.Sustain.Value;
+        set => _comp.Sustain.Value = value;
+    }
+
+    public int CompAttack
+    {
+        get => _comp.Attack.Value;
+        set => _comp.Attack.Value = value;
+    }
+
+    public int CompTone
+    {
+        get => _comp.Tone.Value;
+        set => _comp.Tone.Value = value;
+    }
+
+    public int CompLevel
+    {
+        get => _comp.Level.Value;
+        set => _comp.Level.Value = value;
+    }
+
+    /// <summary> LIMITER params ──────────────────────────────────────────────────────────── </summary>
+    public int LimiterType
+    {
+        get => _limiter.Type.Value;
+        set => _limiter.Type.Value = value;
+    }
+
+    public int LimiterAttack
+    {
+        get => _limiter.Attack.Value;
+        set => _limiter.Attack.Value = value;
+    }
+
+    public int LimiterThreshold
+    {
+        get => _limiter.Threshold.Value;
+        set => _limiter.Threshold.Value = value;
+    }
+
+    public int LimiterRatio
+    {
+        get => _limiter.Ratio.Value;
+        set => _limiter.Ratio.Value = value;
+    }
+
+    public int LimiterRelease
+    {
+        get => _limiter.Release.Value;
+        set => _limiter.Release.Value = value;
+    }
+
+    public int LimiterLevel
+    {
+        get => _limiter.Level.Value;
+        set => _limiter.Level.Value = value;
+    }
+
+    /// <summary> T.WAH params ────────────────────────────────────────────────────────────── </summary>
+    public int TWahMode
+    {
+        get => _tWah.Mode.Value;
+        set => _tWah.Mode.Value = value;
+    }
+
+    public int TWahPolarity
+    {
+        get => _tWah.Polarity.Value;
+        set => _tWah.Polarity.Value = value;
+    }
+
+    public int TWahSens
+    {
+        get => _tWah.Sens.Value;
+        set => _tWah.Sens.Value = value;
+    }
+
+    public int TWahFreq
+    {
+        get => _tWah.Freq.Value;
+        set => _tWah.Freq.Value = value;
+    }
+
+    public int TWahPeak
+    {
+        get => _tWah.Peak.Value;
+        set => _tWah.Peak.Value = value;
+    }
+
+    public int TWahDirectMix
+    {
+        get => _tWah.DirectMix.Value;
+        set => _tWah.DirectMix.Value = value;
+    }
+
+    public int TWahEffectLevel
+    {
+        get => _tWah.EffectLevel.Value;
+        set => _tWah.EffectLevel.Value = value;
+    }
+
+    /// <summary> AUTO WAH params ─────────────────────────────────────────────────────────── </summary>
+    public int AutoWahMode
+    {
+        get => _autoWah.Mode.Value;
+        set => _autoWah.Mode.Value = value;
+    }
+
+    public int AutoWahFreq
+    {
+        get => _autoWah.Freq.Value;
+        set => _autoWah.Freq.Value = value;
+    }
+
+    public int AutoWahPeak
+    {
+        get => _autoWah.Peak.Value;
+        set => _autoWah.Peak.Value = value;
+    }
+
+    public int AutoWahRate
+    {
+        get => _autoWah.Rate.Value;
+        set => _autoWah.Rate.Value = value;
+    }
+
+    public int AutoWahDepth
+    {
+        get => _autoWah.Depth.Value;
+        set => _autoWah.Depth.Value = value;
+    }
+
+    public int AutoWahDirectMix
+    {
+        get => _autoWah.DirectMix.Value;
+        set => _autoWah.DirectMix.Value = value;
+    }
+
+    public int AutoWahEffectLevel
+    {
+        get => _autoWah.EffectLevel.Value;
+        set => _autoWah.EffectLevel.Value = value;
+    }
+
+    /// <summary> PEDAL WAH params ────────────────────────────────────────────────────────── </summary>
+    public int PedalWahType
+    {
+        get => _pedalWah.Type.Value;
+        set => _pedalWah.Type.Value = value;
+    }
+
+    public int PedalWahPedalPosition
+    {
+        get => _pedalWah.PedalPos.Value;
+        set => _pedalWah.PedalPos.Value = value;
+    }
+
+    public int PedalWahPedalMin
+    {
+        get => _pedalWah.PedalMin.Value;
+        set => _pedalWah.PedalMin.Value = value;
+    }
+
+    public int PedalWahPedalMax
+    {
+        get => _pedalWah.PedalMax.Value;
+        set => _pedalWah.PedalMax.Value = value;
+    }
+
+    public int PedalWahEffectLevel
+    {
+        get => _pedalWah.EffectLevel.Value;
+        set => _pedalWah.EffectLevel.Value = value;
+    }
+
+    public int PedalWahDirectMix
+    {
+        get => _pedalWah.DirectMix.Value;
+        set => _pedalWah.DirectMix.Value = value;
+    }
+
+    /// <summary> GRAPHIC EQ params ───────────────────────────────────────────────────────── </summary>
+    public int GraphicEq31Hz
+    {
+        get => _graphicEq.Hz31.Value;
+        set => _graphicEq.Hz31.Value = value;
+    }
+
+    public int GraphicEq62Hz
+    {
+        get => _graphicEq.Hz62.Value;
+        set => _graphicEq.Hz62.Value = value;
+    }
+
+    public int GraphicEq125Hz
+    {
+        get => _graphicEq.Hz125.Value;
+        set => _graphicEq.Hz125.Value = value;
+    }
+
+    public int GraphicEq250Hz
+    {
+        get => _graphicEq.Hz250.Value;
+        set => _graphicEq.Hz250.Value = value;
+    }
+
+    public int GraphicEq500Hz
+    {
+        get => _graphicEq.Hz500.Value;
+        set => _graphicEq.Hz500.Value = value;
+    }
+
+    public int GraphicEq1kHz
+    {
+        get => _graphicEq.kHz1.Value;
+        set => _graphicEq.kHz1.Value = value;
+    }
+
+    public int GraphicEq2kHz
+    {
+        get => _graphicEq.kHz2.Value;
+        set => _graphicEq.kHz2.Value = value;
+    }
+
+    public int GraphicEq4kHz
+    {
+        get => _graphicEq.kHz4.Value;
+        set => _graphicEq.kHz4.Value = value;
+    }
+
+    public int GraphicEq8kHz
+    {
+        get => _graphicEq.kHz8.Value;
+        set => _graphicEq.kHz8.Value = value;
+    }
+
+    public int GraphicEq16kHz
+    {
+        get => _graphicEq.kHz16.Value;
+        set => _graphicEq.kHz16.Value = value;
+    }
+
+    public int GraphicEqLevel
+    {
+        get => _graphicEq.Level.Value;
+        set => _graphicEq.Level.Value = value;
+    }
+
+    /// <summary> PARAMETRIC EQ params ────────────────────────────────────────────────────── </summary>
+    public int ParametricEqLowCut
+    {
+        get => _parametricEq.LowCut.Value;
+        set => _parametricEq.LowCut.Value = value;
+    }
+
+    public int ParametricEqLowGain
+    {
+        get => _parametricEq.LowGain.Value;
+        set => _parametricEq.LowGain.Value = value;
+    }
+
+    public int ParametricEqLowMidFreq
+    {
+        get => _parametricEq.LoMidFreq.Value;
+        set => _parametricEq.LoMidFreq.Value = value;
+    }
+
+    public int ParametricEqLowMidQ
+    {
+        get => _parametricEq.LoMidQ.Value;
+        set => _parametricEq.LoMidQ.Value = value;
+    }
+
+    public int ParametricEqLowMidGain
+    {
+        get => _parametricEq.LoMidGain.Value;
+        set => _parametricEq.LoMidGain.Value = value;
+    }
+
+    public int ParametricEqHighMidFreq
+    {
+        get => _parametricEq.HiMidFreq.Value;
+        set => _parametricEq.HiMidFreq.Value = value;
+    }
+
+    public int ParametricEqHighMidQ
+    {
+        get => _parametricEq.HiMidQ.Value;
+        set => _parametricEq.HiMidQ.Value = value;
+    }
+
+    public int ParametricEqHighMidGain
+    {
+        get => _parametricEq.HiMidGain.Value;
+        set => _parametricEq.HiMidGain.Value = value;
+    }
+
+    public int ParametricEqHighGain
+    {
+        get => _parametricEq.HighGain.Value;
+        set => _parametricEq.HighGain.Value = value;
+    }
+
+    public int ParametricEqHighCut
+    {
+        get => _parametricEq.HighCut.Value;
+        set => _parametricEq.HighCut.Value = value;
+    }
+
+    public int ParametricEqLevel
+    {
+        get => _parametricEq.Level.Value;
+        set => _parametricEq.Level.Value = value;
+    }
+
+    /// <summary> GUITAR SIM params ───────────────────────────────────────────────────────── </summary>
+    public int GuitarSimType
+    {
+        get => _guitarSim.Type.Value;
+        set => _guitarSim.Type.Value = value;
+    }
+
+    public int GuitarSimLow
+    {
+        get => _guitarSim.Low.Value;
+        set => _guitarSim.Low.Value = value;
+    }
+
+    public int GuitarSimHigh
+    {
+        get => _guitarSim.High.Value;
+        set => _guitarSim.High.Value = value;
+    }
+
+    public int GuitarSimLevel
+    {
+        get => _guitarSim.Level.Value;
+        set => _guitarSim.Level.Value = value;
+    }
+
+    public int GuitarSimBody
+    {
+        get => _guitarSim.Body.Value;
+        set => _guitarSim.Body.Value = value;
+    }
+
+    /// <summary> AC. GUITAR SIM params ───────────────────────────────────────────────────── </summary>
+    public int AcGuitarSimHigh
+    {
+        get => _acGuitarSim.High.Value;
+        set => _acGuitarSim.High.Value = value;
+    }
+
+    public int AcGuitarSimBody
+    {
+        get => _acGuitarSim.Body.Value;
+        set => _acGuitarSim.Body.Value = value;
+    }
+
+    public int AcGuitarSimLow
+    {
+        get => _acGuitarSim.Low.Value;
+        set => _acGuitarSim.Low.Value = value;
+    }
+
+    public int AcGuitarSimLevel
+    {
+        get => _acGuitarSim.Level.Value;
+        set => _acGuitarSim.Level.Value = value;
+    }
+
+    /// <summary> AC. PROCESSOR params ────────────────────────────────────────────────────── </summary>
+    public int AcProcessorType
+    {
+        get => _acProcessor.Type.Value;
+        set => _acProcessor.Type.Value = value;
+    }
+
+    public int AcProcessorBass
+    {
+        get => _acProcessor.Bass.Value;
+        set => _acProcessor.Bass.Value = value;
+    }
+
+    public int AcProcessorMid
+    {
+        get => _acProcessor.Mid.Value;
+        set => _acProcessor.Mid.Value = value;
+    }
+
+    public int AcProcessorMidFreq
+    {
+        get => _acProcessor.MidFreq.Value;
+        set => _acProcessor.MidFreq.Value = value;
+    }
+
+    public int AcProcessorTreble
+    {
+        get => _acProcessor.Treble.Value;
+        set => _acProcessor.Treble.Value = value;
+    }
+
+    public int AcProcessorPresence
+    {
+        get => _acProcessor.Presence.Value;
+        set => _acProcessor.Presence.Value = value;
+    }
+
+    public int AcProcessorLevel
+    {
+        get => _acProcessor.Level.Value;
+        set => _acProcessor.Level.Value = value;
+    }
+
+    /// <summary> WAVE SYNTH params ───────────────────────────────────────────────────────── </summary>
+    public int WaveSynthWave
+    {
+        get => _waveSynth.Wave.Value;
+        set => _waveSynth.Wave.Value = value;
+    }
+
+    public int WaveSynthCutoff
+    {
+        get => _waveSynth.Cutoff.Value;
+        set => _waveSynth.Cutoff.Value = value;
+    }
+
+    public int WaveSynthResonance
+    {
+        get => _waveSynth.Resonance.Value;
+        set => _waveSynth.Resonance.Value = value;
+    }
+
+    public int WaveSynthFilterSens
+    {
+        get => _waveSynth.FilterSens.Value;
+        set => _waveSynth.FilterSens.Value = value;
+    }
+
+    public int WaveSynthFilterDecay
+    {
+        get => _waveSynth.FilterDecay.Value;
+        set => _waveSynth.FilterDecay.Value = value;
+    }
+
+    public int WaveSynthFilterDepth
+    {
+        get => _waveSynth.FilterDepth.Value;
+        set => _waveSynth.FilterDepth.Value = value;
+    }
+
+    public int WaveSynthSynthLevel
+    {
+        get => _waveSynth.SynthLevel.Value;
+        set => _waveSynth.SynthLevel.Value = value;
+    }
+
+    public int WaveSynthDirectMix
+    {
+        get => _waveSynth.DirectMix.Value;
+        set => _waveSynth.DirectMix.Value = value;
+    }
+
+    /// <summary> OCTAVE params ───────────────────────────────────────────────────────────── </summary>
+    public int OctaveRange
+    {
+        get => _octave.Range.Value;
+        set => _octave.Range.Value = value;
+    }
+
+    public int OctaveEffectLevel
+    {
+        get => _octave.EffectLevel.Value;
+        set => _octave.EffectLevel.Value = value;
+    }
+
+    public int OctaveDirectMix
+    {
+        get => _octave.DirectMix.Value;
+        set => _octave.DirectMix.Value = value;
+    }
+
+    /// <summary> HEAVY OCTAVE params ─────────────────────────────────────────────────────── </summary>
+    public int HeavyOctave1OctLevel
+    {
+        get => _heavyOctave.Oct1Level.Value;
+        set => _heavyOctave.Oct1Level.Value = value;
+    }
+
+    public int HeavyOctave2OctLevel
+    {
+        get => _heavyOctave.Oct2Level.Value;
+        set => _heavyOctave.Oct2Level.Value = value;
+    }
+
+    public int HeavyOctaveDirectMix
+    {
+        get => _heavyOctave.DirectMix.Value;
+        set => _heavyOctave.DirectMix.Value = value;
+    }
+
+    /// <summary> PITCH SHIFTER params ────────────────────────────────────────────────────── </summary>
+    public int PitchShifterVoice
+    {
+        get => _pitchShifter.Voice.Value;
+        set => _pitchShifter.Voice.Value = value;
+    }
+
+    public int PitchShifterPS1Mode
+    {
+        get => _pitchShifter.Ps1Mode.Value;
+        set => _pitchShifter.Ps1Mode.Value = value;
+    }
+
+    public int PitchShifterPS1Pitch
+    {
+        get => _pitchShifter.Ps1Pitch.Value;
+        set => _pitchShifter.Ps1Pitch.Value = value;
+    }
+
+    public int PitchShifterPS1Fine
+    {
+        get => _pitchShifter.Ps1Fine.Value;
+        set => _pitchShifter.Ps1Fine.Value = value;
+    }
+
+    public int PitchShifterPS1Level
+    {
+        get => _pitchShifter.Ps1Level.Value;
+        set => _pitchShifter.Ps1Level.Value = value;
+    }
+
+    public int PitchShifterPS2Mode
+    {
+        get => _pitchShifter.Ps2Mode.Value;
+        set => _pitchShifter.Ps2Mode.Value = value;
+    }
+
+    public int PitchShifterPS2Pitch
+    {
+        get => _pitchShifter.Ps2Pitch.Value;
+        set => _pitchShifter.Ps2Pitch.Value = value;
+    }
+
+    public int PitchShifterPS2Fine
+    {
+        get => _pitchShifter.Ps2Fine.Value;
+        set => _pitchShifter.Ps2Fine.Value = value;
+    }
+
+    public int PitchShifterPS2Level
+    {
+        get => _pitchShifter.Ps2Level.Value;
+        set => _pitchShifter.Ps2Level.Value = value;
+    }
+
+    public int PitchShifterFeedback
+    {
+        get => _pitchShifter.Feedback.Value;
+        set => _pitchShifter.Feedback.Value = value;
+    }
+
+    public int PitchShifterDirectMix
+    {
+        get => _pitchShifter.DirectMix.Value;
+        set => _pitchShifter.DirectMix.Value = value;
+    }
+
+    /// <summary> HARMONIST params ────────────────────────────────────────────────────────── </summary>
+    public int HarmonistVoice
+    {
+        get => _harmonist.Voice.Value;
+        set => _harmonist.Voice.Value = value;
+    }
+
+    public int HarmonistHarmony1
+    {
+        get => _harmonist.Harmony1.Value;
+        set => _harmonist.Harmony1.Value = value;
+    }
+
+    public int HarmonistLevel1
+    {
+        get => _harmonist.Level1.Value;
+        set => _harmonist.Level1.Value = value;
+    }
+
+    public int HarmonistHarmony2
+    {
+        get => _harmonist.Harmony2.Value;
+        set => _harmonist.Harmony2.Value = value;
+    }
+
+    public int HarmonistLevel2
+    {
+        get => _harmonist.Level2.Value;
+        set => _harmonist.Level2.Value = value;
+    }
+
+    public int HarmonistFeedback
+    {
+        get => _harmonist.Feedback.Value;
+        set => _harmonist.Feedback.Value = value;
+    }
+
+    public int HarmonistDirectMix
+    {
+        get => _harmonist.DirectMix.Value;
+        set => _harmonist.DirectMix.Value = value;
+    }
+
+    /// <summary> HUMANIZER params ────────────────────────────────────────────────────────── </summary>
+    public int HumanizerMode
+    {
+        get => _humanizer.Mode.Value;
+        set => _humanizer.Mode.Value = value;
+    }
+
+    public int HumanizerVowel1
+    {
+        get => _humanizer.Vowel1.Value;
+        set => _humanizer.Vowel1.Value = value;
+    }
+
+    public int HumanizerVowel2
+    {
+        get => _humanizer.Vowel2.Value;
+        set => _humanizer.Vowel2.Value = value;
+    }
+
+    public int HumanizerSens
+    {
+        get => _humanizer.Sens.Value;
+        set => _humanizer.Sens.Value = value;
+    }
+
+    public int HumanizerRate
+    {
+        get => _humanizer.Rate.Value;
+        set => _humanizer.Rate.Value = value;
+    }
+
+    public int HumanizerDepth
+    {
+        get => _humanizer.Depth.Value;
+        set => _humanizer.Depth.Value = value;
+    }
+
+    public int HumanizerManual
+    {
+        get => _humanizer.Manual.Value;
+        set => _humanizer.Manual.Value = value;
+    }
+
+    public int HumanizerLevel
+    {
+        get => _humanizer.Level.Value;
+        set => _humanizer.Level.Value = value;
+    }
+
+    /// <summary> PHASER 90E params ───────────────────────────────────────────────────────── </summary>
+    public int Phaser90EScript
+    {
+        get => _phaser90E.Script.Value;
+        set => _phaser90E.Script.Value = value;
+    }
+
+    public int Phaser90ESpeed
+    {
+        get => _phaser90E.Speed.Value;
+        set => _phaser90E.Speed.Value = value;
+    }
+
+    /// <summary> FLANGER 117E params ─────────────────────────────────────────────────────── </summary>
+    public int Flanger117EManual
+    {
+        get => _flanger117E.Manual.Value;
+        set => _flanger117E.Manual.Value = value;
+    }
+
+    public int Flanger117EWidth
+    {
+        get => _flanger117E.Width.Value;
+        set => _flanger117E.Width.Value = value;
+    }
+
+    public int Flanger117ESpeed
+    {
+        get => _flanger117E.Speed.Value;
+        set => _flanger117E.Speed.Value = value;
+    }
+
+    public int Flanger117ERegen
+    {
+        get => _flanger117E.Regen.Value;
+        set => _flanger117E.Regen.Value = value;
+    }
+
+    /// <summary> WAH 95E params ──────────────────────────────────────────────────────────── </summary>
+    public int Wah95EPedalPosition
+    {
+        get => _wah95E.PedalPos.Value;
+        set => _wah95E.PedalPos.Value = value;
+    }
+
+    public int Wah95EPedalMin
+    {
+        get => _wah95E.PedalMin.Value;
+        set => _wah95E.PedalMin.Value = value;
+    }
+
+    public int Wah95EPedalMax
+    {
+        get => _wah95E.PedalMax.Value;
+        set => _wah95E.PedalMax.Value = value;
+    }
+
+    public int Wah95EEffectLevel
+    {
+        get => _wah95E.EffectLevel.Value;
+        set => _wah95E.EffectLevel.Value = value;
+    }
+
+    public int Wah95EDirectMix
+    {
+        get => _wah95E.DirectMix.Value;
+        set => _wah95E.DirectMix.Value = value;
+    }
+
+    /// <summary> DC-30 params ────────────────────────────────────────────────────────────── </summary>
+    public int DC30Selector
+    {
+        get => _dc30.Selector.Value;
+        set => _dc30.Selector.Value = value;
+    }
+
+    public int DC30InputVolume
+    {
+        get => _dc30.InputVolume.Value;
+        set => _dc30.InputVolume.Value = value;
+    }
+
+    public int DC30ChorusIntensity
+    {
+        get => _dc30.ChorusIntensity.Value;
+        set => _dc30.ChorusIntensity.Value = value;
+    }
+
+    public int DC30EchoIntensity
+    {
+        get => _dc30.EchoIntensity.Value;
+        set => _dc30.EchoIntensity.Value = value;
+    }
+
+    public int DC30EchoVolume
+    {
+        get => _dc30.EchoVolume.Value;
+        set => _dc30.EchoVolume.Value = value;
+    }
+
+    public int DC30Tone
+    {
+        get => _dc30.Tone.Value;
+        set => _dc30.Tone.Value = value;
+    }
+
+    public int DC30Output
+    {
+        get => _dc30.Output.Value;
+        set => _dc30.Output.Value = value;
+    }
+
+    /// <summary> PEDAL BEND params ───────────────────────────────────────────────────────── </summary>
+    public int PedalBendPitch
+    {
+        get => _pedalBend.Pitch.Value;
+        set => _pedalBend.Pitch.Value = value;
+    }
+
+    public int PedalBendPedalPosition
+    {
+        get => _pedalBend.PedalPos.Value;
+        set => _pedalBend.PedalPos.Value = value;
+    }
+
+    public int PedalBendEffectLevel
+    {
+        get => _pedalBend.EffectLevel.Value;
+        set => _pedalBend.EffectLevel.Value = value;
+    }
+
+    public int PedalBendDirectMix
+    {
+        get => _pedalBend.DirectMix.Value;
+        set => _pedalBend.DirectMix.Value = value;
+    }
+
     public override bool TryGetTypeValue(string? option, out byte value)
     {
         if (option is not null && ReverseTypeTable.TryGetValue(option, out value))
@@ -491,247 +1613,4 @@ public partial class ModFxPedalViewModel : PedalViewModel
 
     public override string ToTypeOption(byte rawValue) =>
         TypeTable.TryGetValue(rawValue, out var name) ? name : $"Type {rawValue}";
-
-    /// <summary> CHORUS params ───────────────────────────────────────────────────────────── </summary>
-    public int ChorusXoverFreq { get => _chorus.XoverFreq.Value; set => _chorus.XoverFreq.Value = value; }
-    public int ChorusLowRate { get => _chorus.LowRate.Value; set => _chorus.LowRate.Value = value; }
-    public int ChorusLowDepth { get => _chorus.LowDepth.Value; set => _chorus.LowDepth.Value = value; }
-    public int ChorusLowPreDelay { get => _chorus.LowPreDelay.Value; set => _chorus.LowPreDelay.Value = value; }
-    public int ChorusLowLevel { get => _chorus.LowLevel.Value; set => _chorus.LowLevel.Value = value; }
-    public int ChorusHighRate { get => _chorus.HighRate.Value; set => _chorus.HighRate.Value = value; }
-    public int ChorusHighDepth { get => _chorus.HighDepth.Value; set => _chorus.HighDepth.Value = value; }
-    public int ChorusHighPreDelay { get => _chorus.HighPreDelay.Value; set => _chorus.HighPreDelay.Value = value; }
-    public int ChorusHighLevel { get => _chorus.HighLevel.Value; set => _chorus.HighLevel.Value = value; }
-    public int ChorusDirectMix { get => _chorus.DirectMix.Value; set => _chorus.DirectMix.Value = value; }
-
-    /// <summary> FLANGER params ──────────────────────────────────────────────────────────── </summary>
-    public int FlangerRate { get => _flanger.Rate.Value; set => _flanger.Rate.Value = value; }
-    public int FlangerDepth { get => _flanger.Depth.Value; set => _flanger.Depth.Value = value; }
-    public int FlangerManual { get => _flanger.Manual.Value; set => _flanger.Manual.Value = value; }
-    public int FlangerResonance { get => _flanger.Resonance.Value; set => _flanger.Resonance.Value = value; }
-    public int FlangerLowCut { get => _flanger.LowCut.Value; set => _flanger.LowCut.Value = value; }
-    public int FlangerEffectLevel { get => _flanger.EffectLevel.Value; set => _flanger.EffectLevel.Value = value; }
-    public int FlangerDirectMix { get => _flanger.DirectMix.Value; set => _flanger.DirectMix.Value = value; }
-
-    /// <summary> PHASER params ───────────────────────────────────────────────────────────── </summary>
-    public int PhaserType { get => _phaser.Type.Value; set => _phaser.Type.Value = value; }
-    public int PhaserRate { get => _phaser.Rate.Value; set => _phaser.Rate.Value = value; }
-    public int PhaserDepth { get => _phaser.Depth.Value; set => _phaser.Depth.Value = value; }
-    public int PhaserManual { get => _phaser.Manual.Value; set => _phaser.Manual.Value = value; }
-    public int PhaserResonance { get => _phaser.Resonance.Value; set => _phaser.Resonance.Value = value; }
-    public int PhaserStepRate { get => _phaser.StepRate.Value; set => _phaser.StepRate.Value = value; }
-    public int PhaserEffectLevel { get => _phaser.EffectLevel.Value; set => _phaser.EffectLevel.Value = value; }
-    public int PhaserDirectMix { get => _phaser.DirectMix.Value; set => _phaser.DirectMix.Value = value; }
-
-    /// <summary> UNI-V params ────────────────────────────────────────────────────────────── </summary>
-    public int UniVRate { get => _uniV.Rate.Value; set => _uniV.Rate.Value = value; }
-    public int UniVDepth { get => _uniV.Depth.Value; set => _uniV.Depth.Value = value; }
-    public int UniVLevel { get => _uniV.Level.Value; set => _uniV.Level.Value = value; }
-
-    /// <summary> TREMOLO params ──────────────────────────────────────────────────────────── </summary>
-    public int TremoloWaveShape { get => _tremolo.WaveShape.Value; set => _tremolo.WaveShape.Value = value; }
-    public int TremoloRate { get => _tremolo.Rate.Value; set => _tremolo.Rate.Value = value; }
-    public int TremoloDepth { get => _tremolo.Depth.Value; set => _tremolo.Depth.Value = value; }
-    public int TremoloLevel { get => _tremolo.Level.Value; set => _tremolo.Level.Value = value; }
-
-    /// <summary> VIBRATO params ──────────────────────────────────────────────────────────── </summary>
-    public int VibratoRate { get => _vibrato.Rate.Value; set => _vibrato.Rate.Value = value; }
-    public int VibratoDepth { get => _vibrato.Depth.Value; set => _vibrato.Depth.Value = value; }
-    public int VibratoLevel { get => _vibrato.Level.Value; set => _vibrato.Level.Value = value; }
-
-    /// <summary> ROTARY params ───────────────────────────────────────────────────────────── </summary>
-    public int RotaryRateFast { get => _rotary.RateFast.Value; set => _rotary.RateFast.Value = value; }
-    public int RotaryDepth { get => _rotary.Depth.Value; set => _rotary.Depth.Value = value; }
-    public int RotaryLevel { get => _rotary.Level.Value; set => _rotary.Level.Value = value; }
-
-    /// <summary> RING MOD params ─────────────────────────────────────────────────────────── </summary>
-    public int RingModMode { get => _ringMod.Mode.Value; set => _ringMod.Mode.Value = value; }
-    public int RingModFrequency { get => _ringMod.Frequency.Value; set => _ringMod.Frequency.Value = value; }
-    public int RingModEffectLevel { get => _ringMod.EffectLevel.Value; set => _ringMod.EffectLevel.Value = value; }
-    public int RingModDirectMix { get => _ringMod.DirectMix.Value; set => _ringMod.DirectMix.Value = value; }
-
-    /// <summary> SLOW GEAR params ────────────────────────────────────────────────────────── </summary>
-    public int SlowGearSens { get => _slowGear.Sens.Value; set => _slowGear.Sens.Value = value; }
-    public int SlowGearRiseTime { get => _slowGear.RiseTime.Value; set => _slowGear.RiseTime.Value = value; }
-    public int SlowGearLevel { get => _slowGear.Level.Value; set => _slowGear.Level.Value = value; }
-
-    /// <summary> SLICER params ───────────────────────────────────────────────────────────── </summary>
-    public int SlicerPattern { get => _slicer.Pattern.Value; set => _slicer.Pattern.Value = value; }
-    public int SlicerRate { get => _slicer.Rate.Value; set => _slicer.Rate.Value = value; }
-    public int SlicerTriggerSens { get => _slicer.TriggerSens.Value; set => _slicer.TriggerSens.Value = value; }
-    public int SlicerEffectLevel { get => _slicer.EffectLevel.Value; set => _slicer.EffectLevel.Value = value; }
-    public int SlicerDirectMix { get => _slicer.DirectMix.Value; set => _slicer.DirectMix.Value = value; }
-
-    /// <summary> COMP params ─────────────────────────────────────────────────────────────── </summary>
-    public int CompType { get => _comp.Type.Value; set => _comp.Type.Value = value; }
-    public int CompSustain { get => _comp.Sustain.Value; set => _comp.Sustain.Value = value; }
-    public int CompAttack { get => _comp.Attack.Value; set => _comp.Attack.Value = value; }
-    public int CompTone { get => _comp.Tone.Value; set => _comp.Tone.Value = value; }
-    public int CompLevel { get => _comp.Level.Value; set => _comp.Level.Value = value; }
-
-    /// <summary> LIMITER params ──────────────────────────────────────────────────────────── </summary>
-    public int LimiterType { get => _limiter.Type.Value; set => _limiter.Type.Value = value; }
-    public int LimiterAttack { get => _limiter.Attack.Value; set => _limiter.Attack.Value = value; }
-    public int LimiterThreshold { get => _limiter.Threshold.Value; set => _limiter.Threshold.Value = value; }
-    public int LimiterRatio { get => _limiter.Ratio.Value; set => _limiter.Ratio.Value = value; }
-    public int LimiterRelease { get => _limiter.Release.Value; set => _limiter.Release.Value = value; }
-    public int LimiterLevel { get => _limiter.Level.Value; set => _limiter.Level.Value = value; }
-
-    /// <summary> T.WAH params ────────────────────────────────────────────────────────────── </summary>
-    public int TWahMode { get => _tWah.Mode.Value; set => _tWah.Mode.Value = value; }
-    public int TWahPolarity { get => _tWah.Polarity.Value; set => _tWah.Polarity.Value = value; }
-    public int TWahSens { get => _tWah.Sens.Value; set => _tWah.Sens.Value = value; }
-    public int TWahFreq { get => _tWah.Freq.Value; set => _tWah.Freq.Value = value; }
-    public int TWahPeak { get => _tWah.Peak.Value; set => _tWah.Peak.Value = value; }
-    public int TWahDirectMix { get => _tWah.DirectMix.Value; set => _tWah.DirectMix.Value = value; }
-    public int TWahEffectLevel { get => _tWah.EffectLevel.Value; set => _tWah.EffectLevel.Value = value; }
-
-    /// <summary> AUTO WAH params ─────────────────────────────────────────────────────────── </summary>
-    public int AutoWahMode { get => _autoWah.Mode.Value; set => _autoWah.Mode.Value = value; }
-    public int AutoWahFreq { get => _autoWah.Freq.Value; set => _autoWah.Freq.Value = value; }
-    public int AutoWahPeak { get => _autoWah.Peak.Value; set => _autoWah.Peak.Value = value; }
-    public int AutoWahRate { get => _autoWah.Rate.Value; set => _autoWah.Rate.Value = value; }
-    public int AutoWahDepth { get => _autoWah.Depth.Value; set => _autoWah.Depth.Value = value; }
-    public int AutoWahDirectMix { get => _autoWah.DirectMix.Value; set => _autoWah.DirectMix.Value = value; }
-    public int AutoWahEffectLevel { get => _autoWah.EffectLevel.Value; set => _autoWah.EffectLevel.Value = value; }
-
-    /// <summary> PEDAL WAH params ────────────────────────────────────────────────────────── </summary>
-    public int PedalWahType { get => _pedalWah.Type.Value; set => _pedalWah.Type.Value = value; }
-    public int PedalWahPedalPosition { get => _pedalWah.PedalPos.Value; set => _pedalWah.PedalPos.Value = value; }
-    public int PedalWahPedalMin { get => _pedalWah.PedalMin.Value; set => _pedalWah.PedalMin.Value = value; }
-    public int PedalWahPedalMax { get => _pedalWah.PedalMax.Value; set => _pedalWah.PedalMax.Value = value; }
-    public int PedalWahEffectLevel { get => _pedalWah.EffectLevel.Value; set => _pedalWah.EffectLevel.Value = value; }
-    public int PedalWahDirectMix { get => _pedalWah.DirectMix.Value; set => _pedalWah.DirectMix.Value = value; }
-
-    /// <summary> GRAPHIC EQ params ───────────────────────────────────────────────────────── </summary>
-    public int GraphicEq31Hz { get => _graphicEq.Hz31.Value; set => _graphicEq.Hz31.Value = value; }
-    public int GraphicEq62Hz { get => _graphicEq.Hz62.Value; set => _graphicEq.Hz62.Value = value; }
-    public int GraphicEq125Hz { get => _graphicEq.Hz125.Value; set => _graphicEq.Hz125.Value = value; }
-    public int GraphicEq250Hz { get => _graphicEq.Hz250.Value; set => _graphicEq.Hz250.Value = value; }
-    public int GraphicEq500Hz { get => _graphicEq.Hz500.Value; set => _graphicEq.Hz500.Value = value; }
-    public int GraphicEq1kHz { get => _graphicEq.kHz1.Value; set => _graphicEq.kHz1.Value = value; }
-    public int GraphicEq2kHz { get => _graphicEq.kHz2.Value; set => _graphicEq.kHz2.Value = value; }
-    public int GraphicEq4kHz { get => _graphicEq.kHz4.Value; set => _graphicEq.kHz4.Value = value; }
-    public int GraphicEq8kHz { get => _graphicEq.kHz8.Value; set => _graphicEq.kHz8.Value = value; }
-    public int GraphicEq16kHz { get => _graphicEq.kHz16.Value; set => _graphicEq.kHz16.Value = value; }
-    public int GraphicEqLevel { get => _graphicEq.Level.Value; set => _graphicEq.Level.Value = value; }
-
-    /// <summary> PARAMETRIC EQ params ────────────────────────────────────────────────────── </summary>
-    public int ParametricEqLowCut { get => _parametricEq.LowCut.Value; set => _parametricEq.LowCut.Value = value; }
-    public int ParametricEqLowGain { get => _parametricEq.LowGain.Value; set => _parametricEq.LowGain.Value = value; }
-    public int ParametricEqLowMidFreq { get => _parametricEq.LoMidFreq.Value; set => _parametricEq.LoMidFreq.Value = value; }
-    public int ParametricEqLowMidQ { get => _parametricEq.LoMidQ.Value; set => _parametricEq.LoMidQ.Value = value; }
-    public int ParametricEqLowMidGain { get => _parametricEq.LoMidGain.Value; set => _parametricEq.LoMidGain.Value = value; }
-    public int ParametricEqHighMidFreq { get => _parametricEq.HiMidFreq.Value; set => _parametricEq.HiMidFreq.Value = value; }
-    public int ParametricEqHighMidQ { get => _parametricEq.HiMidQ.Value; set => _parametricEq.HiMidQ.Value = value; }
-    public int ParametricEqHighMidGain { get => _parametricEq.HiMidGain.Value; set => _parametricEq.HiMidGain.Value = value; }
-    public int ParametricEqHighGain { get => _parametricEq.HighGain.Value; set => _parametricEq.HighGain.Value = value; }
-    public int ParametricEqHighCut { get => _parametricEq.HighCut.Value; set => _parametricEq.HighCut.Value = value; }
-    public int ParametricEqLevel { get => _parametricEq.Level.Value; set => _parametricEq.Level.Value = value; }
-
-    /// <summary> GUITAR SIM params ───────────────────────────────────────────────────────── </summary>
-    public int GuitarSimType { get => _guitarSim.Type.Value; set => _guitarSim.Type.Value = value; }
-    public int GuitarSimLow { get => _guitarSim.Low.Value; set => _guitarSim.Low.Value = value; }
-    public int GuitarSimHigh { get => _guitarSim.High.Value; set => _guitarSim.High.Value = value; }
-    public int GuitarSimLevel { get => _guitarSim.Level.Value; set => _guitarSim.Level.Value = value; }
-    public int GuitarSimBody { get => _guitarSim.Body.Value; set => _guitarSim.Body.Value = value; }
-
-    /// <summary> AC. GUITAR SIM params ───────────────────────────────────────────────────── </summary>
-    public int AcGuitarSimHigh { get => _acGuitarSim.High.Value; set => _acGuitarSim.High.Value = value; }
-    public int AcGuitarSimBody { get => _acGuitarSim.Body.Value; set => _acGuitarSim.Body.Value = value; }
-    public int AcGuitarSimLow { get => _acGuitarSim.Low.Value; set => _acGuitarSim.Low.Value = value; }
-    public int AcGuitarSimLevel { get => _acGuitarSim.Level.Value; set => _acGuitarSim.Level.Value = value; }
-
-    /// <summary> AC. PROCESSOR params ────────────────────────────────────────────────────── </summary>
-    public int AcProcessorType { get => _acProcessor.Type.Value; set => _acProcessor.Type.Value = value; }
-    public int AcProcessorBass { get => _acProcessor.Bass.Value; set => _acProcessor.Bass.Value = value; }
-    public int AcProcessorMid { get => _acProcessor.Mid.Value; set => _acProcessor.Mid.Value = value; }
-    public int AcProcessorMidFreq { get => _acProcessor.MidFreq.Value; set => _acProcessor.MidFreq.Value = value; }
-    public int AcProcessorTreble { get => _acProcessor.Treble.Value; set => _acProcessor.Treble.Value = value; }
-    public int AcProcessorPresence { get => _acProcessor.Presence.Value; set => _acProcessor.Presence.Value = value; }
-    public int AcProcessorLevel { get => _acProcessor.Level.Value; set => _acProcessor.Level.Value = value; }
-
-    /// <summary> WAVE SYNTH params ───────────────────────────────────────────────────────── </summary>
-    public int WaveSynthWave { get => _waveSynth.Wave.Value; set => _waveSynth.Wave.Value = value; }
-    public int WaveSynthCutoff { get => _waveSynth.Cutoff.Value; set => _waveSynth.Cutoff.Value = value; }
-    public int WaveSynthResonance { get => _waveSynth.Resonance.Value; set => _waveSynth.Resonance.Value = value; }
-    public int WaveSynthFilterSens { get => _waveSynth.FilterSens.Value; set => _waveSynth.FilterSens.Value = value; }
-    public int WaveSynthFilterDecay { get => _waveSynth.FilterDecay.Value; set => _waveSynth.FilterDecay.Value = value; }
-    public int WaveSynthFilterDepth { get => _waveSynth.FilterDepth.Value; set => _waveSynth.FilterDepth.Value = value; }
-    public int WaveSynthSynthLevel { get => _waveSynth.SynthLevel.Value; set => _waveSynth.SynthLevel.Value = value; }
-    public int WaveSynthDirectMix { get => _waveSynth.DirectMix.Value; set => _waveSynth.DirectMix.Value = value; }
-
-    /// <summary> OCTAVE params ───────────────────────────────────────────────────────────── </summary>
-    public int OctaveRange { get => _octave.Range.Value; set => _octave.Range.Value = value; }
-    public int OctaveEffectLevel { get => _octave.EffectLevel.Value; set => _octave.EffectLevel.Value = value; }
-    public int OctaveDirectMix { get => _octave.DirectMix.Value; set => _octave.DirectMix.Value = value; }
-
-    /// <summary> HEAVY OCTAVE params ─────────────────────────────────────────────────────── </summary>
-    public int HeavyOctave1OctLevel { get => _heavyOctave.Oct1Level.Value; set => _heavyOctave.Oct1Level.Value = value; }
-    public int HeavyOctave2OctLevel { get => _heavyOctave.Oct2Level.Value; set => _heavyOctave.Oct2Level.Value = value; }
-    public int HeavyOctaveDirectMix { get => _heavyOctave.DirectMix.Value; set => _heavyOctave.DirectMix.Value = value; }
-
-    /// <summary> PITCH SHIFTER params ────────────────────────────────────────────────────── </summary>
-    public int PitchShifterVoice { get => _pitchShifter.Voice.Value; set => _pitchShifter.Voice.Value = value; }
-    public int PitchShifterPS1Mode { get => _pitchShifter.Ps1Mode.Value; set => _pitchShifter.Ps1Mode.Value = value; }
-    public int PitchShifterPS1Pitch { get => _pitchShifter.Ps1Pitch.Value; set => _pitchShifter.Ps1Pitch.Value = value; }
-    public int PitchShifterPS1Fine { get => _pitchShifter.Ps1Fine.Value; set => _pitchShifter.Ps1Fine.Value = value; }
-    public int PitchShifterPS1Level { get => _pitchShifter.Ps1Level.Value; set => _pitchShifter.Ps1Level.Value = value; }
-    public int PitchShifterPS2Mode { get => _pitchShifter.Ps2Mode.Value; set => _pitchShifter.Ps2Mode.Value = value; }
-    public int PitchShifterPS2Pitch { get => _pitchShifter.Ps2Pitch.Value; set => _pitchShifter.Ps2Pitch.Value = value; }
-    public int PitchShifterPS2Fine { get => _pitchShifter.Ps2Fine.Value; set => _pitchShifter.Ps2Fine.Value = value; }
-    public int PitchShifterPS2Level { get => _pitchShifter.Ps2Level.Value; set => _pitchShifter.Ps2Level.Value = value; }
-    public int PitchShifterFeedback { get => _pitchShifter.Feedback.Value; set => _pitchShifter.Feedback.Value = value; }
-    public int PitchShifterDirectMix { get => _pitchShifter.DirectMix.Value; set => _pitchShifter.DirectMix.Value = value; }
-
-    /// <summary> HARMONIST params ────────────────────────────────────────────────────────── </summary>
-    public int HarmonistVoice { get => _harmonist.Voice.Value; set => _harmonist.Voice.Value = value; }
-    public int HarmonistHarmony1 { get => _harmonist.Harmony1.Value; set => _harmonist.Harmony1.Value = value; }
-    public int HarmonistLevel1 { get => _harmonist.Level1.Value; set => _harmonist.Level1.Value = value; }
-    public int HarmonistHarmony2 { get => _harmonist.Harmony2.Value; set => _harmonist.Harmony2.Value = value; }
-    public int HarmonistLevel2 { get => _harmonist.Level2.Value; set => _harmonist.Level2.Value = value; }
-    public int HarmonistFeedback { get => _harmonist.Feedback.Value; set => _harmonist.Feedback.Value = value; }
-    public int HarmonistDirectMix { get => _harmonist.DirectMix.Value; set => _harmonist.DirectMix.Value = value; }
-
-    /// <summary> HUMANIZER params ────────────────────────────────────────────────────────── </summary>
-    public int HumanizerMode { get => _humanizer.Mode.Value; set => _humanizer.Mode.Value = value; }
-    public int HumanizerVowel1 { get => _humanizer.Vowel1.Value; set => _humanizer.Vowel1.Value = value; }
-    public int HumanizerVowel2 { get => _humanizer.Vowel2.Value; set => _humanizer.Vowel2.Value = value; }
-    public int HumanizerSens { get => _humanizer.Sens.Value; set => _humanizer.Sens.Value = value; }
-    public int HumanizerRate { get => _humanizer.Rate.Value; set => _humanizer.Rate.Value = value; }
-    public int HumanizerDepth { get => _humanizer.Depth.Value; set => _humanizer.Depth.Value = value; }
-    public int HumanizerManual { get => _humanizer.Manual.Value; set => _humanizer.Manual.Value = value; }
-    public int HumanizerLevel { get => _humanizer.Level.Value; set => _humanizer.Level.Value = value; }
-
-    /// <summary> PHASER 90E params ───────────────────────────────────────────────────────── </summary>
-    public int Phaser90EScript { get => _phaser90E.Script.Value; set => _phaser90E.Script.Value = value; }
-    public int Phaser90ESpeed { get => _phaser90E.Speed.Value; set => _phaser90E.Speed.Value = value; }
-
-    /// <summary> FLANGER 117E params ─────────────────────────────────────────────────────── </summary>
-    public int Flanger117EManual { get => _flanger117E.Manual.Value; set => _flanger117E.Manual.Value = value; }
-    public int Flanger117EWidth { get => _flanger117E.Width.Value; set => _flanger117E.Width.Value = value; }
-    public int Flanger117ESpeed { get => _flanger117E.Speed.Value; set => _flanger117E.Speed.Value = value; }
-    public int Flanger117ERegen { get => _flanger117E.Regen.Value; set => _flanger117E.Regen.Value = value; }
-
-    /// <summary> WAH 95E params ──────────────────────────────────────────────────────────── </summary>
-    public int Wah95EPedalPosition { get => _wah95E.PedalPos.Value; set => _wah95E.PedalPos.Value = value; }
-    public int Wah95EPedalMin { get => _wah95E.PedalMin.Value; set => _wah95E.PedalMin.Value = value; }
-    public int Wah95EPedalMax { get => _wah95E.PedalMax.Value; set => _wah95E.PedalMax.Value = value; }
-    public int Wah95EEffectLevel { get => _wah95E.EffectLevel.Value; set => _wah95E.EffectLevel.Value = value; }
-    public int Wah95EDirectMix { get => _wah95E.DirectMix.Value; set => _wah95E.DirectMix.Value = value; }
-
-    /// <summary> DC-30 params ────────────────────────────────────────────────────────────── </summary>
-    public int DC30Selector { get => _dc30.Selector.Value; set => _dc30.Selector.Value = value; }
-    public int DC30InputVolume { get => _dc30.InputVolume.Value; set => _dc30.InputVolume.Value = value; }
-    public int DC30ChorusIntensity { get => _dc30.ChorusIntensity.Value; set => _dc30.ChorusIntensity.Value = value; }
-    public int DC30EchoIntensity { get => _dc30.EchoIntensity.Value; set => _dc30.EchoIntensity.Value = value; }
-    public int DC30EchoVolume { get => _dc30.EchoVolume.Value; set => _dc30.EchoVolume.Value = value; }
-    public int DC30Tone { get => _dc30.Tone.Value; set => _dc30.Tone.Value = value; }
-    public int DC30Output { get => _dc30.Output.Value; set => _dc30.Output.Value = value; }
-
-    /// <summary> PEDAL BEND params ───────────────────────────────────────────────────────── </summary>
-    public int PedalBendPitch { get => _pedalBend.Pitch.Value; set => _pedalBend.Pitch.Value = value; }
-    public int PedalBendPedalPosition { get => _pedalBend.PedalPos.Value; set => _pedalBend.PedalPos.Value = value; }
-    public int PedalBendEffectLevel { get => _pedalBend.EffectLevel.Value; set => _pedalBend.EffectLevel.Value = value; }
-    public int PedalBendDirectMix { get => _pedalBend.DirectMix.Value; set => _pedalBend.DirectMix.Value = value; }
 }

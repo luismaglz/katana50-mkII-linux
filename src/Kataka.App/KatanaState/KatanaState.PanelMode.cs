@@ -4,14 +4,17 @@ namespace Kataka.App.KatanaState;
 
 public partial class KatanaState
 {
-    /// <summary> Panel-mode knob positions (Temporary + PatchStatus block) ─────────────── </summary>
-    public AmpControlState AmpType { get; } = new(KatanaMkIIParameterCatalog.AmpType);
-    public AmpControlState AmpVariation { get; } = new(KatanaMkIIParameterCatalog.AmpVariation);
+    private KatanaPanelChannel _selectedChannel;
     public AmpControlState LedStateBooster { get; } = new(KatanaMkIIParameterCatalog.LedStateBooster);
     public AmpControlState LedStateMod { get; } = new(KatanaMkIIParameterCatalog.LedStateMod);
     public AmpControlState LedStateFx { get; } = new(KatanaMkIIParameterCatalog.LedStateFx);
     public AmpControlState LedStateDelay { get; } = new(KatanaMkIIParameterCatalog.LedStateDelay);
     public AmpControlState LedStateReverb { get; } = new(KatanaMkIIParameterCatalog.LedStateReverb);
+
+    /// <summary> Panel-mode knob positions (Temporary + PatchStatus block) ─────────────── </summary>
+    public AmpControlState AmpType { get; } = new(KatanaMkIIParameterCatalog.AmpType);
+
+    public AmpControlState AmpVariation { get; } = new(KatanaMkIIParameterCatalog.AmpVariation);
     public AmpControlState Gain { get; } = new(KatanaMkIIParameterCatalog.AmpGain);
     public AmpControlState Volume { get; } = new(KatanaMkIIParameterCatalog.AmpVolume);
     public AmpControlState Bass { get; } = new(KatanaMkIIParameterCatalog.AmpBass);
@@ -20,8 +23,6 @@ public partial class KatanaState
     public AmpControlState Presence { get; } = new(KatanaMkIIParameterCatalog.AmpPresence);
     public AmpControlState CabinetResonance { get; } = new(KatanaMkIIParameterCatalog.CabinetResonance);
     public AmpControlState PatchLevel { get; } = new(KatanaMkIIParameterCatalog.PatchLevel, 0, 200);
-
-    private KatanaPanelChannel _selectedChannel;
 
     public KatanaPanelChannel SelectedChannel
     {

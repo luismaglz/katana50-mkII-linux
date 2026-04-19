@@ -46,7 +46,7 @@ public static partial class KatanaMkIIParameterCatalog
         AmpBass,
         AmpMiddle,
         AmpTreble,
-        AmpPresence,
+        AmpPresence
     ];
 
     /// <summary>Parameter definition for Booster Switch.</summary>
@@ -184,15 +184,19 @@ public static partial class KatanaMkIIParameterCatalog
     /// <summary>Parameter definition for Led State Booster.</summary>
     public static KatanaParameterDefinition LedStateBooster { get; } =
         new("led-state-booster", "Booster LED", [0x60, 0x00, 0x06, 0x5D], maximum: 3);
+
     /// <summary>Parameter definition for Led State Mod.</summary>
     public static KatanaParameterDefinition LedStateMod { get; } =
         new("led-state-mod", "Mod LED", [0x60, 0x00, 0x06, 0x5E], maximum: 3);
+
     /// <summary>Parameter definition for Led State Fx.</summary>
     public static KatanaParameterDefinition LedStateFx { get; } =
         new("led-state-fx", "FX LED", [0x60, 0x00, 0x06, 0x5F], maximum: 3);
+
     /// <summary>Parameter definition for Led State Delay.</summary>
     public static KatanaParameterDefinition LedStateDelay { get; } =
         new("led-state-delay", "Delay LED", [0x60, 0x00, 0x06, 0x60], maximum: 3);
+
     /// <summary>Parameter definition for Led State Reverb.</summary>
     public static KatanaParameterDefinition LedStateReverb { get; } =
         new("led-state-reverb", "Reverb LED", [0x60, 0x00, 0x06, 0x61], maximum: 3);
@@ -419,7 +423,7 @@ public static partial class KatanaMkIIParameterCatalog
 
     /// <summary>Parameter definition for Contour 1 Freq Shift.</summary>
     public static KatanaParameterDefinition Contour1FreqShift { get; } =
-        new("contour1-freq-shift", "Contour 1 Freq", [0x60, 0x00, 0x0F, 0x31], 0, 100,
+        new("contour1-freq-shift", "Contour 1 Freq", [0x60, 0x00, 0x0F, 0x31],
             description: "Adjusts the frequency shift amount for Contour 1.");
 
     /// <summary>Parameter definition for Contour 2 Type.</summary>
@@ -429,7 +433,7 @@ public static partial class KatanaMkIIParameterCatalog
 
     /// <summary>Parameter definition for Contour 2 Freq Shift.</summary>
     public static KatanaParameterDefinition Contour2FreqShift { get; } =
-        new("contour2-freq-shift", "Contour 2 Freq", [0x60, 0x00, 0x0F, 0x39], 0, 100,
+        new("contour2-freq-shift", "Contour 2 Freq", [0x60, 0x00, 0x0F, 0x39],
             description: "Adjusts the frequency shift amount for Contour 2.");
 
     /// <summary>Parameter definition for Contour 3 Type.</summary>
@@ -439,7 +443,7 @@ public static partial class KatanaMkIIParameterCatalog
 
     /// <summary>Parameter definition for Contour 3 Freq Shift.</summary>
     public static KatanaParameterDefinition Contour3FreqShift { get; } =
-        new("contour3-freq-shift", "Contour 3 Freq", [0x60, 0x00, 0x0F, 0x41], 0, 100,
+        new("contour3-freq-shift", "Contour 3 Freq", [0x60, 0x00, 0x0F, 0x41],
             description: "Adjusts the frequency shift amount for Contour 3.");
 
     /// <summary> Patch EQ — Patch_0 embedded EQ block (BTS prm_prop_patch_0 addrs 0x30–0x47) ── </summary>
@@ -702,8 +706,8 @@ public static partial class KatanaMkIIParameterCatalog
     public static IReadOnlyList<byte> PatchWriteAddress { get; } = [0x7F, 0x00, 0x01, 0x04];
 
     /// <summary>
-    /// Address pushed by the amp when the active panel/channel changes (DT1 SysEx).
-    /// Value encoding: 0=Panel, 1=ChA1, 2=ChA2, 5=ChB1, 6=ChB2.
+    ///     Address pushed by the amp when the active panel/channel changes (DT1 SysEx).
+    ///     Value encoding: 0=Panel, 1=ChA1, 2=ChA2, 5=ChB1, 6=ChB2.
     /// </summary>
     public static IReadOnlyList<byte> CurrentChannelAddress { get; } = [0x00, 0x01, 0x00, 0x00];
 

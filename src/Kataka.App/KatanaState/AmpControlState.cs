@@ -47,12 +47,12 @@ public class AmpControlState
 
     public event Action? ValueChanged;
 
-    /// <summary>Fires when the user sets <see cref="Value"/>. Subscribe here for write-back to amp.</summary>
+    /// <summary>Fires when the user sets <see cref="Value" />. Subscribe here for write-back to amp.</summary>
     public event Action? WriteRequested;
 
     /// <summary>
-    ///     Updates the value from an amp read or push notification. Fires <see cref="ValueChanged"/> for UI
-    ///     but NOT <see cref="WriteRequested"/>, breaking the circular write-back loop.
+    ///     Updates the value from an amp read or push notification. Fires <see cref="ValueChanged" /> for UI
+    ///     but NOT <see cref="WriteRequested" />, breaking the circular write-back loop.
     /// </summary>
     public void SetFromAmp(int value)
     {

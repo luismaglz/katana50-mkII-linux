@@ -1,7 +1,7 @@
 namespace Kataka.Application.Katana;
 
 /// <summary>
-/// Represents a Boss Tone Studio .tsl patch file loaded into memory.
+///     Represents a Boss Tone Studio .tsl patch file loaded into memory.
 /// </summary>
 public sealed class TslPatch
 {
@@ -11,8 +11,8 @@ public sealed class TslPatch
     public string Device { get; init; } = "KATANA MkII";
 
     /// <summary>
-    /// Block data keyed by TSL block name (e.g. "Patch_0", "Fx(1)", "Status").
-    /// Values are the raw byte arrays for each block.
+    ///     Block data keyed by TSL block name (e.g. "Patch_0", "Fx(1)", "Status").
+    ///     Values are the raw byte arrays for each block.
     /// </summary>
     public Dictionary<string, byte[]> Blocks { get; } = new();
 }

@@ -4,8 +4,5 @@ namespace Kataka.App.Views;
 
 public partial class PedalboardView : UserControl
 {
-    public PedalboardView()
-    {
-        InitializeComponent();
-    }
+    public PedalboardView() => InitializeComponent();
 }

@@ -6,8 +6,6 @@ namespace Kataka.App.ViewModels.Design;
 
 public sealed class DesignChannelSelectionViewModel : ChannelSelectionViewModel
 {
-    public static DesignChannelSelectionViewModel Instance => new();
-
     public DesignChannelSelectionViewModel()
         : base(
             new AmpSyncService(
@@ -17,4 +15,6 @@ public sealed class DesignChannelSelectionViewModel : ChannelSelectionViewModel
             new KatanaState.KatanaState(NullLogger<KatanaState.KatanaState>.Instance))
     {
     }
+
+    public static DesignChannelSelectionViewModel Instance => new();
 }

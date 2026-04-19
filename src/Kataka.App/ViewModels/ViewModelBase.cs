@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 using ReactiveUI;
@@ -10,8 +9,8 @@ public abstract class ViewModelBase : ReactiveObject
     protected CompositeDisposable Disposables { get; } = new();
 
     /// <summary>
-    /// Sets <paramref name="field"/> to <paramref name="value"/>, fires PropertyChanging/Changed, and returns
-    /// <c>true</c> if the value actually changed. Mirrors ObservableObject.SetProperty for legacy VMs.
+    ///     Sets <paramref name="field" /> to <paramref name="value" />, fires PropertyChanging/Changed, and returns
+    ///     <c>true</c> if the value actually changed. Mirrors ObservableObject.SetProperty for legacy VMs.
     /// </summary>
     protected bool ChangeProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {

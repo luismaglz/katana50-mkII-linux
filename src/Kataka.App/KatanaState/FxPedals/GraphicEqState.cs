@@ -4,6 +4,19 @@ namespace Kataka.App.KatanaState.FxPedals;
 
 public class GraphicEqState
 {
+    public AmpControlState Hz125;
+    public AmpControlState Hz250;
+
+    public AmpControlState Hz31;
+    public AmpControlState Hz500;
+    public AmpControlState Hz62;
+    public AmpControlState kHz1;
+    public AmpControlState kHz16;
+    public AmpControlState kHz2;
+    public AmpControlState kHz4;
+    public AmpControlState kHz8;
+    public AmpControlState Level;
+
     public GraphicEqState(bool isMod)
     {
         var p = isMod ? KatanaMkIIParameterCatalog.ModGraphicEqParams : KatanaMkIIParameterCatalog.FxGraphicEqParams;
@@ -19,16 +32,4 @@ public class GraphicEqState
         kHz16 = new AmpControlState(p[9], description: "Adjusts the 16 kHz band level.");
         Level = new AmpControlState(p[10], description: "Adjusts the overall volume level of the equalizer.");
     }
-
-    public AmpControlState Hz31;
-    public AmpControlState Hz62;
-    public AmpControlState Hz125;
-    public AmpControlState Hz250;
-    public AmpControlState Hz500;
-    public AmpControlState kHz1;
-    public AmpControlState kHz2;
-    public AmpControlState kHz4;
-    public AmpControlState kHz8;
-    public AmpControlState kHz16;
-    public AmpControlState Level;
 }

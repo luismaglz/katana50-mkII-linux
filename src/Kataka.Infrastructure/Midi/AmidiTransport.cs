@@ -40,10 +40,7 @@ public sealed class AmidiTransport : IMidiTransport
 
     public static bool IsSupported()
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            return false;
-        }
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) return false;
 
         return TryLocateExecutable("amidi");
     }
@@ -57,15 +54,12 @@ public sealed class AmidiTransport : IMidiTransport
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
-            CreateNoWindow = true,
+            CreateNoWindow = true
         };
 
         using var process = new Process { StartInfo = startInfo };
 
-        if (!process.Start())
-        {
-            throw new InvalidOperationException("Failed to start amidi.");
-        }
+        if (!process.Start()) throw new InvalidOperationException("Failed to start amidi.");
 
         var stdoutTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
         var stderrTask = process.StandardError.ReadToEndAsync(cancellationToken);
@@ -76,10 +70,8 @@ public sealed class AmidiTransport : IMidiTransport
         var stderr = await stderrTask;
 
         if (process.ExitCode != 0)
-        {
             throw new InvalidOperationException(
                 $"amidi -l failed with exit code {process.ExitCode}: {stderr}".Trim());
-        }
 
         return Parse(stdout);
     }
@@ -90,25 +82,16 @@ public sealed class AmidiTransport : IMidiTransport
 
         foreach (var line in output.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
-            if (line.StartsWith("Dir ", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
+            if (line.StartsWith("Dir ", StringComparison.OrdinalIgnoreCase)) continue;
 
             var parts = line.Split(' ', 3, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            if (parts.Length < 3)
-            {
-                continue;
-            }
+            if (parts.Length < 3) continue;
 
             var direction = parts[0];
             var id = parts[1];
             var name = parts[2];
 
-            if (!direction.Contains('I') && !direction.Contains('O'))
-            {
-                continue;
-            }
+            if (!direction.Contains('I') && !direction.Contains('O')) continue;
 
             entries.Add(new AmidiPortEntry(id, $"{name} ({id})"));
         }
@@ -122,8 +105,8 @@ public sealed class AmidiTransport : IMidiTransport
             : portId;
 
     /// <summary>
-    /// Maps an ALSA hardware port identifier to the corresponding raw MIDI device file.
-    /// Example: <c>hw:1,0,0</c> → <c>/dev/snd/midiC1D0</c>
+    ///     Maps an ALSA hardware port identifier to the corresponding raw MIDI device file.
+    ///     Example: <c>hw:1,0,0</c> → <c>/dev/snd/midiC1D0</c>
     /// </summary>
     private static string HwIdToDevicePath(string hwId)
     {
@@ -131,9 +114,7 @@ public sealed class AmidiTransport : IMidiTransport
         var bare = hwId.StartsWith("hw:", StringComparison.OrdinalIgnoreCase) ? hwId[3..] : hwId;
         var parts = bare.Split(',');
         if (parts.Length < 2)
-        {
             throw new ArgumentException($"Cannot parse ALSA port id '{hwId}' — expected hw:CARD,DEVICE[,SUBDEV].");
-        }
 
         return $"/dev/snd/midiC{parts[0]}D{parts[1]}";
     }
@@ -141,10 +122,7 @@ public sealed class AmidiTransport : IMidiTransport
     private static bool TryLocateExecutable(string name)
     {
         var path = Environment.GetEnvironmentVariable("PATH");
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return false;
-        }
+        if (string.IsNullOrWhiteSpace(path)) return false;
 
         return path
             .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)

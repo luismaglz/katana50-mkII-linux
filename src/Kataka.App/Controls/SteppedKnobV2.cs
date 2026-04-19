@@ -1,14 +1,12 @@
-using System;
-
 using Avalonia;
 using Avalonia.Media;
 
 namespace Kataka.App.Controls;
 
 /// <summary>
-/// Code-drawn stepped rotary knob (Scale-aware). No SVG dependency — ticks and face
-/// are all Avalonia primitives using KatanaPalette colors. The active tick is lit in
-/// amber; inactive ticks are dimmed. Minimum/Maximum are auto-set from Steps.Count.
+///     Code-drawn stepped rotary knob (Scale-aware). No SVG dependency — ticks and face
+///     are all Avalonia primitives using KatanaPalette colors. The active tick is lit in
+///     amber; inactive ticks are dimmed. Minimum/Maximum are auto-set from Steps.Count.
 /// </summary>
 public sealed class SteppedKnobV2 : RotaryKnobBase
 {
@@ -67,7 +65,9 @@ public sealed class SteppedKnobV2 : RotaryKnobBase
         context.DrawText(labelText, new Point((bounds.Width - labelText.Width) / 2, bounds.Top));
 
         var accentColor = IsSet(AccentColorProperty) ? AccentColor : RuntimePaletteService.Accent;
-        var trackColor = IsSet(TrackColorProperty) ? TrackColor : Color.FromArgb(70, accentColor.R, accentColor.G, accentColor.B);
+        var trackColor = IsSet(TrackColorProperty)
+            ? TrackColor
+            : Color.FromArgb(70, accentColor.R, accentColor.G, accentColor.B);
         var faceColor = IsSet(FaceColorProperty) ? FaceColor : RuntimePaletteService.KnobFace;
         var bezelColor = IsSet(BezelColorProperty) ? BezelColor : RuntimePaletteService.BgBase;
         var accentBrush = new SolidColorBrush(accentColor);
@@ -75,33 +75,31 @@ public sealed class SteppedKnobV2 : RotaryKnobBase
 
         // Dots at each step position on the arc ring
         if (steps is { Length: >= 2 })
-        {
             for (var i = 0; i < steps.Length; i++)
             {
-                var angleDeg = StartDeg + (double)i / (steps.Length - 1) * SweepDeg;
+                var angleDeg = StartDeg + ((double)i / (steps.Length - 1) * SweepDeg);
                 var angleRad = DegreesToRadians(angleDeg);
                 var isActive = i == Value;
                 var r = isActive ? dotR * 1.5 : dotR;
-                var dotCenter = new Point(cx + Math.Cos(angleRad) * arcR, cy + Math.Sin(angleRad) * arcR);
+                var dotCenter = new Point(cx + (Math.Cos(angleRad) * arcR), cy + (Math.Sin(angleRad) * arcR));
                 context.DrawEllipse(isActive ? accentBrush : trackBrush, null, dotCenter, r, r);
             }
-        }
 
         // Bezel + face
-        context.DrawEllipse(new SolidColorBrush(bezelColor), null, new Point(cx, cy), knobR + 4 * s, knobR + 4 * s);
+        context.DrawEllipse(new SolidColorBrush(bezelColor), null, new Point(cx, cy), knobR + (4 * s), knobR + (4 * s));
         context.DrawEllipse(new SolidColorBrush(faceColor),
             new Pen(new SolidColorBrush(KatanaPalette.BorderLight), 1.5 * s),
             new Point(cx, cy), knobR, knobR);
 
         // Pointer snapped to step
-        var pointerAngle = DegreesToRadians(StartDeg + NormalizedValue * SweepDeg);
+        var pointerAngle = DegreesToRadians(StartDeg + (NormalizedValue * SweepDeg));
         var pointerLen = knobR * 0.68;
-        var tip = new Point(cx + Math.Cos(pointerAngle) * pointerLen, cy + Math.Sin(pointerAngle) * pointerLen);
+        var tip = new Point(cx + (Math.Cos(pointerAngle) * pointerLen), cy + (Math.Sin(pointerAngle) * pointerLen));
         context.DrawLine(new Pen(accentBrush, 3.0 * s, lineCap: PenLineCap.Round), new Point(cx, cy), tip);
         context.DrawEllipse(accentBrush, null, new Point(cx, cy), 3.5 * s, 3.5 * s);
 
         // Active step label
-        var activeLabel = (steps is not null && Value >= 0 && Value < steps.Length)
+        var activeLabel = steps is not null && Value >= 0 && Value < steps.Length
             ? steps[Value]
             : Value.ToString();
         var valueText = CreateText(activeLabel, valueFontSize, FontWeight.SemiBold, accentBrush);

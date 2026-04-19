@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Kataka.App.ViewModels"
              xmlns:dvm="using:Kataka.App.ViewModels.Design"
-             xmlns:controls="using:Kataka.App.Controls"
              xmlns:views="using:Kataka.App.Views"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -40,7 +39,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:PedalboardItemViewModel"
-             x:CompileBindings="False">
+                                      x:CompileBindings="False">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
 
                                 <!-- Signal cable between items -->
@@ -69,7 +68,7 @@
 
                                             <Image Source="/Assets/electric-guitar.png"
                                                    Width="80" Height="80"
-                                                   HorizontalAlignment="Center" BlendMode="Multiply"/>
+                                                   HorizontalAlignment="Center" BlendMode="Multiply" />
                                             <TextBlock Text="{Binding DisplayName}"
                                                        FontSize="11" FontWeight="Bold"
                                                        HorizontalAlignment="Center"
@@ -97,7 +96,7 @@
                                             <TextBlock Text="{Binding DisplayName}"
                                                        FontSize="11" FontWeight="Bold"
                                                        HorizontalAlignment="Center"
-                                                       Foreground="#7ab0c8" LetterSpacing="1.2"/>
+                                                       Foreground="#7ab0c8" LetterSpacing="1.2" />
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>

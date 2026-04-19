@@ -6,6 +6,7 @@ public interface IKatanaState
 {
     /// <summary> Panel-mode knob positions ──────────────────────────────────────────────── </summary>
     AmpControlState AmpType { get; }
+
     AmpControlState AmpVariation { get; }
     AmpControlState Gain { get; }
     AmpControlState Volume { get; }
@@ -24,6 +25,7 @@ public interface IKatanaState
 
     /// <summary> Pedals ─────────────────────────────────────────────────────────────────── </summary>
     AmpControlState PedalChain { get; }
+
     BoostPedalState BoostPedal { get; }
     ModPedalState ModPedal { get; }
     FxPedalState FxPedal { get; }
@@ -34,6 +36,7 @@ public interface IKatanaState
 
     /// <summary> Ver200+ features ───────────────────────────────────────────────────────── </summary>
     SoloEqState SoloEq { get; }
+
     ContourState Contour1 { get; }
     ContourState Contour2 { get; }
     ContourState Contour3 { get; }

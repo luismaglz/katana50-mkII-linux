@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 
+using Kataka.App.ViewModels;
+
 namespace Kataka.App.Views;
 
 public partial class MainWindow : Window
@@ -9,9 +11,9 @@ public partial class MainWindow : Window
         InitializeComponent();
         Opened += (_, _) =>
         {
-            if (DataContext is ViewModels.MainWindowViewModel vm)
+            if (DataContext is MainWindowViewModel vm)
                 vm.StorageProvider = StorageProvider;
         };
-        Closing += (_, _) => (DataContext as ViewModels.MainWindowViewModel)?.Shutdown();
+        Closing += (_, _) => (DataContext as MainWindowViewModel)?.Shutdown();
     }
 }

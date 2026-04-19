@@ -1,16 +1,14 @@
-using System;
-
 using Avalonia;
 using Avalonia.Media;
 
 namespace Kataka.App.Controls;
 
 /// <summary>
-/// Rotary knob that snaps to a discrete list of named steps.
-/// Bind <see cref="Value"/> (0-based index) and supply <see cref="Steps"/> with the label for
-/// each position. The control automatically sets Minimum=0 / Maximum=Steps.Count-1.
-/// Tick marks are drawn around the arc; the selected tick and its label are highlighted.
-/// The <see cref="RotaryKnobBase.Scale"/> property scales the entire control proportionally.
+///     Rotary knob that snaps to a discrete list of named steps.
+///     Bind <see cref="Value" /> (0-based index) and supply <see cref="Steps" /> with the label for
+///     each position. The control automatically sets Minimum=0 / Maximum=Steps.Count-1.
+///     Tick marks are drawn around the arc; the selected tick and its label are highlighted.
+///     The <see cref="RotaryKnobBase.Scale" /> property scales the entire control proportionally.
 /// </summary>
 public sealed class SteppedKnob : RotaryKnobBase
 {
@@ -22,8 +20,8 @@ public sealed class SteppedKnob : RotaryKnobBase
     private const double BaseWidth = 80;
     private const double BaseHeight = 115;
 
-    private const double BaseTickInner = BaseImgSize / 2 + 3;
-    private const double BaseTickOuter = BaseImgSize / 2 + 10;
+    private const double BaseTickInner = (BaseImgSize / 2) + 3;
+    private const double BaseTickOuter = (BaseImgSize / 2) + 10;
 
     public static readonly StyledProperty<string[]?> StepsProperty =
         AvaloniaProperty.Register<SteppedKnob, string[]?>(nameof(Steps));
@@ -69,20 +67,20 @@ public sealed class SteppedKnob : RotaryKnobBase
         var labelText = CreateText(Label.ToUpperInvariant(), LabelFontSize * s, FontWeight.Bold, LabelBrush);
         context.DrawText(labelText, new Point((bounds.Width - labelText.Width) / 2, bounds.Top));
 
-        var cy = labelText.Height + topPad + imgSize / 2;
+        var cy = labelText.Height + topPad + (imgSize / 2);
 
         DrawTicks(context, steps, cx, cy, tickInner, tickOuter, s);
 
-        context.DrawEllipse(KnobShadowBrush, null, new Point(cx + 1.5 * s, cy + 2 * s), imgSize / 2, imgSize / 2);
+        context.DrawEllipse(KnobShadowBrush, null, new Point(cx + (1.5 * s), cy + (2 * s)), imgSize / 2, imgSize / 2);
         context.DrawEllipse(KnobBgBrush, null, new Point(cx, cy), imgSize / 2, imgSize / 2);
 
-        var angleRad = KnobImageAsset.MinAngleRad + NormalizedValue * KnobImageAsset.AngleSweep * Math.PI / 180.0;
-        var imgRect = new Rect(cx - imgSize / 2, cy - imgSize / 2, imgSize, imgSize);
+        var angleRad = KnobImageAsset.MinAngleRad + (NormalizedValue * KnobImageAsset.AngleSweep * Math.PI / 180.0);
+        var imgRect = new Rect(cx - (imgSize / 2), cy - (imgSize / 2), imgSize, imgSize);
 
         using (context.PushTransform(
-            Matrix.CreateTranslation(-cx, -cy) *
-            Matrix.CreateRotation(angleRad) *
-            Matrix.CreateTranslation(cx, cy)))
+                   Matrix.CreateTranslation(-cx, -cy) *
+                   Matrix.CreateRotation(angleRad) *
+                   Matrix.CreateTranslation(cx, cy)))
         {
             var bmp = KnobImageAsset.Bitmap.Value;
             if (bmp is not null)
@@ -93,11 +91,11 @@ public sealed class SteppedKnob : RotaryKnobBase
                     new Point(cx, cy), imgSize / 2, imgSize / 2);
         }
 
-        var valueLabel = (steps is not null && Value >= 0 && Value < steps.Length)
+        var valueLabel = steps is not null && Value >= 0 && Value < steps.Length
             ? steps[Value]
             : Value.ToString();
         var valueText = CreateText(valueLabel, valueFontSize, FontWeight.SemiBold, ValueBrush);
-        context.DrawText(valueText, new Point((bounds.Width - valueText.Width) / 2, cy + imgSize / 2 + bottomPad));
+        context.DrawText(valueText, new Point((bounds.Width - valueText.Width) / 2, cy + (imgSize / 2) + bottomPad));
     }
 
     private void SyncRangeToSteps()
@@ -117,14 +115,14 @@ public sealed class SteppedKnob : RotaryKnobBase
 
         for (var i = 0; i < steps.Length; i++)
         {
-            var angleDeg = KnobImageAsset.MinAngleRad * (180.0 / Math.PI)
-                           + i * KnobImageAsset.AngleSweep / (steps.Length - 1);
+            var angleDeg = (KnobImageAsset.MinAngleRad * (180.0 / Math.PI))
+                           + (i * KnobImageAsset.AngleSweep / (steps.Length - 1));
             var angleRad = DegreesToRadians(angleDeg);
             var sin = Math.Sin(angleRad);
             var cos = -Math.Cos(angleRad);
 
-            var p1 = new Point(cx + sin * tickInner, cy + cos * tickInner);
-            var p2 = new Point(cx + sin * tickOuter, cy + cos * tickOuter);
+            var p1 = new Point(cx + (sin * tickInner), cy + (cos * tickInner));
+            var p2 = new Point(cx + (sin * tickOuter), cy + (cos * tickOuter));
 
             var isSelected = i == Value;
             context.DrawLine(

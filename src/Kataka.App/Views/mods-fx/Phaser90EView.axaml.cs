@@ -4,8 +4,5 @@ namespace Kataka.App.Views.ModsFx;
 
 public partial class Phaser90EView : UserControl
 {
-    public Phaser90EView()
-    {
-        InitializeComponent();
-    }
+    public Phaser90EView() => InitializeComponent();
 }

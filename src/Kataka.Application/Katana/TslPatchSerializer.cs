@@ -4,7 +4,7 @@ using System.Text.Json.Nodes;
 namespace Kataka.Application.Katana;
 
 /// <summary>
-/// Reads and writes Boss Tone Studio .tsl patch files (format rev 0002, KATANA MkII).
+///     Reads and writes Boss Tone Studio .tsl patch files (format rev 0002, KATANA MkII).
 /// </summary>
 public static class TslPatchSerializer
 {
@@ -18,11 +18,11 @@ public static class TslPatchSerializer
         {
             Name = root["name"]?.GetValue<string>() ?? "Unknown",
             FormatRev = root["formatRev"]?.GetValue<string>() ?? "0002",
-            Device = root["device"]?.GetValue<string>() ?? "KATANA MkII",
+            Device = root["device"]?.GetValue<string>() ?? "KATANA MkII"
         };
 
         var paramSet = root["data"]?[0]?[0]?["paramSet"]?.AsObject()
-            ?? throw new InvalidDataException("TSL file missing data/paramSet.");
+                       ?? throw new InvalidDataException("TSL file missing data/paramSet.");
 
         patch.Memo = root["data"]?[0]?[0]?["memo"]?.GetValue<string>() ?? string.Empty;
 
@@ -57,13 +57,9 @@ public static class TslPatchSerializer
             ["device"] = patch.Device,
             ["data"] = new JsonArray(
                 new JsonArray(
-                    new JsonObject
-                    {
-                        ["memo"] = patch.Memo,
-                        ["paramSet"] = paramSet,
-                    }
+                    new JsonObject { ["memo"] = patch.Memo, ["paramSet"] = paramSet }
                 )
-            ),
+            )
         };
 
         return root.ToJsonString(new JsonSerializerOptions { WriteIndented = false });

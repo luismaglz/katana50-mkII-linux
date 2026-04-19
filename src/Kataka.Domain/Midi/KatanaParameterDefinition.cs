@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Kataka.Domain.Midi;
 
 /// <summary>Auto-generated: sealed class KatanaParameterDefinition</summary>

@@ -41,37 +41,37 @@
 
 
                 <!-- Type-specific body — one panel visible at a time -->
-                <modsfx:ChorusView         IsVisible="{Binding IsTypeChorus}" />
-                <modsfx:FlangerView        IsVisible="{Binding IsTypeFlanger}" />
-                <modsfx:PhaserView         IsVisible="{Binding IsTypePhaser}" />
-                <modsfx:UniVView           IsVisible="{Binding IsTypeUnivibe}" />
-                <modsfx:TremoloView        IsVisible="{Binding IsTypeTremolo}" />
-                <modsfx:VibratoView        IsVisible="{Binding IsTypeVibrato}" />
-                <modsfx:RotaryView         IsVisible="{Binding IsTypeRotary}" />
-                <modsfx:RingModView        IsVisible="{Binding IsTypeRingMod}" />
-                <modsfx:SlowGearView       IsVisible="{Binding IsTypeSlowGear}" />
-                <modsfx:SlicerView         IsVisible="{Binding IsTypeSlicer}" />
-                <modsfx:CompView           IsVisible="{Binding IsTypeComp}" />
-                <modsfx:LimiterView        IsVisible="{Binding IsTypeLimiter}" />
-                <modsfx:TWahView           IsVisible="{Binding IsTypeTouchWah}" />
-                <modsfx:AutoWahView        IsVisible="{Binding IsTypeAutoWah}" />
-                <modsfx:PedalWahView       IsVisible="{Binding IsTypePedalWah}" />
-                <modsfx:GraphicEqView      IsVisible="{Binding IsTypeGraphicEq}" />
-                <modsfx:ParametricEqView   IsVisible="{Binding IsTypeParametricEq}" />
-                <modsfx:GuitarSimView      IsVisible="{Binding IsTypeGuitarSim}" />
-                <modsfx:AcGuitarSimView    IsVisible="{Binding IsTypeAcGuitarSim}" />
-                <modsfx:AcProcessorView    IsVisible="{Binding IsTypeAcProcessor}" />
-                <modsfx:WaveSynthView      IsVisible="{Binding IsTypeWaveSynth}" />
-                <modsfx:OctaveView         IsVisible="{Binding IsTypeOctave}" />
-                <modsfx:HeavyOctaveView    IsVisible="{Binding IsTypeHeavyOctave}" />
-                <modsfx:PitchShifterView   IsVisible="{Binding IsTypePitchShifter}" />
-                <modsfx:HarmonistView      IsVisible="{Binding IsTypeHarmonist}" />
-                <modsfx:HumanizerView      IsVisible="{Binding IsTypeHumanizer}" />
-                <modsfx:Phaser90EView      IsVisible="{Binding IsTypePhaser90E}" />
-                <modsfx:Flanger117EView    IsVisible="{Binding IsTypeFlanger117E}" />
-                <modsfx:Wah95EView         IsVisible="{Binding IsTypeWah95E}" />
-                <modsfx:DC30View           IsVisible="{Binding IsTypeDc30}" />
-                <modsfx:PedalBendView      IsVisible="{Binding IsTypePedalBend}" />
+                <modsfx:ChorusView IsVisible="{Binding IsTypeChorus}" />
+                <modsfx:FlangerView IsVisible="{Binding IsTypeFlanger}" />
+                <modsfx:PhaserView IsVisible="{Binding IsTypePhaser}" />
+                <modsfx:UniVView IsVisible="{Binding IsTypeUnivibe}" />
+                <modsfx:TremoloView IsVisible="{Binding IsTypeTremolo}" />
+                <modsfx:VibratoView IsVisible="{Binding IsTypeVibrato}" />
+                <modsfx:RotaryView IsVisible="{Binding IsTypeRotary}" />
+                <modsfx:RingModView IsVisible="{Binding IsTypeRingMod}" />
+                <modsfx:SlowGearView IsVisible="{Binding IsTypeSlowGear}" />
+                <modsfx:SlicerView IsVisible="{Binding IsTypeSlicer}" />
+                <modsfx:CompView IsVisible="{Binding IsTypeComp}" />
+                <modsfx:LimiterView IsVisible="{Binding IsTypeLimiter}" />
+                <modsfx:TWahView IsVisible="{Binding IsTypeTouchWah}" />
+                <modsfx:AutoWahView IsVisible="{Binding IsTypeAutoWah}" />
+                <modsfx:PedalWahView IsVisible="{Binding IsTypePedalWah}" />
+                <modsfx:GraphicEqView IsVisible="{Binding IsTypeGraphicEq}" />
+                <modsfx:ParametricEqView IsVisible="{Binding IsTypeParametricEq}" />
+                <modsfx:GuitarSimView IsVisible="{Binding IsTypeGuitarSim}" />
+                <modsfx:AcGuitarSimView IsVisible="{Binding IsTypeAcGuitarSim}" />
+                <modsfx:AcProcessorView IsVisible="{Binding IsTypeAcProcessor}" />
+                <modsfx:WaveSynthView IsVisible="{Binding IsTypeWaveSynth}" />
+                <modsfx:OctaveView IsVisible="{Binding IsTypeOctave}" />
+                <modsfx:HeavyOctaveView IsVisible="{Binding IsTypeHeavyOctave}" />
+                <modsfx:PitchShifterView IsVisible="{Binding IsTypePitchShifter}" />
+                <modsfx:HarmonistView IsVisible="{Binding IsTypeHarmonist}" />
+                <modsfx:HumanizerView IsVisible="{Binding IsTypeHumanizer}" />
+                <modsfx:Phaser90EView IsVisible="{Binding IsTypePhaser90E}" />
+                <modsfx:Flanger117EView IsVisible="{Binding IsTypeFlanger117E}" />
+                <modsfx:Wah95EView IsVisible="{Binding IsTypeWah95E}" />
+                <modsfx:DC30View IsVisible="{Binding IsTypeDc30}" />
+                <modsfx:PedalBendView IsVisible="{Binding IsTypePedalBend}" />
 
             </StackPanel>
         </StackPanel>

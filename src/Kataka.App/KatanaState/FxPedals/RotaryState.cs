@@ -4,6 +4,11 @@ namespace Kataka.App.KatanaState.FxPedals;
 
 public class RotaryState
 {
+    public AmpControlState Depth;
+    public AmpControlState Level;
+
+    public AmpControlState RateFast;
+
     public RotaryState(bool isMod)
     {
         var p = isMod ? KatanaMkIIParameterCatalog.ModRotaryParams : KatanaMkIIParameterCatalog.FxRotaryParams;
@@ -11,8 +16,4 @@ public class RotaryState
         Depth = new AmpControlState(p[1], description: "Adjusts the amount of depth in the rotary effect.");
         Level = new AmpControlState(p[2], description: "Adjusts the volume.");
     }
-
-    public AmpControlState RateFast;
-    public AmpControlState Depth;
-    public AmpControlState Level;
 }

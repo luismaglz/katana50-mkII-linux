@@ -6,6 +6,7 @@ public partial class KatanaState
 {
     /// <summary> Effect pedals (Temporary + Delay/Mod/FX/Reverb/PedalFx blocks) ────────── </summary>
     public AmpControlState PedalChain { get; } = new(KatanaMkIIParameterCatalog.ChainPattern);
+
     public BoostPedalState BoostPedal { get; } = new();
     public ModPedalState ModPedal { get; } = new();
     public FxPedalState FxPedal { get; } = new();
@@ -14,23 +15,14 @@ public partial class KatanaState
     public ReverbPedalState ReverbPedal { get; } = new();
     public HardwarePedalState HardwarePedal { get; } = new();
 
-    partial void RegisterPedals()
-    {
-        RegisterAll(PedalChain);
-        RegisterAll(BoostPedal);
-        RegisterAll(ModPedal);
-        RegisterAll(FxPedal);
-        RegisterAll(DelayPedal);
-        RegisterAll(Delay2Pedal);
-        RegisterAll(ReverbPedal);
-        RegisterAll(HardwarePedal);
-    }
-
     public IReadOnlyDictionary<string, AmpControlState> GetPedalDomainControlsByKey()
     {
         var dict = new Dictionary<string, AmpControlState>(StringComparer.Ordinal);
 
-        void Add(AmpControlState s) => dict[s.Parameter.Key] = s;
+        void Add(AmpControlState s)
+        {
+            dict[s.Parameter.Key] = s;
+        }
 
         // Booster
         Add(BoostPedal.EnabledState);
@@ -93,5 +85,17 @@ public partial class KatanaState
         Add(ReverbPedal.DirectMix);
 
         return dict;
+    }
+
+    partial void RegisterPedals()
+    {
+        RegisterAll(PedalChain);
+        RegisterAll(BoostPedal);
+        RegisterAll(ModPedal);
+        RegisterAll(FxPedal);
+        RegisterAll(DelayPedal);
+        RegisterAll(Delay2Pedal);
+        RegisterAll(ReverbPedal);
+        RegisterAll(HardwarePedal);
     }
 }
