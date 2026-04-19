@@ -76,9 +76,9 @@ public sealed class AmpSyncService : IAmpSyncService
             try
             {
                 var catalogType = typeof(KatanaMkIIParameterCatalog);
-                var defs = catalogType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
-                    .Where(f => f.Name.StartsWith("GlobalEq"))
-                    .Select(f => f.GetValue(null))
+                var defs = catalogType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+                    .Where(p => p.Name.StartsWith("GlobalEq"))
+                    .Select(p => p.GetValue(null))
                     .OfType<KatanaParameterDefinition>()
                     .ToList();
 

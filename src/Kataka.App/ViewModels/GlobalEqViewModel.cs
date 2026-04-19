@@ -1,126 +1,100 @@
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-
 using Kataka.App.KatanaState;
+
+using ReactiveUI;
 
 namespace Kataka.App.ViewModels;
 
+/// <summary>
+///     ViewModel for the Global EQ panel. Exposes the currently-active EQ bank as
+///     <see cref="ActiveBank" /> (an <see cref="EqBankViewModel" />). When the amp
+///     switches banks, <see cref="ActiveBank" /> is swapped and the view re-binds
+///     automatically — no circular write-back possible because all mutations go
+///     through <see cref="AmpControlViewModel.Value" /> → <see cref="AmpControlState.WriteRequested" />.
+/// </summary>
 public class GlobalEqViewModel : ViewModelBase
 {
-    private readonly IKatanaState _katanaState;
+    private EqBankViewModel _activeBank;
 
     public GlobalEqViewModel(IKatanaState katanaState)
     {
-        _katanaState = katanaState;
+        Bank1 = new EqBankViewModel(katanaState.GlobalEq.Bank1);
+        Bank2 = new EqBankViewModel(katanaState.GlobalEq.Bank2);
+        Bank3 = new EqBankViewModel(katanaState.GlobalEq.Bank3);
 
-        // Update VM when selected bank changes
-        _katanaState.GlobalEq.Select.ValueChanged += UpdateFromActiveBank;
+        _activeBank = BankVmFor(katanaState.GlobalEq.Select.Value);
 
-        // Subscribe to bank members to pick up changes from amp reads
-        foreach (var bank in new[] { _katanaState.GlobalEq.Bank1, _katanaState.GlobalEq.Bank2, _katanaState.GlobalEq.Bank3 })
-        {
-            bank.Geq31Hz.ValueChanged += UpdateFromActiveBank;
-            bank.Geq62Hz.ValueChanged += UpdateFromActiveBank;
-            bank.Geq125Hz.ValueChanged += UpdateFromActiveBank;
-            bank.Geq250Hz.ValueChanged += UpdateFromActiveBank;
-            bank.Geq500Hz.ValueChanged += UpdateFromActiveBank;
-            bank.Geq1kHz.ValueChanged += UpdateFromActiveBank;
-            bank.Geq2kHz.ValueChanged += UpdateFromActiveBank;
-            bank.Geq4kHz.ValueChanged += UpdateFromActiveBank;
-            bank.Geq8kHz.ValueChanged += UpdateFromActiveBank;
-            bank.Geq16kHz.ValueChanged += UpdateFromActiveBank;
-            bank.GeqLevel.ValueChanged += UpdateFromActiveBank;
-            bank.Type.ValueChanged += UpdateFromActiveBank;
-            bank.Sw.ValueChanged += UpdateFromActiveBank;
-        }
-
-        // Write-back from VM to state
-        this.WhenAnyValue(x => x.GraphicEq31Hz)
-            .Subscribe(v => ActiveBank().Geq31Hz.Value = v)
-            .DisposeWith(Disposables);
-        this.WhenAnyValue(x => x.GraphicEq62Hz)
-            .Subscribe(v => ActiveBank().Geq62Hz.Value = v)
-            .DisposeWith(Disposables);
-        this.WhenAnyValue(x => x.GraphicEq125Hz)
-            .Subscribe(v => ActiveBank().Geq125Hz.Value = v)
-            .DisposeWith(Disposables);
-        this.WhenAnyValue(x => x.GraphicEq250Hz)
-            .Subscribe(v => ActiveBank().Geq250Hz.Value = v)
-            .DisposeWith(Disposables);
-        this.WhenAnyValue(x => x.GraphicEq500Hz)
-            .Subscribe(v => ActiveBank().Geq500Hz.Value = v)
-            .DisposeWith(Disposables);
-        this.WhenAnyValue(x => x.GraphicEq1kHz)
-            .Subscribe(v => ActiveBank().Geq1kHz.Value = v)
-            .DisposeWith(Disposables);
-        this.WhenAnyValue(x => x.GraphicEq2kHz)
-            .Subscribe(v => ActiveBank().Geq2kHz.Value = v)
-            .DisposeWith(Disposables);
-        this.WhenAnyValue(x => x.GraphicEq4kHz)
-            .Subscribe(v => ActiveBank().Geq4kHz.Value = v)
-            .DisposeWith(Disposables);
-        this.WhenAnyValue(x => x.GraphicEq8kHz)
-            .Subscribe(v => ActiveBank().Geq8kHz.Value = v)
-            .DisposeWith(Disposables);
-        this.WhenAnyValue(x => x.GraphicEq16kHz)
-            .Subscribe(v => ActiveBank().Geq16kHz.Value = v)
-            .DisposeWith(Disposables);
-        this.WhenAnyValue(x => x.GraphicEqLevel)
-            .Subscribe(v => ActiveBank().GeqLevel.Value = v)
-            .DisposeWith(Disposables);
-
-        this.WhenAnyValue(x => x.Type)
-            .Subscribe(v => ActiveBank().Type.Value = v)
-            .DisposeWith(Disposables);
-
-        this.WhenAnyValue(x => x.IsOn)
-            .Subscribe(v => ActiveBank().Sw.Value = v ? 1 : 0)
-            .DisposeWith(Disposables);
-
-        // Initialize from current state
-        UpdateFromActiveBank();
+        // When amp changes the active bank, swap ActiveBank (no write-back — SetFromAmp
+        // fires only ValueChanged, never WriteRequested).
+        katanaState.GlobalEq.Select.ValueChanged +=
+            () => ActiveBank = BankVmFor(katanaState.GlobalEq.Select.Value);
     }
 
-    private GlobalEqState.EqBankState ActiveBank()
+    public EqBankViewModel Bank1 { get; }
+    public EqBankViewModel Bank2 { get; }
+    public EqBankViewModel Bank3 { get; }
+
+    /// <summary>The VM for the currently-selected EQ bank. The view binds to this.</summary>
+    public EqBankViewModel ActiveBank
     {
-        return _katanaState.GlobalEq.Select.Value switch
-        {
-            1 => _katanaState.GlobalEq.Bank2,
-            2 => _katanaState.GlobalEq.Bank3,
-            _ => _katanaState.GlobalEq.Bank1
-        };
+        get => _activeBank;
+        private set => this.RaiseAndSetIfChanged(ref _activeBank, value);
     }
 
-    private void UpdateFromActiveBank()
+    private EqBankViewModel BankVmFor(int selectValue) => selectValue switch
     {
-        var bank = ActiveBank();
-        GraphicEq31Hz = bank.Geq31Hz.Value;
-        GraphicEq62Hz = bank.Geq62Hz.Value;
-        GraphicEq125Hz = bank.Geq125Hz.Value;
-        GraphicEq250Hz = bank.Geq250Hz.Value;
-        GraphicEq500Hz = bank.Geq500Hz.Value;
-        GraphicEq1kHz = bank.Geq1kHz.Value;
-        GraphicEq2kHz = bank.Geq2kHz.Value;
-        GraphicEq4kHz = bank.Geq4kHz.Value;
-        GraphicEq8kHz = bank.Geq8kHz.Value;
-        GraphicEq16kHz = bank.Geq16kHz.Value;
-        GraphicEqLevel = bank.GeqLevel.Value;
-        Type = bank.Type.Value;
-        IsOn = bank.Sw.Value != 0;
+        1 => Bank2,
+        2 => Bank3,
+        _ => Bank1
+    };
+}
+
+/// <summary>
+///     Wraps a single <see cref="GlobalEqState.EqBankState" /> with one
+///     <see cref="AmpControlViewModel" /> per parameter. The view binds directly to
+///     these — amp reads update them through <c>ValueChanged</c> → <c>PropertyChanged</c>,
+///     and UI edits write through the <c>Value</c> setter → <c>WriteRequested</c>.
+/// </summary>
+public class EqBankViewModel : ViewModelBase
+{
+    public EqBankViewModel(GlobalEqState.EqBankState bank)
+    {
+        Sw = new AmpControlViewModel(bank.Sw!);
+        Type = new AmpControlViewModel(bank.Type!);
+        Geq31Hz = new AmpControlViewModel(bank.Geq31Hz!);
+        Geq62Hz = new AmpControlViewModel(bank.Geq62Hz!);
+        Geq125Hz = new AmpControlViewModel(bank.Geq125Hz!);
+        Geq250Hz = new AmpControlViewModel(bank.Geq250Hz!);
+        Geq500Hz = new AmpControlViewModel(bank.Geq500Hz!);
+        Geq1kHz = new AmpControlViewModel(bank.Geq1kHz!);
+        Geq2kHz = new AmpControlViewModel(bank.Geq2kHz!);
+        Geq4kHz = new AmpControlViewModel(bank.Geq4kHz!);
+        Geq8kHz = new AmpControlViewModel(bank.Geq8kHz!);
+        Geq16kHz = new AmpControlViewModel(bank.Geq16kHz!);
+        GeqLevel = new AmpControlViewModel(bank.GeqLevel!);
+
+        // Convenience bool for IsChecked binding — reads Sw.Value, raises its own
+        // PropertyChanged so the CheckBox stays in sync without any write-back loop.
+        bank.Sw!.ValueChanged += () => this.RaisePropertyChanged(nameof(IsOn));
     }
 
-    [Reactive] public int GraphicEq31Hz { get; set; }
-    [Reactive] public int GraphicEq62Hz { get; set; }
-    [Reactive] public int GraphicEq125Hz { get; set; }
-    [Reactive] public int GraphicEq250Hz { get; set; }
-    [Reactive] public int GraphicEq500Hz { get; set; }
-    [Reactive] public int GraphicEq1kHz { get; set; }
-    [Reactive] public int GraphicEq2kHz { get; set; }
-    [Reactive] public int GraphicEq4kHz { get; set; }
-    [Reactive] public int GraphicEq8kHz { get; set; }
-    [Reactive] public int GraphicEq16kHz { get; set; }
-    [Reactive] public int GraphicEqLevel { get; set; }
+    public AmpControlViewModel Sw { get; }
+    public AmpControlViewModel Type { get; }
+    public AmpControlViewModel Geq31Hz { get; }
+    public AmpControlViewModel Geq62Hz { get; }
+    public AmpControlViewModel Geq125Hz { get; }
+    public AmpControlViewModel Geq250Hz { get; }
+    public AmpControlViewModel Geq500Hz { get; }
+    public AmpControlViewModel Geq1kHz { get; }
+    public AmpControlViewModel Geq2kHz { get; }
+    public AmpControlViewModel Geq4kHz { get; }
+    public AmpControlViewModel Geq8kHz { get; }
+    public AmpControlViewModel Geq16kHz { get; }
+    public AmpControlViewModel GeqLevel { get; }
 
-    [Reactive] public int Type { get; set; }
-    [Reactive] public bool IsOn { get; set; }
+    /// <summary>Boolean wrapper over <see cref="Sw" />.Value for CheckBox binding.</summary>
+    public bool IsOn
+    {
+        get => Sw.Value != 0;
+        set => Sw.Value = value ? 1 : 0;
+    }
 }
