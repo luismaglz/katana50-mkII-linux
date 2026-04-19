@@ -26,7 +26,7 @@
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto">
                 <Border Classes="amp-shell" Padding="24">
-                    <Grid RowDefinitions="Auto,Auto" RowSpacing="18">
+                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="18">
 
                         <Grid ColumnDefinitions="Auto,Auto,*,300" ColumnSpacing="14">
                             <views:AmpControlsView DataContext="{Binding AmpEditor}" />
@@ -35,7 +35,8 @@
                             <views:DeviceStatusView Grid.Column="3" />
                         </Grid>
 
-                        <views:PedalboardView Grid.Row="1" DataContext="{Binding AmpEditor}" />
+                        <views:PedalboardMiniMap Grid.Row="1" DataContext="{Binding PedalboardMiniMap}" />
+                        <views:PedalboardView Grid.Row="2" DataContext="{Binding AmpEditor}" />
 
                     </Grid>
                 </Border>

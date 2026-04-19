@@ -86,7 +86,12 @@ public sealed class AmpSyncService : IAmpSyncService
                 {
                     _logger.LogInformation("Reading {Count} Global EQ parameters from amp.", defs.Count);
                     var sysValues = await _session.ReadParametersAsync(defs);
-                    _katanaState.SetStates(sysValues);
+                    // ReadParametersAsync keys by parameter.Key (kebab-case), but _stateFields uses
+                    // parameter.AddressString (hex). Remap before calling SetStates.
+                    var remapped = defs
+                        .Where(d => sysValues.ContainsKey(d.Key))
+                        .ToDictionary(d => d.AddressString, d => sysValues[d.Key]);
+                    _katanaState.SetStates(remapped);
                 }
             }
             catch (Exception ex)
