@@ -8,9 +8,9 @@ public class GlobalEqState
     public AmpControlState Select = new(KatanaMkIIParameterCatalog.GlobalEqSelect,
         description: "Selects which Global EQ bank is active (0=bank1,1=bank2,2=bank3)");
 
-    public EqBankState Bank1 { get; } = new();
-    public EqBankState Bank2 { get; } = new();
-    public EqBankState Bank3 { get; } = new();
+    public EqBankState Bank1 = new();
+    public EqBankState Bank2 = new();
+    public EqBankState Bank3 = new();
 
     public GlobalEqState()
     {
