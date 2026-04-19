@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Kataka.App.ViewModels"
              xmlns:dvm="using:Kataka.App.ViewModels.Design"
-             xmlns:controls="using:Kataka.App.Controls"
              xmlns:views="using:Kataka.App.Views"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -12,48 +11,18 @@
              x:DataType="vm:AmpEditorViewModel"
              x:CompileBindings="False">
 
-    <Border Classes="panel-section" Padding="16" MinWidth="340">
-        <StackPanel Spacing="10">
-            <ItemsControl ItemsSource="{Binding AmpControls}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" ItemSpacing="14" LineSpacing="14" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:AmpControlViewModel"
-                                  x:CompileBindings="False">
-                        <controls:RotaryKnobV2 Label="{Binding DisplayName}"
-                                               Minimum="{Binding Minimum}"
-                                               Maximum="{Binding Maximum}"
-                                               Value="{Binding Value}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+    <Border Classes="panel-section" Padding="16 16 16 0" MinWidth="340">
+        <StackPanel>
             <views:PanelView DataContext="{Binding Panel}" />
-            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
-                <StackPanel Spacing="4">
-                    <TextBlock Text="AMP TYPE" FontSize="10" FontWeight="SemiBold"
-                               Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                    <ComboBox Classes="midi-port-picker" HorizontalAlignment="Stretch"
-                              ItemsSource="{x:Static vm:AmpEditorViewModel.AmpTypeOptions}"
-                              SelectedItem="{Binding SelectedAmpType}" />
-                </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Bottom">
-                    <ToggleButton IsChecked="{Binding IsAmpVariation}"
-                                  Classes="effect-toggle"
-                                  Content="VARIATION"
-                                  ToolTip.Tip="Amp Variation (TYPE 1 / TYPE 2)" />
-                </StackPanel>
-                <StackPanel Grid.Column="2" Spacing="4">
-                    <TextBlock Text="CABINET" FontSize="10" FontWeight="SemiBold"
-                               Foreground="{StaticResource KatanaSubtleTextBrush}" />
-                    <ComboBox Classes="midi-port-picker" HorizontalAlignment="Stretch"
-                              ItemsSource="{x:Static vm:AmpEditorViewModel.CabinetResonanceOptions}"
-                              SelectedItem="{Binding SelectedCabinetResonance}" />
-                </StackPanel>
-            </Grid>
 
+            <StackPanel Orientation="Horizontal" Margin="20 0 0 0" VerticalAlignment="Bottom">
+                <ToggleButton IsChecked="{Binding IsAmpVariation}"
+                              Classes="effect-toggle"
+                              Content="VARIATION"
+                              ToolTip.Tip="Amp Variation (TYPE 1 / TYPE 2)" />
+                <views:ChannelSelectionView DataContext="{Binding ChannelSelection}" />
+
+            </StackPanel>
         </StackPanel>
     </Border>
 </UserControl>

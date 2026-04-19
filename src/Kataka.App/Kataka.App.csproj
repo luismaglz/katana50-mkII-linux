@@ -56,6 +56,10 @@
       <DependentUpon>PedalHeaderControl.axaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\ChannelSelectionView.axaml.cs">
+      <DependentUpon>ChannelSelectionView.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

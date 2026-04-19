@@ -14,16 +14,16 @@ public class PaletteEditorViewModel : ViewModelBase
 
     public PaletteEditorViewModel()
     {
-        _accentHex     = ToHex(RuntimePaletteService.Accent);
-        _knobFaceHex   = ToHex(RuntimePaletteService.KnobFace);
-        _bgBaseHex     = ToHex(RuntimePaletteService.BgBase);
-        _bgSurfaceHex  = ToHex(RuntimePaletteService.BgSurface);
+        _accentHex = ToHex(RuntimePaletteService.Accent);
+        _knobFaceHex = ToHex(RuntimePaletteService.KnobFace);
+        _bgBaseHex = ToHex(RuntimePaletteService.BgBase);
+        _bgSurfaceHex = ToHex(RuntimePaletteService.BgSurface);
         _bgElevatedHex = ToHex(RuntimePaletteService.BgElevated);
 
-        AccentSwatch     = new SolidColorBrush(RuntimePaletteService.Accent);
-        KnobFaceSwatch   = new SolidColorBrush(RuntimePaletteService.KnobFace);
-        BgBaseSwatch     = new SolidColorBrush(RuntimePaletteService.BgBase);
-        BgSurfaceSwatch  = new SolidColorBrush(RuntimePaletteService.BgSurface);
+        AccentSwatch = new SolidColorBrush(RuntimePaletteService.Accent);
+        KnobFaceSwatch = new SolidColorBrush(RuntimePaletteService.KnobFace);
+        BgBaseSwatch = new SolidColorBrush(RuntimePaletteService.BgBase);
+        BgSurfaceSwatch = new SolidColorBrush(RuntimePaletteService.BgSurface);
         BgElevatedSwatch = new SolidColorBrush(RuntimePaletteService.BgElevated);
     }
 
@@ -66,10 +66,10 @@ public class PaletteEditorViewModel : ViewModelBase
 
     // ── Swatch brushes (mutated in-place so bound controls re-render) ─────────
 
-    public SolidColorBrush AccentSwatch     { get; }
-    public SolidColorBrush KnobFaceSwatch   { get; }
-    public SolidColorBrush BgBaseSwatch     { get; }
-    public SolidColorBrush BgSurfaceSwatch  { get; }
+    public SolidColorBrush AccentSwatch { get; }
+    public SolidColorBrush KnobFaceSwatch { get; }
+    public SolidColorBrush BgBaseSwatch { get; }
+    public SolidColorBrush BgSurfaceSwatch { get; }
     public SolidColorBrush BgElevatedSwatch { get; }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

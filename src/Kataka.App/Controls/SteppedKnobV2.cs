@@ -67,11 +67,11 @@ public sealed class SteppedKnobV2 : RotaryKnobBase
         context.DrawText(labelText, new Point((bounds.Width - labelText.Width) / 2, bounds.Top));
 
         var accentColor = IsSet(AccentColorProperty) ? AccentColor : RuntimePaletteService.Accent;
-        var trackColor  = IsSet(TrackColorProperty)  ? TrackColor  : Color.FromArgb(70, accentColor.R, accentColor.G, accentColor.B);
-        var faceColor   = IsSet(FaceColorProperty)   ? FaceColor   : RuntimePaletteService.KnobFace;
-        var bezelColor  = IsSet(BezelColorProperty)  ? BezelColor  : RuntimePaletteService.BgBase;
+        var trackColor = IsSet(TrackColorProperty) ? TrackColor : Color.FromArgb(70, accentColor.R, accentColor.G, accentColor.B);
+        var faceColor = IsSet(FaceColorProperty) ? FaceColor : RuntimePaletteService.KnobFace;
+        var bezelColor = IsSet(BezelColorProperty) ? BezelColor : RuntimePaletteService.BgBase;
         var accentBrush = new SolidColorBrush(accentColor);
-        var trackBrush  = new SolidColorBrush(trackColor);
+        var trackBrush = new SolidColorBrush(trackColor);
 
         // Dots at each step position on the arc ring
         if (steps is { Length: >= 2 })

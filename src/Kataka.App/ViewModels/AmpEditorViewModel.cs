@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 
 using CommunityToolkit.Mvvm.Input;
 
@@ -19,11 +15,11 @@ namespace Kataka.App.ViewModels;
 
 public partial class AmpEditorViewModel : ViewModelBase
 {
+    private readonly Action<string> _appendStatus;
     private readonly IKatanaSession _katanaSession;
     private readonly IKatanaState _katanaState;
-    private readonly IAmpSyncService _syncService;
-    private readonly Action<string> _appendStatus;
     private readonly ILogger<AmpEditorViewModel> _logger;
+    private readonly IAmpSyncService _syncService;
 
     public AmpEditorViewModel(
         IKatanaSession katanaSession,
@@ -38,38 +34,19 @@ public partial class AmpEditorViewModel : ViewModelBase
         _appendStatus = appendStatus;
         _logger = logger;
 
-        katanaState.AmpType.ValueChanged += () =>
-        {
-            var idx = katanaState.AmpType.Value;
-            if (idx < AmpTypeOptions.Length) SelectedAmpType = AmpTypeOptions[idx];
-        };
-        katanaState.CabinetResonance.ValueChanged += () =>
-        {
-            var idx = katanaState.CabinetResonance.Value;
-            if (idx < CabinetResonanceOptions.Length) SelectedCabinetResonance = CabinetResonanceOptions[idx];
-        };
-        katanaState.AmpVariation.ValueChanged += () =>
-            IsAmpVariation = katanaState.AmpVariation.Value != 0;
-
         foreach (var effectViewModel in new PedalViewModel[]
                  {
-                     new BoosterPedalViewModel(katanaState),
-                     new ModFxPedalViewModel("mod", katanaState),
-                     new ModFxPedalViewModel("fx", katanaState),
-                     new DelayPedalViewModel("delay", katanaState),
-                     new DelayPedalViewModel("delay2", katanaState),
-                     new ReverbPedalViewModel(katanaState)
+                     new BoosterPedalViewModel(katanaState), new ModFxPedalViewModel("mod", katanaState),
+                     new ModFxPedalViewModel("fx", katanaState), new DelayPedalViewModel("delay", katanaState),
+                     new DelayPedalViewModel("delay2", katanaState), new ReverbPedalViewModel(katanaState)
                  })
-        {
             PanelEffects.Add(effectViewModel);
-        }
 
-        foreach (var channel in PanelChannels)
-            PanelChannelOptions.Add(new PanelChannelOptionViewModel(channel) { SelectCommand = SelectPanelChannelCommand });
 
         var panelEffectsByDefinitionKey = PanelEffects.ToDictionary(e => e.Definition.Key);
-        Pedalboard = new PedalboardViewModel(panelEffectsByDefinitionKey, SelectedPanelChannel);
+        Pedalboard = new PedalboardViewModel(katanaState, panelEffectsByDefinitionKey);
         Panel = new PanelViewModel(katanaState);
+        ChannelSelection = new ChannelSelectionViewModel(syncService, katanaState);
 
         syncService.ReadCompleted.Subscribe(meta =>
         {
@@ -77,26 +54,10 @@ public partial class AmpEditorViewModel : ViewModelBase
             if (meta.PedalControlsStatus.Length > 0) PedalControlsStatus = meta.PedalControlsStatus;
         }).DisposeWith(Disposables);
 
-        this.WhenAnyValue(x => x.SelectedAmpType)
-            .Subscribe(v =>
-            {
-                var idx = Array.IndexOf(AmpTypeOptions, v);
-                if (idx < 0) return;
-                _katanaState.AmpType.Value = idx;
-            }).DisposeWith(Disposables);
-
-        this.WhenAnyValue(x => x.SelectedCabinetResonance)
-            .Subscribe(v =>
-            {
-                var idx = Array.IndexOf(CabinetResonanceOptions, v);
-                if (idx < 0) return;
-                _katanaState.CabinetResonance.Value = idx;
-            }).DisposeWith(Disposables);
 
         this.WhenAnyValue(x => x.IsAmpVariation)
             .Subscribe(v => _katanaState.AmpVariation.Value = v ? 1 : 0)
             .DisposeWith(Disposables);
-
     }
 
     public ObservableCollection<AmpControlViewModel> AmpControls { get; } = [];
@@ -104,45 +65,11 @@ public partial class AmpEditorViewModel : ViewModelBase
     public PedalFxViewModel PedalFx { get; } = new();
     public PedalboardViewModel Pedalboard { get; }
     public PanelViewModel Panel { get; }
+    public ChannelSelectionViewModel ChannelSelection { get; }
 
-    public ObservableCollection<string> PanelChannels { get; } =
-    [
-        "Panel", "CH A1", "CH A2", "CH B1", "CH B2"
-    ];
-
-    public ObservableCollection<PanelChannelOptionViewModel> PanelChannelOptions { get; } = [];
-
-    public static string[] AmpTypeOptions { get; } = ["ACOUSTIC", "CLEAN", "CRUNCH", "LEAD", "BROWN"];
-    public static string[] CabinetResonanceOptions { get; } = ["LOW", "MIDDLE", "HIGH"];
-
-    [Reactive] public string SelectedAmpType { get; set; } = "CLEAN";
-    [Reactive] public string SelectedCabinetResonance { get; set; } = "MIDDLE";
-    [Reactive] public bool IsAmpVariation { get; set; } = false;
-    [Reactive] public string SelectedPanelChannel { get; set; } = "Panel";
+    [Reactive] public bool IsAmpVariation { get; set; }
     [Reactive] public string PanelControlsStatus { get; set; } = "Panel controls have not been read yet.";
     [Reactive] public string PedalControlsStatus { get; set; } = "Pedal controls have not been read yet.";
-
-    internal void Initialize()
-    {
-        this.WhenAnyValue(x => x.SelectedPanelChannel)
-            .Subscribe(v =>
-            {
-                UpdatePanelChannelSelection();
-                Pedalboard.SelectedChannel = v;
-            });
-
-        _syncService.PanelChannelPushed
-            .Subscribe(displayName => SelectedPanelChannel = displayName);
-
-        UpdatePanelChannelSelection();
-        Pedalboard.Refresh();
-    }
-
-    [RelayCommand]
-    private void SelectPanelChannel(string? channel)
-    {
-        if (!string.IsNullOrWhiteSpace(channel)) SelectedPanelChannel = channel;
-    }
 
     [RelayCommand]
     private async Task WritePanelControlsAsync()
@@ -156,9 +83,6 @@ public partial class AmpEditorViewModel : ViewModelBase
         try
         {
             _logger.LogInformation("Writing Katana panel controls.");
-            var channel = Utilities.ParsePanelChannelDisplay(SelectedPanelChannel);
-            await _katanaSession.SelectPanelChannelAsync(channel);
-            _logger.LogInformation("Selected panel channel: {Channel}", SelectedPanelChannel);
 
             foreach (var effect in PanelEffects)
             {
@@ -166,7 +90,8 @@ public partial class AmpEditorViewModel : ViewModelBase
                     effect.Definition.SwitchParameter,
                     effect.IsEnabled ? (byte)1 : (byte)0);
                 effect.IsEnabled = confirmedValue != 0;
-                _logger.LogInformation("{Name} confirmed {State}.", effect.DisplayName, effect.IsEnabled ? "On" : "Off");
+                _logger.LogInformation("{Name} confirmed {State}.", effect.DisplayName,
+                    effect.IsEnabled ? "On" : "Off");
 
                 if (effect.Definition.TypeParameter is not null &&
                     effect.TryGetTypeValue(effect.SelectedTypeOption, out var requestedType))
@@ -174,7 +99,8 @@ public partial class AmpEditorViewModel : ViewModelBase
                     var confirmedType = await _katanaSession.WriteParameterAsync(
                         effect.Definition.TypeParameter, requestedType);
                     effect.SelectedTypeOption = effect.ToTypeOption(confirmedType);
-                    _logger.LogInformation("{Name} type confirmed at {Type}.", effect.DisplayName, effect.SelectedTypeOption);
+                    _logger.LogInformation("{Name} type confirmed at {Type}.", effect.DisplayName,
+                        effect.SelectedTypeOption);
                 }
             }
 
@@ -228,12 +154,6 @@ public partial class AmpEditorViewModel : ViewModelBase
             _appendStatus(ex.Message);
             _logger.LogError(ex, "Pedal control write failed.");
         }
-    }
-
-    private void UpdatePanelChannelSelection()
-    {
-        foreach (var option in PanelChannelOptions)
-            option.IsSelected = option.DisplayName == SelectedPanelChannel;
     }
 
     private void ApplyPedalValue(string parameterKey, byte value)

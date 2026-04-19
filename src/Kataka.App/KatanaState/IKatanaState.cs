@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using Kataka.Domain.Midi;
 
 namespace Kataka.App.KatanaState;
 
@@ -15,6 +15,9 @@ public interface IKatanaState
     AmpControlState Presence { get; }
     AmpControlState CabinetResonance { get; }
     AmpControlState PatchLevel { get; }
+
+    // -- Selected Channel Tracker
+    KatanaPanelChannel SelectedChannel { get; set; }
 
     // ── Channel-mode stored preamp values ────────────────────────────────────────
     PreampState Preamp { get; }
@@ -35,6 +38,8 @@ public interface IKatanaState
     ContourState Contour2 { get; }
     ContourState Contour3 { get; }
 
+    event Action<KatanaPanelChannel> SelectedChannelChanged;
+
     /// <summary>
     ///     Returns all top-level amp control states (EQ, gain, tone) keyed by parameter key.
     ///     Used by the service to keep domain state in sync with amp reads.
@@ -49,13 +54,13 @@ public interface IKatanaState
     IReadOnlyDictionary<string, AmpControlState> GetPedalDomainControlsByKey();
 
     /// <summary>
-    /// Set values from a response from the amp
+    ///     Set values from a response from the amp
     /// </summary>
     /// <param name="values"></param>
     public void SetStates(IReadOnlyDictionary<string, byte> values);
 
     /// <summary>
-    /// Set individual control value
+    ///     Set individual control value
     /// </summary>
     /// <param name="key"></param>
     /// <param name="value"></param>

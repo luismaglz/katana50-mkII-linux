@@ -73,6 +73,10 @@ public sealed class AmpSyncService : IAmpSyncService
             var allStates = await _session.ReadAllPatchStatesAsync();
             _katanaState.SetStates(allStates);
 
+            var channel = await _session.ReadCurrentPanelChannelAsync();
+            if (channel.HasValue)
+                _katanaState.SelectedChannel = channel.Value;
+
             SubscribeToStateWrites();
             StartWriteLoop();
             _logger.LogInformation("KatanaState seeded. Write loop started.");
@@ -83,6 +87,17 @@ public sealed class AmpSyncService : IAmpSyncService
             _logger.LogError(ex, "Full patch state read failed.");
             return false;
         }
+    }
+
+    /// <summary>
+    ///     Select the Amp Channel
+    /// </summary>
+    /// <param name="channel"></param>
+    public async Task SelectChannelAsync(KatanaPanelChannel channel)
+    {
+        await _session.SelectPanelChannelAsync(channel);
+        _katanaState.SelectedChannel = channel;
+        await TryRefreshAmpStateAsync();
     }
 
     // ── Write loop ────────────────────────────────────────────────────────────
@@ -194,22 +209,19 @@ public sealed class AmpSyncService : IAmpSyncService
             return;
         }
 
-        var displayName = Utilities.ToPanelChannelDisplay(channel.Value);
-        _logger.LogInformation("Amp channel changed (SysEx): {Channel}", displayName);
-        _ = RefreshOnChannelChangeAsync(displayName);
+        _logger.LogInformation("Amp channel changed (SysEx): {Channel}", channel.ToString());
+        _ = RefreshOnChannelChangeAsync(channel.Value);
     }
 
     private void OnAmpPanelChannelChanged(object? sender, KatanaPanelChannel channel)
     {
-        var displayName = Utilities.ToPanelChannelDisplay(channel);
-        _logger.LogInformation("Amp channel changed (push): {Channel}", displayName);
-
-        _ = RefreshOnChannelChangeAsync(displayName);
+        _logger.LogInformation("Amp channel changed (push): {Channel}", channel.ToString());
+        _ = RefreshOnChannelChangeAsync(channel);
     }
 
-    private async Task RefreshOnChannelChangeAsync(string displayName)
+    private async Task RefreshOnChannelChangeAsync(KatanaPanelChannel channel)
     {
         await TryRefreshAmpStateAsync();
-        Dispatcher.UIThread.Post(() => _panelChannelSubject.OnNext(displayName));
+        Dispatcher.UIThread.Post(() => { _katanaState.SelectedChannel = channel; });
     }
 }

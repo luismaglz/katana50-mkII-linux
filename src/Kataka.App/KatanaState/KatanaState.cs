@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 using Kataka.Domain.Midi;
@@ -185,13 +183,6 @@ public class KatanaState : IKatanaState
 
     #endregion
 
-    #region Patch EQ (Eq1 in Patch_0 block, Eq2 at 0x0060)
-
-    public PatchEqState PatchEq1 { get; } = new(isEq2: false);
-    public PatchEqState PatchEq2 { get; } = new(isEq2: true);
-
-    #endregion
-
     private void RegisterAll(object obj)
     {
         // Direct AmpControlState (top-level properties on KatanaState itself)
@@ -208,6 +199,13 @@ public class KatanaState : IKatanaState
                      && field.GetValue(obj) is { } nested)
                 RegisterAll(nested);
     }
+
+    #region Patch EQ (Eq1 in Patch_0 block, Eq2 at 0x0060)
+
+    public PatchEqState PatchEq1 { get; } = new();
+    public PatchEqState PatchEq2 { get; } = new(true);
+
+    #endregion
 
     #region Pedals
 
@@ -240,6 +238,20 @@ public class KatanaState : IKatanaState
 
     /// <summary>Patch output level (0-200).</summary>
     public AmpControlState PatchLevel { get; } = new(KatanaMkIIParameterCatalog.PatchLevel, 0, 200);
+
+    private KatanaPanelChannel _selectedChannel;
+
+    public KatanaPanelChannel SelectedChannel
+    {
+        get => _selectedChannel;
+        set
+        {
+            _selectedChannel = value;
+            SelectedChannelChanged?.Invoke(value);
+        }
+    }
+
+    public event Action<KatanaPanelChannel>? SelectedChannelChanged;
 
     #endregion
 
