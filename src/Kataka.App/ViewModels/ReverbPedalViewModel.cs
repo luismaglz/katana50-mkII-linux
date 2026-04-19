@@ -40,8 +40,7 @@ public partial class ReverbPedalViewModel : PedalViewModel
         _state.DirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(DirectMix));
     }
 
-    // ── View-only properties ──────────────────────────────────────────────────────
-
+    /// <summary> View-only properties ────────────────────────────────────────────────────── </summary>
     public IReadOnlyList<string> TypeOptions { get; }
     public bool HasTypeOptions => TypeOptions.Count > 0;
     public IBrush VariationBrush => GetVariationBrush(Variation);
@@ -75,8 +74,7 @@ public partial class ReverbPedalViewModel : PedalViewModel
 
     public override string TypeCaption => SelectedTypeOption ?? "—";
 
-    // ── Reverb-specific controls ──────────────────────────────────────────────────
-
+    /// <summary> Reverb-specific controls ────────────────────────────────────────────────── </summary>
     public int Time
     {
         get => _state.Time.Value;

@@ -4,7 +4,7 @@ namespace Kataka.App.KatanaState;
 
 public partial class KatanaState
 {
-    // ── Effect pedals (Temporary + Delay/Mod/FX/Reverb/PedalFx blocks) ──────────
+    /// <summary> Effect pedals (Temporary + Delay/Mod/FX/Reverb/PedalFx blocks) ────────── </summary>
     public AmpControlState PedalChain { get; } = new(KatanaMkIIParameterCatalog.ChainPattern);
     public BoostPedalState BoostPedal { get; } = new();
     public ModPedalState ModPedal { get; } = new();

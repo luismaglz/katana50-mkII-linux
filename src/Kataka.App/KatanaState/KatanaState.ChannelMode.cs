@@ -4,7 +4,7 @@ namespace Kataka.App.KatanaState;
 
 public partial class KatanaState
 {
-    // ── Channel-mode stored preamp values (Temporary + Patch0 / Mk2V2 blocks) ───
+    /// <summary> Channel-mode stored preamp values (Temporary + Patch0 / Mk2V2 blocks) ─── </summary>
     public PreampState Preamp { get; } = new();
     public SoloEqState SoloEq { get; } = new();
     public PatchEqState PatchEq1 { get; } = new();

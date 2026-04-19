@@ -27,8 +27,7 @@ public class PaletteEditorViewModel : ViewModelBase
         BgElevatedSwatch = new SolidColorBrush(RuntimePaletteService.BgElevated);
     }
 
-    // ── Hex inputs ────────────────────────────────────────────────────────────
-
+    /// <summary> Hex inputs ──────────────────────────────────────────────────────────── </summary>
     public string AccentHex
     {
         get => _accentHex;
@@ -64,16 +63,14 @@ public class PaletteEditorViewModel : ViewModelBase
             c => { RuntimePaletteService.BgElevated = c; BgElevatedSwatch.Color = c; });
     }
 
-    // ── Swatch brushes (mutated in-place so bound controls re-render) ─────────
-
+    /// <summary> Swatch brushes (mutated in-place so bound controls re-render) ───────── </summary>
     public SolidColorBrush AccentSwatch { get; }
     public SolidColorBrush KnobFaceSwatch { get; }
     public SolidColorBrush BgBaseSwatch { get; }
     public SolidColorBrush BgSurfaceSwatch { get; }
     public SolidColorBrush BgElevatedSwatch { get; }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
+    /// <summary> Helpers ─────────────────────────────────────────────────────────────── </summary>
     private void SetColor(ref string field, string value, string propName, Action<Color> apply)
     {
         if (!ChangeProperty(ref field, value, propName)) return;

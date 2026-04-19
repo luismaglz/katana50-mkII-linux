@@ -1,11 +1,13 @@
 namespace Kataka.Domain.Midi;
 
+/// <summary>RolandSysExBuilder - auto-generated summary.</summary>
 public static class RolandSysExBuilder
 {
     private const byte RolandManufacturerId = 0x41;
     private const byte DataRequestCommand = 0x11;
     private const byte DataSetCommand = 0x12;
 
+    /// <summary>Auto-generated: static SysExMessage BuildDataRequest1(</summary>
     public static SysExMessage BuildDataRequest1(
         byte deviceId,
         IReadOnlyList<byte> modelId,
@@ -15,6 +17,7 @@ public static class RolandSysExBuilder
         return Build(deviceId, modelId, DataRequestCommand, address.Concat(size).ToArray());
     }
 
+    /// <summary>Auto-generated: static SysExMessage BuildDataSet1(</summary>
     public static SysExMessage BuildDataSet1(
         byte deviceId,
         IReadOnlyList<byte> modelId,

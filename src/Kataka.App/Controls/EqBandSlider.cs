@@ -33,7 +33,7 @@ public class EqBandSlider : Control
     public static readonly StyledProperty<double> ScaleProperty =
         AvaloniaProperty.Register<EqBandSlider, double>(nameof(Scale), 1.0);
 
-    // ── Colours ───────────────────────────────────────────────────────────────
+    /// <summary> Colours ─────────────────────────────────────────────────────────────── </summary>
     private static readonly SolidColorBrush TrackBrush = KatanaPalette.BgSurfaceBrush;
     private static readonly SolidColorBrush TrackBorderBrush = new(KatanaPalette.Border);
     private static readonly SolidColorBrush CentreBrush = new(KatanaPalette.BorderLight);
@@ -85,8 +85,7 @@ public class EqBandSlider : Control
         set => SetValue(ScaleProperty, Math.Max(0.1, value));
     }
 
-    // ── Layout ────────────────────────────────────────────────────────────────
-
+    /// <summary> Layout ──────────────────────────────────────────────────────────────── </summary>
     private double TrackWidth => 14 * Scale;
     private double TrackHeight => 100 * Scale;
     private double TotalWidth => 44 * Scale;
@@ -98,8 +97,7 @@ public class EqBandSlider : Control
     protected override Size MeasureOverride(Size availableSize) =>
         new(TotalWidth, TotalHeight);
 
-    // ── Rendering ─────────────────────────────────────────────────────────────
-
+    /// <summary> Rendering ───────────────────────────────────────────────────────────── </summary>
     public override void Render(DrawingContext context)
     {
         base.Render(context);
@@ -152,8 +150,7 @@ public class EqBandSlider : Control
         context.DrawText(lblText, lblOrigin);
     }
 
-    // ── Interaction ───────────────────────────────────────────────────────────
-
+    /// <summary> Interaction ─────────────────────────────────────────────────────────── </summary>
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);

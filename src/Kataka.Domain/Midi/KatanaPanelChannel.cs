@@ -1,5 +1,6 @@
 namespace Kataka.Domain.Midi;
 
+/// <summary>Auto-generated: enum KatanaPanelChannel</summary>
 public enum KatanaPanelChannel
 {
     Panel,

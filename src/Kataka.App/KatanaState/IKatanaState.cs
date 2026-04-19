@@ -4,7 +4,7 @@ namespace Kataka.App.KatanaState;
 
 public interface IKatanaState
 {
-    // ── Panel-mode knob positions ────────────────────────────────────────────────
+    /// <summary> Panel-mode knob positions ──────────────────────────────────────────────── </summary>
     AmpControlState AmpType { get; }
     AmpControlState AmpVariation { get; }
     AmpControlState Gain { get; }
@@ -19,10 +19,10 @@ public interface IKatanaState
     // -- Selected Channel Tracker
     KatanaPanelChannel SelectedChannel { get; set; }
 
-    // ── Channel-mode stored preamp values ────────────────────────────────────────
+    /// <summary> Channel-mode stored preamp values ──────────────────────────────────────── </summary>
     PreampState Preamp { get; }
 
-    // ── Pedals ───────────────────────────────────────────────────────────────────
+    /// <summary> Pedals ─────────────────────────────────────────────────────────────────── </summary>
     AmpControlState PedalChain { get; }
     BoostPedalState BoostPedal { get; }
     ModPedalState ModPedal { get; }
@@ -32,7 +32,7 @@ public interface IKatanaState
     ReverbPedalState ReverbPedal { get; }
     HardwarePedalState HardwarePedal { get; }
 
-    // ── Ver200+ features ─────────────────────────────────────────────────────────
+    /// <summary> Ver200+ features ───────────────────────────────────────────────────────── </summary>
     SoloEqState SoloEq { get; }
     ContourState Contour1 { get; }
     ContourState Contour2 { get; }

@@ -50,7 +50,6 @@ public class MainWindowViewModel : ViewModelBase
 
     public void Shutdown() => syncService.Shutdown();
 
-    // ── Private helpers ───────────────────────────────────────────────────────
-
+    /// <summary> Private helpers ─────────────────────────────────────────────────────── </summary>
     private void AppendStatus(string msg) => StatusMessage = msg;
 }

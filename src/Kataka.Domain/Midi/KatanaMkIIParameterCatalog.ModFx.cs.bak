@@ -1,0 +1,600 @@
+namespace Kataka.Domain.Midi;
+
+public static partial class KatanaMkIIParameterCatalog
+{
+    // Address helper: slotBase is 0x01 for Mod, 0x03 for FX.
+    // sectionRel is the offset within prm_prop_patch_fx (BTS absolute addr minus 0x0100).
+    private static byte[] ModFxAddr(byte slotBase, int sectionRel) =>
+        [0x60, 0x00, (byte)(slotBase + (sectionRel >> 8)), (byte)(sectionRel & 0xFF)];
+
+    private static KatanaParameterDefinition ModFxParam(
+        string key, string display, byte slotBase, int sectionRel,
+        byte minimum = 0, byte maximum = 100) =>
+        new(key, display, ModFxAddr(slotBase, sectionRel), minimum, maximum);
+
+    // ── CHORUS (2×2 Chorus, type index 0) ────────────────────────────────────────
+    // BTS section: PRM_FX1_2x2CHORUS, addrs 0x0137–0x0140
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModChorusParams { get; } = BuildChorusParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxChorusParams { get; } = BuildChorusParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildChorusParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-chorus-xover-freq",     "XOVER FREQ",    slot, 0x0037, maximum: 16),
+            ModFxParam($"modfx-{s}-chorus-low-rate",       "LOW RATE",      slot, 0x0038),
+            ModFxParam($"modfx-{s}-chorus-low-depth",      "LOW DEPTH",     slot, 0x0039),
+            ModFxParam($"modfx-{s}-chorus-low-pre-delay",  "LOW PRE DLY",   slot, 0x003A, maximum: 80),
+            ModFxParam($"modfx-{s}-chorus-low-level",      "LOW LEVEL",     slot, 0x003B),
+            ModFxParam($"modfx-{s}-chorus-high-rate",      "HIGH RATE",     slot, 0x003C),
+            ModFxParam($"modfx-{s}-chorus-high-depth",     "HIGH DEPTH",    slot, 0x003D),
+            ModFxParam($"modfx-{s}-chorus-high-pre-delay", "HIGH PRE DLY",  slot, 0x003E, maximum: 80),
+            ModFxParam($"modfx-{s}-chorus-high-level",     "HIGH LEVEL",    slot, 0x003F),
+            ModFxParam($"modfx-{s}-chorus-direct-mix",     "DIRECT MIX",    slot, 0x0040),
+        ];
+    }
+
+    // ── FLANGER (type index 1) ────────────────────────────────────────────────────
+    // BTS section: PRM_FX1_FLANGER, addrs 0x010B–0x0112 (skip 0x010F which is empty)
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModFlangerParams { get; } = BuildFlangerParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxFlangerParams { get; } = BuildFlangerParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildFlangerParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-flanger-rate",         "RATE",          slot, 0x000B),
+            ModFxParam($"modfx-{s}-flanger-depth",        "DEPTH",         slot, 0x000C),
+            ModFxParam($"modfx-{s}-flanger-manual",       "MANUAL",        slot, 0x000D),
+            ModFxParam($"modfx-{s}-flanger-resonance",    "RESONANCE",     slot, 0x000E),
+            ModFxParam($"modfx-{s}-flanger-low-cut",      "LOW CUT",       slot, 0x0010, maximum: 10),
+            ModFxParam($"modfx-{s}-flanger-effect-level", "EFFECT LEVEL",  slot, 0x0011),
+            ModFxParam($"modfx-{s}-flanger-direct-mix",   "DIRECT MIX",    slot, 0x0012),
+        ];
+    }
+
+    // ── PHASER (type index 2) ─────────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModPhaserParams { get; } = BuildPhaserParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxPhaserParams { get; } = BuildPhaserParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildPhaserParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-phaser-type",         "TYPE",          slot, 0x0003, maximum: 3),
+            ModFxParam($"modfx-{s}-phaser-rate",         "RATE",          slot, 0x0004),
+            ModFxParam($"modfx-{s}-phaser-depth",        "DEPTH",         slot, 0x0005),
+            ModFxParam($"modfx-{s}-phaser-manual",       "MANUAL",        slot, 0x0006),
+            ModFxParam($"modfx-{s}-phaser-resonance",    "RESONANCE",     slot, 0x0007),
+            ModFxParam($"modfx-{s}-phaser-step-rate",    "STEP RATE",     slot, 0x0008),
+            ModFxParam($"modfx-{s}-phaser-effect-level", "EFFECT LEVEL",  slot, 0x0009),
+            ModFxParam($"modfx-{s}-phaser-direct-mix",   "DIRECT MIX",    slot, 0x000A),
+        ];
+    }
+
+    // ── T.WAH (type index 12) ─────────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModTWahParams { get; } = BuildTWahParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxTWahParams { get; } = BuildTWahParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildTWahParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-twah-mode",         "MODE",         slot, 0x0002, maximum: 1),
+            ModFxParam($"modfx-{s}-twah-polarity",     "POLARITY",     slot, 0x0003, maximum: 1),
+            ModFxParam($"modfx-{s}-twah-sens",         "SENS",         slot, 0x0004),
+            ModFxParam($"modfx-{s}-twah-freq",         "FREQ",         slot, 0x0005),
+            ModFxParam($"modfx-{s}-twah-peak",         "PEAK",         slot, 0x0006),
+            ModFxParam($"modfx-{s}-twah-direct-mix",   "DIRECT MIX",   slot, 0x0007),
+            ModFxParam($"modfx-{s}-twah-effect-level", "EFFECT LEVEL", slot, 0x0008),
+        ];
+    }
+
+    // ── AUTO WAH (type index 13) ──────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModAutoWahParams { get; } = BuildAutoWahParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxAutoWahParams { get; } = BuildAutoWahParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildAutoWahParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-autowah-mode",         "MODE",         slot, 0x0009, maximum: 1),
+            ModFxParam($"modfx-{s}-autowah-freq",         "FREQ",         slot, 0x000A),
+            ModFxParam($"modfx-{s}-autowah-peak",         "PEAK",         slot, 0x000B),
+            ModFxParam($"modfx-{s}-autowah-rate",         "RATE",         slot, 0x000C),
+            ModFxParam($"modfx-{s}-autowah-depth",        "DEPTH",        slot, 0x000D),
+            ModFxParam($"modfx-{s}-autowah-direct-mix",   "DIRECT MIX",   slot, 0x000E),
+            ModFxParam($"modfx-{s}-autowah-effect-level", "EFFECT LEVEL", slot, 0x000F),
+        ];
+    }
+
+    // ── PEDAL WAH (type index 14) ─────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModPedalWahParams { get; } = BuildPedalWahParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxPedalWahParams { get; } = BuildPedalWahParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildPedalWahParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-pedalwah-type",         "WAH TYPE",     slot, 0x0010, maximum: 5),
+            ModFxParam($"modfx-{s}-pedalwah-pedal-pos",    "PEDAL POS",    slot, 0x0011),
+            ModFxParam($"modfx-{s}-pedalwah-pedal-min",    "PEDAL MIN",    slot, 0x0012),
+            ModFxParam($"modfx-{s}-pedalwah-pedal-max",    "PEDAL MAX",    slot, 0x0013),
+            ModFxParam($"modfx-{s}-pedalwah-effect-level", "EFFECT LEVEL", slot, 0x0014),
+            ModFxParam($"modfx-{s}-pedalwah-direct-mix",   "DIRECT MIX",   slot, 0x0015),
+        ];
+    }
+
+    // ── COMP (type index 10) ──────────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModCompParams { get; } = BuildCompParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxCompParams { get; } = BuildCompParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildCompParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-comp-type",    "TYPE",    slot, 0x0016, maximum: 6),
+            ModFxParam($"modfx-{s}-comp-sustain", "SUSTAIN", slot, 0x0017),
+            ModFxParam($"modfx-{s}-comp-attack",  "ATTACK",  slot, 0x0018),
+            ModFxParam($"modfx-{s}-comp-tone",    "TONE",    slot, 0x0019),
+            ModFxParam($"modfx-{s}-comp-level",   "LEVEL",   slot, 0x001A),
+        ];
+    }
+
+    // ── LIMITER (type index 11) ───────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModLimiterParams { get; } = BuildLimiterParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxLimiterParams { get; } = BuildLimiterParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildLimiterParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-limiter-type",      "TYPE",      slot, 0x001B, maximum: 2),
+            ModFxParam($"modfx-{s}-limiter-attack",    "ATTACK",    slot, 0x001C),
+            ModFxParam($"modfx-{s}-limiter-threshold", "THRESHOLD", slot, 0x001D),
+            ModFxParam($"modfx-{s}-limiter-ratio",     "RATIO",     slot, 0x001E, maximum: 17),
+            ModFxParam($"modfx-{s}-limiter-release",   "RELEASE",   slot, 0x001F),
+            ModFxParam($"modfx-{s}-limiter-level",     "LEVEL",     slot, 0x0020),
+        ];
+    }
+
+    // ── GRAPHIC EQ (type index 15) ────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModGraphicEqParams { get; } = BuildGraphicEqParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxGraphicEqParams { get; } = BuildGraphicEqParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildGraphicEqParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-geq-31hz",  "31Hz",  slot, 0x0021, maximum: 40),
+            ModFxParam($"modfx-{s}-geq-62hz",  "62Hz",  slot, 0x0022, maximum: 40),
+            ModFxParam($"modfx-{s}-geq-125hz", "125Hz", slot, 0x0023, maximum: 40),
+            ModFxParam($"modfx-{s}-geq-250hz", "250Hz", slot, 0x0024, maximum: 40),
+            ModFxParam($"modfx-{s}-geq-500hz", "500Hz", slot, 0x0025, maximum: 40),
+            ModFxParam($"modfx-{s}-geq-1khz",  "1kHz",  slot, 0x0026, maximum: 40),
+            ModFxParam($"modfx-{s}-geq-2khz",  "2kHz",  slot, 0x0027, maximum: 40),
+            ModFxParam($"modfx-{s}-geq-4khz",  "4kHz",  slot, 0x0028, maximum: 40),
+            ModFxParam($"modfx-{s}-geq-8khz",  "8kHz",  slot, 0x0029, maximum: 40),
+            ModFxParam($"modfx-{s}-geq-16khz", "16kHz", slot, 0x002A, maximum: 40),
+            ModFxParam($"modfx-{s}-geq-level", "LEVEL", slot, 0x002B, maximum: 40),
+        ];
+    }
+
+    // ── PARAMETRIC EQ (type index 16) ─────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModParametricEqParams { get; } = BuildParametricEqParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxParametricEqParams { get; } = BuildParametricEqParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildParametricEqParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-peq-low-cut",       "LOW CUT",       slot, 0x002C, maximum: 17),
+            ModFxParam($"modfx-{s}-peq-low-gain",      "LOW GAIN",      slot, 0x002D, maximum: 40),
+            ModFxParam($"modfx-{s}-peq-lomid-freq",    "LO-MID FREQ",   slot, 0x002E, maximum: 27),
+            ModFxParam($"modfx-{s}-peq-lomid-q",       "LO-MID Q",      slot, 0x002F, maximum: 5),
+            ModFxParam($"modfx-{s}-peq-lomid-gain",    "LO-MID GAIN",   slot, 0x0030, maximum: 40),
+            ModFxParam($"modfx-{s}-peq-himid-freq",    "HI-MID FREQ",   slot, 0x0031, maximum: 27),
+            ModFxParam($"modfx-{s}-peq-himid-q",       "HI-MID Q",      slot, 0x0032, maximum: 5),
+            ModFxParam($"modfx-{s}-peq-himid-gain",    "HI-MID GAIN",   slot, 0x0033, maximum: 40),
+            ModFxParam($"modfx-{s}-peq-high-gain",     "HIGH GAIN",     slot, 0x0034, maximum: 40),
+            ModFxParam($"modfx-{s}-peq-high-cut",      "HIGH CUT",      slot, 0x0035, maximum: 14),
+            ModFxParam($"modfx-{s}-peq-level",         "LEVEL",         slot, 0x0036, maximum: 40),
+        ];
+    }
+
+    // ── GUITAR SIM (type index 17) ────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModGuitarSimParams { get; } = BuildGuitarSimParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxGuitarSimParams { get; } = BuildGuitarSimParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildGuitarSimParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-guitarsim-type",  "TYPE",  slot, 0x0037, maximum: 7),
+            ModFxParam($"modfx-{s}-guitarsim-low",   "LOW",   slot, 0x0038),
+            ModFxParam($"modfx-{s}-guitarsim-high",  "HIGH",  slot, 0x0039),
+            ModFxParam($"modfx-{s}-guitarsim-level", "LEVEL", slot, 0x003A),
+            ModFxParam($"modfx-{s}-guitarsim-body",  "BODY",  slot, 0x003B),
+        ];
+    }
+
+    // ── SLOW GEAR (type index 8) ──────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModSlowGearParams { get; } = BuildSlowGearParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxSlowGearParams { get; } = BuildSlowGearParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildSlowGearParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-slowgear-sens",      "SENS",      slot, 0x003C),
+            ModFxParam($"modfx-{s}-slowgear-rise-time", "RISE TIME", slot, 0x003D),
+            ModFxParam($"modfx-{s}-slowgear-level",     "LEVEL",     slot, 0x003E),
+        ];
+    }
+
+    // ── WAVE SYNTH (type index 20) ────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModWaveSynthParams { get; } = BuildWaveSynthParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxWaveSynthParams { get; } = BuildWaveSynthParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildWaveSynthParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-wavesynth-wave",          "WAVE",          slot, 0x003F, maximum: 1),
+            ModFxParam($"modfx-{s}-wavesynth-cutoff",        "CUTOFF",        slot, 0x0040),
+            ModFxParam($"modfx-{s}-wavesynth-resonance",     "RESONANCE",     slot, 0x0041),
+            ModFxParam($"modfx-{s}-wavesynth-filter-sens",   "FILTER SENS",   slot, 0x0042),
+            ModFxParam($"modfx-{s}-wavesynth-filter-decay",  "FILTER DECAY",  slot, 0x0043),
+            ModFxParam($"modfx-{s}-wavesynth-filter-depth",  "FILTER DEPTH",  slot, 0x0044),
+            ModFxParam($"modfx-{s}-wavesynth-synth-level",   "SYNTH LEVEL",   slot, 0x0045),
+            ModFxParam($"modfx-{s}-wavesynth-direct-mix",    "DIRECT MIX",    slot, 0x0046),
+        ];
+    }
+
+    // ── OCTAVE (type index 21) ────────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModOctaveParams { get; } = BuildOctaveParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxOctaveParams { get; } = BuildOctaveParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildOctaveParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-octave-range",        "RANGE",        slot, 0x0047, maximum: 3),
+            ModFxParam($"modfx-{s}-octave-effect-level", "EFFECT LEVEL", slot, 0x0048),
+            ModFxParam($"modfx-{s}-octave-direct-mix",   "DIRECT MIX",   slot, 0x0049),
+        ];
+    }
+
+    // ── PITCH SHIFTER (type index 23) ─────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModPitchShifterParams { get; } = BuildPitchShifterParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxPitchShifterParams { get; } = BuildPitchShifterParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildPitchShifterParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-pitchshift-voice",     "VOICE",    slot, 0x004A, maximum: 1),
+            ModFxParam($"modfx-{s}-pitchshift-ps1-mode",  "PS1 MODE", slot, 0x004B, maximum: 3),
+            ModFxParam($"modfx-{s}-pitchshift-ps1-pitch", "PS1 PITCH",slot, 0x004C, maximum: 48),
+            ModFxParam($"modfx-{s}-pitchshift-ps1-fine",  "PS1 FINE", slot, 0x004D),
+            ModFxParam($"modfx-{s}-pitchshift-ps1-level", "PS1 LEVEL",slot, 0x0050),
+            ModFxParam($"modfx-{s}-pitchshift-ps2-mode",  "PS2 MODE", slot, 0x0051, maximum: 3),
+            ModFxParam($"modfx-{s}-pitchshift-ps2-pitch", "PS2 PITCH",slot, 0x0052, maximum: 48),
+            ModFxParam($"modfx-{s}-pitchshift-ps2-fine",  "PS2 FINE", slot, 0x0053),
+            ModFxParam($"modfx-{s}-pitchshift-ps2-level", "PS2 LEVEL",slot, 0x0056),
+            ModFxParam($"modfx-{s}-pitchshift-feedback",  "FEEDBACK", slot, 0x0057),
+            ModFxParam($"modfx-{s}-pitchshift-direct-mix","DIRECT MIX",slot,0x0058),
+        ];
+    }
+
+    // ── HARMONIST (type index 24) ─────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModHarmonistParams { get; } = BuildHarmonistParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxHarmonistParams { get; } = BuildHarmonistParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildHarmonistParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-harmonist-voice",      "VOICE",     slot, 0x0059, maximum: 1),
+            ModFxParam($"modfx-{s}-harmonist-harmony1",   "HARMONY 1", slot, 0x005A, maximum: 29),
+            ModFxParam($"modfx-{s}-harmonist-level1",     "LEVEL 1",   slot, 0x005D),
+            ModFxParam($"modfx-{s}-harmonist-harmony2",   "HARMONY 2", slot, 0x005E, maximum: 29),
+            ModFxParam($"modfx-{s}-harmonist-level2",     "LEVEL 2",   slot, 0x0061),
+            ModFxParam($"modfx-{s}-harmonist-feedback",   "FEEDBACK",  slot, 0x0062),
+            ModFxParam($"modfx-{s}-harmonist-direct-mix", "DIRECT MIX",slot, 0x0063),
+        ];
+    }
+
+    // ── AC.GUITAR SIM (type index 18) ────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModAcGuitarSimParams { get; } = BuildAcGuitarSimParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxAcGuitarSimParams { get; } = BuildAcGuitarSimParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildAcGuitarSimParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-acguitarsim-high",  "HIGH",  slot, 0x0141),
+            ModFxParam($"modfx-{s}-acguitarsim-body",  "BODY",  slot, 0x0142),
+            ModFxParam($"modfx-{s}-acguitarsim-low",   "LOW",   slot, 0x0143),
+            ModFxParam($"modfx-{s}-acguitarsim-level", "LEVEL", slot, 0x0145),
+        ];
+    }
+
+    // ── AC.PROCESSOR (type index 19) ─────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModAcProcessorParams { get; } = BuildAcProcessorParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxAcProcessorParams { get; } = BuildAcProcessorParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildAcProcessorParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-acprocessor-type",     "TYPE",     slot, 0x007C, maximum: 3),
+            ModFxParam($"modfx-{s}-acprocessor-bass",     "BASS",     slot, 0x007D),
+            ModFxParam($"modfx-{s}-acprocessor-mid",      "MID",      slot, 0x007E),
+            ModFxParam($"modfx-{s}-acprocessor-mid-freq", "MID FREQ", slot, 0x007F, maximum: 27),
+            ModFxParam($"modfx-{s}-acprocessor-treble",   "TREBLE",   slot, 0x0100),
+            ModFxParam($"modfx-{s}-acprocessor-presence", "PRESENCE", slot, 0x0101),
+            ModFxParam($"modfx-{s}-acprocessor-level",    "LEVEL",    slot, 0x0102),
+        ];
+    }
+
+    // ── TREMOLO (type index 4) ────────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModTremoloParams { get; } = BuildTremoloParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxTremoloParams { get; } = BuildTremoloParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildTremoloParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-tremolo-waveshape", "WAVE SHAPE", slot, 0x0013),
+            ModFxParam($"modfx-{s}-tremolo-rate",      "RATE",       slot, 0x0014),
+            ModFxParam($"modfx-{s}-tremolo-depth",     "DEPTH",      slot, 0x0015),
+            ModFxParam($"modfx-{s}-tremolo-level",     "LEVEL",      slot, 0x0016),
+        ];
+    }
+
+    // ── UNI-V (type index 3) ──────────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModUniVParams { get; } = BuildUniVParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxUniVParams { get; } = BuildUniVParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildUniVParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-univ-rate",  "RATE",  slot, 0x011E),
+            ModFxParam($"modfx-{s}-univ-depth", "DEPTH", slot, 0x011F),
+            ModFxParam($"modfx-{s}-univ-level", "LEVEL", slot, 0x0120),
+        ];
+    }
+
+    // ── SLICER (type index 9) ─────────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModSlicerParams { get; } = BuildSlicerParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxSlicerParams { get; } = BuildSlicerParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildSlicerParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-slicer-pattern",      "PATTERN",      slot, 0x0121, maximum: 19),
+            ModFxParam($"modfx-{s}-slicer-rate",         "RATE",         slot, 0x0122),
+            ModFxParam($"modfx-{s}-slicer-trigger-sens", "TRIGGER SENS", slot, 0x0123),
+            ModFxParam($"modfx-{s}-slicer-effect-level", "EFFECT LEVEL", slot, 0x0124),
+            ModFxParam($"modfx-{s}-slicer-direct-mix",   "DIRECT MIX",   slot, 0x0125),
+        ];
+    }
+
+    // ── VIBRATO (type index 5) ────────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModVibratoParams { get; } = BuildVibratoParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxVibratoParams { get; } = BuildVibratoParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildVibratoParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-vibrato-rate",  "RATE",  slot, 0x0126),
+            ModFxParam($"modfx-{s}-vibrato-depth", "DEPTH", slot, 0x0127),
+            ModFxParam($"modfx-{s}-vibrato-level", "LEVEL", slot, 0x012A),
+        ];
+    }
+
+    // ── HUMANIZER (type index 25) ─────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModHumanizerParams { get; } = BuildHumanizerParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxHumanizerParams { get; } = BuildHumanizerParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildHumanizerParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-humanizer-mode",   "MODE",   slot, 0x012F, maximum: 1),
+            ModFxParam($"modfx-{s}-humanizer-vowel1", "VOWEL 1",slot, 0x0130, maximum: 4),
+            ModFxParam($"modfx-{s}-humanizer-vowel2", "VOWEL 2",slot, 0x0131, maximum: 4),
+            ModFxParam($"modfx-{s}-humanizer-sens",   "SENS",   slot, 0x0132),
+            ModFxParam($"modfx-{s}-humanizer-rate",   "RATE",   slot, 0x0133),
+            ModFxParam($"modfx-{s}-humanizer-depth",  "DEPTH",  slot, 0x0134),
+            ModFxParam($"modfx-{s}-humanizer-manual", "MANUAL", slot, 0x0135),
+            ModFxParam($"modfx-{s}-humanizer-level",  "LEVEL",  slot, 0x0136),
+        ];
+    }
+
+    // ── ROTARY (type index 6) ─────────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModRotaryParams { get; } = BuildRotaryParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxRotaryParams { get; } = BuildRotaryParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildRotaryParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-rotary-rate-fast", "RATE FAST", slot, 0x0119),
+            ModFxParam($"modfx-{s}-rotary-depth",     "DEPTH",     slot, 0x011C),
+            ModFxParam($"modfx-{s}-rotary-level",     "LEVEL",     slot, 0x011D),
+        ];
+    }
+
+    // ── RING MOD (type index 7) ───────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModRingModParams { get; } = BuildRingModParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxRingModParams { get; } = BuildRingModParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildRingModParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-ringmod-mode",         "MODE",         slot, 0x012B, maximum: 1),
+            ModFxParam($"modfx-{s}-ringmod-frequency",    "FREQUENCY",    slot, 0x012C),
+            ModFxParam($"modfx-{s}-ringmod-effect-level", "EFFECT LEVEL", slot, 0x012D),
+            ModFxParam($"modfx-{s}-ringmod-direct-mix",   "DIRECT MIX",   slot, 0x012E),
+        ];
+    }
+
+    // ── PHASER 90E (type index 26) ────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModPhaser90EParams { get; } = BuildPhaser90EParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxPhaser90EParams { get; } = BuildPhaser90EParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildPhaser90EParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-phaser90e-script", "SCRIPT", slot, 0x0146, maximum: 1),
+            ModFxParam($"modfx-{s}-phaser90e-speed",  "SPEED",  slot, 0x0147),
+        ];
+    }
+
+    // ── FLANGER 117E (type index 27) ──────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModFlanger117EParams { get; } = BuildFlanger117EParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxFlanger117EParams { get; } = BuildFlanger117EParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildFlanger117EParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-flanger117e-manual", "MANUAL", slot, 0x0148),
+            ModFxParam($"modfx-{s}-flanger117e-width",  "WIDTH",  slot, 0x0149),
+            ModFxParam($"modfx-{s}-flanger117e-speed",  "SPEED",  slot, 0x014A),
+            ModFxParam($"modfx-{s}-flanger117e-regen",  "REGEN",  slot, 0x014B),
+        ];
+    }
+
+    // ── WAH 95E (type index 28) ───────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModWah95EParams { get; } = BuildWah95EParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxWah95EParams { get; } = BuildWah95EParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildWah95EParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-wah95e-pedal-pos",    "PEDAL POS",    slot, 0x014C),
+            ModFxParam($"modfx-{s}-wah95e-pedal-min",    "PEDAL MIN",    slot, 0x014D),
+            ModFxParam($"modfx-{s}-wah95e-pedal-max",    "PEDAL MAX",    slot, 0x014E),
+            ModFxParam($"modfx-{s}-wah95e-effect-level", "EFFECT LEVEL", slot, 0x014F),
+            ModFxParam($"modfx-{s}-wah95e-direct-mix",   "DIRECT MIX",   slot, 0x0150),
+        ];
+    }
+
+    // ── DC-30 (type index 29) ─────────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModDC30Params { get; } = BuildDC30Params(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxDC30Params { get; } = BuildDC30Params(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildDC30Params(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-dc30-selector",        "SELECTOR",        slot, 0x0151, maximum: 1),
+            ModFxParam($"modfx-{s}-dc30-input-volume",    "INPUT VOLUME",    slot, 0x0152),
+            ModFxParam($"modfx-{s}-dc30-chorus-intensity","CHORUS INTENSITY",slot, 0x0153),
+            ModFxParam($"modfx-{s}-dc30-echo-intensity",  "ECHO INTENSITY",  slot, 0x0156),
+            ModFxParam($"modfx-{s}-dc30-echo-volume",     "ECHO VOLUME",     slot, 0x0157),
+            ModFxParam($"modfx-{s}-dc30-tone",            "TONE",            slot, 0x0158),
+            ModFxParam($"modfx-{s}-dc30-output",          "OUTPUT",          slot, 0x0159),
+        ];
+    }
+
+    // ── HEAVY OCTAVE (type index 22) ─────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModHeavyOctaveParams { get; } = BuildHeavyOctaveParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxHeavyOctaveParams { get; } = BuildHeavyOctaveParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildHeavyOctaveParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-heavyoctave-1oct-level", "1-OCT LEVEL", slot, 0x015A),
+            ModFxParam($"modfx-{s}-heavyoctave-2oct-level", "2-OCT LEVEL", slot, 0x015B),
+            ModFxParam($"modfx-{s}-heavyoctave-direct-mix", "DIRECT MIX",  slot, 0x015C),
+        ];
+    }
+
+    // ── PEDAL BEND (type index 30) ────────────────────────────────────────────────
+
+    public static IReadOnlyList<KatanaParameterDefinition> ModPedalBendParams { get; } = BuildPedalBendParams(0x01);
+    public static IReadOnlyList<KatanaParameterDefinition> FxPedalBendParams { get; } = BuildPedalBendParams(0x03);
+
+    private static IReadOnlyList<KatanaParameterDefinition> BuildPedalBendParams(byte slot)
+    {
+        string s = slot == 0x01 ? "mod" : "fx";
+        return
+        [
+            ModFxParam($"modfx-{s}-pedalbend-pitch",        "PITCH",        slot, 0x015D, maximum: 48),
+            ModFxParam($"modfx-{s}-pedalbend-pedal-pos",    "PEDAL POS",    slot, 0x015E),
+            ModFxParam($"modfx-{s}-pedalbend-effect-level", "EFFECT LEVEL", slot, 0x015F),
+            ModFxParam($"modfx-{s}-pedalbend-direct-mix",   "DIRECT MIX",   slot, 0x0160),
+        ];
+    }
+}
