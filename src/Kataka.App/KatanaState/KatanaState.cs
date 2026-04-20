@@ -7,6 +7,7 @@ namespace Kataka.App.KatanaState;
 public partial class KatanaState : IKatanaState
 {
     private readonly ILogger<KatanaState> _logger;
+    private readonly Dictionary<string, IMultiAddressState> _multiAddressStates = new();
     private readonly Dictionary<string, AmpControlState> _stateFields = new();
 
     public KatanaState(ILogger<KatanaState> logger)
@@ -45,17 +46,16 @@ public partial class KatanaState : IKatanaState
         if (_stateFields.TryGetValue(key, out var state))
         {
             state.SetFromAmp(value);
-            if (state.Parameter.Key == "chain-pattern")
-            {
-                ;
-            }
+            if (state.Parameter.Key == "chain-pattern") ;
             var t = state.DisplayName;
             _logger.LogDebug("{Name} ({Address}): {Value}", state.Parameter.DisplayName, key, value);
         }
-        else
+        else if (_multiAddressStates.TryGetValue(key, out var multi))
         {
-            _logger.LogDebug("Untracked: {Address}", key);
+            multi.SetByte(key, value);
+            _logger.LogDebug("MultiAddress ({Address}): {Value}", key, value);
         }
+        // _logger.LogDebug("Untracked: {Address}", key);
     }
 
     partial void RegisterPanelMode();
@@ -71,9 +71,19 @@ public partial class KatanaState : IKatanaState
             return;
         }
 
+        if (obj is IMultiAddressState multi)
+        {
+            foreach (var addr in multi.AddressKeys)
+                _multiAddressStates.TryAdd(addr, multi);
+            return;
+        }
+
         foreach (var field in obj.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
             if (field.GetValue(obj) is AmpControlState state)
                 _stateFields.TryAdd(state.Parameter.AddressString, state);
+            else if (field.GetValue(obj) is IMultiAddressState multiField)
+                foreach (var addr in multiField.AddressKeys)
+                    _multiAddressStates.TryAdd(addr, multiField);
             else if (field.FieldType.Namespace?.StartsWith("Kataka") == true
                      && field.GetValue(obj) is { } nested)
                 RegisterAll(nested);

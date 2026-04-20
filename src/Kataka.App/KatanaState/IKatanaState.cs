@@ -17,8 +17,13 @@ public interface IKatanaState
     AmpControlState CabinetResonance { get; }
     AmpControlState PatchLevel { get; }
 
-    // -- Selected Channel Tracker
-    KatanaPanelChannel SelectedChannel { get; set; }
+    // -- Channel
+    AmpControlState CurrentChannel { get; }
+
+    /// <summary>Currently displayed patch name, trimmed of trailing spaces.</summary>
+    string CurrentPatchName { get; }
+
+    event Action? PatchNameChanged;
 
     /// <summary> Channel-mode stored preamp values ──────────────────────────────────────── </summary>
     PreampState Preamp { get; }
@@ -41,8 +46,6 @@ public interface IKatanaState
     ContourState Contour1 { get; }
     ContourState Contour2 { get; }
     ContourState Contour3 { get; }
-
-    event Action<KatanaPanelChannel> SelectedChannelChanged;
 
     /// <summary>
     ///     Returns all top-level amp control states (EQ, gain, tone) keyed by parameter key.

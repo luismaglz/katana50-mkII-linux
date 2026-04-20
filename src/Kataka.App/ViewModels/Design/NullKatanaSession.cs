@@ -40,6 +40,9 @@ internal sealed class NullKatanaSession : IKatanaSession
     public Task<KatanaPanelChannel?> ReadCurrentPanelChannelAsync(CancellationToken cancellationToken = default)
         => Task.FromResult<KatanaPanelChannel?>(null);
 
+    public Task<byte?> ReadCurrentChannelByteAsync(CancellationToken cancellationToken = default)
+        => Task.FromResult<byte?>(null);
+
     public Task SelectPanelChannelAsync(KatanaPanelChannel channel, CancellationToken cancellationToken = default)
         => Task.CompletedTask;
 

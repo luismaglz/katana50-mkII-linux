@@ -25,7 +25,7 @@ public sealed class AmpSyncService : IAmpSyncService
 
     private bool _stateWritesSubscribed;
 
-    private Channel<(IReadOnlyList<byte> Address, byte Value)>? _writeChannel;
+    private Channel<(IReadOnlyList<byte> Address, IReadOnlyList<byte> Data)>? _writeChannel;
     private CancellationTokenSource? _writeCts;
 
     /// <summary> Construction ────────────────────────────────────────────────────────── </summary>
@@ -41,17 +41,9 @@ public sealed class AmpSyncService : IAmpSyncService
     public IObservable<string> StatusMessages => _statusSubject;
 
     /// <summary> Lifecycle ───────────────────────────────────────────────────────────── </summary>
-    public void Activate()
-    {
-        _session.PushNotificationReceived += OnAmpPushNotification;
-        _session.PanelChannelChanged += OnAmpPanelChannelChanged;
-    }
+    public void Activate() => _session.PushNotificationReceived += OnAmpPushNotification;
 
-    public void Deactivate()
-    {
-        _session.PushNotificationReceived -= OnAmpPushNotification;
-        _session.PanelChannelChanged -= OnAmpPanelChannelChanged;
-    }
+    public void Deactivate() => _session.PushNotificationReceived -= OnAmpPushNotification;
 
     public void Shutdown() => StopWriteLoop();
 
@@ -76,9 +68,9 @@ public sealed class AmpSyncService : IAmpSyncService
             var allStates = await _session.ReadAllPatchStatesAsync();
             _katanaState.SetStates(allStates);
 
-            var channel = await _session.ReadCurrentPanelChannelAsync();
-            if (channel.HasValue)
-                _katanaState.SelectedChannel = channel.Value;
+            var channelByte = await _session.ReadCurrentChannelByteAsync();
+            if (channelByte.HasValue)
+                _katanaState.SetState(KatanaMkIIParameterCatalog.CurrentChannel.AddressString, channelByte.Value);
 
             // Also read System-level Global EQ parameters (not included in ReadAllPatchStatesAsync)
             try
@@ -123,23 +115,12 @@ public sealed class AmpSyncService : IAmpSyncService
         }
     }
 
-    /// <summary>
-    ///     Select the Amp Channel
-    /// </summary>
-    /// <param name="channel"></param>
-    public async Task SelectChannelAsync(KatanaPanelChannel channel)
-    {
-        await _session.SelectPanelChannelAsync(channel);
-        // The amp will push back the full patch block and a channel-change notification;
-        // OnAmpPushNotification and OnChannelChangePush update state without a re-read.
-    }
-
     /// <summary> Write loop ──────────────────────────────────────────────────────────── </summary>
     private void StartWriteLoop()
     {
         StopWriteLoop();
 
-        _writeChannel = Channel.CreateUnbounded<(IReadOnlyList<byte>, byte)>(
+        _writeChannel = Channel.CreateUnbounded<(IReadOnlyList<byte>, IReadOnlyList<byte>)>(
             new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
         _writeCts = new CancellationTokenSource();
 
@@ -155,7 +136,7 @@ public sealed class AmpSyncService : IAmpSyncService
     }
 
     private async Task RunWriteLoopAsync(
-        Channel<(IReadOnlyList<byte> Address, byte Value)> channel,
+        Channel<(IReadOnlyList<byte> Address, IReadOnlyList<byte> Data)> channel,
         CancellationToken ct)
     {
         var reader = channel.Reader;
@@ -167,7 +148,10 @@ public sealed class AmpSyncService : IAmpSyncService
                 if (!reader.TryRead(out var msg)) continue;
                 try
                 {
-                    await _session.WriteBlockAsync(msg.Address, [msg.Value]);
+                    var addrStr = string.Join("-", msg.Address.Select(b => b.ToString("X2")));
+                    _logger.LogInformation("TX {Address} -> [{Data}]", addrStr,
+                        string.Join(" ", msg.Data.Select(b => b.ToString("X2"))));
+                    await _session.WriteBlockAsync(msg.Address, msg.Data);
                 }
                 catch (Exception ex) when (ex is not OperationCanceledException)
                 {
@@ -190,15 +174,49 @@ public sealed class AmpSyncService : IAmpSyncService
         foreach (var (_, state) in _katanaState.GetAllRegisteredStates())
         {
             var captured = state;
-            captured.WriteRequested += () => OnDomainStateChanged(captured);
+            if (captured.Parameter.AddressString == KatanaMkIIParameterCatalog.CurrentChannel.AddressString)
+                captured.WriteRequested += () => OnChannelStateChanged(captured);
+            else
+                captured.WriteRequested += () => OnDomainStateChanged(captured);
         }
     }
 
     private void OnDomainStateChanged(AmpControlState state)
     {
-        if (!_session.IsConnected) return;
-        _logger.LogDebug("Domain state change: {Address} -> {Value}", state.Parameter.AddressString, state.Value);
-        _writeChannel?.Writer.TryWrite((state.Parameter.Address, (byte)state.Value));
+        if (!_session.IsConnected)
+        {
+            _logger.LogWarning("WriteRequested for {Address} but session not connected — dropped.", state.Parameter.AddressString);
+            return;
+        }
+        _logger.LogInformation("WriteRequested: {Address} -> {Value}", state.Parameter.AddressString, state.Value);
+        _writeChannel?.Writer.TryWrite((state.Parameter.Address, [(byte)state.Value]));
+    }
+
+    private static readonly Dictionary<int, KatanaPanelChannel> SysExToChannel = new()
+    {
+        [0] = KatanaPanelChannel.Panel,
+        [1] = KatanaPanelChannel.ChA1,
+        [2] = KatanaPanelChannel.ChA2,
+        [5] = KatanaPanelChannel.ChB1,
+        [6] = KatanaPanelChannel.ChB2,
+    };
+
+    private void OnChannelStateChanged(AmpControlState state)
+    {
+        if (!_session.IsConnected)
+        {
+            _logger.LogWarning("WriteRequested for channel but session not connected — dropped.");
+            return;
+        }
+
+        if (!SysExToChannel.TryGetValue(state.Value, out var channel))
+        {
+            _logger.LogWarning("WriteRequested: unknown channel value {Value} — dropped.", state.Value);
+            return;
+        }
+
+        _logger.LogInformation("WriteRequested: channel -> {Channel} (PC)", channel);
+        _ = _session.SelectPanelChannelAsync(channel);
     }
 
     /// <summary> Push notification infrastructure ───────────────────────────────────── </summary>
@@ -212,7 +230,7 @@ public sealed class AmpSyncService : IAmpSyncService
         if (bytes[7] != 0x12) return;
         if (bytes.Count < 15) return;
 
-        var address = new byte[] { bytes[8], bytes[9], bytes[10], bytes[11] };
+        var address = new[] { bytes[8], bytes[9], bytes[10], bytes[11] };
         var dataLength = bytes.Count - 14; // N bytes between address and checksum
 
         if (dataLength == 1)
@@ -220,13 +238,6 @@ public sealed class AmpSyncService : IAmpSyncService
             var addressKey = Utilities.AddressToKey(address);
             var value = bytes[12];
             _logger.LogDebug("Received {Value} on {Address}", value, addressKey);
-
-            if (addressKey == Utilities.AddressToKey(KatanaMkIIParameterCatalog.CurrentChannelAddress))
-            {
-                OnChannelChangePush(value);
-                return;
-            }
-
             _katanaState.SetState(addressKey, value);
         }
         else
@@ -243,33 +254,5 @@ public sealed class AmpSyncService : IAmpSyncService
                 _katanaState.SetState(key, bytes[12 + i]);
             }
         }
-    }
-
-    private void OnChannelChangePush(byte channelCode)
-    {
-        KatanaPanelChannel? channel = channelCode switch
-        {
-            0 => KatanaPanelChannel.Panel,
-            1 => KatanaPanelChannel.ChA1,
-            2 => KatanaPanelChannel.ChA2,
-            5 => KatanaPanelChannel.ChB1,
-            6 => KatanaPanelChannel.ChB2,
-            _ => null
-        };
-
-        if (channel is null)
-        {
-            _logger.LogWarning("Unknown channel code in SysEx push: {Code:X2}", channelCode);
-            return;
-        }
-
-        _logger.LogInformation("Amp channel changed (SysEx): {Channel}", channel.ToString());
-        _katanaState.SelectedChannel = channel.Value;
-    }
-
-    private void OnAmpPanelChannelChanged(object? sender, KatanaPanelChannel channel)
-    {
-        _logger.LogInformation("Amp channel changed (Program Change): {Channel}", channel.ToString());
-        _katanaState.SelectedChannel = channel;
     }
 }

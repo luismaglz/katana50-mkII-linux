@@ -25,7 +25,7 @@
                 Content="{Binding DisplayName}"
                 IsChecked="{Binding IsSelected, Mode=OneWay}"
                 Command="{Binding SelectCommand}"
-                CommandParameter="{Binding DisplayName}" />
+                CommandParameter="{Binding ChannelValue}" />
         </DataTemplate>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" Spacing="12" Margin="20 0 0 0">
@@ -39,6 +39,10 @@
                         ContentTemplate="{StaticResource ChannelSelectorButton}" />
         <ContentControl Width="60" Height="32" Content="{Binding CHB2}"
                         ContentTemplate="{StaticResource ChannelSelectorButton}" />
+        <TextBlock Text="{Binding CurrentPatchName}"
+                   VerticalAlignment="Center"
+                   Foreground="{StaticResource TextMainBrush}"
+                   FontSize="14" />
     </StackPanel>
 
 </UserControl>

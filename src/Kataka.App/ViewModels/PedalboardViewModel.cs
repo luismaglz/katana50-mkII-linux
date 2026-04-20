@@ -45,11 +45,11 @@ public class PedalboardViewModel : ViewModelBase
         _katanaState = katanaState;
         _pedalsByKey = pedalsByKey;
 
-        _katanaState.SelectedChannelChanged += newChannel =>
-        {
-            SelectedChannel = newChannel;
-            Refresh();
-        };
+        // _katanaState.SelectedChannelChanged += newChannel =>
+        // {
+        //     SelectedChannel = newChannel;
+        //     Refresh();
+        // };
 
         _katanaState.PedalChain.ValueChanged += () =>
         {

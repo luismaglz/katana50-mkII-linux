@@ -42,7 +42,7 @@ public class AmpEditorViewModel : ViewModelBase
         var panelEffectsByDefinitionKey = PanelEffects.ToDictionary(e => e.Definition.Key);
         Pedalboard = new PedalboardViewModel(katanaState, panelEffectsByDefinitionKey);
         Panel = new PanelViewModel(katanaState);
-        ChannelSelection = new ChannelSelectionViewModel(syncService, katanaState);
+        ChannelSelection = new ChannelSelectionViewModel(katanaState);
         PedalFx = new PedalFxViewModel(katanaState);
 
         syncService.ReadCompleted.Subscribe(meta =>
