@@ -14,8 +14,9 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     // Writing 0x00 tells the amp to stop. See BTS address_const.js: EDITOR_COMMUNICATION_MODE = 0x7f000001.
     private static readonly byte[] EditorCommunicationModeAddress = [0x7F, 0x00, 0x00, 0x01];
 
-    private static readonly byte[] CurrentChannelAddress = [0x00, 0x01, 0x00, 0x00];
-    private static readonly byte[] CurrentChannelSize = [0x00, 0x00, 0x00, 0x02];
+    // The channel code lives at offset +1 in the 2-byte block at 0x00010000.
+    private static readonly byte[] CurrentChannelAddress = [0x00, 0x01, 0x00, 0x01];
+    private static readonly byte[] CurrentChannelSize = [0x00, 0x00, 0x00, 0x01];
     private readonly IMidiTransport midiTransport = midiTransport;
     private DateTimeOffset _nextSendAllowedAt = DateTimeOffset.MinValue;
     private IMidiConnection? activeConnection;
@@ -88,6 +89,21 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         if (!TryParseCurrentPanelChannel(reply, out var channel)) return null;
 
         return channel;
+    }
+
+    /// <summary>Returns the raw channel byte from the amp without mapping to <see cref="KatanaPanelChannel"/>.</summary>
+    public async Task<byte?> ReadCurrentChannelByteAsync(CancellationToken cancellationToken = default)
+    {
+        var request = RolandSysExBuilder.BuildDataRequest1(0x00, [0x00, 0x00, 0x00, 0x33], CurrentChannelAddress,
+            CurrentChannelSize);
+        await EnforcePacingAsync(request.Bytes.Count, cancellationToken);
+        var reply = await RequireConnection().RequestAsync(request, DefaultRequestTimeout, cancellationToken);
+
+        var bytes = reply.Bytes;
+        if (bytes.Count != 15 || bytes[0] != 0xF0 || bytes[7] != 0x12 || bytes[^1] != 0xF7)
+            return null;
+
+        return bytes[12];
     }
 
     public async Task SelectPanelChannelAsync(KatanaPanelChannel channel, CancellationToken cancellationToken = default)
@@ -357,18 +373,18 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
     {
         channel = KatanaPanelChannel.Panel;
         var bytes = message.Bytes;
-        if (bytes.Count != 16 ||
+        if (bytes.Count != 15 ||
             bytes[0] != 0xF0 ||
             bytes[1] != 0x41 ||
             bytes[7] != 0x12 ||
             bytes[8] != 0x00 ||
             bytes[9] != 0x01 ||
             bytes[10] != 0x00 ||
-            bytes[11] != 0x00 ||
+            bytes[11] != 0x01 ||
             bytes[^1] != 0xF7)
             return false;
 
-        return TryMapCurrentChannelCode(bytes[13], out channel);
+        return TryMapCurrentChannelCode(bytes[12], out channel);
     }
 
     private static bool TryMapCurrentChannelCode(byte code, out KatanaPanelChannel channel)

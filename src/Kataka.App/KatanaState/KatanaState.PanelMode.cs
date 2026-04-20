@@ -4,7 +4,6 @@ namespace Kataka.App.KatanaState;
 
 public partial class KatanaState
 {
-    private KatanaPanelChannel _selectedChannel;
     public AmpControlState LedStateBooster { get; } = new(KatanaMkIIParameterCatalog.LedStateBooster);
     public AmpControlState LedStateMod { get; } = new(KatanaMkIIParameterCatalog.LedStateMod);
     public AmpControlState LedStateFx { get; } = new(KatanaMkIIParameterCatalog.LedStateFx);
@@ -24,17 +23,15 @@ public partial class KatanaState
     public AmpControlState CabinetResonance { get; } = new(KatanaMkIIParameterCatalog.CabinetResonance);
     public AmpControlState PatchLevel { get; } = new(KatanaMkIIParameterCatalog.PatchLevel, 0, 200);
 
-    public KatanaPanelChannel SelectedChannel
-    {
-        get => _selectedChannel;
-        set
-        {
-            _selectedChannel = value;
-            SelectedChannelChanged?.Invoke(value);
-        }
-    }
+    /// <summary>Current channel as a raw SysEx byte value (see KatanaMkIIParameterCatalog.Channel* constants).</summary>
+    public AmpControlState CurrentChannel { get; } = new(KatanaMkIIParameterCatalog.CurrentChannel);
 
-    public event Action<KatanaPanelChannel>? SelectedChannelChanged;
+    /// <summary>16-character patch name; public field so RegisterAll finds it via GetFields().</summary>
+    public PatchNameState PatchName = new();
+
+    public string CurrentPatchName => PatchName.CurrentName;
+
+    public event Action? PatchNameChanged;
 
     partial void RegisterPanelMode()
     {
@@ -53,5 +50,10 @@ public partial class KatanaState
         RegisterAll(Presence);
         RegisterAll(CabinetResonance);
         RegisterAll(PatchLevel);
+        RegisterAll(CurrentChannel);
+        RegisterAll(PatchName);
+
+        PatchName.NameChanged += () => PatchNameChanged?.Invoke();
     }
 }
+

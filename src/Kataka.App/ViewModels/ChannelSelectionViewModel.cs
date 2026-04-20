@@ -1,7 +1,4 @@
-using CommunityToolkit.Mvvm.Input;
-
 using Kataka.App.KatanaState;
-using Kataka.App.Services;
 using Kataka.Domain.Midi;
 
 using ReactiveUI.Fody.Helpers;
@@ -10,85 +7,60 @@ namespace Kataka.App.ViewModels;
 
 public partial class ChannelSelectionViewModel
 {
-    private const string TextPanel = "PANEL";
-    private readonly IAmpSyncService _ampSyncService;
     private readonly IKatanaState _katanaState;
 
-    public ChannelSelectionViewModel(IAmpSyncService ampSyncService, IKatanaState katanaState)
+    public ChannelSelectionViewModel(IKatanaState katanaState)
     {
-        _ampSyncService = ampSyncService;
         _katanaState = katanaState;
-        CHA1 = new PanelChannelOptionViewModel("CH A1") { SelectCommand = SelectPanelChannelCommand };
-        CHA2 = new PanelChannelOptionViewModel("CH A2") { SelectCommand = SelectPanelChannelCommand };
-        CHB1 = new PanelChannelOptionViewModel("CH B1") { SelectCommand = SelectPanelChannelCommand };
-        CHB2 = new PanelChannelOptionViewModel("CH B2") { SelectCommand = SelectPanelChannelCommand };
-        Panel = new PanelChannelOptionViewModel(TextPanel) { SelectCommand = SelectPanelChannelCommand };
 
-        _katanaState.SelectedChannelChanged += UpdatePanelChannelSelection;
+        Panel = new PanelChannelOptionViewModel("PANEL", KatanaMkIIParameterCatalog.ChannelPanel) { SelectCommand = new SelectChannelCommand(this) };
+        CHA1 = new PanelChannelOptionViewModel("CH A1", KatanaMkIIParameterCatalog.ChannelChA1) { SelectCommand = new SelectChannelCommand(this) };
+        CHA2 = new PanelChannelOptionViewModel("CH A2", KatanaMkIIParameterCatalog.ChannelChA2) { SelectCommand = new SelectChannelCommand(this) };
+        CHB1 = new PanelChannelOptionViewModel("CH B1", KatanaMkIIParameterCatalog.ChannelChB1) { SelectCommand = new SelectChannelCommand(this) };
+        CHB2 = new PanelChannelOptionViewModel("CH B2", KatanaMkIIParameterCatalog.ChannelChB2) { SelectCommand = new SelectChannelCommand(this) };
+
+        _katanaState.CurrentChannel.ValueChanged += UpdateSelection;
+        _katanaState.PatchNameChanged += () => CurrentPatchName = _katanaState.CurrentPatchName;
+
+        UpdateSelection();
     }
 
-    public PanelChannelOptionViewModel CHA1 { get; internal set; }
-    public PanelChannelOptionViewModel CHA2 { get; internal set; }
-    public PanelChannelOptionViewModel CHB1 { get; internal set; }
-    public PanelChannelOptionViewModel CHB2 { get; internal set; }
-    public PanelChannelOptionViewModel Panel { get; internal set; }
+    public PanelChannelOptionViewModel Panel { get; }
+    public PanelChannelOptionViewModel CHA1 { get; }
+    public PanelChannelOptionViewModel CHA2 { get; }
+    public PanelChannelOptionViewModel CHB1 { get; }
+    public PanelChannelOptionViewModel CHB2 { get; }
 
-    private List<PanelChannelOptionViewModel> PanelChannelOptions => new()
+    [Reactive] public string CurrentPatchName { get; set; } = string.Empty;
+
+    private IEnumerable<PanelChannelOptionViewModel> AllOptions => [Panel, CHA1, CHA2, CHB1, CHB2];
+
+    internal void SelectChannel(byte channelValue)
     {
-        CHA1,
-        CHA2,
-        CHB1,
-        CHB2,
-        Panel
-    };
-
-    [Reactive] public string SelectedPanelChannel { get; set; } = TextPanel;
-
-    [RelayCommand]
-    private async Task SelectPanelChannel(string? channel)
-    {
-        var channelEnum = channel?.Trim() switch
-        {
-            "CH A1" => KatanaPanelChannel.ChA1,
-            "CH A2" => KatanaPanelChannel.ChA2,
-            "CH B1" => KatanaPanelChannel.ChB1,
-            "CH B2" => KatanaPanelChannel.ChB2,
-            TextPanel => KatanaPanelChannel.Panel,
-            _ => throw new ArgumentOutOfRangeException(nameof(channel), $"Unknown channel: {channel}")
-        };
-
-        await _ampSyncService.SelectChannelAsync(channelEnum);
+        _katanaState.CurrentChannel.Value = channelValue;
     }
 
-    private void UpdatePanelChannelSelection(KatanaPanelChannel channel)
+    private void UpdateSelection()
     {
-        foreach (var option in PanelChannelOptions)
-            option.IsSelected = false;
+        var current = _katanaState.CurrentChannel.Value;
+        foreach (var option in AllOptions)
+            option.IsSelected = option.ChannelValue == current;
+    }
 
-        switch (channel)
+    private sealed class SelectChannelCommand(ChannelSelectionViewModel vm) : System.Windows.Input.ICommand
+    {
+        public event EventHandler? CanExecuteChanged;
+        public bool CanExecute(object? parameter) => true;
+        public void Execute(object? parameter)
         {
-            case KatanaPanelChannel.ChA1:
-                CHA1.IsSelected = true;
-                SelectedPanelChannel = "CH A1";
-                break;
-            case KatanaPanelChannel.ChA2:
-                CHA2.IsSelected = true;
-                SelectedPanelChannel = "CH A2";
-                break;
-            case KatanaPanelChannel.ChB1:
-                CHB1.IsSelected = true;
-                SelectedPanelChannel = "CH B1";
-                break;
-            case KatanaPanelChannel.ChB2:
-                CHB2.IsSelected = true;
-                SelectedPanelChannel = "CH B2";
-                break;
-            case KatanaPanelChannel.Panel:
-                Panel.IsSelected = true;
-                SelectedPanelChannel = TextPanel;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(channel), channel, null);
+            var channelValue = parameter switch
+            {
+                byte b => b,
+                int i => (byte)i,
+                _ => (byte?)null
+            };
+            if (channelValue.HasValue) vm.SelectChannel(channelValue.Value);
         }
     }
 }
+

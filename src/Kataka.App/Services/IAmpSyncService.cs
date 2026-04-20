@@ -30,6 +30,4 @@ public interface IAmpSyncService
     /// <summary> Read operations ─────────────────────────────────────────────────────── </summary>
     /// <summary>Reads the full patch from the amp and seeds KatanaState. Also wires write-back subscriptions.</summary>
     Task<bool> TryRefreshAmpStateAsync();
-
-    Task SelectChannelAsync(KatanaPanelChannel channel);
 }
