@@ -23,7 +23,7 @@
                 Background="{StaticResource BgElevatedBrush}"
                 Padding="0"
                 Content="{Binding DisplayName}"
-                IsChecked="{Binding IsSelected}"
+                IsChecked="{Binding IsSelected, Mode=OneWay}"
                 Command="{Binding SelectCommand}"
                 CommandParameter="{Binding DisplayName}" />
         </DataTemplate>

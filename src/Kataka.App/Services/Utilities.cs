@@ -7,6 +7,18 @@ public static class Utilities
     public static string AddressToKey(IReadOnlyList<byte> address) =>
         $"{address[0]:X2}-{address[1]:X2}-{address[2]:X2}-{address[3]:X2}";
 
+    public static byte[] AddressOffset(IReadOnlyList<byte> baseAddr, int offset)
+    {
+        var full = ((baseAddr[0] << 24) | (baseAddr[1] << 16) | (baseAddr[2] << 8) | baseAddr[3]) + offset;
+        return
+        [
+            (byte)((full >> 24) & 0x7F),
+            (byte)((full >> 16) & 0x7F),
+            (byte)((full >> 8) & 0x7F),
+            (byte)(full & 0x7F)
+        ];
+    }
+
     public static int DecodeDelayTime(IReadOnlyList<byte> data)
     {
         if (data.Count != 2) throw new ArgumentException("Delay time data must contain exactly 2 bytes.", nameof(data));
