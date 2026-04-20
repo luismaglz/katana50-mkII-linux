@@ -49,7 +49,7 @@
                               PedalTemplate="{StaticResource PedalTemplate}" />
     </UserControl.Resources>
 
-    <Border BorderThickness="1">
+    <Border BorderThickness="1" BorderBrush="Chartreuse">
         <ItemsControl ItemsSource="{Binding ChainNodes}" ItemTemplate="{StaticResource PedalSelector}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>

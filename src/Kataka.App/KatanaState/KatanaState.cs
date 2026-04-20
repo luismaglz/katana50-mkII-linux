@@ -45,6 +45,11 @@ public partial class KatanaState : IKatanaState
         if (_stateFields.TryGetValue(key, out var state))
         {
             state.SetFromAmp(value);
+            if (state.Parameter.Key == "chain-pattern")
+            {
+                ;
+            }
+            var t = state.DisplayName;
             _logger.LogDebug("{Name} ({Address}): {Value}", state.Parameter.DisplayName, key, value);
         }
         else
