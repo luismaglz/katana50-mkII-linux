@@ -64,6 +64,11 @@ public sealed class AmpSyncService : IAmpSyncService
 
         try
         {
+            // Tell the amp we are an editor. Without this the amp pushes extra raw state blocks
+            // at 0x60000000 after a channel change that overwrite the patch name with garbage.
+            await _session.WriteBlockAsync(KatanaAddressMap.Commands.EditorCommunicationMode, [0x01]);
+            _logger.LogInformation("Editor communication mode enabled.");
+
             _logger.LogInformation("Seeding KatanaState from full patch read.");
             var allStates = await _session.ReadAllPatchStatesAsync();
             _katanaState.SetStates(allStates);
@@ -101,6 +106,9 @@ public sealed class AmpSyncService : IAmpSyncService
 
             SubscribeToStateWrites();
             StartWriteLoop();
+
+            await ReadUserPatchNamesAsync();
+
             _logger.LogInformation("KatanaState seeded. Write loop started.");
             return true;
         }
@@ -217,6 +225,30 @@ public sealed class AmpSyncService : IAmpSyncService
 
         _logger.LogInformation("WriteRequested: channel -> {Channel} (PC)", channel);
         _ = _session.SelectPanelChannelAsync(channel);
+    }
+
+    /// <summary>
+    ///     Reads the 16-byte PatchName block from each of the 9 user-patch slots and stores them
+    ///     in <see cref="IKatanaState.UserPatchNames" /> (slot index 0-based).
+    /// </summary>
+    public async Task ReadUserPatchNamesAsync()
+    {
+        _logger.LogInformation("Reading user patch names from amp.");
+        for (var i = 0; i < KatanaAddressMap.UserPatchNameAddresses.Count; i++)
+        {
+            try
+            {
+                var addr = KatanaAddressMap.UserPatchNameAddresses[i];
+                var raw = await _session.ReadBlockAsync(addr, 16);
+                var name = System.Text.Encoding.ASCII.GetString(raw).TrimEnd();
+                _katanaState.SetUserPatchName(i, name);
+                _logger.LogDebug("UserPatch[{Slot}] name = \"{Name}\"", i + 1, name);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to read patch name for slot {Slot}.", i + 1);
+            }
+        }
     }
 
     /// <summary> Push notification infrastructure ───────────────────────────────────── </summary>

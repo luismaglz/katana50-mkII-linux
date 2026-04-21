@@ -43,6 +43,36 @@ public static class KatanaAddressMap
     /// <summary>Parameter offset constant 'UserPatch9' from address_map.js.</summary>
     public const uint UserPatch9 = 0x10080000;
 
+    /// <summary>
+    ///     The 9 user-patch-name addresses, one per stored slot.
+    ///     Each entry is the 4-byte Roland SysEx start address for a 16-byte PatchName block.
+    ///     Slot index matches UserPatch(n) in BTS (0-based here, 1-based in BTS).
+    /// </summary>
+    public static readonly IReadOnlyList<byte[]> UserPatchNameAddresses =
+    [
+        ComputeAddress(UserPatch1, PatchBlocks.PatchName, 0),
+        ComputeAddress(UserPatch2, PatchBlocks.PatchName, 0),
+        ComputeAddress(UserPatch3, PatchBlocks.PatchName, 0),
+        ComputeAddress(UserPatch4, PatchBlocks.PatchName, 0),
+        ComputeAddress(UserPatch5, PatchBlocks.PatchName, 0),
+        ComputeAddress(UserPatch6, PatchBlocks.PatchName, 0),
+        ComputeAddress(UserPatch7, PatchBlocks.PatchName, 0),
+        ComputeAddress(UserPatch8, PatchBlocks.PatchName, 0),
+        ComputeAddress(UserPatch9, PatchBlocks.PatchName, 0),
+    ];
+
+    /// <summary> Command addresses (0x7F…) ────────────────────────────────────────────── </summary>
+    public static class Commands
+    {
+        /// <summary>
+        ///     Enables BTS editor-communication mode on the amp (address_const.js: EDITOR_COMMUNICATION_MODE).
+        ///     Write 0x01 to put the amp in editor mode; write 0x00 to exit.
+        ///     In editor mode the amp only pushes clean DT1 patch data — without this, it may push
+        ///     additional raw state blocks at 0x60000000 that corrupt the PatchName display.
+        /// </summary>
+        public static readonly byte[] EditorCommunicationMode = [0x7F, 0x00, 0x00, 0x01];
+    }
+
     /// <summary> Address computation helper ────────────────────────────────────────────── </summary>
     /// <summary>
     ///     Computes the 4-byte Roland SysEx address from the three address components.
