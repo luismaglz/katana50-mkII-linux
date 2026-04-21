@@ -1,5 +1,7 @@
 using System.Reflection;
 
+using Kataka.App.Services;
+
 using Microsoft.Extensions.Logging;
 
 namespace Kataka.App.KatanaState;
@@ -38,7 +40,24 @@ public partial class KatanaState : IKatanaState
 
     public void SetStates(IReadOnlyDictionary<string, byte> values)
     {
-        foreach (var kvp in values) SetState(kvp.Key, kvp.Value);
+        var consumed = new HashSet<string>(StringComparer.Ordinal);
+
+        // First pass: multi-byte (INTEGER2x7) params — decode both bytes together.
+        foreach (var (addr, state) in _stateFields)
+        {
+            if (state.Parameter.ByteSize != 2) continue;
+            if (!values.TryGetValue(addr, out var b0)) continue;
+            var lsbKey = Utilities.AddressToKey(Utilities.AddressOffset(state.Parameter.Address, 1));
+            if (!values.TryGetValue(lsbKey, out var b1)) continue;
+            SetState(addr, new byte[] { b0, b1 });
+            consumed.Add(addr);
+            consumed.Add(lsbKey);
+        }
+
+        // Second pass: single-byte params (skip addresses already decoded above).
+        foreach (var kvp in values)
+            if (!consumed.Contains(kvp.Key))
+                SetState(kvp.Key, kvp.Value);
     }
 
     public void SetState(string key, byte value)
@@ -56,6 +75,16 @@ public partial class KatanaState : IKatanaState
             _logger.LogDebug("MultiAddress ({Address}): {Value}", key, value);
         }
         // _logger.LogDebug("Untracked: {Address}", key);
+    }
+
+    public void SetState(string key, byte[] bytes)
+    {
+        if (_stateFields.TryGetValue(key, out var state))
+        {
+            state.SetFromAmp(bytes);
+            _logger.LogDebug("{Name} ({Address}): [{Bytes}]", state.Parameter.DisplayName, key,
+                string.Join(" ", bytes.Select(b => b.ToString("X2"))));
+        }
     }
 
     partial void RegisterPanelMode();

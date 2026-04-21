@@ -73,6 +73,12 @@ public interface IKatanaState
     /// <param name="value"></param>
     public void SetState(string key, byte value);
 
+    /// <summary>
+    ///     Set individual control value from a multi-byte SysEx payload.
+    ///     For ByteSize==2 parameters: decodes INTEGER2x7 as (bytes[0] &lt;&lt; 7) | bytes[1].
+    /// </summary>
+    public void SetState(string key, byte[] bytes);
+
     /// <summary>Returns all registered parameter states keyed by AddressString (e.g. "60-00-06-52").</summary>
     IReadOnlyDictionary<string, AmpControlState> GetAllRegisteredStates();
 }
