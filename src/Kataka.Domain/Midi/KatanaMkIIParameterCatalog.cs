@@ -304,7 +304,7 @@ public static partial class KatanaMkIIParameterCatalog
 
     /// <summary>Parameter definition for Patch Level.</summary>
     public static KatanaParameterDefinition PatchLevel { get; } =
-        new("panel-patch-level", "Patch Level", [0x60, 0x00, 0x06, 0x4C], maximum: 200,
+        new("panel-patch-level", "Patch Level", [0x60, 0x00, 0x06, 0x4C], maximum: 200, byteSize: 2,
             description: "Adjusts the overall output level of the patch.");
 
     /// <summary> Solo EQ (Ver200+, Mk2V2 block, patch offset 0xF10) ────────────────────── </summary>

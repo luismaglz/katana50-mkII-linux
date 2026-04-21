@@ -60,4 +60,27 @@ public class AmpControlState
         _value = value;
         ValueChanged?.Invoke();
     }
+
+    /// <summary>
+    ///     Decodes a raw SysEx byte payload and updates from amp. For ByteSize==2 uses INTEGER2x7 decoding:
+    ///     value = (bytes[0] &lt;&lt; 7) | bytes[1].
+    /// </summary>
+    public void SetFromAmp(byte[] bytes)
+    {
+        var decoded = Parameter.ByteSize == 2
+            ? (bytes[0] << 7) | bytes[1]
+            : bytes[0];
+        SetFromAmp(decoded);
+    }
+
+    /// <summary>
+    ///     Returns the SysEx byte encoding of <see cref="Value" /> for writing to the amp.
+    ///     For ByteSize==2 uses INTEGER2x7: [value >> 7 &amp; 0x7F, value &amp; 0x7F].
+    /// </summary>
+    public byte[] GetWriteBytes()
+    {
+        if (Parameter.ByteSize == 2)
+            return [(byte)((_value >> 7) & 0x7F), (byte)(_value & 0x7F)];
+        return [(byte)_value];
+    }
 }

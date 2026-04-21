@@ -189,7 +189,7 @@ public sealed class AmpSyncService : IAmpSyncService
             return;
         }
         _logger.LogInformation("WriteRequested: {Address} -> {Value}", state.Parameter.AddressString, state.Value);
-        _writeChannel?.Writer.TryWrite((state.Parameter.Address, [(byte)state.Value]));
+        _writeChannel?.Writer.TryWrite((state.Parameter.Address, state.GetWriteBytes()));
     }
 
     private static readonly Dictionary<int, KatanaPanelChannel> SysExToChannel = new()
@@ -244,15 +244,33 @@ public sealed class AmpSyncService : IAmpSyncService
         {
             // Multi-byte block push (e.g. full patch dump on channel change).
             // Expand each byte to its individual address and update state.
+            // Multi-byte (INTEGER2x7) params consume 2 bytes and are decoded as (b0<<7)|b1.
             _logger.LogDebug("Received block push: {Length} bytes at {Address}", dataLength,
                 Utilities.AddressToKey(address));
+            var states = _katanaState.GetAllRegisteredStates();
             for (var i = 0; i < dataLength; i++)
             {
                 var byteAddr = Utilities.AddressOffset(address, i);
                 var key = Utilities.AddressToKey(byteAddr);
 
-                _katanaState.SetState(key, bytes[12 + i]);
+                if (HasPendingLsb(states, key, i, dataLength))
+                {
+                    _katanaState.SetState(key, new byte[] { bytes[12 + i], bytes[12 + i + 1] });
+                    i++; // skip the LSB byte
+                }
+                else
+                {
+                    _katanaState.SetState(key, bytes[12 + i]);
+                }
             }
         }
     }
+
+    /// <summary>
+    ///     Returns true when the state at <paramref name="key" /> uses INTEGER2x7 (ByteSize==2)
+    ///     and a following byte exists in the current block to serve as the LSB.
+    /// </summary>
+    private static bool HasPendingLsb(IReadOnlyDictionary<string, AmpControlState> states, string key, int i,
+        int dataLength)
+        => states.TryGetValue(key, out var st) && st.Parameter.ByteSize == 2 && i + 1 < dataLength;
 }
