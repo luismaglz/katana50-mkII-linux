@@ -1,3 +1,5 @@
+using System.Windows.Input;
+
 using Kataka.App.KatanaState;
 using Kataka.Domain.Midi;
 
@@ -5,7 +7,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Kataka.App.ViewModels;
 
-public partial class ChannelSelectionViewModel
+public class ChannelSelectionViewModel : ViewModelBase
 {
     private readonly IKatanaState _katanaState;
 
@@ -13,16 +15,32 @@ public partial class ChannelSelectionViewModel
     {
         _katanaState = katanaState;
 
-        Panel = new PanelChannelOptionViewModel("PANEL", KatanaMkIIParameterCatalog.ChannelPanel) { SelectCommand = new SelectChannelCommand(this) };
-        CHA1 = new PanelChannelOptionViewModel("CH A1", KatanaMkIIParameterCatalog.ChannelChA1) { SelectCommand = new SelectChannelCommand(this) };
-        CHA2 = new PanelChannelOptionViewModel("CH A2", KatanaMkIIParameterCatalog.ChannelChA2) { SelectCommand = new SelectChannelCommand(this) };
-        CHB1 = new PanelChannelOptionViewModel("CH B1", KatanaMkIIParameterCatalog.ChannelChB1) { SelectCommand = new SelectChannelCommand(this) };
-        CHB2 = new PanelChannelOptionViewModel("CH B2", KatanaMkIIParameterCatalog.ChannelChB2) { SelectCommand = new SelectChannelCommand(this) };
+        Panel = new PanelChannelOptionViewModel("PANEL", KatanaMkIIParameterCatalog.ChannelPanel)
+        {
+            SelectCommand = new SelectChannelCommand(this)
+        };
+        CHA1 = new PanelChannelOptionViewModel("CH A1", KatanaMkIIParameterCatalog.ChannelChA1)
+        {
+            SelectCommand = new SelectChannelCommand(this)
+        };
+        CHA2 = new PanelChannelOptionViewModel("CH A2", KatanaMkIIParameterCatalog.ChannelChA2)
+        {
+            SelectCommand = new SelectChannelCommand(this)
+        };
+        CHB1 = new PanelChannelOptionViewModel("CH B1", KatanaMkIIParameterCatalog.ChannelChB1)
+        {
+            SelectCommand = new SelectChannelCommand(this)
+        };
+        CHB2 = new PanelChannelOptionViewModel("CH B2", KatanaMkIIParameterCatalog.ChannelChB2)
+        {
+            SelectCommand = new SelectChannelCommand(this)
+        };
 
         _katanaState.CurrentChannel.ValueChanged += UpdateSelection;
-        _katanaState.PatchNameChanged += () => CurrentPatchName = _katanaState.CurrentPatchName;
+        _katanaState.UserPatchNamesChanged += UpdatePatchName;
 
         UpdateSelection();
+        UpdatePatchName();
     }
 
     public PanelChannelOptionViewModel Panel { get; }
@@ -35,22 +53,31 @@ public partial class ChannelSelectionViewModel
 
     private IEnumerable<PanelChannelOptionViewModel> AllOptions => [Panel, CHA1, CHA2, CHB1, CHB2];
 
-    internal void SelectChannel(byte channelValue)
-    {
-        _katanaState.CurrentChannel.Value = channelValue;
-    }
+    internal void SelectChannel(byte channelValue) => _katanaState.CurrentChannel.Value = channelValue;
 
     private void UpdateSelection()
     {
         var current = _katanaState.CurrentChannel.Value;
         foreach (var option in AllOptions)
             option.IsSelected = option.ChannelValue == current;
+        UpdatePatchName();
     }
 
-    private sealed class SelectChannelCommand(ChannelSelectionViewModel vm) : System.Windows.Input.ICommand
+    // Channel byte is 1-based UserPatch slot index (PANEL=0 has no stored name).
+    private void UpdatePatchName()
+    {
+        var channel = _katanaState.CurrentChannel.Value;
+        var slotIndex = channel - 1;
+        CurrentPatchName = slotIndex >= 0 && _katanaState.UserPatchNames.TryGetValue(slotIndex, out var name)
+            ? name
+            : string.Empty;
+    }
+
+    private sealed class SelectChannelCommand(ChannelSelectionViewModel vm) : ICommand
     {
         public event EventHandler? CanExecuteChanged;
         public bool CanExecute(object? parameter) => true;
+
         public void Execute(object? parameter)
         {
             var channelValue = parameter switch
@@ -63,4 +90,3 @@ public partial class ChannelSelectionViewModel
         }
     }
 }
-

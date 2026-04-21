@@ -26,13 +26,6 @@ public partial class KatanaState
     /// <summary>Current channel as a raw SysEx byte value (see KatanaMkIIParameterCatalog.Channel* constants).</summary>
     public AmpControlState CurrentChannel { get; } = new(KatanaMkIIParameterCatalog.CurrentChannel);
 
-    /// <summary>16-character patch name; public field so RegisterAll finds it via GetFields().</summary>
-    public PatchNameState PatchName = new();
-
-    public string CurrentPatchName => PatchName.CurrentName;
-
-    public event Action? PatchNameChanged;
-
     partial void RegisterPanelMode()
     {
         RegisterAll(AmpType);
@@ -51,9 +44,6 @@ public partial class KatanaState
         RegisterAll(CabinetResonance);
         RegisterAll(PatchLevel);
         RegisterAll(CurrentChannel);
-        RegisterAll(PatchName);
-
-        PatchName.NameChanged += () => PatchNameChanged?.Invoke();
     }
 }
 

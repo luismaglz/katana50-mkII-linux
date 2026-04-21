@@ -20,10 +20,14 @@ public interface IKatanaState
     // -- Channel
     AmpControlState CurrentChannel { get; }
 
-    /// <summary>Currently displayed patch name, trimmed of trailing spaces.</summary>
-    string CurrentPatchName { get; }
+    /// <summary>Maps slot index (0-based) to the stored patch name for that slot.</summary>
+    IReadOnlyDictionary<int, string> UserPatchNames { get; }
 
-    event Action? PatchNameChanged;
+    /// <summary>Fires whenever any entry in <see cref="UserPatchNames" /> is added or updated.</summary>
+    event Action? UserPatchNamesChanged;
+
+    /// <summary>Sets the stored name for <paramref name="slotIndex" /> and fires <see cref="UserPatchNamesChanged" />.</summary>
+    void SetUserPatchName(int slotIndex, string name);
 
     /// <summary> Channel-mode stored preamp values ──────────────────────────────────────── </summary>
     PreampState Preamp { get; }
