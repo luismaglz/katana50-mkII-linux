@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Avalonia.Threading;
 
 using Kataka.App.KatanaState;
 
@@ -36,8 +35,7 @@ public class PedalboardMiniMapViewModel : ViewModelBase
         Chains.Add([Guitar, Mod, Booster, Fx, Amp, Delay, Delay2, Reverb, Speaker]);
         Chains.Add([Guitar, Mod, Booster, Fx, Delay, Amp, Delay2, Reverb, Speaker]);
 
-        _katanaState.PedalChain.ValueChanged += () =>
-            Dispatcher.UIThread.Post(() => UpdateChain(_katanaState.PedalChain.Value));
+        _katanaState.PedalChain.ValueChanged += () => { UpdateChain(_katanaState.PedalChain.Value); };
     }
 
     public ObservableCollection<ChainNode> ChainNodes { get; set; } = new();
