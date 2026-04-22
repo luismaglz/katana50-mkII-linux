@@ -1,7 +1,12 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Data.Converters;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+using Avalonia.Threading;
 
 using Kataka.App.KatanaState;
 
@@ -42,11 +47,14 @@ public class PedalboardMiniMapViewModel : ViewModelBase
 
     private void UpdateChain(int chainValue)
     {
-        ChainNodes.Clear();
-        var nodes = Chains[chainValue] ?? null;
-        if (nodes != null)
-            foreach (var node in nodes)
-                ChainNodes.Add(node);
+        // Ensure we are on the UI thread for collection changes
+        Dispatcher.UIThread.Post(() =>
+        {
+            ChainNodes.Clear();
+            if (chainValue >= 0 && chainValue < Chains.Count)
+                foreach (var node in Chains[chainValue])
+                    ChainNodes.Add(node);
+        });
     }
 }
 
@@ -77,6 +85,34 @@ public class PedalTypeSelector : IDataTemplate
 
     // This tells Avalonia: "I only handle ChainNode objects"
     public bool Match(object? data) => data is ChainNode;
+}
+
+public class NodeTypeToImageConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is ChainNodeType type)
+        {
+            var assetName = type switch
+            {
+                ChainNodeType.Input => "electric-guitar.png",
+                ChainNodeType.Amp => "amplifier.png",
+                ChainNodeType.Speaker => "speakers.png",
+                _ => "guitar-pedal.png"
+            };
+
+            // Important: Use the full avares path to your project
+            var uri = new Uri($"avares://Kataka.App/Assets/{assetName}");
+
+            // AssetLoader is the reliable way to grab these for a converter
+            return new Bitmap(AssetLoader.Open(uri));
+        }
+
+        return null;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
 }
 
 public enum ChainNodeType

@@ -1,62 +1,36 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Kataka.App.ViewModels"
-             xmlns:dvm="using:Kataka.App.ViewModels.Design"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d"
-             d:DesignWidth="2400"
-             d:DesignHeight="480"
-             d:DataContext="{x:Static dvm:DesignPanelViewModel.Instance}"
              x:Class="Kataka.App.Views.PedalboardMiniMap"
              x:DataType="vm:PedalboardMiniMapViewModel"
-             x:CompileBindings="False">
+             x:CompileBindings="True">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="PedalTemplate">
-            <Border Background="{Binding Color}" Width="50" Height="50">
-                <Border.OpacityMask>
-                    <ImageBrush Source="/Assets/guitar-pedal.png" />
-                </Border.OpacityMask>
-            </Border>
-        </DataTemplate>
-        <DataTemplate x:Key="GuitarTemplate">
-            <Border Background="{Binding Color}" Width="50" Height="50">
-                <Border.OpacityMask>
-                    <ImageBrush Source="/Assets/electric-guitar.png" />
-                </Border.OpacityMask>
-            </Border>
-        </DataTemplate>
-        <DataTemplate x:Key="AmplifierTemplate">
-            <Border Background="{Binding Color}" Width="50" Height="50">
-                <Border.OpacityMask>
-                    <ImageBrush Source="/Assets/amplifier.png" />
-                </Border.OpacityMask>
-            </Border>
-        </DataTemplate>
-        <DataTemplate x:Key="SpeakerTemplate">
-            <Border Background="{Binding Color}" Width="50" Height="50">
-                <Border.OpacityMask>
-                    <ImageBrush Source="/Assets/speakers.png" />
-                </Border.OpacityMask>
-            </Border>
-        </DataTemplate>
-
-        <vm:PedalTypeSelector x:Key="PedalSelector"
-                              GuitarTemplate="{StaticResource GuitarTemplate}"
-                              AmpTemplate="{StaticResource AmplifierTemplate}"
-                              SpeakerTemplate="{StaticResource SpeakerTemplate}"
-                              PedalTemplate="{StaticResource PedalTemplate}" />
+        <vm:NodeTypeToImageConverter x:Key="NodeTypeToImageConverter" />
     </UserControl.Resources>
 
-    <Border BorderThickness="1" BorderBrush="Chartreuse">
-        <ItemsControl ItemsSource="{Binding ChainNodes}" ItemTemplate="{StaticResource PedalSelector}">
+    <Border BorderThickness="1" BorderBrush="Chartreuse" Padding="10">
+        <ItemsControl ItemsSource="{Binding ChainNodes}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="8"
-                                RenderOptions.BitmapInterpolationMode="HighQuality" />
+                    <StackPanel Orientation="Horizontal" Spacing="10" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:ChainNode">
+                    <Border Background="{Binding Color}"
+                            Width="50"
+                            Height="50"
+                            CornerRadius="5">
+                        <Border.OpacityMask>
+                            <ImageBrush
+                                Source="{Binding ChainNodeType, Converter={StaticResource NodeTypeToImageConverter}}"
+                                Stretch="Uniform" />
+                        </Border.OpacityMask>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
         </ItemsControl>
     </Border>
 </UserControl>
