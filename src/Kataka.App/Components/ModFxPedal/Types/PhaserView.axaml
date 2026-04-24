@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kataka.App.ViewModels"
+             xmlns:dvm="using:Kataka.App.ViewModels.Design"
+             xmlns:controls="using:Kataka.App.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DataContext="{x:Static dvm:DesignModFxPedalViewModel.Instance}"
+             x:Class="Kataka.App.Views.ModsFx.PhaserView"
+             x:DataType="vm:ModFxPedalViewModel"
+             x:CompileBindings="False">
+
+    <StackPanel Spacing="8">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <controls:RotaryKnob Scale="0.75" Label="RATE"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding PhaserRate}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.75" Label="DEPTH"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding PhaserDepth}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.75" Label="MANUAL"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding PhaserManual}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.75" Label="RESONANCE"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding PhaserResonance}"
+                                 LabelFontSize="11" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <controls:RotaryKnob Scale="0.75" Label="STEP RATE"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding PhaserStepRate}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.75" Label="E.LEVEL"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding PhaserEffectLevel}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.75" Label="DIRECT MIX"
+                                 Minimum="0" Maximum="100"
+                                 Value="{Binding PhaserDirectMix}"
+                                 LabelFontSize="11" />
+            <controls:RotaryKnob Scale="0.75" Label="TYPE"
+                                 Minimum="0" Maximum="3"
+                                 Value="{Binding PhaserType}"
+                                 LabelFontSize="11" />
+        </StackPanel>
+    </StackPanel>
+
+</UserControl>

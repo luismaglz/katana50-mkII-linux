@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Kataka.App.ViewModels"
+             xmlns:dvm="clr-namespace:Kataka.App.ViewModels.Design"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             d:DataContext="{x:Static dvm:DesignChannelSelectionViewModel.Instance}"
+             x:Class="Kataka.App.Views.ChannelSelectionView"
+             x:DataType="vm:ChannelSelectionViewModel"
+             x:CompileBindings="False">
+    <UserControl.Resources>
+        <DataTemplate x:Key="ChannelSelectorButton" x:DataType="vm:PanelChannelOptionViewModel">
+            <ToggleButton
+                FontSize="14"
+                FontWeight="Bold"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                BorderThickness="1"
+                Foreground="{StaticResource TextMainBrush}"
+                Background="{StaticResource BgElevatedBrush}"
+                Padding="0"
+                Content="{Binding DisplayName}"
+                IsChecked="{Binding IsSelected, Mode=OneWay}"
+                Command="{Binding SelectCommand}"
+                CommandParameter="{Binding ChannelValue}" />
+        </DataTemplate>
+    </UserControl.Resources>
+    <StackPanel Orientation="Horizontal" Spacing="12" Margin="20 0 0 0">
+        <ContentControl Width="60" Height="32" Content="{Binding Panel}"
+                        ContentTemplate="{StaticResource ChannelSelectorButton}" />
+        <ContentControl Width="60" Height="32" Content="{Binding CHA1}"
+                        ContentTemplate="{StaticResource ChannelSelectorButton}" />
+        <ContentControl Width="60" Height="32" Content="{Binding CHA2}"
+                        ContentTemplate="{StaticResource ChannelSelectorButton}" />
+        <ContentControl Width="60" Height="32" Content="{Binding CHB1}"
+                        ContentTemplate="{StaticResource ChannelSelectorButton}" />
+        <ContentControl Width="60" Height="32" Content="{Binding CHB2}"
+                        ContentTemplate="{StaticResource ChannelSelectorButton}" />
+        <TextBlock Text="{Binding CurrentPatchName}"
+                   VerticalAlignment="Center"
+                   Foreground="{StaticResource TextMainBrush}"
+                   FontSize="14" />
+    </StackPanel>
+
+</UserControl>
