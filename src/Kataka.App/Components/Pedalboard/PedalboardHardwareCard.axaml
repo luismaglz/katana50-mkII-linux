@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="Kataka.App.Components.Pedalboard.PedalboardHardwareCard"
+             x:Name="root">
+    <StackPanel Orientation="Horizontal"
+                VerticalAlignment="Top">
+        <Canvas Width="28"
+                Height="40"
+                VerticalAlignment="Top"
+                Margin="0,24,0,0"
+                IsVisible="{Binding ShowConnector, ElementName=root}">
+            <Border Canvas.Left="0"
+                    Canvas.Top="14"
+                    Width="28"
+                    Height="4"
+                    CornerRadius="2"
+                    Background="#7a7060" />
+            <Border Canvas.Left="0"
+                    Canvas.Top="12"
+                    Width="7"
+                    Height="8"
+                    CornerRadius="2"
+                    Background="#444" />
+            <Border Canvas.Left="21"
+                    Canvas.Top="12"
+                    Width="7"
+                    Height="8"
+                    CornerRadius="2"
+                    Background="#444" />
+        </Canvas>
+
+        <Border CornerRadius="10"
+                Width="{Binding CardWidth, ElementName=root}"
+                BorderThickness="2"
+                BorderBrush="{Binding CardBorderBrush, ElementName=root}"
+                Background="{StaticResource TextLightBrush}"
+                VerticalAlignment="Top">
+            <StackPanel Spacing="0"
+                        HorizontalAlignment="Center">
+                <Border Height="6"
+                        CornerRadius="10,10,0,0"
+                        Background="{Binding AccentBrush, ElementName=root}" />
+                <StackPanel Spacing="5"
+                            Margin="10,10,10,12"
+                            HorizontalAlignment="Center">
+                    <Image Source="{Binding ImagePath, ElementName=root}"
+                           Width="80"
+                           Height="80"
+                           HorizontalAlignment="Center" />
+                    <TextBlock Text="{Binding Label, ElementName=root}"
+                               FontSize="{Binding LabelFontSize, ElementName=root}"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Foreground="{Binding LabelBrush, ElementName=root}"
+                               LetterSpacing="1.5" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>
