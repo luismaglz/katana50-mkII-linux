@@ -1,0 +1,82 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kataka.App.ViewModels"
+             xmlns:dvm="using:Kataka.App.ViewModels.Design"
+             xmlns:controls="using:Kataka.App.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DataContext="{x:Static dvm:DesignMainWindowViewModel.Instance}"
+             x:Class="Kataka.App.Views.ChannelStripView"
+             x:DataType="vm:MainWindowViewModel"
+             x:CompileBindings="False"
+             x:Name="RootControl">
+
+    <Border Classes="panel-section alt" Padding="16">
+        <StackPanel Spacing="10">
+            <StackPanel Spacing="4">
+                <TextBlock Text="CHANNEL STRIP"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           LetterSpacing="1.5" />
+                <TextBlock Text="{Binding AmpEditor.PanelControlsStatus}"
+                           FontSize="11"
+                           Foreground="{StaticResource KatanaSubtleTextBrush}"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+            <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+                <Button Classes="transport-button" Content="Load Patch"
+                        Command="{Binding Patch.LoadPatchCommand}"
+                        IsEnabled="{Binding Patch.CanWritePatch}"
+                        ToolTip.Tip="Load a .tsl patch file and send it to the amp" />
+                <Button Classes="transport-button" Content="Save Patch"
+                        Command="{Binding Patch.SavePatchCommand}"
+                        IsEnabled="{Binding Patch.CanWritePatch}"
+                        ToolTip.Tip="Save the current amp state as a .tsl patch file" />
+                <Button Classes="transport-button" Content="Write Patch"
+                        Command="{Binding Patch.WritePatchCommand}"
+                        IsEnabled="{Binding Patch.CanWritePatch}"
+                        ToolTip.Tip="Save current settings to patch memory on the Katana" />
+            </WrapPanel>
+            <ItemsControl ItemsSource="{Binding AmpEditor.PanelChannelOptions}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:PanelChannelOptionViewModel">
+                        <ToggleButton Classes="channel-button"
+                                      Content="{Binding DisplayName}"
+                                      IsChecked="{Binding IsSelected}"
+                                      Command="{Binding SelectCommand}"
+                                      CommandParameter="{Binding DisplayName}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <WrapPanel Orientation="Horizontal" ItemSpacing="14" LineSpacing="14">
+                <controls:RotaryKnob Label="Patch Level"
+                                     IsEnabled="{Binding Patch.IsPatchLevelAvailable}"
+                                     Minimum="0" Maximum="200"
+                                     Value="{Binding Patch.PatchLevel}" />
+                <Border Classes="panel-section" Padding="12" MinWidth="160">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="TAP TEMPO" FontWeight="Bold" FontSize="12"
+                                   LetterSpacing="1.2" />
+                        <TextBlock Text="{Binding Patch.DelayTapStatus}"
+                                   TextWrapping="Wrap" FontSize="11"
+                                   Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                        <StackPanel Orientation="Horizontal" Spacing="8"
+                                    IsVisible="{Binding Patch.DelayTimeMs, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <TextBlock Text="{Binding Patch.DelayTimeMs, StringFormat='{}{0} ms'}"
+                                       FontSize="20" FontWeight="Bold"
+                                       Foreground="{StaticResource KatanaAccentBrush}" />
+                        </StackPanel>
+                        <Button Classes="transport-button accent" HorizontalAlignment="Left"
+                                Content="Tap Delay" Command="{Binding Patch.TapDelayCommand}" />
+                    </StackPanel>
+                </Border>
+            </WrapPanel>
+        </StackPanel>
+    </Border>
+</UserControl>
