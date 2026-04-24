@@ -38,89 +38,33 @@
 
                     <ItemsControl.DataTemplates>
 
-                        <!-- Input: card only, no left connector -->
                         <DataTemplate DataType="pedalboard:PedalboardInput">
-                            <Border CornerRadius="10" Width="100" BorderThickness="2"
-                                    BorderBrush="#3a5a6a"
-                                    Background="{StaticResource TextLightBrush}"
-                                    VerticalAlignment="Top">
-                                <StackPanel Spacing="0" HorizontalAlignment="Center">
-                                    <Border Width="96" Height="6" CornerRadius="10,10,0,0"
-                                            Background="#607080" />
-                                    <StackPanel Spacing="5" Margin="10,10,10,12" HorizontalAlignment="Center">
-                                        <Image Source="/Assets/electric-guitar.png"
-                                               Width="80" Height="80"
-                                               HorizontalAlignment="Center" BlendMode="Multiply" />
-                                        <TextBlock Text="INPUT"
-                                                   FontSize="11" FontWeight="Bold"
-                                                   HorizontalAlignment="Center"
-                                                   Foreground="#7ab0c8" LetterSpacing="1.2" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
+                            <pedalboard:PedalboardHardwareCard ShowConnector="False"
+                                                               ImagePath="/Assets/electric-guitar.png"
+                                                               Label="INPUT"
+                                                               AccentBrush="#607080"
+                                                               CardBorderBrush="#3a5a6a"
+                                                               LabelBrush="#7ab0c8" />
                         </DataTemplate>
 
-                        <!-- Output: left connector + speakers card -->
                         <DataTemplate DataType="pedalboard:PedalboardOutput">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-                                <Canvas Width="28" Height="40" VerticalAlignment="Top" Margin="0,24,0,0">
-                                    <Border Canvas.Left="0" Canvas.Top="14" Width="28" Height="4"
-                                            CornerRadius="2" Background="#7a7060" />
-                                    <Border Canvas.Left="0" Canvas.Top="12" Width="7" Height="8"
-                                            CornerRadius="2" Background="#444" />
-                                    <Border Canvas.Left="21" Canvas.Top="12" Width="7" Height="8"
-                                            CornerRadius="2" Background="#444" />
-                                </Canvas>
-                                <Border CornerRadius="10" Width="100" BorderThickness="2"
-                                        BorderBrush="#3a5a6a"
-                                        Background="{StaticResource TextLightBrush}"
-                                        VerticalAlignment="Top">
-                                    <StackPanel Spacing="0" HorizontalAlignment="Center">
-                                        <Border Width="96" Height="6" CornerRadius="10,10,0,0"
-                                                Background="#607080" />
-                                        <StackPanel Spacing="5" Margin="10,10,10,12" HorizontalAlignment="Center">
-                                            <Image Source="/Assets/speakers.png"
-                                                   Width="80" Height="80"
-                                                   HorizontalAlignment="Center" />
-                                            <TextBlock Text="OUTPUT"
-                                                       FontSize="11" FontWeight="Bold"
-                                                       HorizontalAlignment="Center"
-                                                       Foreground="#7ab0c8" LetterSpacing="1.2" />
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Border>
-                            </StackPanel>
+                            <pedalboard:PedalboardHardwareCard ShowConnector="True"
+                                                               ImagePath="/Assets/speakers.png"
+                                                               Label="OUTPUT"
+                                                               AccentBrush="#607080"
+                                                               CardBorderBrush="#3a5a6a"
+                                                               LabelBrush="#7ab0c8" />
                         </DataTemplate>
 
-                        <!-- Amp: left connector + amp card -->
                         <DataTemplate DataType="pedalboard:PedalboardAmp">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-                                <Canvas Width="28" Height="40" VerticalAlignment="Top" Margin="0,24,0,0">
-                                    <Border Canvas.Left="0" Canvas.Top="14" Width="28" Height="4"
-                                            CornerRadius="2" Background="#7a7060" />
-                                    <Border Canvas.Left="0" Canvas.Top="12" Width="7" Height="8"
-                                            CornerRadius="2" Background="#444" />
-                                    <Border Canvas.Left="21" Canvas.Top="12" Width="7" Height="8"
-                                            CornerRadius="2" Background="#444" />
-                                </Canvas>
-                                <Border Width="110" CornerRadius="10"
-                                        BorderThickness="2" BorderBrush="#8b1c1c"
-                                        Background="{StaticResource TextLightBrush}"
-                                        VerticalAlignment="Top">
-                                    <StackPanel Spacing="0">
-                                        <Border Height="6" CornerRadius="10,10,0,0"
-                                                Background="#c0392b" />
-                                        <StackPanel Spacing="5" Margin="10,10,10,12" HorizontalAlignment="Center">
-                                            <Image Source="/Assets/amplifier.png"
-                                                   Width="80" Height="80"
-                                                   HorizontalAlignment="Center" />
-                                            <TextBlock Text="AMP" FontSize="13" FontWeight="Bold"
-                                                       HorizontalAlignment="Center"
-                                                       Foreground="#e04040" LetterSpacing="2" />
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Border>
-                            </StackPanel>
+                            <pedalboard:PedalboardHardwareCard ShowConnector="True"
+                                                               ImagePath="/Assets/amplifier.png"
+                                                               Label="AMP"
+                                                               AccentBrush="#c0392b"
+                                                               CardBorderBrush="#8b1c1c"
+                                                               LabelBrush="#e04040"
+                                                               CardWidth="110"
+                                                               LabelFontSize="13" />
                         </DataTemplate>
 
                         <!-- Pedal: left connector + ContentControl dispatched by ViewLocator -->
