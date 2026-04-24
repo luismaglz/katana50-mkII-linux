@@ -7,11 +7,20 @@ public abstract class PedalboardPosition(string color)
     public string Color { get; } = color;
 }
 
-public class PedalboardInput(string color) : PedalboardPosition(color);
+public class PedalboardInput(string color, string imagePath) : PedalboardPosition(color)
+{
+    public string ImagePath { get; } = imagePath;
+}
 
-public class PedalboardOutput(string color) : PedalboardPosition(color);
+public class PedalboardOutput(string color, string imagePath) : PedalboardPosition(color)
+{
+    public string ImagePath { get; } = imagePath;
+}
 
-public class PedalboardAmp(string color) : PedalboardPosition(color);
+public class PedalboardAmp(string color, string imagePath) : PedalboardPosition(color)
+{
+    public string ImagePath { get; } = imagePath;
+}
 
 public abstract class PedalboardPedalBase(ViewModelBase viewModel, string color) : PedalboardPosition(color)
 {

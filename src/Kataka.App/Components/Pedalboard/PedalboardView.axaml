@@ -40,7 +40,7 @@
 
                         <DataTemplate DataType="pedalboard:PedalboardInput">
                             <pedalboard:PedalboardHardwareCard ShowConnector="False"
-                                                               ImagePath="/Assets/electric-guitar.png"
+                                                               ImagePath="{Binding ImagePath}"
                                                                Label="INPUT"
                                                                AccentBrush="#607080"
                                                                CardBorderBrush="#3a5a6a"
@@ -49,7 +49,7 @@
 
                         <DataTemplate DataType="pedalboard:PedalboardOutput">
                             <pedalboard:PedalboardHardwareCard ShowConnector="True"
-                                                               ImagePath="/Assets/speakers.png"
+                                                               ImagePath="{Binding ImagePath}"
                                                                Label="OUTPUT"
                                                                AccentBrush="#607080"
                                                                CardBorderBrush="#3a5a6a"
@@ -58,7 +58,7 @@
 
                         <DataTemplate DataType="pedalboard:PedalboardAmp">
                             <pedalboard:PedalboardHardwareCard ShowConnector="True"
-                                                               ImagePath="/Assets/amplifier.png"
+                                                               ImagePath="{Binding ImagePath}"
                                                                Label="AMP"
                                                                AccentBrush="#c0392b"
                                                                CardBorderBrush="#8b1c1c"
