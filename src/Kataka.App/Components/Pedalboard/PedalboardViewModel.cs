@@ -1,56 +1,60 @@
 using System.Collections.ObjectModel;
 
-using Kataka.App.Components.Pedalboard;
+using Avalonia.Threading;
+
 using Kataka.App.KatanaState;
+using Kataka.App.ViewModels;
 using Kataka.Domain.Midi;
 using Kataka.Domain.Models;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Kataka.App.ViewModels;
+namespace Kataka.App.Components.Pedalboard;
 
 public class PedalboardViewModel : ViewModelBase
 {
     private readonly IKatanaState _katanaState;
-    private PedalboardItemViewModel? _ampItem;
+    private readonly List<PedalboardPosition[]> _chains = [];
 
-    /// <summary>
-    ///     List of possible pedalboard chains to select from
-    /// </summary>
-    private List<PedalboardPosition>[] _chains;
+    private readonly PedalboardInput _inputHardware = new("white");
+    private readonly PedalboardOutput _outputHardware = new("white");
+    private readonly PedalboardAmp _ampHardware = new("white");
 
-    private int _lastRenderedChain = -1;
-    private KatanaPanelChannel _lastRenderedChannel;
+    private readonly PedalboardPedal<BoosterPedalViewModel> _boosterPedal;
+    private readonly PedalboardPedal<ModFxPedalViewModel> _modPedal;
+    private readonly PedalboardPedal<ModFxPedalViewModel> _fxPedal;
+    private readonly PedalboardPedal<DelayPedalViewModel> _delayPedal;
+    private readonly PedalboardPedal<DelayPedalViewModel> _delayPedal2;
+    private readonly PedalboardPedal<ReverbPedalViewModel> _reverbPedal;
 
     public PedalboardViewModel(IKatanaState katanaState)
     {
         _katanaState = katanaState;
 
-        // Initialize Pedals
         _boosterPedal = new PedalboardPedal<BoosterPedalViewModel>(new BoosterPedalViewModel(katanaState), "gold");
-        _modPedal = new PedalboardPedal<ModFxPedalViewModel>(new ModFxPedalViewModel(PedalPosition.Mod, katanaState),
-            "blue");
-        _fxPedal = new PedalboardPedal<ModFxPedalViewModel>(new ModFxPedalViewModel(PedalPosition.Fx, katanaState),
-            "purple");
-        _delayPedal =
-            new PedalboardPedal<DelayPedalViewModel>(new DelayPedalViewModel(PedalPosition.Delay, katanaState),
-                "lightgray");
+        _modPedal = new PedalboardPedal<ModFxPedalViewModel>(new ModFxPedalViewModel(PedalPosition.Mod, katanaState), "blue");
+        _fxPedal = new PedalboardPedal<ModFxPedalViewModel>(new ModFxPedalViewModel(PedalPosition.Fx, katanaState), "purple");
+        _delayPedal = new PedalboardPedal<DelayPedalViewModel>(new DelayPedalViewModel(PedalPosition.Delay, katanaState), "lightgray");
+        _delayPedal2 = new PedalboardPedal<DelayPedalViewModel>(new DelayPedalViewModel(PedalPosition.Delay2, katanaState), "lightgray");
+        _reverbPedal = new PedalboardPedal<ReverbPedalViewModel>(new ReverbPedalViewModel(katanaState), "cyan");
 
+        _chains.Add([_inputHardware, _boosterPedal, _ampHardware, _modPedal, _fxPedal, _delayPedal, _delayPedal2, _reverbPedal, _outputHardware]);
+        _chains.Add([_inputHardware, _boosterPedal, _modPedal, _ampHardware, _fxPedal, _delayPedal, _delayPedal2, _reverbPedal, _outputHardware]);
+        _chains.Add([_inputHardware, _boosterPedal, _modPedal, _fxPedal, _ampHardware, _delayPedal, _delayPedal2, _reverbPedal, _outputHardware]);
+        _chains.Add([_inputHardware, _boosterPedal, _modPedal, _fxPedal, _delayPedal, _ampHardware, _delayPedal2, _reverbPedal, _outputHardware]);
+        _chains.Add([_inputHardware, _modPedal, _boosterPedal, _ampHardware, _fxPedal, _delayPedal, _delayPedal2, _reverbPedal, _outputHardware]);
+        _chains.Add([_inputHardware, _modPedal, _boosterPedal, _fxPedal, _ampHardware, _delayPedal, _delayPedal2, _reverbPedal, _outputHardware]);
+        _chains.Add([_inputHardware, _modPedal, _boosterPedal, _fxPedal, _delayPedal, _ampHardware, _delayPedal2, _reverbPedal, _outputHardware]);
 
-        _katanaState.PedalChain.ValueChanged += () =>
-        {
-            this.RaisePropertyChanged(nameof(SelectedChainPattern));
-            Refresh();
-        };
+        _katanaState.PedalChain.ValueChanged += () => UpdateChain(_katanaState.PedalChain.Value);
+        UpdateChain(_katanaState.PedalChain.Value);
     }
 
-    public IReadOnlyDictionary<string, PedalViewModel> PedalsByKey { get; }
+    public ObservableCollection<PedalboardPosition> ChainNodes { get; } = [];
 
     public static string[] ChainPatternNames { get; } =
         ["CHAIN 1", "CHAIN 2-1", "CHAIN 3-1", "CHAIN 4-1", "CHAIN 2-2", "CHAIN 3-2", "CHAIN 4-2"];
-
-    public ObservableCollection<PedalboardItemViewModel> PedalboardItems { get; } = [];
 
     [Reactive] public KatanaPanelChannel SelectedChannel { get; set; } = KatanaPanelChannel.Panel;
 
@@ -64,86 +68,14 @@ public class PedalboardViewModel : ViewModelBase
         }
     }
 
-    private void Refresh()
+    private void UpdateChain(int chainValue)
     {
-        var chain = _katanaState.PedalChain.Value;
-        var channel = SelectedChannel;
-        if (chain == _lastRenderedChain && channel == _lastRenderedChannel) return;
-        _lastRenderedChain = chain;
-        _lastRenderedChannel = channel;
-
-        var chainIdx = Math.Clamp(chain, 0, Chains.Count - 1);
-        var keys = Chains[chainIdx];
-
-        var items = new List<PedalboardItemViewModel>();
-        foreach (var key in keys)
+        Dispatcher.UIThread.Post(() =>
         {
-            var isConnected = items.Count > 0;
-            if (key == "input")
-                items.Add(new PedalboardItemViewModel
-                {
-                    Key = "input",
-                    DisplayName = "INPUT",
-                    Detail = "Guitar",
-                    IsEndpoint = true,
-                    Family = "io",
-                    IsConnectedFromPrevious = isConnected
-                });
-            else if (key == "output")
-                items.Add(new PedalboardItemViewModel
-                {
-                    Key = "output",
-                    DisplayName = "OUTPUT",
-                    Detail = "Speaker / Rec Out",
-                    IsEndpoint = true,
-                    Family = "io",
-                    IsConnectedFromPrevious = isConnected
-                });
-            else if (key == "amp")
-                items.Add(_ampItem = new PedalboardItemViewModel
-                {
-                    Key = "amp",
-                    DisplayName = "AMP",
-                    Detail = SelectedChannel.ToString().ToUpperInvariant(),
-                    IsAmp = true,
-                    Family = "amp",
-                    IsConnectedFromPrevious = isConnected
-                });
-            else if (PedalsByKey.TryGetValue(key, out var effect))
-                items.Add(new PedalboardItemViewModel
-                {
-                    Key = effect.Definition.Key,
-                    DisplayName = effect.DisplayName.ToUpperInvariant(),
-                    Detail = effect.DisplayName,
-                    Family = effect.Definition.Key,
-                    PanelEffect = effect,
-                    IsConnectedFromPrevious = isConnected
-                });
-        }
-
-        PedalboardItems.Clear();
-        foreach (var item in items)
-            PedalboardItems.Add(item);
+            ChainNodes.Clear();
+            if (chainValue >= 0 && chainValue < _chains.Count)
+                foreach (var node in _chains[chainValue])
+                    ChainNodes.Add(node);
+        });
     }
-
-    #region Pedalboard Hardware
-
-    // Represents the input/output/amp positions on the pedalboard, which are not actual pedals but still need to be rendered
-    private readonly PedalboardHardware _inputHardware = new("Assets/electric-guitar.png", "white");
-    private readonly PedalboardHardware _outputHardware = new("Assets/speakers.png", "white");
-    private readonly PedalboardHardware _ampHardware = new("Assets/amp.png", "white");
-
-    #endregion
-
-    #region Pedalboard Pedals
-
-    // Pedals that need to be rendered in different positions in the pedalboard
-    private readonly PedalboardPedal<BoosterPedalViewModel> _boosterPedal;
-    private readonly PedalboardPedal<ModFxPedalViewModel> _modPedal;
-    private readonly PedalboardPedal<ModFxPedalViewModel> _fxPedal;
-    private readonly PedalboardPedal<DelayPedalViewModel> _delayPedal;
-    private readonly PedalboardPedal<DelayPedalViewModel> _delayPedal2;
-    private readonly PedalboardPedal<ReverbPedalViewModel> _reverbPedal;
-
-    #endregion
 }

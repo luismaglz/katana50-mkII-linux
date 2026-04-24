@@ -1,3 +1,4 @@
+using Kataka.App.Components.Pedalboard;
 using Kataka.App.KatanaState;
 
 using ReactiveUI;
@@ -17,6 +18,7 @@ public class AmpEditorViewModel : ViewModelBase
         katanaState.AmpVariation.ValueChanged += () =>
             IsAmpVariation = katanaState.AmpVariation.Value != 0;
 
+        Pedalboard = new PedalboardViewModel(katanaState);
         Panel = new PanelViewModel(katanaState);
         ChannelSelection = new ChannelSelectionViewModel(katanaState);
 
