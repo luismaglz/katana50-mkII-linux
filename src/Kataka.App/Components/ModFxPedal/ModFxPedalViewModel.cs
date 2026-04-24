@@ -3,6 +3,7 @@ using Avalonia.Media;
 using Kataka.App.KatanaState;
 using Kataka.App.KatanaState.FxPedals;
 using Kataka.Domain.Midi;
+using Kataka.Domain.Models;
 
 using ReactiveUI;
 
@@ -63,12 +64,12 @@ public class ModFxPedalViewModel : PedalViewModel
 
     private string _variation = "N/A";
 
-    public ModFxPedalViewModel(string slot, IKatanaState katanaState) : base(
+    public ModFxPedalViewModel(PedalPosition slot, IKatanaState katanaState) : base(
         KatanaMkIIParameterCatalog.PanelEffects.First(e => e.Key == slot))
     {
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
 
-        if (slot == "mod")
+        if (slot == PedalPosition.Mod)
         {
             var s = katanaState.ModPedal;
             _enabledState = s.EnabledState;

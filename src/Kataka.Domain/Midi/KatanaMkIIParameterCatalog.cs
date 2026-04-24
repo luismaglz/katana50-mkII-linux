@@ -1,3 +1,5 @@
+using Kataka.Domain.Models;
+
 namespace Kataka.Domain.Midi;
 
 /// <summary>Auto-generated: static partial class KatanaMkIIParameterCatalog</summary>
@@ -976,27 +978,27 @@ public static partial class KatanaMkIIParameterCatalog
     /// <summary>Auto-generated: static IReadOnlyList<KatanaPanelEffectDefinition> PanelEffects { get; } =</summary>
     public static IReadOnlyList<KatanaPanelEffectDefinition> PanelEffects { get; } =
     [
-        new("booster", "Booster", BoosterSwitch, BoosterVariation, BoosterType,
+        new(PedalPosition.Booster, "Booster", BoosterSwitch, BoosterVariation, BoosterType,
             detailParameters:
             [
                 BoosterDrive, BoosterTone, BoosterBottom, BoosterSoloSw, BoosterSoloLevel, BoosterEffectLevel,
                 BoosterDirectMix
             ]),
-        new("mod", "Mod", ModSwitch, ModVariation, ModType),
-        new("fx", "FX", FxSwitch, FxVariation, FxType),
-        new("delay", "Delay", DelaySwitch, DelayVariation, DelayType,
+        new(PedalPosition.Mod, "Mod", ModSwitch, ModVariation, ModType),
+        new(PedalPosition.Fx, "FX", FxSwitch, FxVariation, FxType),
+        new(PedalPosition.Delay, "Delay", DelaySwitch, DelayVariation, DelayType,
             detailParameters:
             [
                 DelayFeedback, DelayHighCut, DelayEffectLevel, DelayDirectMix, DelayTapTime, DelayModRate,
                 DelayModDepth, DelayRange, DelayFilter, DelayFeedbackPhase, DelayDelayPhase, DelayModSw
             ]),
-        new("delay2", "Delay 2", Delay2Switch, typeParameter: Delay2Type,
+        new(PedalPosition.Delay2, "Delay 2", Delay2Switch, typeParameter: Delay2Type,
             detailParameters:
             [
                 Delay2Feedback, Delay2HighCut, Delay2EffectLevel, Delay2DirectMix, Delay2TapTime, Delay2ModRate,
                 Delay2ModDepth, Delay2Range, Delay2Filter, Delay2FeedbackPhase, Delay2DelayPhase, Delay2ModSw
             ]),
-        new("reverb", "Reverb", ReverbSwitch, ReverbVariation, ReverbType,
+        new(PedalPosition.Reverb, "Reverb", ReverbSwitch, ReverbVariation, ReverbType,
             detailParameters:
             [
                 ReverbTime, ReverbPreDelay, ReverbLowCut, ReverbHighCut, ReverbDensity, ReverbColor, ReverbEffectLevel,

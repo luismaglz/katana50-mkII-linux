@@ -2,6 +2,7 @@ using Avalonia.Media;
 
 using Kataka.App.KatanaState;
 using Kataka.Domain.Midi;
+using Kataka.Domain.Models;
 
 using ReactiveUI;
 
@@ -10,7 +11,7 @@ namespace Kataka.App.ViewModels;
 public class BoosterPedalViewModel : PedalViewModel
 {
     private static readonly KatanaPanelEffectDefinition OwnDefinition =
-        KatanaMkIIParameterCatalog.PanelEffects.First(e => e.Key == "booster");
+        KatanaMkIIParameterCatalog.PanelEffects.First(e => e.Key == PedalPosition.Booster);
 
     private static readonly IReadOnlyDictionary<byte, string> TypeTable = KatanaTypeNameTables.BoosterTypes;
 

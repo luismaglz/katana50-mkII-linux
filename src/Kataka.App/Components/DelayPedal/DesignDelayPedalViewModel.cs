@@ -1,10 +1,12 @@
+using Kataka.Domain.Models;
+
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Kataka.App.ViewModels.Design;
 
 public sealed class DesignDelayPedalViewModel : DelayPedalViewModel
 {
-    public DesignDelayPedalViewModel() : base("delay",
+    public DesignDelayPedalViewModel() : base(PedalPosition.Delay,
         new KatanaState.KatanaState(NullLogger<KatanaState.KatanaState>.Instance))
     {
         IsEnabled = true;
