@@ -24,10 +24,7 @@ public sealed class DesignMainWindowViewModel : MainWindowViewModel
 public sealed class DesignAmpEditorViewModel : AmpEditorViewModel
 {
     public DesignAmpEditorViewModel() : base(
-        new KatanaState.KatanaState(NullLogger<KatanaState.KatanaState>.Instance),
-        new AmpSyncService(new NullKatanaSession(),
-            new KatanaState.KatanaState(NullLogger<KatanaState.KatanaState>.Instance),
-            NullLogger<AmpSyncService>.Instance))
+        new KatanaState.KatanaState(NullLogger<KatanaState.KatanaState>.Instance))
     {
     }
 

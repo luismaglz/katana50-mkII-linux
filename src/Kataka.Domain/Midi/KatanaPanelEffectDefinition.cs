@@ -1,3 +1,5 @@
+using Kataka.Domain.Models;
+
 namespace Kataka.Domain.Midi;
 
 /// <summary>Auto-generated: sealed class KatanaPanelEffectDefinition</summary>
@@ -5,7 +7,7 @@ public sealed class KatanaPanelEffectDefinition
 {
     /// <summary>Auto-generated: KatanaPanelEffectDefinition(</summary>
     public KatanaPanelEffectDefinition(
-        string key,
+        PedalPosition key,
         string displayName,
         KatanaParameterDefinition switchParameter,
         KatanaParameterDefinition? variationParameter = null,
@@ -13,7 +15,6 @@ public sealed class KatanaPanelEffectDefinition
         KatanaParameterDefinition? levelParameter = null,
         IReadOnlyList<KatanaParameterDefinition>? detailParameters = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(key);
         ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
         ArgumentNullException.ThrowIfNull(switchParameter);
 
@@ -27,7 +28,7 @@ public sealed class KatanaPanelEffectDefinition
     }
 
     /// <summary>Auto-generated: string Key { get; }</summary>
-    public string Key { get; }
+    public PedalPosition Key { get; }
 
     /// <summary>Auto-generated: string DisplayName { get; }</summary>
     public string DisplayName { get; }

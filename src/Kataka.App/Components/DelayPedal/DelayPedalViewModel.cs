@@ -2,6 +2,7 @@ using Avalonia.Media;
 
 using Kataka.App.KatanaState;
 using Kataka.Domain.Midi;
+using Kataka.Domain.Models;
 
 using ReactiveUI;
 
@@ -34,13 +35,13 @@ public class DelayPedalViewModel : PedalViewModel
     private readonly AmpControlState _typeState;
     private readonly AmpControlState? _variationState; // null for delay2
 
-    public DelayPedalViewModel(string slot, IKatanaState katanaState) : base(
+    public DelayPedalViewModel(PedalPosition slot, IKatanaState katanaState) : base(
         KatanaMkIIParameterCatalog.PanelEffects.First(e => e.Key == slot))
     {
         TypeOptions = TypeTable.Values.ToList().AsReadOnly();
 
-        var isSlot1 = string.Equals(slot, "delay", StringComparison.Ordinal);
-        if (isSlot1)
+
+        if (PedalPosition.Delay == slot)
         {
             var s = katanaState.DelayPedal;
             _enabledState = s.EnabledState;
@@ -61,7 +62,8 @@ public class DelayPedalViewModel : PedalViewModel
             _modSw = s.ModSw;
             HasVariation = true;
         }
-        else
+
+        if (PedalPosition.Delay2 == slot)
         {
             var s = katanaState.Delay2Pedal;
             _enabledState = s.EnabledState;

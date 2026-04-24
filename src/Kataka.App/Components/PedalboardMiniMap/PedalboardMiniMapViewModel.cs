@@ -114,22 +114,3 @@ public class NodeTypeToImageConverter : IValueConverter
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();
 }
-
-public enum ChainNodeType
-{
-    Input,
-    Booster,
-    Amp,
-    Mod,
-    Fx,
-    Delay,
-    Delay2,
-    Reverb,
-    Speaker
-}
-
-public class ChainNode(ChainNodeType chainNodeType, string color)
-{
-    public ChainNodeType ChainNodeType { get; } = chainNodeType;
-    public string Color { get; } = color;
-}
