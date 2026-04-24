@@ -45,18 +45,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Views\PedalboardMiniMap.axml.cs">
+    <Compile Update="Components\PedalboardMiniMap\PedalboardMiniMap.axml.cs">
       <DependentUpon>PedalboardMiniMap.axaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\PanelView.axaml.cs">
+    <Compile Update="Components\Panel\PanelView.axaml.cs">
       <DependentUpon>PanelView.axaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\PedalHeaderControl.axaml.cs">
+    <Compile Update="Components\Pedalboard\PedalHeaderControl.axaml.cs">
       <DependentUpon>PedalHeaderControl.axaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\ChannelSelectionView.axaml.cs">
+    <Compile Update="Components\ChannelSelection\ChannelSelectionView.axaml.cs">
       <DependentUpon>ChannelSelectionView.axaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>

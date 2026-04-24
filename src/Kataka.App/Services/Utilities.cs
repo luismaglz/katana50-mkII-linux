@@ -14,7 +14,7 @@ public static class Utilities
         var b28 = ((baseAddr[0] & 0x7F) << 21)
                 | ((baseAddr[1] & 0x7F) << 14)
                 | ((baseAddr[2] & 0x7F) << 7)
-                |  (baseAddr[3] & 0x7F);
+                | (baseAddr[3] & 0x7F);
         b28 += offset;
         return
         [
