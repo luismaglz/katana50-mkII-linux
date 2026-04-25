@@ -11,11 +11,10 @@
              x:DataType="vm:ModFxPedalViewModel"
              x:CompileBindings="False">
     <StackPanel Spacing="8">
+        <ComboBox HorizontalAlignment="Center"
+                  ItemsSource="{Binding CompTypeOptions}"
+                  SelectedItem="{Binding CompTypeOption}" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="TYPE"
-                                 Minimum="0" Maximum="6"
-                                 Value="{Binding CompType}"
-                                 LabelFontSize="11" />
             <controls:RotaryKnob Scale="0.75" Label="SUSTAIN"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding CompSustain}"
@@ -25,8 +24,8 @@
                                  Value="{Binding CompAttack}"
                                  LabelFontSize="11" />
             <controls:RotaryKnob Scale="0.75" Label="TONE"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding CompTone}"
+                                 Minimum="-50" Maximum="50"
+                                 Value="{Binding CompToneDisplay}"
                                  LabelFontSize="11" />
             <controls:RotaryKnob Scale="0.75" Label="LEVEL"
                                  Minimum="0" Maximum="100"

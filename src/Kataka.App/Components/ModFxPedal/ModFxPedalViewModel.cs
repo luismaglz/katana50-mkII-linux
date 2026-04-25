@@ -151,6 +151,7 @@ public class ModFxPedalViewModel : PedalViewModel
         {
             var idx = _typeState.Value;
             SelectedTypeIndex = idx;
+            _selectedTypeOption = TypeTable.TryGetValue((byte)idx, out var name) ? name : null;
             this.RaisePropertyChanged(nameof(SelectedTypeOption));
             this.RaisePropertyChanged(nameof(TypeCaption));
         };
@@ -220,10 +221,18 @@ public class ModFxPedalViewModel : PedalViewModel
         _slicer.EffectLevel.ValueChanged += () => this.RaisePropertyChanged(nameof(SlicerEffectLevel));
         _slicer.DirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(SlicerDirectMix));
 
-        _comp.Type.ValueChanged += () => this.RaisePropertyChanged(nameof(CompType));
+        _comp.Type.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(CompType));
+            this.RaisePropertyChanged(nameof(CompTypeOption));
+        };
         _comp.Sustain.ValueChanged += () => this.RaisePropertyChanged(nameof(CompSustain));
         _comp.Attack.ValueChanged += () => this.RaisePropertyChanged(nameof(CompAttack));
-        _comp.Tone.ValueChanged += () => this.RaisePropertyChanged(nameof(CompTone));
+        _comp.Tone.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(CompTone));
+            this.RaisePropertyChanged(nameof(CompToneDisplay));
+        };
         _comp.Level.ValueChanged += () => this.RaisePropertyChanged(nameof(CompLevel));
 
         _limiter.Type.ValueChanged += () => this.RaisePropertyChanged(nameof(LimiterType));
@@ -419,37 +428,37 @@ public class ModFxPedalViewModel : PedalViewModel
         }
     }
 
-    public bool IsTypeChorus => SelectedTypeIndex == 0;
-    public bool IsTypeFlanger => SelectedTypeIndex == 1;
-    public bool IsTypePhaser => SelectedTypeIndex == 2;
-    public bool IsTypeUnivibe => SelectedTypeIndex == 3;
-    public bool IsTypeTremolo => SelectedTypeIndex == 4;
-    public bool IsTypeVibrato => SelectedTypeIndex == 5;
-    public bool IsTypeRotary => SelectedTypeIndex == 6;
-    public bool IsTypeRingMod => SelectedTypeIndex == 7;
-    public bool IsTypeSlowGear => SelectedTypeIndex == 8;
-    public bool IsTypeSlicer => SelectedTypeIndex == 9;
-    public bool IsTypeComp => SelectedTypeIndex == 10;
-    public bool IsTypeLimiter => SelectedTypeIndex == 11;
-    public bool IsTypeTouchWah => SelectedTypeIndex == 12;
-    public bool IsTypeAutoWah => SelectedTypeIndex == 13;
-    public bool IsTypePedalWah => SelectedTypeIndex == 14;
-    public bool IsTypeGraphicEq => SelectedTypeIndex == 15;
-    public bool IsTypeParametricEq => SelectedTypeIndex == 16;
-    public bool IsTypeGuitarSim => SelectedTypeIndex == 17;
-    public bool IsTypeAcGuitarSim => SelectedTypeIndex == 18;
-    public bool IsTypeAcProcessor => SelectedTypeIndex == 19;
-    public bool IsTypeWaveSynth => SelectedTypeIndex == 20;
-    public bool IsTypeOctave => SelectedTypeIndex == 21;
-    public bool IsTypeHeavyOctave => SelectedTypeIndex == 22;
-    public bool IsTypePitchShifter => SelectedTypeIndex == 23;
-    public bool IsTypeHarmonist => SelectedTypeIndex == 24;
-    public bool IsTypeHumanizer => SelectedTypeIndex == 25;
-    public bool IsTypePhaser90E => SelectedTypeIndex == 26;
-    public bool IsTypeFlanger117E => SelectedTypeIndex == 27;
-    public bool IsTypeWah95E => SelectedTypeIndex == 28;
-    public bool IsTypeDc30 => SelectedTypeIndex == 29;
-    public bool IsTypePedalBend => SelectedTypeIndex == 30;
+    public bool IsTypeTouchWah => SelectedTypeIndex == 0;
+    public bool IsTypeAutoWah => SelectedTypeIndex == 1;
+    public bool IsTypePedalWah => SelectedTypeIndex == 2;
+    public bool IsTypeComp => SelectedTypeIndex == 3;
+    public bool IsTypeLimiter => SelectedTypeIndex == 4;
+    public bool IsTypeGraphicEq => SelectedTypeIndex == 6;
+    public bool IsTypeParametricEq => SelectedTypeIndex == 7;
+    public bool IsTypeGuitarSim => SelectedTypeIndex == 9;
+    public bool IsTypeSlowGear => SelectedTypeIndex == 10;
+    public bool IsTypeWaveSynth => SelectedTypeIndex == 12;
+    public bool IsTypeOctave => SelectedTypeIndex == 14;
+    public bool IsTypePitchShifter => SelectedTypeIndex == 15;
+    public bool IsTypeHarmonist => SelectedTypeIndex == 16;
+    public bool IsTypeAcProcessor => SelectedTypeIndex == 18;
+    public bool IsTypePhaser => SelectedTypeIndex == 19;
+    public bool IsTypeFlanger => SelectedTypeIndex == 20;
+    public bool IsTypeTremolo => SelectedTypeIndex == 21;
+    public bool IsTypeRotary => SelectedTypeIndex == 22;
+    public bool IsTypeUnivibe => SelectedTypeIndex == 23;
+    public bool IsTypeSlicer => SelectedTypeIndex == 25;
+    public bool IsTypeVibrato => SelectedTypeIndex == 26;
+    public bool IsTypeRingMod => SelectedTypeIndex == 27;
+    public bool IsTypeHumanizer => SelectedTypeIndex == 28;
+    public bool IsTypeChorus => SelectedTypeIndex == 29;
+    public bool IsTypeAcGuitarSim => SelectedTypeIndex == 31;
+    public bool IsTypePhaser90E => SelectedTypeIndex == 35;
+    public bool IsTypeFlanger117E => SelectedTypeIndex == 36;
+    public bool IsTypeWah95E => SelectedTypeIndex == 37;
+    public bool IsTypeDc30 => SelectedTypeIndex == 38;
+    public bool IsTypeHeavyOctave => SelectedTypeIndex == 39;
+    public bool IsTypePedalBend => SelectedTypeIndex == 40;
 
     /// <summary> PedalViewModel abstract overrides ──────────────────────────────────────── </summary>
     public override bool IsEnabled
@@ -460,7 +469,7 @@ public class ModFxPedalViewModel : PedalViewModel
 
     public override string? SelectedTypeOption
     {
-        get => _selectedTypeOption;
+        get => TypeTable.TryGetValue((byte)_typeState.Value, out var name) ? name : null;
         set
         {
             if (!ChangeProperty(ref _selectedTypeOption, value)) return;
@@ -798,10 +807,25 @@ public class ModFxPedalViewModel : PedalViewModel
     }
 
     /// <summary> COMP params ─────────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] CompTypeOptionsList =
+        ["BOSS COMP", "HI-BAND", "LIGHT", "D-COMP", "ORANGE", "FAT", "MILD"];
+
+    public IReadOnlyList<string> CompTypeOptions => CompTypeOptionsList;
+
     public int CompType
     {
         get => _comp.Type.Value;
         set => _comp.Type.Value = value;
+    }
+
+    public string? CompTypeOption
+    {
+        get => _comp.Type.Value < CompTypeOptionsList.Length ? CompTypeOptionsList[_comp.Type.Value] : null;
+        set
+        {
+            var idx = value is not null ? Array.IndexOf(CompTypeOptionsList, value) : -1;
+            if (idx >= 0) _comp.Type.Value = idx;
+        }
     }
 
     public int CompSustain
@@ -820,6 +844,12 @@ public class ModFxPedalViewModel : PedalViewModel
     {
         get => _comp.Tone.Value;
         set => _comp.Tone.Value = value;
+    }
+
+    public int CompToneDisplay
+    {
+        get => _comp.Tone.Value - 50;
+        set => _comp.Tone.Value = value + 50;
     }
 
     public int CompLevel
