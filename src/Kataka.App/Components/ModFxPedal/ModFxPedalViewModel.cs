@@ -1,5 +1,6 @@
 using Avalonia.Media;
 
+using Kataka.App.Components.ModFxPedal;
 using Kataka.App.KatanaState;
 using Kataka.App.KatanaState.FxPedals;
 using Kataka.Domain.Midi;
@@ -154,6 +155,7 @@ public class ModFxPedalViewModel : PedalViewModel
             _selectedTypeOption = TypeTable.TryGetValue((byte)idx, out var name) ? name : null;
             this.RaisePropertyChanged(nameof(SelectedTypeOption));
             this.RaisePropertyChanged(nameof(TypeCaption));
+            this.RaisePropertyChanged(nameof(CardBackgroundBrush));
         };
         _variationState.ValueChanged += () =>
         {
@@ -497,6 +499,9 @@ public class ModFxPedalViewModel : PedalViewModel
     public bool IsTypePedalBend => SelectedTypeIndex == 40;
 
     /// <summary> PedalViewModel abstract overrides ──────────────────────────────────────── </summary>
+    public override IBrush CardBackgroundBrush =>
+        ModFxPedalColors.GetBackgroundBrush(SelectedTypeOption);
+
     public override bool IsEnabled
     {
         get => _enabledState.Value != 0;

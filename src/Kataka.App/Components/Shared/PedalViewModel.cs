@@ -9,7 +9,7 @@ namespace Kataka.App.ViewModels;
 
 public abstract class PedalViewModel : ViewModelBase
 {
-    protected static readonly IBrush DefaultCardBackground = new LinearGradientBrush
+    public static readonly IBrush DefaultCardBackground = new LinearGradientBrush
     {
         StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
         EndPoint   = new RelativePoint(0, 1, RelativeUnit.Relative),
