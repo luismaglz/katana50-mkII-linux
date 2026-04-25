@@ -90,6 +90,9 @@ public class DelayPedalViewModel : PedalViewModel
         {
             this.RaisePropertyChanged(nameof(SelectedTypeOption));
             this.RaisePropertyChanged(nameof(TypeCaption));
+            this.RaisePropertyChanged(nameof(IsTypePan));
+            this.RaisePropertyChanged(nameof(IsTypeModulateOrSde));
+            this.RaisePropertyChanged(nameof(IsTypeSde3000));
         };
         _variationState?.ValueChanged += () =>
         {
@@ -112,6 +115,10 @@ public class DelayPedalViewModel : PedalViewModel
 
     /// <summary> View-only properties ────────────────────────────────────────────────────── </summary>
     public IReadOnlyList<string> TypeOptions { get; }
+
+    public bool IsTypePan => _typeState.Value == 1;
+    public bool IsTypeModulateOrSde => _typeState.Value == 9 || _typeState.Value == 10;
+    public bool IsTypeSde3000 => _typeState.Value == 10;
 
     public bool HasTypeOptions => TypeOptions.Count > 0;
     public bool HasVariation { get; }
