@@ -1,5 +1,6 @@
 using Avalonia.Media;
 
+using Kataka.App.Components.ReverbPedal;
 using Kataka.App.KatanaState;
 using Kataka.Domain.Midi;
 using Kataka.Domain.Models;
@@ -30,6 +31,8 @@ public class ReverbPedalViewModel : PedalViewModel
         {
             this.RaisePropertyChanged(nameof(SelectedTypeOption));
             this.RaisePropertyChanged(nameof(TypeCaption));
+            this.RaisePropertyChanged(nameof(CardBackgroundBrush));
+            this.RaisePropertyChanged(nameof(TypeLabelBrush));
         };
         _state.Variation.ValueChanged += () =>
         {
@@ -50,6 +53,9 @@ public class ReverbPedalViewModel : PedalViewModel
     public IReadOnlyList<string> TypeOptions { get; }
 
     public bool HasTypeOptions => TypeOptions.Count > 0;
+
+    public override IBrush CardBackgroundBrush => ReverbPedalColors.GetBackgroundBrush(SelectedTypeOption);
+    public IBrush TypeLabelBrush => ReverbPedalColors.GetLabelBrush(SelectedTypeOption);
     public IBrush VariationBrush => GetVariationBrush(Variation);
 
 

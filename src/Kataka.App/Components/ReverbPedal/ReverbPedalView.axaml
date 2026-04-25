@@ -13,9 +13,8 @@
              x:DataType="vm:ReverbPedalViewModel"
              x:CompileBindings="False">
 
-    <Border MinWidth="160" CornerRadius="8" VerticalAlignment="Top"
-            Classes="pedal-card"
-            Background="{Binding CardBackgroundBrush}">
+    <controls:PedalCardBorder MinWidth="160" CornerRadius="8" VerticalAlignment="Top"
+                              Background="{Binding CardBackgroundBrush}">
         <Grid>
             <StackPanel Spacing="0">
                 <!-- Reverb accent bar: purple -->
@@ -27,7 +26,7 @@
                     <!-- Type selector -->
                     <StackPanel Spacing="4">
                         <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
-                                   Foreground="#5a2088" />
+                                   Foreground="{Binding TypeLabelBrush}" />
                         <ComboBox Classes="midi-port-picker"
                                   HorizontalAlignment="Stretch"
                                   ItemsSource="{Binding TypeOptions}"
@@ -94,5 +93,5 @@
                 </Border.Background>
             </Border>
         </Grid>
-    </Border>
+    </controls:PedalCardBorder>
 </UserControl>
