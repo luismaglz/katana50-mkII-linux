@@ -8,75 +8,89 @@ namespace Kataka.Domain.Midi;
 /// </summary>
 public static class KatanaTypeNameTables
 {
-    // Source: BTS booster-type-select-box. Sequential, no skips. Max 22.
+    // Source: BTS booster-type-select-box (item.json list_order + layout.div option labels).
+    // Wire values are NOT sequential; BTS reorders display items independently of wire encoding.
+    // Wire 7 is skipped (not present in BTS list_order). Max wire value from address_map.js: 25.
     /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> BoosterTypes { get; } =</summary>
     public static IReadOnlyDictionary<byte, string> BoosterTypes { get; } =
         new Dictionary<byte, string>
         {
-            [0] = "CLEAN BOOST",
-            [1] = "TREBLE BOOST",
-            [2] = "MID BOOST",
+            [0] = "MID BOOST",
+            [1] = "CLEAN BOOST",
+            [2] = "TREBLE BOOST",
             [3] = "CRUNCH OD",
-            [4] = "BLUES DRIVE",
-            [5] = "OVERDRIVE",
-            [6] = "NATURAL OD",
-            [7] = "WARM OD",
-            [8] = "TURBO OD",
-            [9] = "T-SCREAM",
-            [10] = "DISTORTION",
-            [11] = "FAT DS",
-            [12] = "DST+",
-            [13] = "GUV DS",
-            [14] = "RAT",
-            [15] = "METAL ZONE",
-            [16] = "METAL DS",
-            [17] = "'60S FUZZ",
-            [18] = "MUFF FUZZ",
-            [19] = "OCT FUZZ",
-            [20] = "HM-2",
-            [21] = "METAL CORE",
-            [22] = "CENTA OD"
+            [4] = "NATURAL OD",
+            [5] = "WARM OD",
+            [6] = "FAT DS",
+            // [7] skipped — not a valid wire value
+            [8] = "METAL DS",
+            [9] = "OCT FUZZ",
+            [10] = "BLUES DRIVE",
+            [11] = "OVERDRIVE",
+            [12] = "T-SCREAM",
+            [13] = "TURBO OD",
+            [14] = "DISTORTION",
+            [15] = "RAT",
+            [16] = "GUV DS",
+            [17] = "DST+",
+            [18] = "METAL ZONE",
+            [19] = "'60S FUZZ",
+            [20] = "MUFF FUZZ",
+            [21] = "HM-2",
+            [22] = "METAL CORE",
+            [23] = "CENTA OD"
         };
 
-    // Source: BTS modfx-fx-type-select-box (shared for Mod and FX). Sequential, no skips. Max 30.
+    // Source: BTS modfx-mod-type-select-box / modfx-fx-type-select-box (item.json list_order + layout.div labels).
+    // Wire values are NOT sequential; BTS reorders display items independently of wire encoding.
+    // Skipped wires: 5, 8, 11, 13, 17, 24, 30, 32, 33, 34. Max wire value: 40 (from address_map.js).
     /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> ModFxTypes { get; } =</summary>
     public static IReadOnlyDictionary<byte, string> ModFxTypes { get; } =
         new Dictionary<byte, string>
         {
-            [0] = "CHORUS",
-            [1] = "FLANGER",
-            [2] = "PHASER",
-            [3] = "UNI-V",
-            [4] = "TREMOLO",
-            [5] = "VIBRATO",
-            [6] = "ROTARY",
-            [7] = "RING MOD",
-            [8] = "SLOW GEAR",
-            [9] = "SLICER",
-            [10] = "COMP",
-            [11] = "LIMITER",
-            [12] = "T.WAH",
-            [13] = "AUTO WAH",
-            [14] = "PEDAL WAH",
-            [15] = "GRAPHIC EQ",
-            [16] = "PARAMETRIC EQ",
-            [17] = "GUITAR SIM",
-            [18] = "AC.GUITAR SIM",
-            [19] = "AC.PROCESSOR",
-            [20] = "WAVE SYNTH",
-            [21] = "OCTAVE",
-            [22] = "HEAVY OCTAVE",
-            [23] = "PITCH SHIFTER",
-            [24] = "HARMONIST",
-            [25] = "HUMANIZER",
-            [26] = "PHASER 90E",
-            [27] = "FLANGER 117E",
-            [28] = "WAH 95E",
-            [29] = "DC-30",
-            [30] = "PEDAL BEND"
+            [0] = "T.WAH",
+            [1] = "AUTO WAH",
+            [2] = "PEDAL WAH",
+            [3] = "COMP",
+            [4] = "LIMITER",
+            // [5] skipped
+            [6] = "GRAPHIC EQ",
+            [7] = "PARAMETRIC EQ",
+            // [8] skipped
+            [9] = "GUITAR SIM",
+            [10] = "SLOW GEAR",
+            // [11] skipped
+            [12] = "WAVE SYNTH",
+            // [13] skipped
+            [14] = "OCTAVE",
+            [15] = "PITCH SHIFTER",
+            [16] = "HARMONIST",
+            // [17] skipped
+            [18] = "AC.PROCESSOR",
+            [19] = "PHASER",
+            [20] = "FLANGER",
+            [21] = "TREMOLO",
+            [22] = "ROTARY",
+            [23] = "UNI-V",
+            // [24] skipped
+            [25] = "SLICER",
+            [26] = "VIBRATO",
+            [27] = "RING MOD",
+            [28] = "HUMANIZER",
+            [29] = "CHORUS",
+            // [30] skipped
+            [31] = "AC.GUITAR SIM",
+            // [32], [33], [34] skipped
+            [35] = "PHASER 90E",
+            [36] = "FLANGER 117E",
+            [37] = "WAH 95E",
+            [38] = "DC-30",
+            [39] = "HEAVY OCTAVE",
+            [40] = "PEDAL BEND"
         };
 
-    // Source: BTS delay-delay1-type-select-box. Sequential, no skips. Max 7.
+    // Source: BTS delay-delay1-type-select-box (item.json list_order + layout.div labels).
+    // Wire values 3, 4, 5 are skipped. Max wire value: 10 (from address_map.js).
     /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> DelayTypes { get; } =</summary>
     public static IReadOnlyDictionary<byte, string> DelayTypes { get; } =
         new Dictionary<byte, string>
@@ -84,25 +98,27 @@ public static class KatanaTypeNameTables
             [0] = "DIGITAL",
             [1] = "PAN",
             [2] = "STEREO",
-            [3] = "ANALOG",
-            [4] = "TAPE ECHO",
-            [5] = "REVERSE",
-            [6] = "MODULATE",
-            [7] = "SDE-3000"
+            // [3], [4], [5] skipped
+            [6] = "REVERSE",
+            [7] = "ANALOG",
+            [8] = "TAPE ECHO",
+            [9] = "MODULATE",
+            [10] = "SDE-3000"
         };
 
-    // Source: BTS reverb-type-select-box. Sequential, no skips. Max 6.
+    // Source: BTS reverb-type-select-box (item.json list_order + layout.div labels).
+    // Wire values 0 and 2 are skipped. Only 5 valid types. Max wire value: 6 (from address_map.js).
     /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> ReverbTypes { get; } =</summary>
     public static IReadOnlyDictionary<byte, string> ReverbTypes { get; } =
         new Dictionary<byte, string>
         {
-            [0] = "PLATE",
+            // [0] skipped
             [1] = "ROOM",
-            [2] = "HALL 1",
-            [3] = "SPRING",
-            [4] = "MODULATE",
-            [5] = "SFX",
-            [6] = "GATE"
+            // [2] skipped
+            [3] = "HALL",
+            [4] = "PLATE",
+            [5] = "SPRING",
+            [6] = "MODULATE"
         };
 
     // Source: BTS pedalwah-type-select-box. Sequential, no skips. Max 5.

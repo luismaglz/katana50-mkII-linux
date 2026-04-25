@@ -1,4 +1,5 @@
 using Kataka.Domain.Midi;
+using Kataka.Domain.Models;
 
 namespace Kataka.Tests;
 
@@ -135,17 +136,17 @@ public sealed class RolandSysExBuilderTests
         Assert.Equal([0x60, 0x00, 0x06, 0x3B], KatanaMkIIParameterCatalog.FxVariation.Address);
         Assert.Equal([0x60, 0x00, 0x06, 0x3C], KatanaMkIIParameterCatalog.DelayVariation.Address);
         Assert.Equal([0x60, 0x00, 0x06, 0x3D], KatanaMkIIParameterCatalog.ReverbVariation.Address);
-        Assert.Null(KatanaMkIIParameterCatalog.PanelEffects.Single(effect => effect.Key == "delay2")
+        Assert.Null(KatanaMkIIParameterCatalog.PanelEffects.Single(effect => effect.Key == PedalPosition.Delay2)
             .VariationParameter);
     }
 
     [Fact]
     public void KatanaMkIIParameterCatalog_ExposesConfirmedTypeRangesAndSkippedValues()
     {
-        Assert.Equal((byte)22, KatanaMkIIParameterCatalog.BoosterType.Maximum);
+        Assert.Equal(25, KatanaMkIIParameterCatalog.BoosterType.Maximum);
         Assert.Equal<byte>([0x07], KatanaMkIIParameterCatalog.BoosterType.SkippedValues);
 
-        Assert.Equal((byte)39, KatanaMkIIParameterCatalog.ModType.Maximum);
+        Assert.Equal(40, KatanaMkIIParameterCatalog.ModType.Maximum);
         Assert.Equal<byte>([0x05, 0x08, 0x0B, 0x0D, 0x11, 0x18, 0x1E, 0x20, 0x21, 0x22],
             KatanaMkIIParameterCatalog.ModType.SkippedValues);
         Assert.Equal(KatanaMkIIParameterCatalog.ModType.SkippedValues, KatanaMkIIParameterCatalog.FxType.SkippedValues);
