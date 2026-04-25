@@ -14,9 +14,8 @@
              x:DataType="vm:ModFxPedalViewModel"
              x:CompileBindings="False">
 
-    <Border MinWidth="200" CornerRadius="8" VerticalAlignment="Top"
-            Classes="pedal-card"
-            Background="{Binding CardBackgroundBrush}">
+    <controls:PedalCardBorder MinWidth="200" CornerRadius="8" VerticalAlignment="Top"
+                              Background="{Binding CardBackgroundBrush}">
         <Grid>
             <StackPanel Spacing="0">
                 <!-- Accent bar: green for mod, blue for fx — driven by FamilyAccentColor in parent but we use green default -->
@@ -29,7 +28,7 @@
                     <!-- Type selector -->
                     <StackPanel Spacing="4" IsVisible="{Binding HasTypeOptions}">
                         <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
-                                   Foreground="#267a44" />
+                                   Foreground="{Binding TypeLabelBrush}" />
                         <ComboBox Classes="midi-port-picker"
                                   HorizontalAlignment="Stretch"
                                   ItemsSource="{Binding TypeOptions}"
@@ -82,6 +81,6 @@
                 </Border.Background>
             </Border>
         </Grid>
-    </Border>
+    </controls:PedalCardBorder>
 
 </UserControl>
