@@ -61,50 +61,58 @@
                                            LabelFontSize="12" />
                 </StackPanel>
 
-                <!-- Row 2: TapTime, ModRate, ModDepth -->
+                <!-- Row 2: TapTime (PAN only), ModRate/ModDepth (MODULATE/SDE-3000 only) -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <controls:RotaryKnobV2 Label="TAP TIME" Scale="0.75"
+                                           IsVisible="{Binding IsTypePan}"
                                            Description="Adjusts the delay time of the right channel relative to the left channel (100%). Only active when TYPE is PAN."
                                            Minimum="0" Maximum="100"
                                            Value="{Binding TapTime}"
                                            LabelFontSize="12" />
                     <controls:RotaryKnobV2 Label="MOD RATE" Scale="0.75"
+                                           IsVisible="{Binding IsTypeModulateOrSde}"
                                            Description="Adjusts the modulation rate of the delay sound. Only active when TYPE is MODULATE or SDE-3000."
                                            Minimum="0" Maximum="100"
                                            Value="{Binding ModRate}"
                                            LabelFontSize="12" />
                     <controls:RotaryKnobV2 Label="MOD DEPTH" Scale="0.75"
+                                           IsVisible="{Binding IsTypeModulateOrSde}"
                                            Description="Adjusts the modulation depth of the delay sound. Only active when TYPE is MODULATE or SDE-3000."
                                            Minimum="0" Maximum="100"
                                            Value="{Binding ModDepth}"
                                            LabelFontSize="12" />
                 </StackPanel>
 
-                <!-- Toggles row 1: Range, Filter, ModSw -->
+                <!-- Toggles row 1: Range, Filter, ModSw (SDE-3000 only) -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="8">
                     <ToggleButton Classes="effect-button"
                                   Content="17kHz"
                                   Width="72"
+                                  IsVisible="{Binding IsTypeSde3000}"
                                   IsChecked="{Binding RangeHigh}" />
                     <ToggleButton Classes="effect-button"
                                   Content="FILTER"
                                   Width="72"
+                                  IsVisible="{Binding IsTypeSde3000}"
                                   IsChecked="{Binding FilterOn}" />
                     <ToggleButton Classes="effect-button"
                                   Content="MOD SW"
                                   Width="72"
+                                  IsVisible="{Binding IsTypeSde3000}"
                                   IsChecked="{Binding ModSwOn}" />
                 </StackPanel>
 
-                <!-- Toggles row 2: FeedbackPhase (INV), DelayPhase (INV) -->
+                <!-- Toggles row 2: FeedbackPhase, DelayPhase (SDE-3000 only) -->
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="8">
                     <ToggleButton Classes="effect-button"
                                   Content="FB INV"
                                   Width="110"
+                                  IsVisible="{Binding IsTypeSde3000}"
                                   IsChecked="{Binding FeedbackPhaseInverse}" />
                     <ToggleButton Classes="effect-button"
                                   Content="DLY INV"
                                   Width="110"
+                                  IsVisible="{Binding IsTypeSde3000}"
                                   IsChecked="{Binding DelayPhaseInverse}" />
                 </StackPanel>
             </StackPanel>
