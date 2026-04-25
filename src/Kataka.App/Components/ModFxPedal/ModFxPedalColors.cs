@@ -67,5 +67,33 @@ public static class ModFxPedalColors
         _                               => PedalViewModel.DefaultCardBackground,
     };
 
+    public static IBrush GetLabelBrush(string? typeName) => typeName switch
+    {
+        "CHORUS" or "DC-30"             => Solid("#80FFFF"),
+        "FLANGER" or "FLANGER 117E"     => Solid("#E0E0E0"),
+        "PHASER" or "PHASER 90E"        => Solid("#FFB84D"),
+        "UNI-V"                         => Solid("#7FAAAA"),
+        "TREMOLO"                       => Solid("#66CC66"),
+        "VIBRATO"                       => Solid("#C088FF"),
+        "ROTARY"                        => Solid("#CC8855"),
+        "SLICER"                        => Solid("#FF6666"),
+        "COMP"                          => Solid("#D0E8FF"),
+        "LIMITER"                       => Solid("#FF8855"),
+        "GRAPHIC EQ" or "PARAMETRIC EQ" => Solid("#66BB66"),
+        "SLOW GEAR"                     => Solid("#888888"),
+        "T.WAH" or "AUTO WAH"           => Solid("#FFE566"),
+        "PEDAL WAH" or "WAH 95E"        => Solid("#DDBB44"),
+        "HUMANIZER"                     => Solid("#FFB8C8"),
+        "PITCH SHIFTER" or "PEDAL BEND" => Solid("#AA88FF"),
+        "HARMONIST"                     => Solid("#BB88FF"),
+        "OCTAVE" or "HEAVY OCTAVE"      => Solid("#AA8866"),
+        "WAVE SYNTH"                    => Solid("#FF88FF"),
+        "RING MOD"                      => Solid("#CC6666"),
+        "GUITAR SIM"                    => Solid("#AABBCC"),
+        "AC.GUITAR SIM"                 => Solid("#DDCCBB"),
+        "AC.PROCESSOR"                  => Solid("#CCBBBB"),
+        _                               => Solid("#AAAAAA"),
+    };
+
     private static IBrush Solid(string hex) => new SolidColorBrush(Color.Parse(hex));
 }

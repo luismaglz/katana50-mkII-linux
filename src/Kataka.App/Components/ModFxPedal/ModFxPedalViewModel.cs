@@ -156,6 +156,7 @@ public class ModFxPedalViewModel : PedalViewModel
             this.RaisePropertyChanged(nameof(SelectedTypeOption));
             this.RaisePropertyChanged(nameof(TypeCaption));
             this.RaisePropertyChanged(nameof(CardBackgroundBrush));
+            this.RaisePropertyChanged(nameof(TypeLabelBrush));
         };
         _variationState.ValueChanged += () =>
         {
@@ -501,6 +502,8 @@ public class ModFxPedalViewModel : PedalViewModel
     /// <summary> PedalViewModel abstract overrides ──────────────────────────────────────── </summary>
     public override IBrush CardBackgroundBrush =>
         ModFxPedalColors.GetBackgroundBrush(SelectedTypeOption);
+
+    public IBrush TypeLabelBrush => ModFxPedalColors.GetLabelBrush(SelectedTypeOption);
 
     public override bool IsEnabled
     {
