@@ -150,5 +150,6 @@
         <Style Selector="Border.stompbox-card.selected">
             <Setter Property="BorderBrush" Value="{StaticResource PrimaryLitBrush}" />
         </Style>
+
     </Application.Styles>
 </Application>
