@@ -15,61 +15,73 @@
              x:CompileBindings="False">
 
     <Border MinWidth="200" CornerRadius="8" VerticalAlignment="Top"
+            Classes="pedal-card"
             Background="{Binding CardBackgroundBrush}">
-        <StackPanel Spacing="0">
-            <!-- Accent bar: green for mod, blue for fx — driven by FamilyAccentColor in parent but we use green default -->
-            <Border Height="6" CornerRadius="8,8,0,0" Background="#3dbf6c" />
-            <StackPanel Spacing="10" Margin="12,10,12,14">
+        <Grid>
+            <StackPanel Spacing="0">
+                <!-- Accent bar: green for mod, blue for fx — driven by FamilyAccentColor in parent but we use green default -->
+                <Border Height="6" CornerRadius="8,8,0,0" Background="#3dbf6c" />
+                <StackPanel Spacing="10" Margin="12,10,12,14">
 
-                <!-- On/Off toggle + LED -->
-                <controls:PedalHeaderControl />
+                    <!-- On/Off toggle + LED -->
+                    <controls:PedalHeaderControl />
 
-                <!-- Type selector -->
-                <StackPanel Spacing="4" IsVisible="{Binding HasTypeOptions}">
-                    <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
-                               Foreground="#267a44" />
-                    <ComboBox Classes="midi-port-picker"
-                              HorizontalAlignment="Stretch"
-                              ItemsSource="{Binding TypeOptions}"
-                              SelectedItem="{Binding SelectedTypeOption}" />
+                    <!-- Type selector -->
+                    <StackPanel Spacing="4" IsVisible="{Binding HasTypeOptions}">
+                        <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="#267a44" />
+                        <ComboBox Classes="midi-port-picker"
+                                  HorizontalAlignment="Stretch"
+                                  ItemsSource="{Binding TypeOptions}"
+                                  SelectedItem="{Binding SelectedTypeOption}" />
+                    </StackPanel>
+
+
+                    <!-- Type-specific body — one panel visible at a time -->
+                    <modsfx:ChorusView IsVisible="{Binding IsTypeChorus}" />
+                    <modsfx:FlangerView IsVisible="{Binding IsTypeFlanger}" />
+                    <modsfx:PhaserView IsVisible="{Binding IsTypePhaser}" />
+                    <modsfx:UniVView IsVisible="{Binding IsTypeUnivibe}" />
+                    <modsfx:TremoloView IsVisible="{Binding IsTypeTremolo}" />
+                    <modsfx:VibratoView IsVisible="{Binding IsTypeVibrato}" />
+                    <modsfx:RotaryView IsVisible="{Binding IsTypeRotary}" />
+                    <modsfx:RingModView IsVisible="{Binding IsTypeRingMod}" />
+                    <modsfx:SlowGearView IsVisible="{Binding IsTypeSlowGear}" />
+                    <modsfx:SlicerView IsVisible="{Binding IsTypeSlicer}" />
+                    <modsfx:CompView IsVisible="{Binding IsTypeComp}" />
+                    <modsfx:LimiterView IsVisible="{Binding IsTypeLimiter}" />
+                    <modsfx:TWahView IsVisible="{Binding IsTypeTouchWah}" />
+                    <modsfx:AutoWahView IsVisible="{Binding IsTypeAutoWah}" />
+                    <modsfx:PedalWahView IsVisible="{Binding IsTypePedalWah}" />
+                    <modsfx:GraphicEqView IsVisible="{Binding IsTypeGraphicEq}" />
+                    <modsfx:ParametricEqView IsVisible="{Binding IsTypeParametricEq}" />
+                    <modsfx:GuitarSimView IsVisible="{Binding IsTypeGuitarSim}" />
+                    <modsfx:AcGuitarSimView IsVisible="{Binding IsTypeAcGuitarSim}" />
+                    <modsfx:AcProcessorView IsVisible="{Binding IsTypeAcProcessor}" />
+                    <modsfx:WaveSynthView IsVisible="{Binding IsTypeWaveSynth}" />
+                    <modsfx:OctaveView IsVisible="{Binding IsTypeOctave}" />
+                    <modsfx:HeavyOctaveView IsVisible="{Binding IsTypeHeavyOctave}" />
+                    <modsfx:PitchShifterView IsVisible="{Binding IsTypePitchShifter}" />
+                    <modsfx:HarmonistView IsVisible="{Binding IsTypeHarmonist}" />
+                    <modsfx:HumanizerView IsVisible="{Binding IsTypeHumanizer}" />
+                    <modsfx:Phaser90EView IsVisible="{Binding IsTypePhaser90E}" />
+                    <modsfx:Flanger117EView IsVisible="{Binding IsTypeFlanger117E}" />
+                    <modsfx:Wah95EView IsVisible="{Binding IsTypeWah95E}" />
+                    <modsfx:DC30View IsVisible="{Binding IsTypeDc30}" />
+                    <modsfx:PedalBendView IsVisible="{Binding IsTypePedalBend}" />
+
                 </StackPanel>
-
-
-                <!-- Type-specific body — one panel visible at a time -->
-                <modsfx:ChorusView IsVisible="{Binding IsTypeChorus}" />
-                <modsfx:FlangerView IsVisible="{Binding IsTypeFlanger}" />
-                <modsfx:PhaserView IsVisible="{Binding IsTypePhaser}" />
-                <modsfx:UniVView IsVisible="{Binding IsTypeUnivibe}" />
-                <modsfx:TremoloView IsVisible="{Binding IsTypeTremolo}" />
-                <modsfx:VibratoView IsVisible="{Binding IsTypeVibrato}" />
-                <modsfx:RotaryView IsVisible="{Binding IsTypeRotary}" />
-                <modsfx:RingModView IsVisible="{Binding IsTypeRingMod}" />
-                <modsfx:SlowGearView IsVisible="{Binding IsTypeSlowGear}" />
-                <modsfx:SlicerView IsVisible="{Binding IsTypeSlicer}" />
-                <modsfx:CompView IsVisible="{Binding IsTypeComp}" />
-                <modsfx:LimiterView IsVisible="{Binding IsTypeLimiter}" />
-                <modsfx:TWahView IsVisible="{Binding IsTypeTouchWah}" />
-                <modsfx:AutoWahView IsVisible="{Binding IsTypeAutoWah}" />
-                <modsfx:PedalWahView IsVisible="{Binding IsTypePedalWah}" />
-                <modsfx:GraphicEqView IsVisible="{Binding IsTypeGraphicEq}" />
-                <modsfx:ParametricEqView IsVisible="{Binding IsTypeParametricEq}" />
-                <modsfx:GuitarSimView IsVisible="{Binding IsTypeGuitarSim}" />
-                <modsfx:AcGuitarSimView IsVisible="{Binding IsTypeAcGuitarSim}" />
-                <modsfx:AcProcessorView IsVisible="{Binding IsTypeAcProcessor}" />
-                <modsfx:WaveSynthView IsVisible="{Binding IsTypeWaveSynth}" />
-                <modsfx:OctaveView IsVisible="{Binding IsTypeOctave}" />
-                <modsfx:HeavyOctaveView IsVisible="{Binding IsTypeHeavyOctave}" />
-                <modsfx:PitchShifterView IsVisible="{Binding IsTypePitchShifter}" />
-                <modsfx:HarmonistView IsVisible="{Binding IsTypeHarmonist}" />
-                <modsfx:HumanizerView IsVisible="{Binding IsTypeHumanizer}" />
-                <modsfx:Phaser90EView IsVisible="{Binding IsTypePhaser90E}" />
-                <modsfx:Flanger117EView IsVisible="{Binding IsTypeFlanger117E}" />
-                <modsfx:Wah95EView IsVisible="{Binding IsTypeWah95E}" />
-                <modsfx:DC30View IsVisible="{Binding IsTypeDc30}" />
-                <modsfx:PedalBendView IsVisible="{Binding IsTypePedalBend}" />
-
             </StackPanel>
-        </StackPanel>
+            <Border IsHitTestVisible="False" CornerRadius="8">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Color="#33FFFFFF" Offset="0" />
+                        <GradientStop Color="#00000000" Offset="0.5" />
+                        <GradientStop Color="#40000000" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+        </Grid>
     </Border>
 
 </UserControl>
