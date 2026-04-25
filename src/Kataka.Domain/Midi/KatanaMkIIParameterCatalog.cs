@@ -58,7 +58,7 @@ public static partial class KatanaMkIIParameterCatalog
 
     /// <summary>Parameter definition for Booster Type.</summary>
     public static KatanaParameterDefinition BoosterType { get; } =
-        new("panel-booster-type", "Booster Type", [0x60, 0x00, 0x00, 0x11], maximum: 22,
+        new("panel-booster-type", "Booster Type", [0x60, 0x00, 0x00, 0x11], maximum: 25,
             skippedValues: [0x07],
             description: "Selects the booster/distortion type (Clean Boost, Blues Drive, Metal Zone, etc.).");
 
@@ -69,7 +69,7 @@ public static partial class KatanaMkIIParameterCatalog
 
     /// <summary>Parameter definition for Mod Type.</summary>
     public static KatanaParameterDefinition ModType { get; } =
-        new("panel-mod-type", "Mod Type", [0x60, 0x00, 0x01, 0x01], maximum: 39,
+        new("panel-mod-type", "Mod Type", [0x60, 0x00, 0x01, 0x01], maximum: 40,
             skippedValues: [0x05, 0x08, 0x0B, 0x0D, 0x11, 0x18, 0x1E, 0x20, 0x21, 0x22],
             description: "Selects the modulation effect type (Chorus, Flanger, Phaser, Tremolo, etc.).");
 
@@ -80,7 +80,7 @@ public static partial class KatanaMkIIParameterCatalog
 
     /// <summary>Parameter definition for Fx Type.</summary>
     public static KatanaParameterDefinition FxType { get; } =
-        new("panel-fx-type", "FX Type", [0x60, 0x00, 0x03, 0x01], maximum: 39,
+        new("panel-fx-type", "FX Type", [0x60, 0x00, 0x03, 0x01], maximum: 40,
             skippedValues: [0x05, 0x08, 0x0B, 0x0D, 0x11, 0x18, 0x1E, 0x20, 0x21, 0x22],
             description: "Selects the FX effect type (same options as Mod).");
 
@@ -92,8 +92,9 @@ public static partial class KatanaMkIIParameterCatalog
     /// <summary>Parameter definition for Delay Type.</summary>
     public static KatanaParameterDefinition DelayType { get; } =
         new("panel-delay-type", "Delay Type", [0x60, 0x00, 0x05, 0x01], maximum: 10,
+            skippedValues: [0x03, 0x04, 0x05],
             description:
-            "Selects the delay type (Digital, Pan, Stereo, Analog, Tape Echo, Reverse, Modulate, SDE-3000).");
+            "Selects the delay type (Digital, Pan, Stereo, Reverse, Analog, Tape Echo, Modulate, SDE-3000).");
 
     /// <summary>Parameter definition for Delay 2 Switch.</summary>
     public static KatanaParameterDefinition Delay2Switch { get; } =
@@ -103,6 +104,7 @@ public static partial class KatanaMkIIParameterCatalog
     /// <summary>Parameter definition for Delay 2 Type.</summary>
     public static KatanaParameterDefinition Delay2Type { get; } =
         new("panel-delay2-type", "Delay 2 Type", [0x60, 0x00, 0x05, 0x21], maximum: 10,
+            skippedValues: [0x03, 0x04, 0x05],
             description: "Selects the type for the second delay (same options as Delay).");
 
     /// <summary>Parameter definition for Reverb Switch.</summary>
@@ -113,7 +115,8 @@ public static partial class KatanaMkIIParameterCatalog
     /// <summary>Parameter definition for Reverb Type.</summary>
     public static KatanaParameterDefinition ReverbType { get; } =
         new("panel-reverb-type", "Reverb Type", [0x60, 0x00, 0x05, 0x41], maximum: 6,
-            description: "Selects the reverb type (Plate, Room, Hall 1, Spring, Modulate).");
+            skippedValues: [0x00, 0x02],
+            description: "Selects the reverb type (Room, Hall, Plate, Spring, Modulate).");
 
     /// <summary>Parameter definition for Booster Variation.</summary>
     public static KatanaParameterDefinition BoosterVariation { get; } =
@@ -775,12 +778,12 @@ public static partial class KatanaMkIIParameterCatalog
 
     /// <summary>Parameter definition for Booster Tone.</summary>
     public static KatanaParameterDefinition BoosterTone { get; } =
-        new("booster-tone", "Tone", [0x60, 0x00, 0x00, 0x13],
+        new("booster-tone", "Tone", [0x60, 0x00, 0x00, 0x14],
             description: "Adjusts the tone.");
 
     /// <summary>Parameter definition for Booster Bottom.</summary>
     public static KatanaParameterDefinition BoosterBottom { get; } =
-        new("booster-bottom", "Bottom", [0x60, 0x00, 0x00, 0x14],
+        new("booster-bottom", "Bottom", [0x60, 0x00, 0x00, 0x13],
             description:
             "Adjusts the tone for the low frequency range. Turning left reduces the low end; turning right boosts it.");
 
