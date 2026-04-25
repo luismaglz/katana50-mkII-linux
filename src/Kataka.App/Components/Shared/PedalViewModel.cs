@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Media;
 
 using Kataka.Domain.Midi;
@@ -8,6 +9,19 @@ namespace Kataka.App.ViewModels;
 
 public abstract class PedalViewModel : ViewModelBase
 {
+    protected static readonly IBrush DefaultCardBackground = new LinearGradientBrush
+    {
+        StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+        EndPoint   = new RelativePoint(0, 1, RelativeUnit.Relative),
+        GradientStops =
+        {
+            new GradientStop(Color.Parse("#2E3138"), 0),
+            new GradientStop(Color.Parse("#1C1F24"), 1),
+        }
+    };
+
+    public virtual IBrush CardBackgroundBrush => DefaultCardBackground;
+
     protected static readonly IBrush OffVariationBrush = new SolidColorBrush(Color.Parse("#35383f"));
     protected static readonly IBrush GreenVariationBrush = new SolidColorBrush(Color.Parse("#91ff92"));
     protected static readonly IBrush RedVariationBrush = new SolidColorBrush(Color.Parse("#ff6f61"));

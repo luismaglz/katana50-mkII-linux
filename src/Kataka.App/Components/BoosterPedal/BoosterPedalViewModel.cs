@@ -1,6 +1,8 @@
 using Avalonia.Media;
 
+using Kataka.App.Components.BoosterPedal;
 using Kataka.App.KatanaState;
+
 using Kataka.Domain.Midi;
 using Kataka.Domain.Models;
 
@@ -30,6 +32,7 @@ public class BoosterPedalViewModel : PedalViewModel
         {
             this.RaisePropertyChanged(nameof(SelectedTypeOption));
             this.RaisePropertyChanged(nameof(TypeCaption));
+            this.RaisePropertyChanged(nameof(CardBackgroundBrush));
         };
         _state.Variation.ValueChanged += () =>
         {
@@ -50,6 +53,8 @@ public class BoosterPedalViewModel : PedalViewModel
 
     public bool HasTypeOptions => TypeOptions.Count > 0;
     public IBrush VariationBrush => GetVariationBrush(Variation);
+
+    public override IBrush CardBackgroundBrush => BoosterPedalColors.GetBackgroundBrush(SelectedTypeOption);
 
 
     public override bool IsEnabled

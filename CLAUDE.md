@@ -258,6 +258,59 @@ Set the selector **directly** as `ItemsControl.ItemTemplate` — do not wrap it 
 </ItemsControl.ItemTemplate>
 ```
 
+### Pedal card background color by type
+
+Each pedal view binds its card background to `CardBackgroundBrush` on `PedalViewModel`. The base class returns a neutral dark gradient (`#2E3138`→`#1C1F24`). To map colors to a specific pedal's types:
+
+**1. Create a `<Pedal>Colors.cs` in the pedal's component folder** — define one `static readonly IBrush` per color category and a `GetBackgroundBrush(string? typeName)` switch. Use the `Gradient(top, bottom)` helper pattern:
+
+```csharp
+// src/Kataka.App/Components/BoosterPedal/BoosterPedalColors.cs
+public static class BoosterPedalColors
+{
+    public static readonly IBrush Overdrive = Gradient("#1e3222", "#111e14");
+    // ...
+
+    public static IBrush GetBackgroundBrush(string? typeName) => typeName switch
+    {
+        "T-SCREAM" or "OVERDRIVE" => Overdrive,
+        // ...
+        _ => PedalViewModel.DefaultCardBackground,
+    };
+
+    private static IBrush Gradient(string top, string bottom) =>
+        new LinearGradientBrush { ... };
+}
+```
+
+**2. Override `CardBackgroundBrush` in the pedal ViewModel:**
+
+```csharp
+public override IBrush CardBackgroundBrush =>
+    BoosterPedalColors.GetBackgroundBrush(SelectedTypeOption);
+```
+
+**3. Raise `CardBackgroundBrush` when type changes** (in the `_typeState.ValueChanged` handler):
+
+```csharp
+this.RaisePropertyChanged(nameof(CardBackgroundBrush));
+```
+
+**4. All pedal views already bind** `Background="{Binding CardBackgroundBrush}"` — no view changes needed.
+
+**Color guide** (pedalboard convention):
+| Category | Color | Hex top/bottom |
+|---|---|---|
+| Boost / Tuner | White/neutral | `#302e2a` / `#1e1c18` |
+| Overdrive (TS-style) | Green | `#1e3222` / `#111e14` |
+| Blues / Transparent OD | Blue | `#1a2c3e` / `#111c28` |
+| Distortion | Orange | `#342216` / `#20140c` |
+| Fuzz / Heavy | Charcoal | `#201e2c` / `#141218` |
+
+See `src/Kataka.App/Components/BoosterPedal/BoosterPedalColors.cs` as the reference implementation.
+
+---
+
 ### Design ViewModels
 
 Complex views have a corresponding design VM in `ViewModels/Design/`. Design VMs extend the real VM, seed test values, and expose a static `Instance`:
