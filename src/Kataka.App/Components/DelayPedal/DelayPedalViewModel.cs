@@ -1,5 +1,6 @@
 using Avalonia.Media;
 
+using Kataka.App.Components.DelayPedal;
 using Kataka.App.KatanaState;
 using Kataka.Domain.Midi;
 using Kataka.Domain.Models;
@@ -90,6 +91,8 @@ public class DelayPedalViewModel : PedalViewModel
         {
             this.RaisePropertyChanged(nameof(SelectedTypeOption));
             this.RaisePropertyChanged(nameof(TypeCaption));
+            this.RaisePropertyChanged(nameof(CardBackgroundBrush));
+            this.RaisePropertyChanged(nameof(TypeLabelBrush));
             this.RaisePropertyChanged(nameof(IsTypePan));
             this.RaisePropertyChanged(nameof(IsTypeModulateOrSde));
             this.RaisePropertyChanged(nameof(IsTypeSde3000));
@@ -121,6 +124,9 @@ public class DelayPedalViewModel : PedalViewModel
     public bool IsTypeSde3000 => _typeState.Value == 10;
 
     public bool HasTypeOptions => TypeOptions.Count > 0;
+
+    public override IBrush CardBackgroundBrush => DelayPedalColors.GetBackgroundBrush(SelectedTypeOption);
+    public IBrush TypeLabelBrush => DelayPedalColors.GetLabelBrush(SelectedTypeOption);
     public bool HasVariation { get; }
 
     public IBrush VariationBrush => HasVariation ? GetVariationBrush(Variation) : OffVariationBrush;
