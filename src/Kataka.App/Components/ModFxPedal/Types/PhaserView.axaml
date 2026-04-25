@@ -43,10 +43,8 @@
                                  Minimum="0" Maximum="100"
                                  Value="{Binding PhaserDirectMix}"
                                  LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="TYPE"
-                                 Minimum="0" Maximum="3"
-                                 Value="{Binding PhaserType}"
-                                 LabelFontSize="11" />
+            <ComboBox ItemsSource="{Binding PhaserTypeOptions}"
+                      SelectedItem="{Binding PhaserTypeOption}" />
         </StackPanel>
     </StackPanel>
 

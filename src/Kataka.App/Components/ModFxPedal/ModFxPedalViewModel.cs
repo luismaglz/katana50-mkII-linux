@@ -180,7 +180,11 @@ public class ModFxPedalViewModel : PedalViewModel
         _flanger.EffectLevel.ValueChanged += () => this.RaisePropertyChanged(nameof(FlangerEffectLevel));
         _flanger.DirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(FlangerDirectMix));
 
-        _phaser.Type.ValueChanged += () => this.RaisePropertyChanged(nameof(PhaserType));
+        _phaser.Type.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(PhaserType));
+            this.RaisePropertyChanged(nameof(PhaserTypeOption));
+        };
         _phaser.Rate.ValueChanged += () => this.RaisePropertyChanged(nameof(PhaserRate));
         _phaser.Depth.ValueChanged += () => this.RaisePropertyChanged(nameof(PhaserDepth));
         _phaser.Manual.ValueChanged += () => this.RaisePropertyChanged(nameof(PhaserManual));
@@ -206,7 +210,11 @@ public class ModFxPedalViewModel : PedalViewModel
         _rotary.Depth.ValueChanged += () => this.RaisePropertyChanged(nameof(RotaryDepth));
         _rotary.Level.ValueChanged += () => this.RaisePropertyChanged(nameof(RotaryLevel));
 
-        _ringMod.Mode.ValueChanged += () => this.RaisePropertyChanged(nameof(RingModMode));
+        _ringMod.Mode.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(RingModMode));
+            this.RaisePropertyChanged(nameof(RingModModeOption));
+        };
         _ringMod.Frequency.ValueChanged += () => this.RaisePropertyChanged(nameof(RingModFrequency));
         _ringMod.EffectLevel.ValueChanged += () => this.RaisePropertyChanged(nameof(RingModEffectLevel));
         _ringMod.DirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(RingModDirectMix));
@@ -235,7 +243,11 @@ public class ModFxPedalViewModel : PedalViewModel
         };
         _comp.Level.ValueChanged += () => this.RaisePropertyChanged(nameof(CompLevel));
 
-        _limiter.Type.ValueChanged += () => this.RaisePropertyChanged(nameof(LimiterType));
+        _limiter.Type.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(LimiterType));
+            this.RaisePropertyChanged(nameof(LimiterTypeOption));
+        };
         _limiter.Attack.ValueChanged += () => this.RaisePropertyChanged(nameof(LimiterAttack));
         _limiter.Threshold.ValueChanged += () => this.RaisePropertyChanged(nameof(LimiterThreshold));
         _limiter.Ratio.ValueChanged += () => this.RaisePropertyChanged(nameof(LimiterRatio));
@@ -258,7 +270,11 @@ public class ModFxPedalViewModel : PedalViewModel
         _autoWah.DirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(AutoWahDirectMix));
         _autoWah.EffectLevel.ValueChanged += () => this.RaisePropertyChanged(nameof(AutoWahEffectLevel));
 
-        _pedalWah.Type.ValueChanged += () => this.RaisePropertyChanged(nameof(PedalWahType));
+        _pedalWah.Type.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(PedalWahType));
+            this.RaisePropertyChanged(nameof(PedalWahTypeOption));
+        };
         _pedalWah.PedalPos.ValueChanged += () => this.RaisePropertyChanged(nameof(PedalWahPedalPosition));
         _pedalWah.PedalMin.ValueChanged += () => this.RaisePropertyChanged(nameof(PedalWahPedalMin));
         _pedalWah.PedalMax.ValueChanged += () => this.RaisePropertyChanged(nameof(PedalWahPedalMax));
@@ -289,7 +305,11 @@ public class ModFxPedalViewModel : PedalViewModel
         _parametricEq.HighCut.ValueChanged += () => this.RaisePropertyChanged(nameof(ParametricEqHighCut));
         _parametricEq.Level.ValueChanged += () => this.RaisePropertyChanged(nameof(ParametricEqLevel));
 
-        _guitarSim.Type.ValueChanged += () => this.RaisePropertyChanged(nameof(GuitarSimType));
+        _guitarSim.Type.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(GuitarSimType));
+            this.RaisePropertyChanged(nameof(GuitarSimTypeOption));
+        };
         _guitarSim.Low.ValueChanged += () => this.RaisePropertyChanged(nameof(GuitarSimLow));
         _guitarSim.High.ValueChanged += () => this.RaisePropertyChanged(nameof(GuitarSimHigh));
         _guitarSim.Level.ValueChanged += () => this.RaisePropertyChanged(nameof(GuitarSimLevel));
@@ -308,7 +328,11 @@ public class ModFxPedalViewModel : PedalViewModel
         _acProcessor.Presence.ValueChanged += () => this.RaisePropertyChanged(nameof(AcProcessorPresence));
         _acProcessor.Level.ValueChanged += () => this.RaisePropertyChanged(nameof(AcProcessorLevel));
 
-        _waveSynth.Wave.ValueChanged += () => this.RaisePropertyChanged(nameof(WaveSynthWave));
+        _waveSynth.Wave.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(WaveSynthWave));
+            this.RaisePropertyChanged(nameof(WaveSynthWaveOption));
+        };
         _waveSynth.Cutoff.ValueChanged += () => this.RaisePropertyChanged(nameof(WaveSynthCutoff));
         _waveSynth.Resonance.ValueChanged += () => this.RaisePropertyChanged(nameof(WaveSynthResonance));
         _waveSynth.FilterSens.ValueChanged += () => this.RaisePropertyChanged(nameof(WaveSynthFilterSens));
@@ -325,7 +349,11 @@ public class ModFxPedalViewModel : PedalViewModel
         _heavyOctave.Oct2Level.ValueChanged += () => this.RaisePropertyChanged(nameof(HeavyOctave2OctLevel));
         _heavyOctave.DirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(HeavyOctaveDirectMix));
 
-        _pitchShifter.Voice.ValueChanged += () => this.RaisePropertyChanged(nameof(PitchShifterVoice));
+        _pitchShifter.Voice.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(PitchShifterVoice));
+            this.RaisePropertyChanged(nameof(PitchShifterVoiceOption));
+        };
         _pitchShifter.Ps1Mode.ValueChanged += () => this.RaisePropertyChanged(nameof(PitchShifterPS1Mode));
         _pitchShifter.Ps1Pitch.ValueChanged += () => this.RaisePropertyChanged(nameof(PitchShifterPS1Pitch));
         _pitchShifter.Ps1Fine.ValueChanged += () => this.RaisePropertyChanged(nameof(PitchShifterPS1Fine));
@@ -337,7 +365,11 @@ public class ModFxPedalViewModel : PedalViewModel
         _pitchShifter.Feedback.ValueChanged += () => this.RaisePropertyChanged(nameof(PitchShifterFeedback));
         _pitchShifter.DirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(PitchShifterDirectMix));
 
-        _harmonist.Voice.ValueChanged += () => this.RaisePropertyChanged(nameof(HarmonistVoice));
+        _harmonist.Voice.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(HarmonistVoice));
+            this.RaisePropertyChanged(nameof(HarmonistVoiceOption));
+        };
         _harmonist.Harmony1.ValueChanged += () => this.RaisePropertyChanged(nameof(HarmonistHarmony1));
         _harmonist.Level1.ValueChanged += () => this.RaisePropertyChanged(nameof(HarmonistLevel1));
         _harmonist.Harmony2.ValueChanged += () => this.RaisePropertyChanged(nameof(HarmonistHarmony2));
@@ -345,7 +377,11 @@ public class ModFxPedalViewModel : PedalViewModel
         _harmonist.Feedback.ValueChanged += () => this.RaisePropertyChanged(nameof(HarmonistFeedback));
         _harmonist.DirectMix.ValueChanged += () => this.RaisePropertyChanged(nameof(HarmonistDirectMix));
 
-        _humanizer.Mode.ValueChanged += () => this.RaisePropertyChanged(nameof(HumanizerMode));
+        _humanizer.Mode.ValueChanged += () =>
+        {
+            this.RaisePropertyChanged(nameof(HumanizerMode));
+            this.RaisePropertyChanged(nameof(HumanizerModeOption));
+        };
         _humanizer.Vowel1.ValueChanged += () => this.RaisePropertyChanged(nameof(HumanizerVowel1));
         _humanizer.Vowel2.ValueChanged += () => this.RaisePropertyChanged(nameof(HumanizerVowel2));
         _humanizer.Sens.ValueChanged += () => this.RaisePropertyChanged(nameof(HumanizerSens));
@@ -601,10 +637,23 @@ public class ModFxPedalViewModel : PedalViewModel
     }
 
     /// <summary> PHASER params ───────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] PhaserTypeOptionsList = ["4STAGE", "8STAGE", "12STAGE", "BiPHASE"];
+    public IReadOnlyList<string> PhaserTypeOptions => PhaserTypeOptionsList;
+
     public int PhaserType
     {
         get => _phaser.Type.Value;
         set => _phaser.Type.Value = value;
+    }
+
+    public string? PhaserTypeOption
+    {
+        get => _phaser.Type.Value < PhaserTypeOptionsList.Length ? PhaserTypeOptionsList[_phaser.Type.Value] : null;
+        set
+        {
+            var idx = value is not null ? Array.IndexOf(PhaserTypeOptionsList, value) : -1;
+            if (idx >= 0) _phaser.Type.Value = idx;
+        }
     }
 
     public int PhaserRate
@@ -732,10 +781,23 @@ public class ModFxPedalViewModel : PedalViewModel
     }
 
     /// <summary> RING MOD params ─────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] RingModModeOptionsList = ["NORMAL", "INTELLIGENT"];
+    public IReadOnlyList<string> RingModModeOptions => RingModModeOptionsList;
+
     public int RingModMode
     {
         get => _ringMod.Mode.Value;
         set => _ringMod.Mode.Value = value;
+    }
+
+    public string? RingModModeOption
+    {
+        get => _ringMod.Mode.Value < RingModModeOptionsList.Length ? RingModModeOptionsList[_ringMod.Mode.Value] : null;
+        set
+        {
+            var idx = value is not null ? Array.IndexOf(RingModModeOptionsList, value) : -1;
+            if (idx >= 0) _ringMod.Mode.Value = idx;
+        }
     }
 
     public int RingModFrequency
@@ -859,10 +921,23 @@ public class ModFxPedalViewModel : PedalViewModel
     }
 
     /// <summary> LIMITER params ──────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] LimiterTypeOptionsList = ["BOSS LIMITER", "RACK 160D", "VTG RACK U"];
+    public IReadOnlyList<string> LimiterTypeOptions => LimiterTypeOptionsList;
+
     public int LimiterType
     {
         get => _limiter.Type.Value;
         set => _limiter.Type.Value = value;
+    }
+
+    public string? LimiterTypeOption
+    {
+        get => _limiter.Type.Value < LimiterTypeOptionsList.Length ? LimiterTypeOptionsList[_limiter.Type.Value] : null;
+        set
+        {
+            var idx = value is not null ? Array.IndexOf(LimiterTypeOptionsList, value) : -1;
+            if (idx >= 0) _limiter.Type.Value = idx;
+        }
     }
 
     public int LimiterAttack
@@ -982,10 +1057,24 @@ public class ModFxPedalViewModel : PedalViewModel
     }
 
     /// <summary> PEDAL WAH params ────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] PedalWahTypeOptionsList =
+        ["CRY WAH", "VO WAH", "FAT WAH", "LIGHT WAH", "7STRING WAH", "RESO WAH"];
+    public IReadOnlyList<string> PedalWahTypeOptions => PedalWahTypeOptionsList;
+
     public int PedalWahType
     {
         get => _pedalWah.Type.Value;
         set => _pedalWah.Type.Value = value;
+    }
+
+    public string? PedalWahTypeOption
+    {
+        get => _pedalWah.Type.Value < PedalWahTypeOptionsList.Length ? PedalWahTypeOptionsList[_pedalWah.Type.Value] : null;
+        set
+        {
+            var idx = value is not null ? Array.IndexOf(PedalWahTypeOptionsList, value) : -1;
+            if (idx >= 0) _pedalWah.Type.Value = idx;
+        }
     }
 
     public int PedalWahPedalPosition
@@ -1153,10 +1242,24 @@ public class ModFxPedalViewModel : PedalViewModel
     }
 
     /// <summary> GUITAR SIM params ───────────────────────────────────────────────────────── </summary>
+    private static readonly string[] GuitarSimTypeOptionsList =
+        ["S->H", "H->S", "H->HF", "S->HOLLOW", "H->HOLLOW", "S->AC", "H->AC", "P->AC"];
+    public IReadOnlyList<string> GuitarSimTypeOptions => GuitarSimTypeOptionsList;
+
     public int GuitarSimType
     {
         get => _guitarSim.Type.Value;
         set => _guitarSim.Type.Value = value;
+    }
+
+    public string? GuitarSimTypeOption
+    {
+        get => _guitarSim.Type.Value < GuitarSimTypeOptionsList.Length ? GuitarSimTypeOptionsList[_guitarSim.Type.Value] : null;
+        set
+        {
+            var idx = value is not null ? Array.IndexOf(GuitarSimTypeOptionsList, value) : -1;
+            if (idx >= 0) _guitarSim.Type.Value = idx;
+        }
     }
 
     public int GuitarSimLow
@@ -1252,10 +1355,23 @@ public class ModFxPedalViewModel : PedalViewModel
     }
 
     /// <summary> WAVE SYNTH params ───────────────────────────────────────────────────────── </summary>
+    private static readonly string[] WaveSynthWaveOptionsList = ["SAW", "SQUARE"];
+    public IReadOnlyList<string> WaveSynthWaveOptions => WaveSynthWaveOptionsList;
+
     public int WaveSynthWave
     {
         get => _waveSynth.Wave.Value;
         set => _waveSynth.Wave.Value = value;
+    }
+
+    public string? WaveSynthWaveOption
+    {
+        get => _waveSynth.Wave.Value < WaveSynthWaveOptionsList.Length ? WaveSynthWaveOptionsList[_waveSynth.Wave.Value] : null;
+        set
+        {
+            var idx = value is not null ? Array.IndexOf(WaveSynthWaveOptionsList, value) : -1;
+            if (idx >= 0) _waveSynth.Wave.Value = idx;
+        }
     }
 
     public int WaveSynthCutoff
@@ -1339,10 +1455,26 @@ public class ModFxPedalViewModel : PedalViewModel
     }
 
     /// <summary> PITCH SHIFTER params ────────────────────────────────────────────────────── </summary>
+    private static readonly string[] PitchShifterVoiceOptionsList = ["1VOICE", "2VOICE"];
+
+    public IReadOnlyList<string> PitchShifterVoiceOptions => PitchShifterVoiceOptionsList;
+
     public int PitchShifterVoice
     {
         get => _pitchShifter.Voice.Value;
         set => _pitchShifter.Voice.Value = value;
+    }
+
+    public string? PitchShifterVoiceOption
+    {
+        get => _pitchShifter.Voice.Value < PitchShifterVoiceOptionsList.Length
+            ? PitchShifterVoiceOptionsList[_pitchShifter.Voice.Value]
+            : null;
+        set
+        {
+            var idx = value is not null ? Array.IndexOf(PitchShifterVoiceOptionsList, value) : -1;
+            if (idx >= 0) _pitchShifter.Voice.Value = idx;
+        }
     }
 
     public int PitchShifterPS1Mode
@@ -1406,10 +1538,23 @@ public class ModFxPedalViewModel : PedalViewModel
     }
 
     /// <summary> HARMONIST params ────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] HarmonistVoiceOptionsList = ["1VOICE", "2VOICE"];
+    public IReadOnlyList<string> HarmonistVoiceOptions => HarmonistVoiceOptionsList;
+
     public int HarmonistVoice
     {
         get => _harmonist.Voice.Value;
         set => _harmonist.Voice.Value = value;
+    }
+
+    public string? HarmonistVoiceOption
+    {
+        get => _harmonist.Voice.Value < HarmonistVoiceOptionsList.Length ? HarmonistVoiceOptionsList[_harmonist.Voice.Value] : null;
+        set
+        {
+            var idx = value is not null ? Array.IndexOf(HarmonistVoiceOptionsList, value) : -1;
+            if (idx >= 0) _harmonist.Voice.Value = idx;
+        }
     }
 
     public int HarmonistHarmony1
@@ -1449,10 +1594,23 @@ public class ModFxPedalViewModel : PedalViewModel
     }
 
     /// <summary> HUMANIZER params ────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] HumanizerModeOptionsList = ["PICKING", "AUTO"];
+    public IReadOnlyList<string> HumanizerModeOptions => HumanizerModeOptionsList;
+
     public int HumanizerMode
     {
         get => _humanizer.Mode.Value;
         set => _humanizer.Mode.Value = value;
+    }
+
+    public string? HumanizerModeOption
+    {
+        get => _humanizer.Mode.Value < HumanizerModeOptionsList.Length ? HumanizerModeOptionsList[_humanizer.Mode.Value] : null;
+        set
+        {
+            var idx = value is not null ? Array.IndexOf(HumanizerModeOptionsList, value) : -1;
+            if (idx >= 0) _humanizer.Mode.Value = idx;
+        }
     }
 
     public int HumanizerVowel1
