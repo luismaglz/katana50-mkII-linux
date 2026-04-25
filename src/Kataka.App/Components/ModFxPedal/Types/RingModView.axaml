@@ -12,10 +12,8 @@
              x:CompileBindings="False">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="MODE"
-                                 Minimum="0" Maximum="1"
-                                 Value="{Binding RingModMode}"
-                                 LabelFontSize="11" />
+            <ComboBox ItemsSource="{Binding RingModModeOptions}"
+                      SelectedItem="{Binding RingModModeOption}" />
             <controls:RotaryKnob Scale="0.75" Label="FREQUENCY"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding RingModFrequency}"

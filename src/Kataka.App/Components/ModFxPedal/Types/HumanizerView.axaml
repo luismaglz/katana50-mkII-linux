@@ -12,10 +12,8 @@
              x:CompileBindings="False">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="MODE"
-                                 Minimum="0" Maximum="1"
-                                 Value="{Binding HumanizerMode}"
-                                 LabelFontSize="11" />
+            <ComboBox ItemsSource="{Binding HumanizerModeOptions}"
+                      SelectedItem="{Binding HumanizerModeOption}" />
             <controls:RotaryKnob Scale="0.75" Label="VOWEL 1"
                                  Minimum="0" Maximum="4"
                                  Value="{Binding HumanizerVowel1}"
