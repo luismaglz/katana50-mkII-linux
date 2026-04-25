@@ -41,4 +41,20 @@ public static class FrequencySteps
         "315Hz", "400Hz", "500Hz", "630Hz", "800Hz",
         "1.0kHz", "1.25kHz", "1.6kHz", "2.0kHz", "2.5kHz"
     ];
+
+    /// <summary>Mid-band freq 28 steps (0–27): 20Hz … 10.0kHz. Used by Global EQ LowMid/HiMid Freq.</summary>
+    public static readonly string[] MidFreq28 =
+    [
+        "20Hz", "25Hz", "31.5Hz", "40Hz", "50Hz", "63Hz", "80Hz",
+        "100Hz", "125Hz", "160Hz", "200Hz", "250Hz", "315Hz", "400Hz",
+        "500Hz", "630Hz", "800Hz", "1.0kHz", "1.25kHz", "1.6kHz",
+        "2.0kHz", "2.5kHz", "3.15kHz", "4.0kHz", "5.0kHz", "6.3kHz",
+        "8.0kHz", "10.0kHz"
+    ];
+
+    /// <summary>Parametric EQ Q 6 steps (0–5): 0.5, 1, 2, 4, 8, 16.</summary>
+    public static readonly string[] Q6 = ["0.5", "1", "2", "4", "8", "16"];
+
+    /// <summary>Global EQ position 4 steps (0–3): signal-chain insert point.</summary>
+    public static readonly string[] EqPosition4 = ["PREAMP", "LOOP", "MASTER", "OUTPUT"];
 }
