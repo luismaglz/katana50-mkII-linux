@@ -5,22 +5,24 @@
              x:DataType="vm:PedalViewModel"
              x:CompileBindings="False">
 
-    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="8" VerticalAlignment="Center">
 
         <!-- LED indicator -->
-        <Panel Width="12" Height="12" VerticalAlignment="Center">
-            <Border Width="12" Height="12" CornerRadius="6"
-                    Background="#00e676"
-                    IsVisible="{Binding IsEnabled}" />
-            <Border Width="12" Height="12" CornerRadius="6"
-                    Background="#333"
-                    IsVisible="{Binding !IsEnabled}" />
-        </Panel>
+        <!-- <Panel Width="12" Height="12" VerticalAlignment="Center"> -->
+        <!--     <Border Width="12" Height="12" CornerRadius="6" -->
+        <!--             Background="#00e676" -->
+        <!--             IsVisible="{Binding IsEnabled}" /> -->
+        <!--     <Border Width="12" Height="12" CornerRadius="6" -->
+        <!--             Background="#333" -->
+        <!--             IsVisible="{Binding !IsEnabled}" /> -->
+        <!-- </Panel> -->
+
 
         <!-- Name + ON/OFF toggle -->
         <ToggleButton Grid.Column="1"
-                      Classes="effect-button"
-                      HorizontalAlignment="Stretch"
+                      FontSize="18"
+                      FontWeight="Bold"
+                      HorizontalAlignment="Center"
                       Content="{Binding DisplayName}"
                       IsChecked="{Binding IsEnabled}" />
 

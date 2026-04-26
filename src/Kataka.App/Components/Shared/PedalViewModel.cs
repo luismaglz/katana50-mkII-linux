@@ -13,14 +13,8 @@ public abstract class PedalViewModel : ViewModelBase
     {
         StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
         EndPoint = new RelativePoint(0, 1, RelativeUnit.Relative),
-        GradientStops =
-        {
-            new GradientStop(Color.Parse("#2E3138"), 0),
-            new GradientStop(Color.Parse("#1C1F24"), 1),
-        }
+        GradientStops = { new GradientStop(Color.Parse("#2E3138"), 0), new GradientStop(Color.Parse("#1C1F24"), 1) }
     };
-
-    public virtual IBrush CardBackgroundBrush => DefaultCardBackground;
 
     protected static readonly IBrush OffVariationBrush = new SolidColorBrush(Color.Parse("#35383f"));
     protected static readonly IBrush GreenVariationBrush = new SolidColorBrush(Color.Parse("#91ff92"));
@@ -29,11 +23,16 @@ public abstract class PedalViewModel : ViewModelBase
 
     private bool _isEnabled;
 
-    protected PedalViewModel(KatanaPanelEffectDefinition definition) => Definition = definition;
+    protected PedalViewModel(KatanaPanelEffectDefinition definition)
+    {
+        Definition = definition;
+    }
+
+    public virtual IBrush CardBackgroundBrush => DefaultCardBackground;
 
     public KatanaPanelEffectDefinition Definition { get; }
 
-    public string DisplayName => Definition.DisplayName;
+    public string DisplayName => Definition.DisplayName.ToUpper();
 
     public virtual bool IsEnabled
     {

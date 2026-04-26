@@ -110,10 +110,6 @@
             <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
 
-        <Style Selector="ComboBox.midi-port-picker">
-            <Setter Property="MinWidth" Value="230" />
-        </Style>
-
         <Style Selector="ToggleButton.channel-button:checked">
             <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
             <Setter Property="BorderBrush" Value="{StaticResource PrimaryLitBrush}" />

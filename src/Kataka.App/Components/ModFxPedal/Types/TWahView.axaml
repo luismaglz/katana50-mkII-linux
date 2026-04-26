@@ -24,6 +24,8 @@
                                  Minimum="0" Maximum="100"
                                  Value="{Binding TWahSens}"
                                  LabelFontSize="11" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnob Scale="0.75" Label="FREQ"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding TWahFreq}"
@@ -36,6 +38,8 @@
                                  Minimum="0" Maximum="100"
                                  Value="{Binding TWahDirectMix}"
                                  LabelFontSize="11" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnob Scale="0.75" Label="E.LEVEL"
                                  Minimum="0" Maximum="100"
                                  Value="{Binding TWahEffectLevel}"
