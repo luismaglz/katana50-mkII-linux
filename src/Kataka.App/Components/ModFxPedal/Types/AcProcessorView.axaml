@@ -12,39 +12,39 @@
              x:CompileBindings="False">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="TYPE"
-                                 Minimum="0" Maximum="3"
-                                 Value="{Binding AcProcessorType}"
-                                 LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="TYPE"
+                                   Minimum="0" Maximum="3"
+                                   Value="{Binding AcProcessorType}"
+                                   LabelFontSize="11" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="LEVEL"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AcProcessorLevel}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="PRESENCE"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AcProcessorPresence}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="BASS"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AcProcessorBass}"
-                                 LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="LEVEL"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AcProcessorLevel}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="PRESENCE"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AcProcessorPresence}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="BASS"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AcProcessorBass}"
+                                   LabelFontSize="11" />
 
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="MID"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AcProcessorMid}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="MID FREQ"
-                                 Minimum="0" Maximum="27"
-                                 Value="{Binding AcProcessorMidFreq}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="TREBLE"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AcProcessorTreble}"
-                                 LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="MID"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AcProcessorMid}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="MID FREQ"
+                                   Minimum="0" Maximum="27"
+                                   Value="{Binding AcProcessorMidFreq}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="TREBLE"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AcProcessorTreble}"
+                                   LabelFontSize="11" />
         </StackPanel>
     </StackPanel>
 </UserControl>

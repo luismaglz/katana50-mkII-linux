@@ -12,34 +12,39 @@
              x:CompileBindings="False">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="MODE"
-                                 Minimum="0" Maximum="1"
-                                 Value="{Binding AutoWahMode}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="FREQ"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AutoWahFreq}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="PEAK"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AutoWahPeak}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="RATE"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AutoWahRate}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="DEPTH"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AutoWahDepth}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="DIRECT MIX"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AutoWahDirectMix}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="E.LEVEL"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AutoWahEffectLevel}"
-                                 LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="MODE"
+                                   Minimum="0" Maximum="1"
+                                   Value="{Binding AutoWahMode}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="FREQ"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AutoWahFreq}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="PEAK"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AutoWahPeak}"
+                                   LabelFontSize="11" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+            <controls:RotaryKnobV2 Scale="0.75" Label="RATE"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AutoWahRate}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="DEPTH"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AutoWahDepth}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="DIRECT MIX"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AutoWahDirectMix}"
+                                   LabelFontSize="11" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <controls:RotaryKnobV2 Scale="0.75" Label="E.LEVEL"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AutoWahEffectLevel}"
+                                   LabelFontSize="11" />
         </StackPanel>
     </StackPanel>
 </UserControl>

@@ -12,38 +12,38 @@
              x:CompileBindings="False">
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="MODE"
-                                 Minimum="0" Maximum="1"
-                                 Value="{Binding TWahMode}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="POLARITY"
-                                 Minimum="0" Maximum="1"
-                                 Value="{Binding TWahPolarity}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="SENS"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding TWahSens}"
-                                 LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="MODE"
+                                   Minimum="0" Maximum="1"
+                                   Value="{Binding TWahMode}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="POLARITY"
+                                   Minimum="0" Maximum="1"
+                                   Value="{Binding TWahPolarity}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="SENS"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding TWahSens}"
+                                   LabelFontSize="11" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="FREQ"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding TWahFreq}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="PEAK"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding TWahPeak}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="DIRECT MIX"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding TWahDirectMix}"
-                                 LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="FREQ"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding TWahFreq}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="PEAK"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding TWahPeak}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="DIRECT MIX"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding TWahDirectMix}"
+                                   LabelFontSize="11" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="E.LEVEL"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding TWahEffectLevel}"
-                                 LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="E.LEVEL"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding TWahEffectLevel}"
+                                   LabelFontSize="11" />
         </StackPanel>
     </StackPanel>
 </UserControl>
