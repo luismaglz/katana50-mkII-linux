@@ -12,24 +12,24 @@
              x:CompileBindings="False">
     <StackPanel Spacing="8" Orientation="Vertical">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="LEVEL"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AcGuitarSimLevel}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="BODY"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AcGuitarSimBody}"
-                                 LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="LEVEL"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AcGuitarSimLevel}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="BODY"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AcGuitarSimBody}"
+                                   LabelFontSize="11" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <controls:RotaryKnob Scale="0.75" Label="HIGH"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AcGuitarSimHigh}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="LOW"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding AcGuitarSimLow}"
-                                 LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="HIGH"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AcGuitarSimHigh}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="LOW"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding AcGuitarSimLow}"
+                                   LabelFontSize="11" />
         </StackPanel>
     </StackPanel>
 </UserControl>

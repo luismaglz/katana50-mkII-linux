@@ -11,21 +11,22 @@
              x:DataType="vm:ModFxPedalViewModel"
              x:CompileBindings="False">
     <StackPanel Spacing="8">
+        <ComboBox ItemsSource="{Binding RingModModeOptions}"
+                  SelectedItem="{Binding RingModModeOption}" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <ComboBox ItemsSource="{Binding RingModModeOptions}"
-                      SelectedItem="{Binding RingModModeOption}" />
-            <controls:RotaryKnob Scale="0.75" Label="FREQUENCY"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding RingModFrequency}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="E.LEVEL"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding RingModEffectLevel}"
-                                 LabelFontSize="11" />
-            <controls:RotaryKnob Scale="0.75" Label="DIRECT MIX"
-                                 Minimum="0" Maximum="100"
-                                 Value="{Binding RingModDirectMix}"
-                                 LabelFontSize="11" />
+
+            <controls:RotaryKnobV2 Scale="0.75" Label="FREQUENCY"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding RingModFrequency}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="E.LEVEL"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding RingModEffectLevel}"
+                                   LabelFontSize="11" />
+            <controls:RotaryKnobV2 Scale="0.75" Label="DIRECT MIX"
+                                   Minimum="0" Maximum="100"
+                                   Value="{Binding RingModDirectMix}"
+                                   LabelFontSize="11" />
         </StackPanel>
     </StackPanel>
 </UserControl>
