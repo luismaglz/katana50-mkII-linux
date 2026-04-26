@@ -16,12 +16,24 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
     private const double BaseArcR = 46.0;
     private const double BaseArcThick = 4.0;
     private const double BasePad = 4.0;
-    private const double BaseTopPad = 20.0;
-    private const double BaseBottomPad = 8.0;
-    private const double BaseValueFontSize = 14.0;
+    private const double BaseTopPad = 16.0;
+    private const double BaseBottomPad = 6.0;
     private const double StartDeg = 135.0;
     private const double SweepDeg = 270.0;
 
+    public static readonly StyledProperty<double> ValueFontSizeProperty =
+        AvaloniaProperty.Register<RotaryKnobV2, double>(nameof(ValueFontSize), 14.0);
+
+    static RotaryKnobV2()
+    {
+        AffectsRender<RotaryKnobV2>(ValueFontSizeProperty);
+    }
+
+    public double ValueFontSize
+    {
+        get => GetValue(ValueFontSizeProperty);
+        set => SetValue(ValueFontSizeProperty, Math.Max(1.0, value));
+    }
 
     protected override Size MeasureOverride(Size availableSize)
     {
@@ -40,7 +52,6 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
         var arcThick = BaseArcThick * s;
         var topPad = BaseTopPad * s;
         var bottomPad = BaseBottomPad * s;
-        var valueFontSize = BaseValueFontSize * s;
         var bounds = Bounds.Deflate(pad);
 
         var labelText = CreateText(Label.ToUpperInvariant(), LabelFontSize * s, FontWeight.Bold, LabelBrush);
@@ -56,8 +67,7 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
         var faceColor = IsSet(FaceColorProperty) ? FaceColor : RuntimePaletteService.KnobFace;
         var bezelColor = IsSet(BezelColorProperty) ? BezelColor : RuntimePaletteService.BgBase;
         var accentBrush = new SolidColorBrush(accentColor);
-
-        var debugColor = new SolidColorBrush(Color.FromArgb(100, 255, 0, 0));
+        var valueBrush = IsSet(ValueBrushProperty) ? ValueBrush : accentBrush;
 
         // Full-sweep dim arc track
         DrawArcStroke(context, cx, cy, arcR, StartDeg, StartDeg + SweepDeg,
@@ -82,22 +92,17 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
 
         // Pointer
         var angleRad = DegreesToRadians(StartDeg + (NormalizedValue * SweepDeg));
-        var indicatorEnd = knobR * 0.9;
-        var indicatorStart = knobR * 0.5;
+        var indicatorEnd = knobR * 0.8;
+        var indicatorStart = knobR * 0.4;
         var tipCx = cx + (Math.Cos(angleRad) * indicatorEnd);
         var tipCy = cy + (Math.Sin(angleRad) * indicatorEnd);
         var tip = new Point(tipCx, tipCy);
         var endTipCx = cx + (Math.Cos(angleRad) * indicatorStart);
         var endTipCy = cy + (Math.Sin(angleRad) * indicatorStart);
         var endTip = new Point(endTipCx, endTipCy);
-        // Indicator Line
-        context.DrawLine(new Pen(accentBrush, 3.0 * s, lineCap: PenLineCap.Round), tip, endTip);
-        // context.DrawLine(new Pen(accentBrush, 3.0 * s, lineCap: PenLineCap.Round), endTip, tip);
+        context.DrawLine(new Pen(accentBrush, 5.0 * s, lineCap: PenLineCap.Round), tip, endTip);
 
-        // Center Dot
-        // context.DrawEllipse(accentBrush, null, new Point(cx, cy), 3.5 * s, 3.5 * s);
-
-        var valueText = CreateText(DisplayValueText, valueFontSize, FontWeight.SemiBold, accentBrush);
+        var valueText = CreateText(DisplayValueText, ValueFontSize * s, FontWeight.Bold, valueBrush);
         context.DrawText(valueText, new Point(
             (bounds.Width - valueText.Width) / 2,
             cy + arcR + bottomPad));
