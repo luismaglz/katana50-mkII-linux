@@ -15,15 +15,15 @@
             <controls:RotaryKnobV2 Scale="0.75" Label="RATE"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding UniVRate}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="DEPTH"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding UniVDepth}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="LEVEL"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding UniVLevel}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
     </StackPanel>
 </UserControl>

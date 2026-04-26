@@ -18,19 +18,19 @@
             <controls:RotaryKnobV2 Scale="0.75" Label="RATE"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding ChorusLowRate}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="DEPTH"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding ChorusLowDepth}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="PRE DLY"
                                    Minimum="0" Maximum="80"
                                    Value="{Binding ChorusLowPreDelay}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="LEVEL"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding ChorusLowLevel}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
 
         <!-- High channel -->
@@ -39,19 +39,19 @@
             <controls:RotaryKnobV2 Scale="0.75" Label="RATE"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding ChorusHighRate}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="DEPTH"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding ChorusHighDepth}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="PRE DLY"
                                    Minimum="0" Maximum="80"
                                    Value="{Binding ChorusHighPreDelay}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="LEVEL"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding ChorusHighLevel}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
 
         <!-- Shared controls -->
@@ -59,11 +59,11 @@
             <controls:SteppedKnobV2 Label="XOVER FREQ"
                                     Steps="{x:Static vm:FrequencySteps.XoverFreq17}"
                                     Value="{Binding ChorusXoverFreq}"
-                                    LabelFontSize="11" />
+                                    LabelFontSize="16" />
             <controls:RotaryKnobV2 Scale="0.75" Label="DIRECT MIX"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding ChorusDirectMix}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
     </StackPanel>
 

@@ -15,17 +15,17 @@
             <controls:RotaryKnobV2 Scale="0.75" Label="RANGE"
                                    Minimum="0" Maximum="3"
                                    Value="{Binding OctaveRange}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="E.LEVEL"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding OctaveEffectLevel}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnobV2 Scale="0.75" Label="DIRECT MIX"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding OctaveDirectMix}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
     </StackPanel>
 </UserControl>

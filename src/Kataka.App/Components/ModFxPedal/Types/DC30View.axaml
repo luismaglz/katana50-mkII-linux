@@ -15,35 +15,35 @@
             <controls:RotaryKnobV2 Scale="0.75" Label="SELECTOR"
                                    Minimum="0" Maximum="1"
                                    Value="{Binding DC30Selector}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="INPUT VOL"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding DC30InputVolume}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="CHORUS INTENSITY"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding DC30ChorusIntensity}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnobV2 Scale="0.75" Label="ECHO INTENSITY"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding DC30EchoIntensity}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="ECHO VOL"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding DC30EchoVolume}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="TONE"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding DC30Tone}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnobV2 Scale="0.75" Label="OUTPUT"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding DC30Output}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
     </StackPanel>
 </UserControl>
