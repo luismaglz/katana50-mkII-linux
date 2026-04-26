@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 
 namespace Kataka.App.Components.Pedalboard;
 
@@ -9,8 +10,8 @@ public partial class PedalboardHardwareCard : UserControl
     public static readonly StyledProperty<bool> ShowConnectorProperty =
         AvaloniaProperty.Register<PedalboardHardwareCard, bool>(nameof(ShowConnector));
 
-    public static readonly StyledProperty<string> ImagePathProperty =
-        AvaloniaProperty.Register<PedalboardHardwareCard, string>(nameof(ImagePath), string.Empty);
+    public static readonly StyledProperty<Bitmap?> ImagePathProperty =
+        AvaloniaProperty.Register<PedalboardHardwareCard, Bitmap?>(nameof(ImagePath));
 
     public static readonly StyledProperty<string> LabelProperty =
         AvaloniaProperty.Register<PedalboardHardwareCard, string>(nameof(Label), string.Empty);
@@ -41,7 +42,7 @@ public partial class PedalboardHardwareCard : UserControl
         set => SetValue(ShowConnectorProperty, value);
     }
 
-    public string ImagePath
+    public Bitmap? ImagePath
     {
         get => GetValue(ImagePathProperty);
         set => SetValue(ImagePathProperty, value);

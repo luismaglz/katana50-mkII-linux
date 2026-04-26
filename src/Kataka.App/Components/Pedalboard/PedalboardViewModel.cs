@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
 
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Threading;
 
 using Kataka.App.KatanaState;
@@ -17,9 +19,9 @@ public class PedalboardViewModel : ViewModelBase
     private readonly IKatanaState _katanaState;
     private readonly List<PedalboardPosition[]> _chains = [];
 
-    private readonly PedalboardInput _inputHardware = new("white", "avares://Kataka.App/Assets/electric-guitar.png");
-    private readonly PedalboardOutput _outputHardware = new("white", "avares://Kataka.App/Assets/speakers.png");
-    private readonly PedalboardAmp _ampHardware = new("white", "avares://Kataka.App/Assets/amplifier.png");
+    private readonly PedalboardInput _inputHardware = new("white", LoadBitmap("electric-guitar.png"));
+    private readonly PedalboardOutput _outputHardware = new("white", LoadBitmap("speakers.png"));
+    private readonly PedalboardAmp _ampHardware = new("white", LoadBitmap("amplifier.png"));
 
     private readonly PedalboardPedal<BoosterPedalViewModel> _boosterPedal;
     private readonly PedalboardPedal<ModFxPedalViewModel> _modPedal;
@@ -78,4 +80,7 @@ public class PedalboardViewModel : ViewModelBase
                     ChainNodes.Add(node);
         });
     }
+
+    private static Bitmap LoadBitmap(string fileName) =>
+        new(AssetLoader.Open(new Uri($"avares://Kataka.App/Assets/{fileName}")));
 }
