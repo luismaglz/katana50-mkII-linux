@@ -1,30 +1,13 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Kataka.App.ViewModels"
+             xmlns:ptb="using:Kataka.App.Components.PhysicalToggleButton"
              x:Class="Kataka.App.Controls.PedalHeaderControl"
              x:DataType="vm:PedalViewModel"
-             x:CompileBindings="False">
+             x:CompileBindings="False"
+             ClipToBounds="False">
 
-    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="8" VerticalAlignment="Center">
+    <ptb:PhysicalToggleButtonView IsChecked="{Binding IsEnabled}"
+                                   DisplayName="{Binding DisplayName}" />
 
-        <!-- LED indicator -->
-        <!-- <Panel Width="12" Height="12" VerticalAlignment="Center"> -->
-        <!--     <Border Width="12" Height="12" CornerRadius="6" -->
-        <!--             Background="#00e676" -->
-        <!--             IsVisible="{Binding IsEnabled}" /> -->
-        <!--     <Border Width="12" Height="12" CornerRadius="6" -->
-        <!--             Background="#333" -->
-        <!--             IsVisible="{Binding !IsEnabled}" /> -->
-        <!-- </Panel> -->
-
-
-        <!-- Name + ON/OFF toggle -->
-        <ToggleButton Grid.Column="1"
-                      FontSize="18"
-                      FontWeight="Bold"
-                      HorizontalAlignment="Center"
-                      Content="{Binding DisplayName}"
-                      IsChecked="{Binding IsEnabled}" />
-
-    </Grid>
 </UserControl>

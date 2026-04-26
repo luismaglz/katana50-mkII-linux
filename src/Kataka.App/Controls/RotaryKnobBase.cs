@@ -281,7 +281,7 @@ public abstract class RotaryKnobBase : Control
         new(text,
             CultureInfo.InvariantCulture,
             FlowDirection.LeftToRight,
-            new Typeface(FontFamily.Default, FontStyle.Normal, weight),
+            new Typeface(KatanaPalette.AppFont, FontStyle.Normal, weight),
             fontSize,
             brush);
 
