@@ -1,3 +1,5 @@
+using Avalonia.Media.Imaging;
+
 using Kataka.App.ViewModels;
 
 namespace Kataka.App.Components.Pedalboard;
@@ -7,19 +9,19 @@ public abstract class PedalboardPosition(string color)
     public string Color { get; } = color;
 }
 
-public class PedalboardInput(string color, string imagePath) : PedalboardPosition(color)
+public class PedalboardInput(string color, Bitmap image) : PedalboardPosition(color)
 {
-    public string ImagePath { get; } = imagePath;
+    public Bitmap Image { get; } = image;
 }
 
-public class PedalboardOutput(string color, string imagePath) : PedalboardPosition(color)
+public class PedalboardOutput(string color, Bitmap image) : PedalboardPosition(color)
 {
-    public string ImagePath { get; } = imagePath;
+    public Bitmap Image { get; } = image;
 }
 
-public class PedalboardAmp(string color, string imagePath) : PedalboardPosition(color)
+public class PedalboardAmp(string color, Bitmap image) : PedalboardPosition(color)
 {
-    public string ImagePath { get; } = imagePath;
+    public Bitmap Image { get; } = image;
 }
 
 public abstract class PedalboardPedalBase(ViewModelBase viewModel, string color) : PedalboardPosition(color)
