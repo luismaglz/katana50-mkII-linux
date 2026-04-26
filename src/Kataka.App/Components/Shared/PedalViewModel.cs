@@ -12,7 +12,7 @@ public abstract class PedalViewModel : ViewModelBase
     public static readonly IBrush DefaultCardBackground = new LinearGradientBrush
     {
         StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
-        EndPoint   = new RelativePoint(0, 1, RelativeUnit.Relative),
+        EndPoint = new RelativePoint(0, 1, RelativeUnit.Relative),
         GradientStops =
         {
             new GradientStop(Color.Parse("#2E3138"), 0),

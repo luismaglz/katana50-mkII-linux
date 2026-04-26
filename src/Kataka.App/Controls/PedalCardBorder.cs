@@ -30,7 +30,10 @@ public sealed class PedalCardBorder : Decorator
     //   feColorMatrix → black at 43 % opacity (0.43 × 255 ≈ 110)
     private static readonly BoxShadows DropShadow = new(new BoxShadow
     {
-        OffsetX = 31, OffsetY = 15, Blur = 108, Spread = 0,
+        OffsetX = 31,
+        OffsetY = 15,
+        Blur = 108,
+        Spread = 0,
         Color = Color.FromArgb(110, 0, 0, 0)
     });
 

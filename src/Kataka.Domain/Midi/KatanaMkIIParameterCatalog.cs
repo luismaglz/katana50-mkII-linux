@@ -451,6 +451,17 @@ public static partial class KatanaMkIIParameterCatalog
         new("contour3-freq-shift", "Contour 3 Freq", [0x60, 0x00, 0x0F, 0x41],
             description: "Adjusts the frequency shift amount for Contour 3.");
 
+    /// <summary> Contour switch/select (Ver200+, Patch_1 offsets 0x56–0x57) ───────────────── </summary>
+    /// <summary>Parameter definition for Contour Switch.</summary>
+    public static KatanaParameterDefinition ContourSw { get; } =
+        new("contour-sw", "Contour Sw", [0x60, 0x00, 0x05, 0x96], maximum: 1,
+            description: "Turns the Contour tone-shaping effect on/off.");
+
+    /// <summary>Parameter definition for Contour Select.</summary>
+    public static KatanaParameterDefinition ContourSelect { get; } =
+        new("contour-select", "Contour Select", [0x60, 0x00, 0x05, 0x97], maximum: 2,
+            description: "Selects which Contour preset is active (0=Contour1, 1=Contour2, 2=Contour3).");
+
     /// <summary> Patch EQ — Patch_0 embedded EQ block (BTS prm_prop_patch_0 addrs 0x30–0x47) ── </summary>
     // Absolute addresses: Patch_0 base (0x10) + relative (0x30–0x47) = 0x40–0x57.
     // Two EQ blocks exist per patch: Eq(1) at 0x40 and Eq(2) at 0x60.

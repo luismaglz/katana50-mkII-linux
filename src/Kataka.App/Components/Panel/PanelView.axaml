@@ -60,15 +60,39 @@
                 </StackPanel>
             </StackPanel>
         </Border>
-        <StackPanel Orientation="Vertical" Spacing="12" Margin="12 0 0 0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom"
-                        Spacing="12">
-                <TextBlock Text="TONE SETTINGS" FontSize="24" FontWeight="SemiBold" Margin="0,0,12,0" />
+        <Border BorderThickness="0 0 2 0" BorderBrush="#fff" Padding="12 0 0 0">
+            <StackPanel Orientation="Vertical" Spacing="12">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                            Spacing="12">
+                    <TextBlock Text="TONE SETTINGS" FontSize="24" FontWeight="SemiBold" Margin="0,0,12,0" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ContentControl Content="{Binding Presence}" ContentTemplate="{StaticResource AmpControlTemplate}" />
+                    <ContentControl Content="{Binding CabinetResonance}"
+                                    ContentTemplate="{StaticResource CabinetControlTemplate}" />
+                </StackPanel>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <ContentControl Content="{Binding Presence}" ContentTemplate="{StaticResource AmpControlTemplate}" />
-                <ContentControl Content="{Binding CabinetResonance}"
-                                ContentTemplate="{StaticResource CabinetControlTemplate}" />
+        </Border>
+        <StackPanel Orientation="Vertical" Spacing="12" Margin="12 0 0 0">
+            <TextBlock Text="TONE SHAPE" FontSize="24" FontWeight="SemiBold"
+                       HorizontalAlignment="Center" Margin="0,0,12,0" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                    <TextBlock Text="GLOBAL EQ" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center"
+                               Foreground="{StaticResource TextMutedBrush}" />
+                    <CheckBox IsChecked="{Binding IsGlobalEqOn}" HorizontalAlignment="Center" />
+                </StackPanel>
+                <controls:SteppedKnobV2 Label="CONTOUR" Scale="0.75" LabelFontSize="11"
+                                        Steps="{x:Static vm:PanelViewModel.ContourOptions}"
+                                        Value="{Binding ContourIndex}" />
+                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                    <TextBlock Text="SOLO" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center"
+                               Foreground="{StaticResource TextMutedBrush}" />
+                    <CheckBox IsChecked="{Binding IsSoloOn}" HorizontalAlignment="Center" />
+                </StackPanel>
+                <controls:RotaryKnobV2 Label="SOLO LVL" Scale="0.75" LabelFontSize="11"
+                                       Minimum="0" Maximum="100"
+                                       Value="{Binding SoloLevel.Value}" />
             </StackPanel>
         </StackPanel>
     </StackPanel>

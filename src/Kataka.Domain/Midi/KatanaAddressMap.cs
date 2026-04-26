@@ -629,6 +629,13 @@ public static class KatanaAddressMap
 
         /// <summary>Parameter offset constant 'SoloLevel' from address_map.js.</summary>
         public const uint SoloLevel = 0x55;
+
+        // Contour (Ver200+)
+        /// <summary>Parameter offset constant 'ContourSw' from address_map.js.</summary>
+        public const uint ContourSw = 0x56;
+
+        /// <summary>Parameter offset constant 'ContourSelect' from address_map.js.</summary>
+        public const uint ContourSelect = 0x57;
     }
 
     /// <summary> Patch2 parameter offsets (prm_prop_patch_2) ───────────────────────────── </summary>
