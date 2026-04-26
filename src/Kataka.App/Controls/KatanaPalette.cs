@@ -6,8 +6,10 @@ namespace Kataka.App.Controls;
 ///     Single source of truth for all UI colors used in custom-drawn controls.
 ///     AXAML views reference the same values via App.axaml resources (same hex, different mechanism).
 /// </summary>
-internal static class KatanaPalette
+public static class KatanaPalette
 {
+    public static readonly FontFamily AppFont = new("avares://Kataka.App/Assets/Fonts#Anta");
+
     /// <summary> Surfaces (by depth) ──────────────────────────────────────────────────P </summary>
     public static readonly Color BgBase = Color.Parse("#111317"); // Window (deepest)
 

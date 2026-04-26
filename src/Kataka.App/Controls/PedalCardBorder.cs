@@ -8,30 +8,19 @@ namespace Kataka.App.Controls;
 
 /// <summary>
 ///     A container control that renders the Boss Katana pedal card visual — coloured rounded-rect
-///     with drop shadow, brushed-metal texture overlay, and a subtle top highlight — as a background
-///     behind its single child. Behaves exactly like <see cref="Avalonia.Controls.Border" /> but
-///     with the pedal-card aesthetic baked in.
-///     Usage:
-///     <code>
-///         &lt;controls:PedalCardBorder Background="{Binding CardBackgroundBrush}" CornerRadius="8"&gt;
-///             &lt;StackPanel&gt;…&lt;/StackPanel&gt;
-///         &lt;/controls:PedalCardBorder&gt;
-///     </code>
-///     The drop shadow renders outside the control's layout bounds; add an appropriate
-///     <see cref="Avalonia.Controls.Control.Margin" /> if you need the shadow to be fully visible.
+///     with drop shadow, brushed-metal texture overlay, and an inset bevel — as a background
+///     behind its single child. Corner radius is enforced via a <see cref="Visual.Clip" /> geometry
+///     set in <see cref="ArrangeOverride" /> so it reliably clips both the background fill and child
+///     content regardless of the rendering backend.
 /// </summary>
 public sealed class PedalCardBorder : Decorator
 {
-    // Translated from the SVG filter values:
-    //   feOffset dx="30.99" dy="15.49"
-    //   feGaussianBlur stdDeviation="54.23"  → CSS blur = stdDev × 2 ≈ 108
-    //   feColorMatrix → black at 43 % opacity (0.43 × 255 ≈ 110)
-    private static readonly BoxShadows CardShadows = new BoxShadows(
-        new BoxShadow { OffsetX = 31, OffsetY = 15, Blur = 108, Spread = 0, Color = Color.FromArgb(110, 0, 0, 0) },
-        [
-            new BoxShadow { OffsetX = -2, OffsetY = -2, Blur = 5, IsInset = true, Color = Color.FromArgb(80, 255, 255, 255) },
-            new BoxShadow { OffsetX =  2, OffsetY =  2, Blur = 5, IsInset = true, Color = Color.FromArgb(80,   0,   0,   0) }
-        ]);
+    private static readonly BoxShadows DropShadow = new(
+        new BoxShadow { OffsetX = 31, OffsetY = 15, Blur = 108, Spread = 0, Color = Color.FromArgb(110, 0, 0, 0) });
+
+    private static readonly BoxShadows InsetShadows = new(
+        new BoxShadow { OffsetX = 0, OffsetY = 0, Blur = 10, Spread = 2, IsInset = true, Color = Color.FromArgb(120, 255, 255, 255) },
+        [new BoxShadow { OffsetX = 0, OffsetY = 0, Blur = 10, Spread = 2, IsInset = true, Color = Color.FromArgb(120, 0, 0, 0) }]);
 
     // Lazy-loaded so startup cost is deferred; shared across all instances.
     private static readonly Lazy<Bitmap?> TextureBitmap = new(LoadTexture);
@@ -49,6 +38,8 @@ public sealed class PedalCardBorder : Decorator
     static PedalCardBorder()
     {
         AffectsRender<PedalCardBorder>(BackgroundProperty, CornerRadiusProperty);
+        // CornerRadius change must re-run ArrangeOverride so the Clip geometry is rebuilt.
+        AffectsArrange<PedalCardBorder>(CornerRadiusProperty);
     }
 
     public IBrush? Background
@@ -63,31 +54,55 @@ public sealed class PedalCardBorder : Decorator
         set => SetValue(CornerRadiusProperty, value);
     }
 
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        var result = base.ArrangeOverride(finalSize);
+
+        // Build a rounded-rect clip geometry. This is the most reliable way to get rounded
+        // corners: the compositor applies it after Render, clipping both the fill and children.
+        var r = CornerRadius.TopLeft;
+        var w = result.Width;
+        var h = result.Height;
+        var geo = new StreamGeometry();
+        using (var ctx = geo.Open())
+        {
+            ctx.BeginFigure(new Point(r, 0), true);
+            ctx.LineTo(new Point(w - r, 0));
+            ctx.ArcTo(new Point(w, r), new Size(r, r), 0, false, SweepDirection.Clockwise);
+            ctx.LineTo(new Point(w, h - r));
+            ctx.ArcTo(new Point(w - r, h), new Size(r, r), 0, false, SweepDirection.Clockwise);
+            ctx.LineTo(new Point(r, h));
+            ctx.ArcTo(new Point(0, h - r), new Size(r, r), 0, false, SweepDirection.Clockwise);
+            ctx.LineTo(new Point(0, r));
+            ctx.ArcTo(new Point(r, 0), new Size(r, r), 0, false, SweepDirection.Clockwise);
+        }
+        Clip = geo;
+
+        return result;
+    }
+
     public override void Render(DrawingContext context)
     {
-        var cr = CornerRadius;
         var bounds = new Rect(Bounds.Size);
-        var rrect = new RoundedRect(
-            bounds,
-            new Point(cr.TopLeft, cr.TopLeft),
-            new Point(cr.TopRight - 3, cr.TopRight),
-            new Point(cr.BottomRight - 3, cr.BottomRight),
-            new Point(cr.BottomLeft, cr.BottomLeft));
+        var r = CornerRadius.TopLeft;
+        var rrect = new RoundedRect(bounds, r, r);
 
-        // Layer 1: background with drop shadow + bevel inset (bright top-left, dark bottom-right)
-        if (Background is not null)
-            context.DrawRectangle(Background, null, rrect, CardShadows);
+        // Outer drop shadow — draw before the clip so it isn't masked.
+        context.DrawRectangle(null, null, bounds, r, r, DropShadow);
 
-        // Layer 2: brushed-metal texture at 20 % opacity, clipped to card shape
-        var texture = TextureBitmap.Value;
-        if (texture is not null)
-            using (context.PushClip(rrect))
-            using (context.PushOpacity(0.2))
-            {
-                context.DrawImage(texture, bounds);
-            }
+        // Everything inside the rounded clip: background, inset bevel, texture.
+        using (context.PushClip(rrect))
+        {
+            if (Background is not null)
+                context.DrawRectangle(Background, null, bounds);
 
-        // Children are rendered on top by the layout system after Render returns.
+            context.DrawRectangle(Brushes.Transparent, null, bounds, r, r, InsetShadows);
+
+            var texture = TextureBitmap.Value;
+            if (texture is not null)
+                using (context.PushOpacity(0.2))
+                    context.DrawImage(texture, bounds);
+        }
     }
 
     private static Bitmap? LoadTexture()
