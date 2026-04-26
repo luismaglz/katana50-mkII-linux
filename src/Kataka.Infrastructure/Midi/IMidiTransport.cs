@@ -1,6 +1,6 @@
 using Kataka.Domain.Midi;
 
-namespace Kataka.Application.Midi;
+namespace Kataka.Infrastructure.Midi;
 
 public interface IMidiTransport
 {

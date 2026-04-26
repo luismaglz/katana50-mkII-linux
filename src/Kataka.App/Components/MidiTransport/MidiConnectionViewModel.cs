@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
 
 using Kataka.App.Services;
-using Kataka.Application.Katana;
 using Kataka.Domain.Midi;
 
 using Microsoft.Extensions.Logging;

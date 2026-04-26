@@ -1,6 +1,6 @@
 using Kataka.Domain.Midi;
 
-namespace Kataka.Application.Katana;
+namespace Kataka.App.Services;
 
 public interface IKatanaSession : IAsyncDisposable
 {

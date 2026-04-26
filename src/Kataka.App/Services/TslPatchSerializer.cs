@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace Kataka.Application.Katana;
+namespace Kataka.App.Services;
 
 /// <summary>
 ///     Reads and writes Boss Tone Studio .tsl patch files (format rev 0002, KATANA MkII).

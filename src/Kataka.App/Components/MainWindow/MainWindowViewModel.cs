@@ -3,7 +3,6 @@ using Avalonia.Platform.Storage;
 using Kataka.App.KatanaState;
 using Kataka.App.Logging;
 using Kataka.App.Services;
-using Kataka.Application.Katana;
 
 using Microsoft.Extensions.Logging;
 

@@ -1,4 +1,4 @@
-namespace Kataka.Application.Katana;
+namespace Kataka.App.Services;
 
 /// <summary>
 ///     Describes a single named block within a Katana patch in the "Temporary" area.

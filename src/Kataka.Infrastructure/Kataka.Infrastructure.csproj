@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Kataka.Application\Kataka.Application.csproj"/>
     <ProjectReference Include="..\Kataka.Domain\Kataka.Domain.csproj"/>
   </ItemGroup>
 

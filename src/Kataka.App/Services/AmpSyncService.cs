@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Threading.Channels;
 
 using Kataka.App.KatanaState;
-using Kataka.Application.Katana;
 using Kataka.Domain.Midi;
 
 using Microsoft.Extensions.Logging;
