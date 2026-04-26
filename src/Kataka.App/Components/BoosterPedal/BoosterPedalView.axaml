@@ -29,7 +29,8 @@
                         <controls:RotaryKnobV2 Label="E.LEVEL" Scale="0.75"
                                                Minimum="0" Maximum="100"
                                                Value="{Binding EffectLevel}"
-                                               LabelFontSize="12" />
+                                               LabelFontSize="16"
+                                               ValueFontSize="14" />
                         <controls:RotaryKnobV2 Label="DRIVE" Scale="0.75"
                                                Minimum="0" Maximum="120"
                                                Value="{Binding Drive}"

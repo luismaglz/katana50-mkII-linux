@@ -75,8 +75,12 @@ public abstract class RotaryKnobBase : Control
     public static readonly StyledProperty<Color> TrackColorProperty =
         AvaloniaProperty.Register<RotaryKnobBase, Color>(nameof(TrackColor), Color.FromArgb(55, 255, 255, 255));
 
-    protected static readonly SolidColorBrush LabelBrush = KatanaPalette.TextMainBrush;
-    protected static readonly SolidColorBrush ValueBrush = KatanaPalette.PrimaryLitBrush;
+    public static readonly StyledProperty<IBrush> LabelBrushProperty =
+        AvaloniaProperty.Register<RotaryKnobBase, IBrush>(nameof(LabelBrush), KatanaPalette.TextMainBrush);
+
+    public static readonly StyledProperty<IBrush> ValueBrushProperty =
+        AvaloniaProperty.Register<RotaryKnobBase, IBrush>(nameof(ValueBrush), KatanaPalette.PrimaryLitBrush);
+
     private Point _dragStart;
     private int _dragStartValue;
 
@@ -89,7 +93,8 @@ public abstract class RotaryKnobBase : Control
             MinimumProperty, MaximumProperty, ValueProperty,
             ScaleProperty, IsBipolarProperty,
             DisplayMinimumProperty, DisplayMaximumProperty,
-            AccentColorProperty, FaceColorProperty, BezelColorProperty, TrackColorProperty);
+            AccentColorProperty, FaceColorProperty, BezelColorProperty, TrackColorProperty,
+            LabelBrushProperty, ValueBrushProperty);
         AffectsMeasure<RotaryKnobBase>(ScaleProperty);
         FocusableProperty.OverrideDefaultValue<RotaryKnobBase>(true);
 
@@ -119,6 +124,18 @@ public abstract class RotaryKnobBase : Control
     {
         get => GetValue(TrackColorProperty);
         set => SetValue(TrackColorProperty, value);
+    }
+
+    public IBrush LabelBrush
+    {
+        get => GetValue(LabelBrushProperty);
+        set => SetValue(LabelBrushProperty, value);
+    }
+
+    public IBrush ValueBrush
+    {
+        get => GetValue(ValueBrushProperty);
+        set => SetValue(ValueBrushProperty, value);
     }
 
     /// <summary> Properties ──────────────────────────────────────────────────────────── </summary>
