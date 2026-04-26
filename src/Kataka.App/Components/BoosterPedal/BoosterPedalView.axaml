@@ -13,67 +13,62 @@
              x:DataType="vm:BoosterPedalViewModel"
              x:CompileBindings="False">
 
-        <controls:PedalCardBorder Background="{Binding CardBackgroundBrush}" CornerRadius="8">
-            <Grid>
-                <StackPanel Spacing="0">
-                    <!-- Booster accent bar: amber -->
-                    <StackPanel Spacing="10" Margin="12,10,12,14">
-                        <!-- On/Off toggle + LED -->
+    <controls:PedalCardBorder Background="{Binding CardBackgroundBrush}" CornerRadius="8">
+        <Grid>
+            <StackPanel Spacing="0">
+                <!-- Booster accent bar: amber -->
+                <StackPanel Spacing="10" Margin="12,10,12,14">
+                    <StackPanel Spacing="4" Orientation="Horizontal" VerticalAlignment="Center">
                         <controls:PedalHeaderControl />
-                        <!-- Type selector -->
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
-                                       Foreground="{Binding TypeLabelBrush}" />
-                            <ComboBox Classes="midi-port-picker"
-                                      HorizontalAlignment="Stretch"
-                                      ItemsSource="{Binding TypeOptions}"
-                                      SelectedItem="{Binding SelectedTypeOption}" />
-                        </StackPanel>
-                        <!-- Variation color -->
-                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                            <controls:RotaryKnobV2 Label="E.LEVEL" Scale="0.75"
-                                                   Minimum="0" Maximum="100"
-                                                   Value="{Binding EffectLevel}"
-                                                   LabelFontSize="12" />
-                            <controls:RotaryKnobV2 Label="DRIVE" Scale="0.75"
-                                                   Minimum="0" Maximum="120"
-                                                   Value="{Binding Drive}"
-                                                   LabelFontSize="12" />
-                            <controls:RotaryKnobV2 Label="TONE" Scale="0.75"
-                                                   Minimum="0" Maximum="100"
-                                                   DisplayMinimum="-50" DisplayMaximum="50"
-                                                   Value="{Binding Tone}"
-                                                   LabelFontSize="12" />
+                        <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                  ItemsSource="{Binding TypeOptions}"
+                                  SelectedItem="{Binding SelectedTypeOption}" />
+                    </StackPanel>
+                    <!-- Variation color -->
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                        <controls:RotaryKnobV2 Label="E.LEVEL" Scale="0.75"
+                                               Minimum="0" Maximum="100"
+                                               Value="{Binding EffectLevel}"
+                                               LabelFontSize="12" />
+                        <controls:RotaryKnobV2 Label="DRIVE" Scale="0.75"
+                                               Minimum="0" Maximum="120"
+                                               Value="{Binding Drive}"
+                                               LabelFontSize="12" />
+                        <controls:RotaryKnobV2 Label="TONE" Scale="0.75"
+                                               Minimum="0" Maximum="100"
+                                               DisplayMinimum="-50" DisplayMaximum="50"
+                                               Value="{Binding Tone}"
+                                               LabelFontSize="12" />
 
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
 
-                            <controls:RotaryKnobV2 Label="BOTTOM" Scale="0.75"
-                                                   Minimum="0" Maximum="100"
-                                                   DisplayMinimum="-50" DisplayMaximum="50"
-                                                   Value="{Binding Bottom}"
-                                                   LabelFontSize="12" />
-                            <controls:RotaryKnobV2 Label="D.MIX" Scale="0.75"
-                                                   Minimum="0" Maximum="100"
-                                                   Value="{Binding DirectMix}"
-                                                   LabelFontSize="12" />
-                            <controls:RotaryKnobV2 Label="SOLO LVL" Scale="0.75"
-                                                   Minimum="0" Maximum="100"
-                                                   Value="{Binding SoloLevel}"
-                                                   LabelFontSize="12" />
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="30">
-                            <ToggleButton Classes="effect-button"
-                                          HorizontalAlignment="Center"
-                                          HorizontalContentAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          Content="SOLO"
-                                          Width="100"
-                                          IsChecked="{Binding SoloSw}" />
-                        </StackPanel>
+                        <controls:RotaryKnobV2 Label="BOTTOM" Scale="0.75"
+                                               Minimum="0" Maximum="100"
+                                               DisplayMinimum="-50" DisplayMaximum="50"
+                                               Value="{Binding Bottom}"
+                                               LabelFontSize="12" />
+                        <controls:RotaryKnobV2 Label="D.MIX" Scale="0.75"
+                                               Minimum="0" Maximum="100"
+                                               Value="{Binding DirectMix}"
+                                               LabelFontSize="12" />
+                        <controls:RotaryKnobV2 Label="SOLO LVL" Scale="0.75"
+                                               Minimum="0" Maximum="100"
+                                               Value="{Binding SoloLevel}"
+                                               LabelFontSize="12" />
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="30">
+                        <ToggleButton Classes="effect-button"
+                                      HorizontalAlignment="Center"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Content="SOLO"
+                                      Width="100"
+                                      IsChecked="{Binding SoloSw}" />
                     </StackPanel>
                 </StackPanel>
-                <Border IsHitTestVisible="False" CornerRadius="8" />
-            </Grid>
-        </controls:PedalCardBorder>
+            </StackPanel>
+            <Border IsHitTestVisible="False" CornerRadius="8" />
+        </Grid>
+    </controls:PedalCardBorder>
 </UserControl>
