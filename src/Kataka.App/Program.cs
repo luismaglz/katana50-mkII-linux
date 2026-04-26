@@ -7,8 +7,6 @@ using Kataka.App.KatanaState;
 using Kataka.App.Logging;
 using Kataka.App.Services;
 using Kataka.App.ViewModels;
-using Kataka.Application.Katana;
-using Kataka.Application.Midi;
 using Kataka.Infrastructure.Midi;
 
 using Microsoft.Extensions.Configuration;

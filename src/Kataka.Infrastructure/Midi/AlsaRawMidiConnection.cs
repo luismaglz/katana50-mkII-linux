@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Text;
 
-using Kataka.Application.Midi;
 using Kataka.Domain.Midi;
 
 namespace Kataka.Infrastructure.Midi;

@@ -1,7 +1,7 @@
-using Kataka.Application.Midi;
 using Kataka.Domain.Midi;
+using Kataka.Infrastructure.Midi;
 
-namespace Kataka.Application.Katana;
+namespace Kataka.App.Services;
 
 public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
 {

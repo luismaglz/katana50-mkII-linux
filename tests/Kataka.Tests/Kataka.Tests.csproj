@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Kataka.Application\Kataka.Application.csproj"/>
     <ProjectReference Include="..\..\src\Kataka.Domain\Kataka.Domain.csproj"/>
     <ProjectReference Include="..\..\src\Kataka.Infrastructure\Kataka.Infrastructure.csproj"/>
   </ItemGroup>

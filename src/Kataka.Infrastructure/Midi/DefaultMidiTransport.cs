@@ -1,5 +1,3 @@
-using Kataka.Application.Midi;
-
 namespace Kataka.Infrastructure.Midi;
 
 public static class DefaultMidiTransport

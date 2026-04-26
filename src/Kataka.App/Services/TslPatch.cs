@@ -1,4 +1,4 @@
-namespace Kataka.Application.Katana;
+namespace Kataka.App.Services;
 
 /// <summary>
 ///     Represents a Boss Tone Studio .tsl patch file loaded into memory.

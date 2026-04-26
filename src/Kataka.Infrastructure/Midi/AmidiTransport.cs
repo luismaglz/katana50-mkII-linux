@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-using Kataka.Application.Midi;
 using Kataka.Domain.Midi;
 
 namespace Kataka.Infrastructure.Midi;
