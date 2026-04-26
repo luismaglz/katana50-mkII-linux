@@ -15,21 +15,21 @@
             <controls:RotaryKnobV2 Scale="0.75" Label="LEVEL"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding AcGuitarSimLevel}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="BODY"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding AcGuitarSimBody}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnobV2 Scale="0.75" Label="HIGH"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding AcGuitarSimHigh}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="LOW"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding AcGuitarSimLow}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
     </StackPanel>
 </UserControl>

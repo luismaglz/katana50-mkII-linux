@@ -40,22 +40,22 @@
                                                Description="Adjusts the length (duration) of the reverberation."
                                                Minimum="0" Maximum="127"
                                                Value="{Binding Time}"
-                                               LabelFontSize="12" />
+                                               LabelFontSize="16" ValueFontSize="14" />
                         <controls:RotaryKnobV2 Label="PRE DELAY" Scale="0.75"
                                                Description="Adjusts the time delay before the reverb sound appears (0–500 ms)."
                                                Minimum="0" Maximum="127"
                                                Value="{Binding PreDelay}"
-                                               LabelFontSize="12" />
+                                               LabelFontSize="16" ValueFontSize="14" />
                         <controls:RotaryKnobV2 Label="E.LEVEL" Scale="0.75"
                                                Description="Adjusts the volume of the reverb (effect) sound."
                                                Minimum="0" Maximum="100"
                                                Value="{Binding EffectLevel}"
-                                               LabelFontSize="12" />
+                                               LabelFontSize="16" ValueFontSize="14" />
                         <controls:RotaryKnobV2 Label="D.MIX" Scale="0.75"
                                                Description="Adjusts the volume of the direct (dry) sound."
                                                Minimum="0" Maximum="100"
                                                Value="{Binding DirectMix}"
-                                               LabelFontSize="12" />
+                                               LabelFontSize="16" ValueFontSize="14" />
                     </StackPanel>
 
                     <!-- Row 2: LowCut, HighCut, Density, Color -->
@@ -64,22 +64,22 @@
                                                 Description="Sets the frequency at which the low cut filter takes effect. At minimum (FLAT), the filter has no effect."
                                                 Steps="{x:Static vm:FrequencySteps.LowCut18}"
                                                 Value="{Binding LowCut}"
-                                                LabelFontSize="12" />
+                                                LabelFontSize="16" />
                         <controls:SteppedKnobV2 Label="HIGH CUT" Scale="0.75"
                                                 Description="Sets the frequency at which the high cut filter takes effect. At maximum (FLAT), the filter has no effect."
                                                 Steps="{x:Static vm:FrequencySteps.HighCut18}"
                                                 Value="{Binding HighCut}"
-                                                LabelFontSize="12" />
+                                                LabelFontSize="16" />
                         <controls:RotaryKnobV2 Label="DENSITY" Scale="0.75"
                                                Description="Adjusts the density of the reverb sound."
                                                Minimum="0" Maximum="10"
                                                Value="{Binding Density}"
-                                               LabelFontSize="12" />
+                                               LabelFontSize="16" ValueFontSize="14" />
                         <controls:RotaryKnobV2 Label="COLOR" Scale="0.75"
                                                Description="Adjusts the unique tone character of the spring reverb. Only active when TYPE is SPRING."
                                                Minimum="0" Maximum="100"
                                                Value="{Binding Color}"
-                                               LabelFontSize="12" />
+                                               LabelFontSize="16" ValueFontSize="14" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

@@ -19,35 +19,35 @@
             <controls:RotaryKnobV2 Scale="0.75" Label="VOWEL 1"
                                    Minimum="0" Maximum="4"
                                    Value="{Binding HumanizerVowel1}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="VOWEL 2"
                                    Minimum="0" Maximum="4"
                                    Value="{Binding HumanizerVowel2}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="SENS"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding HumanizerSens}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnobV2 Scale="0.75" Label="RATE"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding HumanizerRate}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="DEPTH"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding HumanizerDepth}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
             <controls:RotaryKnobV2 Scale="0.75" Label="MANUAL"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding HumanizerManual}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnobV2 Scale="0.75" Label="LEVEL"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding HumanizerLevel}"
-                                   LabelFontSize="11" />
+                                   LabelFontSize="16" ValueFontSize="14" />
         </StackPanel>
     </StackPanel>
 </UserControl>
