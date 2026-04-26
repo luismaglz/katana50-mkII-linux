@@ -51,6 +51,9 @@ public interface IKatanaState
     ContourState Contour2 { get; }
     ContourState Contour3 { get; }
 
+    AmpControlState ContourSw { get; }
+    AmpControlState ContourSelect { get; }
+
     /// <summary>
     ///     Returns all top-level amp control states (EQ, gain, tone) keyed by parameter key.
     ///     Used by the service to keep domain state in sync with amp reads.

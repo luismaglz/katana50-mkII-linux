@@ -21,6 +21,9 @@ public partial class KatanaState
     public ContourState Contour3 { get; } = new(KatanaMkIIParameterCatalog.Contour3Type,
         KatanaMkIIParameterCatalog.Contour3FreqShift);
 
+    public AmpControlState ContourSw { get; } = new(KatanaMkIIParameterCatalog.ContourSw);
+    public AmpControlState ContourSelect { get; } = new(KatanaMkIIParameterCatalog.ContourSelect);
+
     partial void RegisterChannelMode()
     {
         RegisterAll(Preamp);
@@ -30,5 +33,7 @@ public partial class KatanaState
         RegisterAll(Contour1);
         RegisterAll(Contour2);
         RegisterAll(Contour3);
+        RegisterAll(ContourSw);
+        RegisterAll(ContourSelect);
     }
 }
