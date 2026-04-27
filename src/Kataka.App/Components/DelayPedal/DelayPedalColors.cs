@@ -21,7 +21,7 @@ public static class DelayPedalColors
         "TAPE ECHO" => TapeEcho,
         "MODULATE" => Modulate,
         "SDE-3000" => Sde3000,
-        _ => Digital,
+        _ => Digital
     };
 
     private static IBrush Solid(string hex) => new SolidColorBrush(Color.Parse(hex));

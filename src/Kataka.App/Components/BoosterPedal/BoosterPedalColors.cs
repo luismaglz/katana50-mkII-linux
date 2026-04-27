@@ -4,12 +4,12 @@ using Avalonia.Media;
 namespace Kataka.App.Components.BoosterPedal;
 
 /// <summary>
-/// Background color palette for the booster pedal card, keyed by effect category.
-///   White   = Boost/Tuner (MID BOOST, CLEAN BOOST, TREBLE BOOST)
-///   Green   = Overdrive / Tube-Screamer style
-///   Blue    = Blues / Transparent OD
-///   Orange  = Distortion
-///   Charcoal = Fuzz / Heavy
+///     Background color palette for the booster pedal card, keyed by effect category.
+///     White   = Boost/Tuner (MID BOOST, CLEAN BOOST, TREBLE BOOST)
+///     Green   = Overdrive / Tube-Screamer style
+///     Blue    = Blues / Transparent OD
+///     Orange  = Distortion
+///     Charcoal = Fuzz / Heavy
 /// </summary>
 public static class BoosterPedalColors
 {
@@ -26,7 +26,7 @@ public static class BoosterPedalColors
         "BLUES DRIVE" or "CENTA OD" => Blues,
         "FAT DS" or "DISTORTION" or "RAT" or "GUV DS" or "DST+" => Distortion,
         "METAL DS" or "OCT FUZZ" or "METAL ZONE" or "'60S FUZZ" or "MUFF FUZZ" or "HM-2" or "METAL CORE" => Fuzz,
-        _ => Overdrive,
+        _ => Overdrive
     };
 
     private static IBrush Gradient(string top, string bottom) =>
@@ -34,10 +34,6 @@ public static class BoosterPedalColors
         {
             StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
             EndPoint = new RelativePoint(0, 1, RelativeUnit.Relative),
-            GradientStops =
-            {
-                new GradientStop(Color.Parse(top), 0),
-                new GradientStop(Color.Parse(bottom), 1),
-            }
+            GradientStops = { new GradientStop(Color.Parse(top), 0), new GradientStop(Color.Parse(bottom), 1) }
         };
 }

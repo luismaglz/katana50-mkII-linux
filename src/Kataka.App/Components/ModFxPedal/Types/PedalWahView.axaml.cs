@@ -4,5 +4,8 @@ namespace Kataka.App.Views.ModsFx;
 
 public partial class PedalWahView : UserControl
 {
-    public PedalWahView() => InitializeComponent();
+    public PedalWahView()
+    {
+        InitializeComponent();
+    }
 }

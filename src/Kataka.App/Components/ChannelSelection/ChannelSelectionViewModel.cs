@@ -75,7 +75,12 @@ public class ChannelSelectionViewModel : ViewModelBase
 
     private sealed class SelectChannelCommand(ChannelSelectionViewModel vm) : ICommand
     {
-        event EventHandler? ICommand.CanExecuteChanged { add { } remove { } }
+        event EventHandler? ICommand.CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
+
         public bool CanExecute(object? parameter) => true;
 
         public void Execute(object? parameter)

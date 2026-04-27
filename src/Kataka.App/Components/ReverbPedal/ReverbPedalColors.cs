@@ -17,7 +17,7 @@ public static class ReverbPedalColors
         "PLATE" => Plate,
         "SPRING" => Spring,
         "MODULATE" => Modulate,
-        _ => Hall,
+        _ => Hall
     };
 
     private static IBrush Solid(string hex) => new SolidColorBrush(Color.Parse(hex));

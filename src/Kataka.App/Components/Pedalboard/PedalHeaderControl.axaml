@@ -8,6 +8,6 @@
              ClipToBounds="False">
 
     <ptb:PhysicalToggleButtonView IsChecked="{Binding IsEnabled}"
-                                   DisplayName="{Binding DisplayName}" />
+                                  DisplayName="{Binding DisplayName}" />
 
 </UserControl>

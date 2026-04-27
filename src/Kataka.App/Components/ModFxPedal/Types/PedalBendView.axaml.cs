@@ -4,5 +4,8 @@ namespace Kataka.App.Views.ModsFx;
 
 public partial class PedalBendView : UserControl
 {
-    public PedalBendView() => InitializeComponent();
+    public PedalBendView()
+    {
+        InitializeComponent();
+    }
 }

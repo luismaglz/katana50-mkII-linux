@@ -151,9 +151,9 @@ public sealed class RolandSysExBuilderTests
             KatanaMkIIParameterCatalog.ModType.SkippedValues);
         Assert.Equal(KatanaMkIIParameterCatalog.ModType.SkippedValues, KatanaMkIIParameterCatalog.FxType.SkippedValues);
 
-        Assert.Equal((byte)10, KatanaMkIIParameterCatalog.DelayType.Maximum);
-        Assert.Equal((byte)10, KatanaMkIIParameterCatalog.Delay2Type.Maximum);
-        Assert.Equal((byte)6, KatanaMkIIParameterCatalog.ReverbType.Maximum);
+        Assert.Equal(10, KatanaMkIIParameterCatalog.DelayType.Maximum);
+        Assert.Equal(10, KatanaMkIIParameterCatalog.Delay2Type.Maximum);
+        Assert.Equal(6, KatanaMkIIParameterCatalog.ReverbType.Maximum);
     }
 
     [Fact]

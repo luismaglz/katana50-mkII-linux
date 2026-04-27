@@ -1,5 +1,6 @@
 using System.Reactive.Subjects;
 using System.Reflection;
+using System.Text;
 using System.Threading.Channels;
 
 using Kataka.App.KatanaState;
@@ -11,6 +12,15 @@ namespace Kataka.App.Services;
 
 public sealed class AmpSyncService : IAmpSyncService
 {
+    private static readonly Dictionary<int, KatanaPanelChannel> SysExToChannel = new()
+    {
+        [0] = KatanaPanelChannel.Panel,
+        [1] = KatanaPanelChannel.ChA1,
+        [2] = KatanaPanelChannel.ChA2,
+        [5] = KatanaPanelChannel.ChB1,
+        [6] = KatanaPanelChannel.ChB2
+    };
+
     private readonly IKatanaState _katanaState;
     private readonly ILogger<AmpSyncService> _logger;
 
@@ -192,21 +202,14 @@ public sealed class AmpSyncService : IAmpSyncService
     {
         if (!_session.IsConnected)
         {
-            _logger.LogWarning("WriteRequested for {Address} but session not connected — dropped.", state.Parameter.AddressString);
+            _logger.LogWarning("WriteRequested for {Address} but session not connected — dropped.",
+                state.Parameter.AddressString);
             return;
         }
+
         _logger.LogInformation("WriteRequested: {Address} -> {Value}", state.Parameter.AddressString, state.Value);
         _writeChannel?.Writer.TryWrite((state.Parameter.Address, state.GetWriteBytes()));
     }
-
-    private static readonly Dictionary<int, KatanaPanelChannel> SysExToChannel = new()
-    {
-        [0] = KatanaPanelChannel.Panel,
-        [1] = KatanaPanelChannel.ChA1,
-        [2] = KatanaPanelChannel.ChA2,
-        [5] = KatanaPanelChannel.ChB1,
-        [6] = KatanaPanelChannel.ChB2,
-    };
 
     private void OnChannelStateChanged(AmpControlState state)
     {
@@ -234,12 +237,11 @@ public sealed class AmpSyncService : IAmpSyncService
     {
         _logger.LogInformation("Reading user patch names from amp.");
         for (var i = 0; i < KatanaAddressMap.UserPatchNameAddresses.Count; i++)
-        {
             try
             {
                 var addr = KatanaAddressMap.UserPatchNameAddresses[i];
                 var raw = await _session.ReadBlockAsync(addr, 16);
-                var name = System.Text.Encoding.ASCII.GetString(raw).TrimEnd();
+                var name = Encoding.ASCII.GetString(raw).TrimEnd();
                 _katanaState.SetUserPatchName(i, name);
                 _logger.LogDebug("UserPatch[{Slot}] name = \"{Name}\"", i + 1, name);
             }
@@ -247,7 +249,6 @@ public sealed class AmpSyncService : IAmpSyncService
             {
                 _logger.LogWarning(ex, "Failed to read patch name for slot {Slot}.", i + 1);
             }
-        }
     }
 
     /// <summary> Push notification infrastructure ───────────────────────────────────── </summary>
@@ -286,7 +287,7 @@ public sealed class AmpSyncService : IAmpSyncService
 
                 if (HasPendingLsb(states, key, i, dataLength))
                 {
-                    _katanaState.SetState(key, new byte[] { bytes[12 + i], bytes[12 + i + 1] });
+                    _katanaState.SetState(key, new[] { bytes[12 + i], bytes[12 + i + 1] });
                     i++; // skip the LSB byte
                 }
                 else

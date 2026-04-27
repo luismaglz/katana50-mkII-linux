@@ -6,9 +6,9 @@ namespace Kataka.App.ViewModels;
 
 public class PanelViewModel : ViewModelBase
 {
-    private readonly AmpControlState _globalEqSw;
-    private readonly AmpControlState _contourSw;
     private readonly AmpControlState _contourSelect;
+    private readonly AmpControlState _contourSw;
+    private readonly AmpControlState _globalEqSw;
     private readonly AmpControlState _soloSw;
 
     public PanelViewModel(IKatanaState katanaState)
@@ -69,7 +69,9 @@ public class PanelViewModel : ViewModelBase
         set
         {
             if (value == 0)
+            {
                 _contourSw.Value = 0;
+            }
             else
             {
                 _contourSw.Value = 1;

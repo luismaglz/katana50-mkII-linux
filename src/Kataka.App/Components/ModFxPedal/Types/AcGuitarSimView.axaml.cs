@@ -4,5 +4,8 @@ namespace Kataka.App.Views.ModsFx;
 
 public partial class AcGuitarSimView : UserControl
 {
-    public AcGuitarSimView() => InitializeComponent();
+    public AcGuitarSimView()
+    {
+        InitializeComponent();
+    }
 }

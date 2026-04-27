@@ -46,4 +46,3 @@ public partial class KatanaState
         RegisterAll(CurrentChannel);
     }
 }
-

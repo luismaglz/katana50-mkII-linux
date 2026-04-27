@@ -28,7 +28,6 @@ public static partial class KatanaMkIIParameterCatalog
             description: "Selects which Global EQ bank is active (0=bank 1, 1=bank 2, 2=bank 3).");
 
     /// <summary> Global EQ Bank 1 (SysEq1, block 0x0030) ───────────────────────────────── </summary>
-
     /// <summary>Parameter definition for Global Eq 1 Type.</summary>
     public static KatanaParameterDefinition GlobalEq1Type { get; } =
         new("global-eq1-type", "Global EQ Type",
@@ -211,7 +210,6 @@ public static partial class KatanaMkIIParameterCatalog
             maximum: 48, description: "Overall output level of the GE-10 graphic EQ (-24 to +24 dB).");
 
     /// <summary> Global EQ Bank 2 (SysEq2, block 0x0050) ───────────────────────────────── </summary>
-
     /// <summary>Parameter definition for Global Eq 2 Type.</summary>
     public static KatanaParameterDefinition GlobalEq2Type { get; } =
         new("global-eq2-type", "Global EQ 2 Type",
@@ -381,7 +379,6 @@ public static partial class KatanaMkIIParameterCatalog
             maximum: 48, description: "Overall output level of GE-10 graphic EQ bank 2 (-24 to +24 dB).");
 
     /// <summary> Global EQ Bank 3 (SysEq3, block 0x0070) ───────────────────────────────── </summary>
-
     /// <summary>Parameter definition for Global Eq 3 Type.</summary>
     public static KatanaParameterDefinition GlobalEq3Type { get; } =
         new("global-eq3-type", "Global EQ 3 Type",

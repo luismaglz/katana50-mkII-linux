@@ -13,6 +13,7 @@ public static partial class KatanaMkIIParameterCatalog
 
     /// <summary>SysEx byte values for each selectable channel.</summary>
     public static byte ChannelPanel { get; } = 0;
+
     public static byte ChannelChA1 { get; } = 1;
     public static byte ChannelChA2 { get; } = 2;
     public static byte ChannelChB1 { get; } = 5;

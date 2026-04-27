@@ -4,5 +4,8 @@ namespace Kataka.App.Controls;
 
 public partial class PedalHeaderControl : UserControl
 {
-    public PedalHeaderControl() => InitializeComponent();
+    public PedalHeaderControl()
+    {
+        InitializeComponent();
+    }
 }

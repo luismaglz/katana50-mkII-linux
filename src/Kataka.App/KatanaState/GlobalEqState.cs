@@ -4,16 +4,16 @@ namespace Kataka.App.KatanaState;
 
 public class GlobalEqState
 {
-    /// <summary>Master on/off switch (PRM_SYS_EQ_SW) — shared across all banks.</summary>
-    public AmpControlState Sw = new(KatanaMkIIParameterCatalog.GlobalEqSw);
+    public EqBankState Bank1 = new();
+    public EqBankState Bank2 = new();
+    public EqBankState Bank3 = new();
 
     /// <summary>Selector: which bank is active (0=bank1, 1=bank2, 2=bank3).</summary>
     public AmpControlState Select = new(KatanaMkIIParameterCatalog.GlobalEqSelect,
         description: "Selects which Global EQ bank is active (0=bank1,1=bank2,2=bank3)");
 
-    public EqBankState Bank1 = new();
-    public EqBankState Bank2 = new();
-    public EqBankState Bank3 = new();
+    /// <summary>Master on/off switch (PRM_SYS_EQ_SW) — shared across all banks.</summary>
+    public AmpControlState Sw = new(KatanaMkIIParameterCatalog.GlobalEqSw);
 
     public GlobalEqState()
     {
@@ -98,29 +98,29 @@ public class GlobalEqState
 
     public class EqBankState
     {
-        public AmpControlState? Type;
-        public AmpControlState? Position;
+        public AmpControlState? Geq125Hz;
+        public AmpControlState? Geq16kHz;
+        public AmpControlState? Geq1kHz;
+        public AmpControlState? Geq250Hz;
+        public AmpControlState? Geq2kHz;
+        public AmpControlState? Geq31Hz;
+        public AmpControlState? Geq4kHz;
+        public AmpControlState? Geq500Hz;
+        public AmpControlState? Geq62Hz;
+        public AmpControlState? Geq8kHz;
+        public AmpControlState? GeqLevel;
+        public AmpControlState? HighCut;
+        public AmpControlState? HighGain;
+        public AmpControlState? HiMidFreq;
+        public AmpControlState? HiMidGain;
+        public AmpControlState? HiMidQ;
+        public AmpControlState? Level;
         public AmpControlState? LowCut;
         public AmpControlState? LowGain;
         public AmpControlState? LowMidFreq;
-        public AmpControlState? LowMidQ;
         public AmpControlState? LowMidGain;
-        public AmpControlState? HiMidFreq;
-        public AmpControlState? HiMidQ;
-        public AmpControlState? HiMidGain;
-        public AmpControlState? HighGain;
-        public AmpControlState? HighCut;
-        public AmpControlState? Level;
-        public AmpControlState? Geq31Hz;
-        public AmpControlState? Geq62Hz;
-        public AmpControlState? Geq125Hz;
-        public AmpControlState? Geq250Hz;
-        public AmpControlState? Geq500Hz;
-        public AmpControlState? Geq1kHz;
-        public AmpControlState? Geq2kHz;
-        public AmpControlState? Geq4kHz;
-        public AmpControlState? Geq8kHz;
-        public AmpControlState? Geq16kHz;
-        public AmpControlState? GeqLevel;
+        public AmpControlState? LowMidQ;
+        public AmpControlState? Position;
+        public AmpControlState? Type;
     }
 }

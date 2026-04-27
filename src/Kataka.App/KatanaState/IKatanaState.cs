@@ -1,5 +1,3 @@
-using Kataka.Domain.Midi;
-
 namespace Kataka.App.KatanaState;
 
 public interface IKatanaState
@@ -23,12 +21,6 @@ public interface IKatanaState
     /// <summary>Maps slot index (0-based) to the stored patch name for that slot.</summary>
     IReadOnlyDictionary<int, string> UserPatchNames { get; }
 
-    /// <summary>Fires whenever any entry in <see cref="UserPatchNames" /> is added or updated.</summary>
-    event Action? UserPatchNamesChanged;
-
-    /// <summary>Sets the stored name for <paramref name="slotIndex" /> and fires <see cref="UserPatchNamesChanged" />.</summary>
-    void SetUserPatchName(int slotIndex, string name);
-
     /// <summary> Channel-mode stored preamp values ──────────────────────────────────────── </summary>
     PreampState Preamp { get; }
 
@@ -45,6 +37,7 @@ public interface IKatanaState
 
     /// <summary> Ver200+ features ───────────────────────────────────────────────────────── </summary>
     SoloEqState SoloEq { get; }
+
     GlobalEqState GlobalEq { get; }
 
     ContourState Contour1 { get; }
@@ -53,6 +46,12 @@ public interface IKatanaState
 
     AmpControlState ContourSw { get; }
     AmpControlState ContourSelect { get; }
+
+    /// <summary>Fires whenever any entry in <see cref="UserPatchNames" /> is added or updated.</summary>
+    event Action? UserPatchNamesChanged;
+
+    /// <summary>Sets the stored name for <paramref name="slotIndex" /> and fires <see cref="UserPatchNamesChanged" />.</summary>
+    void SetUserPatchName(int slotIndex, string name);
 
     /// <summary>
     ///     Returns all top-level amp control states (EQ, gain, tone) keyed by parameter key.
