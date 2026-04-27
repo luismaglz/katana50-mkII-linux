@@ -34,6 +34,7 @@
     <PackageReference Include="ReactiveUI.Fody" />
     <PackageReference Include="Svg.Controls.Skia.Avalonia" />
     <PackageReference Include="Svg.Skia" />
+    <PackageReference Include="System.IO.Abstractions" />
     <!-- Override transitive dependency to patched version (CVE-2026-39959 / GHSA-xrw6-gwf8-vvr9) -->
     <PackageReference Include="Tmds.DBus.Protocol" />
     <PackageReference Include="AvaloniaUI.DiagnosticsSupport">

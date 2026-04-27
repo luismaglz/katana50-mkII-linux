@@ -23,8 +23,9 @@
             <views:DeviceStatusView Grid.Column="1" />
             <views:ChannelStripView Grid.Column="2" />
         </Grid>
-        <Grid Grid.Row="1" ColumnDefinitions="*" ColumnSpacing="18">
-            <ScrollViewer Grid.Column="0"
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*" ColumnSpacing="18">
+            <views:PatchLibraryView Grid.Column="0" DataContext="{Binding PatchLibrary}" />
+            <ScrollViewer Grid.Column="1"
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto">
                 <Border Classes="amp-shell" Padding="24">

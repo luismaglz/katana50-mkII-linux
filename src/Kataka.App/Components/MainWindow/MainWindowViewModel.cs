@@ -16,7 +16,7 @@ public class MainWindowViewModel : ViewModelBase
     private readonly IAmpSyncService syncService;
 
     public MainWindowViewModel(IKatanaSession katanaSession, IKatanaState katanaState, IAmpSyncService ampSyncService,
-        ILoggerFactory loggerFactory, ObservableLoggerProvider loggerProvider)
+        IPatchLibraryService patchLibraryService, ILoggerFactory loggerFactory, ObservableLoggerProvider loggerProvider)
     {
         syncService = ampSyncService;
 
@@ -28,6 +28,8 @@ public class MainWindowViewModel : ViewModelBase
         AmpEditor = new AmpEditorViewModel(katanaState);
         GlobalEq = new GlobalEqViewModel(katanaState);
         PedalboardMiniMap = new PedalboardMiniMapViewModel(katanaState);
+        PatchLibrary = new PatchLibraryViewModel(patchLibraryService,
+            loggerFactory.CreateLogger<PatchLibraryViewModel>());
 
         syncService.StatusMessages.Subscribe(msg => StatusMessage = msg).DisposeWith(Disposables);
 
@@ -40,6 +42,7 @@ public class MainWindowViewModel : ViewModelBase
     public DiagnosticsViewModel Diagnostics { get; }
     public PatchViewModel Patch { get; }
     public AmpEditorViewModel AmpEditor { get; }
+    public PatchLibraryViewModel PatchLibrary { get; }
 
     public PedalboardMiniMapViewModel PedalboardMiniMap { get; }
     public GlobalEqViewModel GlobalEq { get; }
@@ -49,7 +52,11 @@ public class MainWindowViewModel : ViewModelBase
 
     public IStorageProvider? StorageProvider
     {
-        set => Patch.StorageProvider = value;
+        set
+        {
+            Patch.StorageProvider = value;
+            PatchLibrary.StorageProvider = value;
+        }
     }
 
     public void Shutdown() => syncService.Shutdown();

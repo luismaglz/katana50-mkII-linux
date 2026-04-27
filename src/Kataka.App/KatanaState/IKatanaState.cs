@@ -87,4 +87,11 @@ public interface IKatanaState
 
     /// <summary>Returns all registered parameter states keyed by AddressString (e.g. "60-00-06-52").</summary>
     IReadOnlyDictionary<string, AmpControlState> GetAllRegisteredStates();
+
+    /// <summary>
+    ///     Applies raw SysEx byte values to all registered states using the <see cref="AmpControlState.Value" />
+    ///     setter, which fires <see cref="AmpControlState.WriteRequested" /> for each changed parameter so that
+    ///     AmpSyncService queues the writes to the amp temp area.
+    /// </summary>
+    void ApplyPatchValues(IReadOnlyDictionary<string, byte> rawValues);
 }

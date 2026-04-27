@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kataka.App.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="Kataka.App.Views.PatchLibraryView"
+             x:DataType="vm:PatchLibraryViewModel"
+             x:CompileBindings="False">
+
+    <Border Classes="panel-section" Padding="14">
+        <StackPanel Spacing="10" MinWidth="170">
+            <Button Classes="transport-button"
+                    Content="Load File"
+                    Command="{Binding LoadFileCommand}"
+                    HorizontalAlignment="Stretch" />
+
+            <StackPanel Spacing="6" IsVisible="{Binding HasPatches}">
+                <TextBlock Text="{Binding LoadedFileName}"
+                           FontWeight="SemiBold"
+                           FontSize="11"
+                           TextWrapping="Wrap"
+                           Foreground="{StaticResource KatanaSubtleTextBrush}" />
+                <Separator />
+                <ListBox x:Name="PatchList"
+                         ItemsSource="{Binding PatchNames}"
+                         SelectedIndex="{Binding SelectedIndex, Mode=OneWay}"
+                         SelectionChanged="PatchList_OnSelectionChanged"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="8,5" />
+                            <Setter Property="FontSize" Value="12" />
+                        </Style>
+                    </ListBox.Styles>
+                </ListBox>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

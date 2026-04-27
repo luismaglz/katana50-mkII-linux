@@ -13,6 +13,7 @@ public sealed class DesignMainWindowViewModel : MainWindowViewModel
         new AmpSyncService(new NullKatanaSession(),
             new KatanaState.KatanaState(NullLogger<KatanaState.KatanaState>.Instance),
             NullLogger<AmpSyncService>.Instance),
+        new NullPatchLibraryService(),
         NullLoggerFactory.Instance,
         new ObservableLoggerProvider())
     {

@@ -1,3 +1,5 @@
+using System.IO.Abstractions;
+
 using Avalonia;
 using Avalonia.ReactiveUI;
 
@@ -49,6 +51,8 @@ internal sealed class Program
         services.AddSingleton<IKatanaSession, KatanaSession>();
         services.AddSingleton<IKatanaState, KatanaState.KatanaState>();
         services.AddSingleton<IAmpSyncService, AmpSyncService>();
+        services.AddSingleton<IFileSystem, FileSystem>();
+        services.AddSingleton<IPatchLibraryService, PatchLibraryService>();
         services.AddSingleton<MainWindowViewModel>();
     }
 

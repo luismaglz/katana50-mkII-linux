@@ -85,6 +85,28 @@ public partial class KatanaState : IKatanaState
         }
     }
 
+    public void ApplyPatchValues(IReadOnlyDictionary<string, byte> rawValues)
+    {
+        var consumed = new HashSet<string>(StringComparer.Ordinal);
+
+        // First pass: 2-byte INTEGER2x7 params — decode and set via Value setter (triggers WriteRequested).
+        foreach (var (addr, state) in _stateFields)
+        {
+            if (state.Parameter.ByteSize != 2) continue;
+            if (!rawValues.TryGetValue(addr, out var b0)) continue;
+            var lsbKey = Utilities.AddressToKey(Utilities.AddressOffset(state.Parameter.Address, 1));
+            if (!rawValues.TryGetValue(lsbKey, out var b1)) continue;
+            state.Value = (b0 << 7) | b1;
+            consumed.Add(addr);
+            consumed.Add(lsbKey);
+        }
+
+        // Second pass: single-byte params.
+        foreach (var kvp in rawValues)
+            if (!consumed.Contains(kvp.Key) && _stateFields.TryGetValue(kvp.Key, out var state))
+                state.Value = kvp.Value;
+    }
+
     partial void RegisterPanelMode();
     partial void RegisterChannelMode();
     partial void RegisterPedals();
