@@ -3,20 +3,38 @@
 This file documents the **established patterns** that every new feature must follow.
 When in doubt, look at `BoostPedalState` / `PanelViewModel` / `AmpControlViewModel` as the ground-truth references.
 
----
 
-## Build & test
+# Kataka — Architecture & Development Guidelines
+
+## Project overview
+
+Kataka is an Avalonia desktop app for controlling a Boss Katana 50 MkII guitar amplifier over MIDI SysEx. The amp is the source of truth for hardware state; the app mirrors that state in `KatanaState` and writes changes back. Patches are stored as `.tsl` files (Boss Tone Studio format).
+
+## Commands
 
 ```bash
-dotnet build --no-incremental -v q   # build
-dotnet test -v q                     # run tests
+dotnet build --no-incremental -v q           # build
+dotnet run --project src/Kataka.App/Kataka.App.csproj   # run
+dotnet watch run --project src/Kataka.App/Kataka.App.csproj  # hot reload
+dotnet test --filter "FullyQualifiedName!~Integration"  # test (exclude ALSA hardware tests)
+dotnet format                                # enforce .editorconfig rules (run after every C#/AXAML change)
 ```
 
-Both commands run from the repo root (`katana50-mkII-linux/`).
+Integration tests require a physical MIDI device and will hang without one — always use the filter.
+
+## Solution layout
+
+```
+src/
+  Kataka.Domain/          # Pure domain: parameter catalog, enums, KatanaParameterDefinition
+  Kataka.Infrastructure/  # MIDI transport implementation (ALSA on Linux)
+  Kataka.App/             # Avalonia UI: KatanaState, ViewModels, Views, Services
+tests/
+```
 
 ---
 
-## Architecture overview
+## Data flow
 
 ```
 Amp (SysEx/MIDI)
@@ -27,79 +45,61 @@ Amp (SysEx/MIDI)
   ↕  Views (Avalonia AXAML)
 ```
 
-Data flows in **one direction** per path:
-- **Amp → UI**: `IKatanaSession` push/read → `KatanaState.SetState(key, value)` → `AmpControlState.SetFromAmp(v)` → `ValueChanged` event → `AmpControlViewModel` raises `PropertyChanged` → UI binding refreshes.
-- **UI → Amp**: UI sets `AmpControlViewModel.Value = v` → `AmpControlState.Value = v` → `WriteRequested` event → `AmpSyncService` queues the write → `IKatanaSession.WriteBlockAsync`.
+- **Amp → UI**: `IKatanaSession` push/read → `KatanaState.SetState(key, value)` → `AmpControlState.SetFromAmp(v)` → `ValueChanged` → `AmpControlViewModel` raises `PropertyChanged` → binding refreshes.
+- **UI → Amp**: UI sets `AmpControlViewModel.Value = v` → `AmpControlState.Value = v` → `WriteRequested` → `AmpSyncService` queues the write → `IKatanaSession.WriteBlockAsync`.
 
 ---
 
-## AmpControlState – the core primitive
+## Dependency injection
+
+`Microsoft.Extensions.DependencyInjection` wired through `CommunityToolkit.Mvvm.DependencyInjection.Ioc`.
+
+Only infrastructure/service-level types are registered:
 
 ```csharp
-// Read from amp (no write-back):
-state.SetFromAmp(value);   // fires ValueChanged only
-// User/UI edit (triggers amp write):
-state.Value = value;       // fires ValueChanged + WriteRequested
+services.AddSingleton<IMidiTransport>(...);
+services.AddSingleton<IKatanaSession, KatanaSession>();
+services.AddSingleton<IKatanaState, KatanaState>();
+services.AddSingleton<IAmpSyncService, AmpSyncService>();
+services.AddSingleton<MainWindowViewModel>();
 ```
 
-**Key rule:** `SetFromAmp` fires **only** `ValueChanged`; `WriteRequested` is **never** fired on inbound data.
-The guard `if (_value == value) return;` in the `Value` setter prevents all circular loops.
+ViewModels below `MainWindowViewModel` are created manually via constructor arguments — do not register them in the container. Pass dependencies down the constructor chain.
 
 ---
 
-## State classes – field conventions
+## KatanaState — the single source of truth
 
-`AmpControlState` members inside a state class **must be public fields, not properties**:
+`IKatanaState` / `KatanaState` holds the in-memory mirror of every amp parameter as `AmpControlState` objects.
+
+### AmpControlState
+
+Each `AmpControlState` wraps one SysEx parameter:
 
 ```csharp
-// ✅ Correct – RegisterAll finds it via GetFields()
+state.Value = 42;          // user action — fires ValueChanged AND WriteRequested
+state.SetFromAmp(42);      // amp read — fires ValueChanged ONLY
+```
+
+**Never call `.Value = x` from an amp read path.** Use `SetFromAmp()` for values received from the amp. The `if (_value == value) return;` guard in the `Value` setter prevents circular loops.
+
+### State classes — field conventions
+
+`AmpControlState` members inside a state class **must be public fields, not properties**. Nested state objects that contain `AmpControlState` fields must also be public fields. Both rules apply so `KatanaState.RegisterAll()` can discover them via reflection (`GetFields()` only).
+
+```csharp
+// ✅ Correct
 public AmpControlState Drive = new(KatanaMkIIParameterCatalog.BoosterDrive);
-
-// ❌ Wrong – RegisterAll will NOT recurse into this
-public AmpControlState Drive { get; } = new(...);
-```
-
-Nested state objects that contain `AmpControlState` fields **must also be public fields**, not properties, so `RegisterAll` can recurse into them:
-
-```csharp
-// ✅ Correct – RegisterAll recurses into this
 public EqBankState Bank1 = new();
 
-// ❌ Wrong – RegisterAll will NOT recurse into this
+// ❌ Wrong — RegisterAll will not find these
+public AmpControlState Drive { get; } = new(...);
 public EqBankState Bank1 { get; } = new();
 ```
 
-Reference: `BoostPedalState.cs`, `PatchEqState.cs`, `SoloEqState.cs`.
+### KatanaState partial-class layout
 
----
-
-## RegisterAll – how state registration works
-
-`KatanaState.RegisterAll(object obj)` walks an object tree via **reflection on public instance fields only** and registers every `AmpControlState` it finds into `_stateFields` (keyed by `AddressString`).
-
-- If `obj` is itself an `AmpControlState`, it is registered directly.
-- Otherwise, every field whose value is an `AmpControlState` is registered.
-- Nested objects whose type's namespace starts with `"Kataka"` are recursed into.
-
-```csharp
-// How to register a flat state object:
-RegisterAll(BoostPedal);      // recurses into all AmpControlState fields
-
-// How to register a single AmpControlState (defined as a property on KatanaState):
-RegisterAll(AmpType);         // registers just this one state
-```
-
-Reference: `KatanaState.cs → RegisterAll`, `KatanaState.Pedals.cs`, `KatanaState.PanelMode.cs`.
-
----
-
-## KatanaState partial-class layout
-
-Each feature area gets its own `KatanaState.<Feature>.cs` partial file that declares:
-1. The state object or individual `AmpControlState` properties.
-2. A `partial void Register<Feature>()` implementation that calls `RegisterAll(...)` for each state.
-
-The main `KatanaState.cs` calls `Register<Feature>()` from the constructor and that file is the only place to add new calls.
+Each feature area gets its own `KatanaState.<Feature>.cs` partial file:
 
 ```csharp
 // KatanaState.GlobalEq.cs
@@ -109,83 +109,54 @@ public partial class KatanaState
 
     partial void RegisterGlobalEq()
     {
-        RegisterAll(GlobalEq);  // recurses into all fields of GlobalEqState
+        RegisterAll(GlobalEq);
     }
 }
 ```
 
-The matching feature must also be added to `IKatanaState` as a read-only property.
+The main `KatanaState.cs` calls `Register<Feature>()` from the constructor — that file is the only place to add new calls. Every new feature must also be added to `IKatanaState` as a read-only property.
+
+### RegisterAll — how state registration works
+
+`RegisterAll(obj)` walks the object tree via reflection on **public instance fields only** and registers every `AmpControlState` found into `_stateFields` (keyed by `AddressString`). Nested objects whose type's namespace starts with `"Kataka"` are recursed into.
 
 ---
 
-## Parameter catalog – KatanaMkIIParameterCatalog
+## Parameter catalog
 
-Parameters are **static properties** (not fields):
+Parameters in `KatanaMkIIParameterCatalog` are **static properties** (not fields):
 
 ```csharp
 public static KatanaParameterDefinition BoosterDrive { get; } =
     new("booster-drive", "Drive", KatanaAddressMap.ComputeAddress(...), maximum: 120);
 ```
 
-- Use `GetProperties(BindingFlags.Public | BindingFlags.Static)` (not `GetFields`) when collecting definitions via reflection.
-- Each file is a `static partial class`; group related parameters into one file per feature area.
+Use `GetProperties(BindingFlags.Public | BindingFlags.Static)` when collecting definitions via reflection — `GetFields()` returns 0 results. Each file is a `static partial class`; group related parameters into one file per feature area.
 
----
+### Address map
 
-## Address map – KatanaAddressMap
-
-Use the `ComputeAddress` helper to compute byte addresses from the symbolic constants:
+Use `KatanaAddressMap.ComputeAddress` — never hardcode raw byte arrays:
 
 ```csharp
 KatanaAddressMap.ComputeAddress(
-    KatanaAddressMap.System,              // base area
-    KatanaAddressMap.SystemBlocks.GlobalEq1,   // block offset
-    KatanaAddressMap.GlobalEqParams.LowGain    // parameter offset within block
+    KatanaAddressMap.System,
+    KatanaAddressMap.SystemBlocks.GlobalEq1,
+    KatanaAddressMap.GlobalEqParams.LowGain
 )
 ```
 
-Never hardcode raw byte arrays inline in catalog definitions.
-
 ---
 
-## ViewModel pattern – AmpControlViewModel
+## MVVM patterns
 
-`AmpControlViewModel` is the standard adapter between `AmpControlState` and the UI:
+### AmpControlViewModel — standard adapter
 
-```csharp
-public class AmpControlViewModel : ViewModelBase
-{
-    private readonly AmpControlState _state;
-
-    public AmpControlViewModel(AmpControlState state)
-    {
-        _state = state;
-        // Inbound: amp change → raise PropertyChanged so UI refreshes
-        _state.ValueChanged += () => this.RaisePropertyChanged(nameof(Value));
-    }
-
-    public int Value
-    {
-        get => _state.Value;
-        // Outbound: UI edit → write to state → WriteRequested fires → amp write queued
-        set => _state.Value = Math.Clamp(value, _state.Minimum, _state.Maximum);
-    }
-}
-```
-
-**No `WhenAnyValue` write-backs.** The write path is handled by the `Value` setter alone.
-The `if (_value == value) return;` guard in `AmpControlState` prevents circular re-fires.
-
----
-
-## ViewModel pattern – feature VMs (PanelViewModel)
-
-Create one `AmpControlViewModel` per parameter and expose it as a property. Do **not** duplicate the value in a `[Reactive]` field on the VM:
+`AmpControlViewModel` is the standard bridge between `AmpControlState` and the UI. Create one per parameter and expose it as a property; do not duplicate the value in a `[Reactive]` field on the VM:
 
 ```csharp
 public class PanelViewModel : ViewModelBase
 {
-    public AmpControlViewModel Gain { get; }
+    public AmpControlViewModel Gain   { get; }
     public AmpControlViewModel Volume { get; }
 
     public PanelViewModel(IKatanaState katanaState)
@@ -196,26 +167,44 @@ public class PanelViewModel : ViewModelBase
 }
 ```
 
-The AXAML binds directly to `{Binding Gain.Value}`. No manual subscription needed.
+AXAML binds directly to `{Binding Gain.Value}`. No manual `ValueChanged` subscription needed. **No `WhenAnyValue` write-backs** — the write path is the `Value` setter alone.
 
----
-
-## ViewModel pattern – command / event-driven VMs (ChannelSelectionViewModel)
+### Command / event-driven VMs
 
 For actions that go through `IAmpSyncService` (channel selection, global operations):
 
-- **Inbound** (amp → UI): subscribe to `IKatanaState` events (e.g. `SelectedChannelChanged`) and update VM state in the handler.
-- **Outbound** (UI → amp): use `[RelayCommand]` or a `Task`-returning method that calls `_ampSyncService.SomeActionAsync(...)`. Never write directly to the session.
+- **Inbound** (amp → UI): subscribe to `IKatanaState` events and update VM state in the handler.
+- **Outbound** (UI → amp): use `[RelayCommand]` calling `_ampSyncService.SomeActionAsync(...)`. Never write directly to `IKatanaSession`.
 
 ```csharp
-// Inbound
 _katanaState.SelectedChannelChanged += UpdatePanelChannelSelection;
 
-// Outbound
 [RelayCommand]
 private async Task SelectPanelChannel(string? channel)
     => await _ampSyncService.SelectChannelAsync(channelEnum);
 ```
+
+### ViewModelBase
+
+All ViewModels extend `ViewModelBase` (which extends `ReactiveObject`).
+
+- Use `[Reactive]` (ReactiveUI.Fody) for simple observable properties.
+- Use `[ObservableProperty]` (CommunityToolkit.Mvvm) where partial classes are preferred.
+
+### ViewModel construction hierarchy
+
+```
+MainWindowViewModel
+  ├── AmpEditorViewModel(IKatanaState, IAmpSyncService)
+  │     ├── PedalboardViewModel(IKatanaState, pedalsByKey)
+  │     ├── PanelViewModel(IKatanaState)
+  │     └── [Pedal ViewModels: BoosterPedalViewModel, ModFxPedalViewModel, ...]
+  ├── PedalboardMiniMapViewModel(IKatanaState)
+  ├── GlobalEqViewModel(IKatanaState)
+  └── ...
+```
+
+Each effect slot has a single `PedalViewModel` instance shared between `AmpEditorViewModel.PanelEffects` and `PedalboardViewModel._pedalsByKey`.
 
 ---
 
@@ -224,21 +213,152 @@ private async Task SelectPanelChannel(string? channel)
 | Responsibility | How |
 |---|---|
 | Seed state on connect | `ReadAllPatchStatesAsync()` → `SetStates()` |
-| Seed system-level params (e.g. Global EQ) | explicit `ReadParametersAsync(defs)` with `GetProperties()` reflection on catalog |
+| Seed system-level params (e.g. Global EQ) | `ReadParametersAsync(defs)` with `GetProperties()` reflection on catalog |
 | Route inbound push notifications | `OnAmpPushNotification` → `SetState(key, byte)` |
 | Route outbound writes | Subscribe to `WriteRequested` on all `GetAllRegisteredStates()` entries; queue to write channel |
 | Rate-limit writes | `PeriodicTimer(20 ms)` write loop; one write per tick |
 
-`SubscribeToStateWrites()` is called **after** the seed read, and is guarded by `_stateWritesSubscribed` to prevent double-subscription across reconnects.
+`SubscribeToStateWrites()` is called **after** the seed read and is guarded by `_stateWritesSubscribed` to prevent double-subscription across reconnects.
+
+---
+
+## Chain / pedalboard ordering
+
+Chains are complete ordered arrays of slot keys. Each covers the full signal path from `"input"` to `"output"`, with `"amp"` placed at the chain-specific position:
+
+```csharp
+private static readonly List<string[]> Chains =
+[
+    ["input", "booster", "amp", "mod", "fx", "delay", "delay2", "reverb", "output"],
+    ["input", "booster", "mod", "amp", "fx", "delay", "delay2", "reverb", "output"],
+    // ...
+];
+```
+
+`PedalboardViewModel.Refresh()` iterates the selected chain and builds `PedalboardItems` from it. `PedalboardMiniMapViewModel` follows the same pattern using `ChainNode[]` arrays.
+
+---
+
+## Avalonia view patterns
+
+### Bindings
+
+- Views use `x:CompileBindings="False"` for runtime binding flexibility (avoids `x:DataType` conflicts in nested templates).
+
+### IDataTemplate selectors
+
+Set the selector **directly** as `ItemsControl.ItemTemplate` — do not wrap it in an outer `DataTemplate` + `ContentControl` (breaks per-item DataContext propagation):
+
+```xml
+<ItemsControl.ItemTemplate>
+    <vm:PedalboardItemTypeSelector>
+        <vm:PedalboardItemTypeSelector.InputTemplate>
+            <DataTemplate x:CompileBindings="False"> ... </DataTemplate>
+        </vm:PedalboardItemTypeSelector.InputTemplate>
+    </vm:PedalboardItemTypeSelector>
+</ItemsControl.ItemTemplate>
+```
+
+### Pedal card background color by type
+
+Each pedal view binds its card background to `CardBackgroundBrush` on `PedalViewModel`. The base class returns a neutral dark gradient (`#2E3138`→`#1C1F24`). To map colors to a specific pedal's types:
+
+**1. Create a `<Pedal>Colors.cs` in the pedal's component folder** — define one `static readonly IBrush` per color category and a `GetBackgroundBrush(string? typeName)` switch. Use the `Gradient(top, bottom)` helper pattern:
+
+```csharp
+// src/Kataka.App/Components/BoosterPedal/BoosterPedalColors.cs
+public static class BoosterPedalColors
+{
+    public static readonly IBrush Overdrive = Gradient("#1e3222", "#111e14");
+    // ...
+
+    public static IBrush GetBackgroundBrush(string? typeName) => typeName switch
+    {
+        "T-SCREAM" or "OVERDRIVE" => Overdrive,
+        // ...
+        _ => PedalViewModel.DefaultCardBackground,
+    };
+
+    private static IBrush Gradient(string top, string bottom) =>
+        new LinearGradientBrush { ... };
+}
+```
+
+**2. Override `CardBackgroundBrush` in the pedal ViewModel:**
+
+```csharp
+public override IBrush CardBackgroundBrush =>
+    BoosterPedalColors.GetBackgroundBrush(SelectedTypeOption);
+```
+
+**3. Raise `CardBackgroundBrush` when type changes** (in the `_typeState.ValueChanged` handler):
+
+```csharp
+this.RaisePropertyChanged(nameof(CardBackgroundBrush));
+```
+
+**4. All pedal views already bind** `Background="{Binding CardBackgroundBrush}"` — no view changes needed.
+
+See `src/Kataka.App/Components/BoosterPedal/BoosterPedalColors.cs` as the reference implementation.
+
+---
+
+### Design ViewModels
+
+Complex views have a corresponding design VM in `ViewModels/Design/`. Design VMs extend the real VM, seed test values, and expose a static `Instance`:
+
+```csharp
+public sealed class DesignBoosterPedalViewModel : BoosterPedalViewModel
+{
+    public DesignBoosterPedalViewModel() : base(new KatanaState(NullLogger<KatanaState>.Instance)) { ... }
+    public static DesignBoosterPedalViewModel Instance => new();
+}
+```
+
+Reference via `d:DataContext="{x:Static dvm:DesignFooViewModel.Instance}"`.
+
+---
+
+## Code style
+
+- 4-space indent for C# and AXAML; 2-space for XML/JSON/csproj.
+- No comments unless the WHY is non-obvious (hidden constraint, workaround, subtle invariant).
+- No XML doc blocks except on public API surface in `Kataka.Domain`.
+
+---
+
+## Tooling — Rider MCP
+
+Prefer **Rider MCP tools** over the generic `Read`/`Bash` tools when exploring or modifying the codebase. Always pass `projectPath: "/home/luismaglz/Github/katana50-mkII-linux"` to all Rider MCP calls.
+
+| Tool | When to use |
+|---|---|
+| `mcp__rider__find_files_by_name_keyword` | Locate a file when you know part of its name |
+| `mcp__rider__find_files_by_glob` | Locate files by glob pattern (e.g. `src/**/*.axaml`) |
+| `mcp__rider__list_directory_tree` | Browse directory structure |
+| `mcp__rider__get_symbol_info` | Get declaration, type, and docs for a symbol at a file:line:col |
+| `mcp__rider__search_in_files_by_text` | Full-text search across the solution |
+| `mcp__rider__search_in_files_by_regex` | Regex search across the solution |
+| `mcp__rider__get_file_text_by_path` | Read a file by project-relative path |
+| `mcp__rider__replace_text_in_file` | Targeted find-and-replace (preferred over full rewrites) |
+| `mcp__rider__create_new_file` | Create a new file with optional initial content |
+| `mcp__rider__reformat_file` | Apply IDE formatting rules (alternative to `dotnet format`) |
+| `mcp__rider__rename_refactoring` | Rename a symbol and update all references project-wide |
+| `mcp__rider__get_file_problems` | Check a file for errors/warnings |
+| `mcp__rider__execute_run_configuration` | Run a specific build/test/app configuration |
+| `mcp__rider__execute_terminal_command` | Run a shell command in the IDE terminal |
 
 ---
 
 ## Anti-patterns to avoid
 
-| Anti-pattern | Why bad | Use instead |
-|---|---|---|
-| `[Reactive] int Foo` + `WhenAnyValue(x => x.Foo).Subscribe(v => state.Foo.Value = v)` | `WhenAnyValue` fires immediately on subscribe, causing writes during init; also fires on every `UpdateFromAmp()` call, bypassing the no-writeback guarantee of `SetFromAmp` | `AmpControlViewModel` wrapping `AmpControlState` |
-| `AmpControlState` member declared as `{ get; }` property inside a nested state class | `RegisterAll` uses `GetFields()` only; properties are silently skipped | Use a public field: `public AmpControlState Foo = new(...)` |
-| Nested state sub-object declared as `{ get; }` property | `RegisterAll` won't recurse into it | Declare as public field: `public SubState Sub = new()` |
-| `GetFields()` on `KatanaMkIIParameterCatalog` | Catalog entries are static properties, `GetFields` returns 0 results | Use `GetProperties(Public \| Static)` |
-| Writing to `IKatanaSession` directly from a ViewModel | Bypasses the rate-limiter and write loop | All writes go through `AmpControlState.Value` → `WriteRequested` → `AmpSyncService` |
+| Anti-pattern | Correct approach |
+|---|---|
+| `state.Value = x` from an amp read path | Use `state.SetFromAmp(x)` |
+| `[Reactive] int Foo` + `WhenAnyValue(...).Subscribe(v => state.Foo.Value = v)` | Wrap in `AmpControlViewModel`; `WhenAnyValue` fires on subscribe and bypasses `SetFromAmp` guarantee |
+| `AmpControlState` or nested state sub-object declared as `{ get; }` property | Use public fields — `RegisterAll` uses `GetFields()` only |
+| `GetFields()` on `KatanaMkIIParameterCatalog` | Use `GetProperties(Public | Static)` — catalog entries are static properties |
+| Writing to `IKatanaSession` directly from a ViewModel | All writes go through `AmpControlState.Value` → `WriteRequested` → `AmpSyncService` |
+| Registering pedal VMs in the DI container | Construct manually in `AmpEditorViewModel` |
+| Wrapping `IDataTemplate` selector in `ContentControl` | Set selector directly on `ItemsControl.ItemTemplate` |
+| Defining split before/after-amp chain arrays | Define each chain as a single full-path array |

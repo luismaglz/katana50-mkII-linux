@@ -25,7 +25,6 @@ Integration tests require a physical MIDI device and will hang without one — a
 ```
 src/
   Kataka.Domain/          # Pure domain: parameter catalog, enums, KatanaParameterDefinition
-  Kataka.Application/     # Application services: KatanaSession, MIDI command/query logic
   Kataka.Infrastructure/  # MIDI transport implementation (ALSA on Linux)
   Kataka.App/             # Avalonia UI: KatanaState, ViewModels, Views, Services
 tests/
@@ -297,15 +296,6 @@ this.RaisePropertyChanged(nameof(CardBackgroundBrush));
 ```
 
 **4. All pedal views already bind** `Background="{Binding CardBackgroundBrush}"` — no view changes needed.
-
-**Color guide** (pedalboard convention):
-| Category | Color | Hex top/bottom |
-|---|---|---|
-| Boost / Tuner | White/neutral | `#302e2a` / `#1e1c18` |
-| Overdrive (TS-style) | Green | `#1e3222` / `#111e14` |
-| Blues / Transparent OD | Blue | `#1a2c3e` / `#111c28` |
-| Distortion | Orange | `#342216` / `#20140c` |
-| Fuzz / Heavy | Charcoal | `#201e2c` / `#141218` |
 
 See `src/Kataka.App/Components/BoosterPedal/BoosterPedalColors.cs` as the reference implementation.
 

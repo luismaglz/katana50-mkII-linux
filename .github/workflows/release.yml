@@ -1,0 +1,90 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install nbgv
+        run: dotnet tool install -g nbgv
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --no-incremental -c Release -v q
+
+      - name: Test
+        run: dotnet test --no-build -c Release --filter "FullyQualifiedName!~Integration" --logger "console;verbosity=minimal"
+
+  release:
+    name: Publish Release
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install nbgv
+        run: dotnet tool install -g nbgv
+
+      - name: Get version
+        id: nbgv
+        run: |
+          VERSION=$(nbgv get-version -f json | jq -r '.NuGetPackageVersion')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Publish linux-x64
+        run: |
+          dotnet publish src/Kataka.App/Kataka.App.csproj \
+            -c Release \
+            -r linux-x64 \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:PublishTrimmed=false \
+            -p:DebugType=none \
+            -o publish/linux-x64
+
+      - name: Package
+        run: |
+          VERSION="${{ steps.nbgv.outputs.version }}"
+          ARCHIVE="kataka-${VERSION}-linux-x64.tar.gz"
+          tar -czf "$ARCHIVE" -C publish/linux-x64 .
+          echo "ARCHIVE=$ARCHIVE" >> "$GITHUB_ENV"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.nbgv.outputs.version }}
+          name: Kataka v${{ steps.nbgv.outputs.version }}
+          draft: false
+          prerelease: true
+          generate_release_notes: true
+          files: ${{ env.ARCHIVE }}
