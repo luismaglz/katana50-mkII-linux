@@ -19,9 +19,6 @@
     </UserControl.Styles>
 
     <StackPanel Spacing="8">
-        <TextBlock Text="{Binding KnobLabelBrush}" />
-        <TextBlock Text="{Binding KnobValueBrush}" />
-        <TextBlock Text="{Binding KnobAccentColor}" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnobV2 Scale="0.75" Label="MODE"
                                    Minimum="0" Maximum="1"
