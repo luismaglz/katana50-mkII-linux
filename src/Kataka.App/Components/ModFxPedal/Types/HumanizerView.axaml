@@ -10,6 +10,14 @@
              x:Class="Kataka.App.Views.ModsFx.HumanizerView"
              x:DataType="vm:ModFxPedalViewModel"
              x:CompileBindings="False">
+    <UserControl.Styles>
+        <Style Selector="controls|RotaryKnobV2">
+            <Setter Property="LabelBrush" Value="{Binding KnobLabelBrush}" />
+            <Setter Property="ValueBrush" Value="{Binding KnobValueBrush}" />
+            <Setter Property="AccentColor" Value="{Binding KnobAccentColor}" />
+        </Style>
+    </UserControl.Styles>
+
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <ComboBox ItemsSource="{Binding HumanizerModeOptions}"

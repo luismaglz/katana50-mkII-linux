@@ -10,6 +10,14 @@
              x:Class="Kataka.App.Views.ModsFx.GraphicEqView"
              x:DataType="vm:ModFxPedalViewModel"
              x:CompileBindings="False">
+    <UserControl.Styles>
+        <Style Selector="controls|RotaryKnobV2">
+            <Setter Property="LabelBrush" Value="{Binding KnobLabelBrush}" />
+            <Setter Property="ValueBrush" Value="{Binding KnobValueBrush}" />
+            <Setter Property="AccentColor" Value="{Binding KnobAccentColor}" />
+        </Style>
+    </UserControl.Styles>
+
     <!-- Bands 0–40, centre 20 = 0 dB.  Sliders show offset (+/-20). -->
     <StackPanel Spacing="4">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="2">

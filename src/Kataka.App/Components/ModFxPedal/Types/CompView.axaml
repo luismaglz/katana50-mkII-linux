@@ -10,6 +10,14 @@
              x:Class="Kataka.App.Views.ModsFx.CompView"
              x:DataType="vm:ModFxPedalViewModel"
              x:CompileBindings="False">
+    <UserControl.Styles>
+        <Style Selector="controls|RotaryKnobV2">
+            <Setter Property="LabelBrush" Value="{Binding KnobLabelBrush}" />
+            <Setter Property="ValueBrush" Value="{Binding KnobValueBrush}" />
+            <Setter Property="AccentColor" Value="{Binding KnobAccentColor}" />
+        </Style>
+    </UserControl.Styles>
+
     <StackPanel Spacing="8">
         <ComboBox HorizontalAlignment="Center"
                   ItemsSource="{Binding CompTypeOptions}"
@@ -18,22 +26,33 @@
             <controls:RotaryKnobV2 Scale="0.75" Label="SUSTAIN"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding CompSustain}"
-                                   LabelFontSize="16" ValueFontSize="14" />
+                                   LabelFontSize="16"
+                                   ValueFontSize="14"
+                                   LabelBrush="{StaticResource BgContrastBrush}"
+                                   ValueBrush="{StaticResource BgContrastBrush}" />
             <controls:RotaryKnobV2 Scale="0.75" Label="ATTACK"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding CompAttack}"
-                                   LabelFontSize="16" ValueFontSize="14" />
+                                   LabelFontSize="16"                                   ValueFontSize="14"
+                                   LabelBrush="{StaticResource BgContrastBrush}"
+                                   ValueBrush="{StaticResource BgContrastBrush}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
             <controls:RotaryKnobV2 Scale="0.75" Label="TONE"
                                    Minimum="-50" Maximum="50"
                                    Value="{Binding CompToneDisplay}"
-                                   LabelFontSize="16" ValueFontSize="14" />
+                                   LabelFontSize="16"
+                                   ValueFontSize="14"
+                                   LabelBrush="{StaticResource BgContrastBrush}"
+                                   ValueBrush="{StaticResource BgContrastBrush}" />
             <controls:RotaryKnobV2 Scale="0.75" Label="LEVEL"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding CompLevel}"
-                                   LabelFontSize="16" ValueFontSize="14" />
+                                   LabelFontSize="16"
+                                   ValueFontSize="14"
+                                   LabelBrush="{StaticResource BgContrastBrush}"
+                                   ValueBrush="{StaticResource BgContrastBrush}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

@@ -10,6 +10,19 @@
              x:Class="Kataka.App.Views.ModsFx.ParametricEqView"
              x:DataType="vm:ModFxPedalViewModel"
              x:CompileBindings="False">
+    <UserControl.Styles>
+        <Style Selector="controls|RotaryKnobV2">
+            <Setter Property="LabelBrush" Value="{Binding KnobLabelBrush}" />
+            <Setter Property="ValueBrush" Value="{Binding KnobValueBrush}" />
+            <Setter Property="AccentColor" Value="{Binding KnobAccentColor}" />
+        </Style>
+        <Style Selector="controls|SteppedKnobV2">
+            <Setter Property="LabelBrush" Value="{Binding KnobLabelBrush}" />
+            <Setter Property="ValueBrush" Value="{Binding KnobValueBrush}" />
+            <Setter Property="AccentColor" Value="{Binding KnobAccentColor}" />
+        </Style>
+    </UserControl.Styles>
+
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:SteppedKnobV2 Scale="0.75" Label="LOW CUT"

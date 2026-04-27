@@ -13,6 +13,14 @@
              x:DataType="vm:BoosterPedalViewModel"
              x:CompileBindings="False">
 
+    <UserControl.Styles>
+        <Style Selector="controls|RotaryKnobV2, controls|SteppedKnobV2">
+            <Setter Property="LabelBrush" Value="{Binding KnobLabelBrush}" />
+            <Setter Property="ValueBrush" Value="{Binding KnobValueBrush}" />
+            <Setter Property="AccentColor" Value="{Binding KnobAccentColor}" />
+        </Style>
+    </UserControl.Styles>
+
     <controls:PedalCardBorder Background="{Binding CardBackgroundBrush}" CornerRadius="13">
         <StackPanel Spacing="0">
             <!-- Booster accent bar: amber -->

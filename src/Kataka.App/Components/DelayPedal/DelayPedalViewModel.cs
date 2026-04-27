@@ -92,7 +92,10 @@ public class DelayPedalViewModel : PedalViewModel
             this.RaisePropertyChanged(nameof(SelectedTypeOption));
             this.RaisePropertyChanged(nameof(TypeCaption));
             this.RaisePropertyChanged(nameof(CardBackgroundBrush));
-            this.RaisePropertyChanged(nameof(TypeLabelBrush));
+            this.RaisePropertyChanged(nameof(CardTextBrush));
+            this.RaisePropertyChanged(nameof(KnobLabelBrush));
+            this.RaisePropertyChanged(nameof(KnobValueBrush));
+            this.RaisePropertyChanged(nameof(KnobAccentColor));
             this.RaisePropertyChanged(nameof(IsTypePan));
             this.RaisePropertyChanged(nameof(IsTypeModulateOrSde));
             this.RaisePropertyChanged(nameof(IsTypeSde3000));
@@ -126,7 +129,6 @@ public class DelayPedalViewModel : PedalViewModel
     public bool HasTypeOptions => TypeOptions.Count > 0;
 
     public override IBrush CardBackgroundBrush => DelayPedalColors.GetBackgroundBrush(SelectedTypeOption);
-    public IBrush TypeLabelBrush => DelayPedalColors.GetLabelBrush(SelectedTypeOption);
     public bool HasVariation { get; }
 
     public IBrush VariationBrush => HasVariation ? GetVariationBrush(Variation) : OffVariationBrush;

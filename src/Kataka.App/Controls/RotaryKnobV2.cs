@@ -60,14 +60,14 @@ public sealed class RotaryKnobV2 : RotaryKnobBase
 
         context.DrawText(labelText, new Point((bounds.Width - labelText.Width) / 2, bounds.Top));
 
-        var accentColor = IsSet(AccentColorProperty) ? AccentColor : RuntimePaletteService.Accent;
+        var accentColor = AccentColor;
         var trackColor = IsSet(TrackColorProperty)
             ? TrackColor
             : Color.FromArgb(55, accentColor.R, accentColor.G, accentColor.B);
         var faceColor = IsSet(FaceColorProperty) ? FaceColor : RuntimePaletteService.KnobFace;
         var bezelColor = IsSet(BezelColorProperty) ? BezelColor : RuntimePaletteService.BgBase;
         var accentBrush = new SolidColorBrush(accentColor);
-        var valueBrush = IsSet(ValueBrushProperty) ? ValueBrush : accentBrush;
+        var valueBrush = ValueBrush;
 
         // Full-sweep dim arc track
         DrawArcStroke(context, cx, cy, arcR, StartDeg, StartDeg + SweepDeg,

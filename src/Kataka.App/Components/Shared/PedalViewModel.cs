@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Media;
 
+using Kataka.App.Controls;
 using Kataka.Domain.Midi;
 
 using ReactiveUI;
@@ -29,6 +30,19 @@ public abstract class PedalViewModel : ViewModelBase
     }
 
     public virtual IBrush CardBackgroundBrush => DefaultCardBackground;
+
+    // Extracts a representative solid Color from any brush for color math.
+    protected Color CardBgColor => CardBackgroundBrush switch
+    {
+        SolidColorBrush s => s.Color,
+        LinearGradientBrush g when g.GradientStops.Count > 0 => g.GradientStops[0].Color,
+        _ => Color.Parse("#2E3138")
+    };
+
+    public virtual IBrush CardTextBrush => new SolidColorBrush(ColorUtils.GetBestContrast(CardBgColor));
+    public virtual IBrush KnobLabelBrush => new SolidColorBrush(ColorUtils.DeriveLabel(CardBgColor));
+    public virtual IBrush KnobValueBrush => new SolidColorBrush(ColorUtils.DeriveValue(CardBgColor));
+    public virtual Color KnobAccentColor => ColorUtils.DeriveAccent(CardBgColor);
 
     public KatanaPanelEffectDefinition Definition { get; }
 
