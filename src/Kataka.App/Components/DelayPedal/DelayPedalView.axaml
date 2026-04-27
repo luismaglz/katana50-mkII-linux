@@ -13,6 +13,14 @@
              x:DataType="vm:DelayPedalViewModel"
              x:CompileBindings="False">
 
+    <UserControl.Styles>
+        <Style Selector="controls|RotaryKnobV2, controls|SteppedKnobV2">
+            <Setter Property="LabelBrush" Value="{Binding KnobLabelBrush}" />
+            <Setter Property="ValueBrush" Value="{Binding KnobValueBrush}" />
+            <Setter Property="AccentColor" Value="{Binding KnobAccentColor}" />
+        </Style>
+    </UserControl.Styles>
+
     <controls:PedalCardBorder MinWidth="160" CornerRadius="8" VerticalAlignment="Top"
                               Background="{Binding CardBackgroundBrush}">
         <Grid>
@@ -26,7 +34,7 @@
                     <!-- Type selector -->
                     <StackPanel Spacing="4">
                         <TextBlock Text="TYPE" FontSize="10" FontWeight="SemiBold"
-                                   Foreground="{Binding TypeLabelBrush}" />
+                                   Foreground="{Binding CardTextBrush}" />
                         <ComboBox Classes="midi-port-picker"
                                   HorizontalAlignment="Stretch"
                                   ItemsSource="{Binding TypeOptions}"

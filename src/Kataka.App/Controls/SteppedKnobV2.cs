@@ -16,9 +16,8 @@ public sealed class SteppedKnobV2 : RotaryKnobBase
     private const double BaseArcR = 46.0;
     private const double BaseTickDotR = 2.5;
     private const double BasePad = 4.0;
-    private const double BaseTopPad = 20.0;
-    private const double BaseBottomPad = 8.0;
-    private const double BaseValueFontSize = 14.0;
+    private const double BaseTopPad = 16.0;
+    private const double BaseBottomPad = 6.0;
     private const double StartDeg = 135.0;
     private const double SweepDeg = 270.0;
 
@@ -26,9 +25,12 @@ public sealed class SteppedKnobV2 : RotaryKnobBase
     public static readonly StyledProperty<string[]?> StepsProperty =
         AvaloniaProperty.Register<SteppedKnobV2, string[]?>(nameof(Steps));
 
+    public static readonly StyledProperty<double> ValueFontSizeProperty =
+        AvaloniaProperty.Register<SteppedKnobV2, double>(nameof(ValueFontSize), 14.0);
+
     static SteppedKnobV2()
     {
-        AffectsRender<SteppedKnobV2>(StepsProperty);
+        AffectsRender<SteppedKnobV2>(StepsProperty, ValueFontSizeProperty);
         AffectsMeasure<SteppedKnobV2>(StepsProperty);
         StepsProperty.Changed.AddClassHandler<SteppedKnobV2>((k, _) => k.SyncRangeToSteps());
     }
@@ -37,6 +39,12 @@ public sealed class SteppedKnobV2 : RotaryKnobBase
     {
         get => GetValue(StepsProperty);
         set => SetValue(StepsProperty, value);
+    }
+
+    public double ValueFontSize
+    {
+        get => GetValue(ValueFontSizeProperty);
+        set => SetValue(ValueFontSizeProperty, Math.Max(1.0, value));
     }
 
     protected override Size MeasureOverride(Size availableSize)
@@ -54,7 +62,6 @@ public sealed class SteppedKnobV2 : RotaryKnobBase
         var dotR = BaseTickDotR * s;
         var topPad = BaseTopPad * s;
         var bottomPad = BaseBottomPad * s;
-        var valueFontSize = BaseValueFontSize * s;
         var bounds = Bounds.Deflate(pad);
         var steps = Steps;
 
@@ -64,13 +71,14 @@ public sealed class SteppedKnobV2 : RotaryKnobBase
 
         context.DrawText(labelText, new Point((bounds.Width - labelText.Width) / 2, bounds.Top));
 
-        var accentColor = IsSet(AccentColorProperty) ? AccentColor : RuntimePaletteService.Accent;
+        var accentColor = AccentColor;
         var trackColor = IsSet(TrackColorProperty)
             ? TrackColor
             : Color.FromArgb(70, accentColor.R, accentColor.G, accentColor.B);
         var faceColor = IsSet(FaceColorProperty) ? FaceColor : RuntimePaletteService.KnobFace;
         var bezelColor = IsSet(BezelColorProperty) ? BezelColor : RuntimePaletteService.BgBase;
         var accentBrush = new SolidColorBrush(accentColor);
+        var valueBrush = ValueBrush;
         var trackBrush = new SolidColorBrush(trackColor);
 
         // Dots at each step position on the arc ring
@@ -102,7 +110,7 @@ public sealed class SteppedKnobV2 : RotaryKnobBase
         var activeLabel = steps is not null && Value >= 0 && Value < steps.Length
             ? steps[Value]
             : Value.ToString();
-        var valueText = CreateText(activeLabel, valueFontSize, FontWeight.SemiBold, accentBrush);
+        var valueText = CreateText(activeLabel, ValueFontSize * s, FontWeight.SemiBold, valueBrush);
         context.DrawText(valueText, new Point(
             (bounds.Width - valueText.Width) / 2,
             cy + arcR + bottomPad));

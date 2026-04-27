@@ -32,7 +32,10 @@ public class ReverbPedalViewModel : PedalViewModel
             this.RaisePropertyChanged(nameof(SelectedTypeOption));
             this.RaisePropertyChanged(nameof(TypeCaption));
             this.RaisePropertyChanged(nameof(CardBackgroundBrush));
-            this.RaisePropertyChanged(nameof(TypeLabelBrush));
+            this.RaisePropertyChanged(nameof(CardTextBrush));
+            this.RaisePropertyChanged(nameof(KnobLabelBrush));
+            this.RaisePropertyChanged(nameof(KnobValueBrush));
+            this.RaisePropertyChanged(nameof(KnobAccentColor));
         };
         _state.Variation.ValueChanged += () =>
         {
@@ -55,7 +58,6 @@ public class ReverbPedalViewModel : PedalViewModel
     public bool HasTypeOptions => TypeOptions.Count > 0;
 
     public override IBrush CardBackgroundBrush => ReverbPedalColors.GetBackgroundBrush(SelectedTypeOption);
-    public IBrush TypeLabelBrush => ReverbPedalColors.GetLabelBrush(SelectedTypeOption);
     public IBrush VariationBrush => GetVariationBrush(Variation);
 
 

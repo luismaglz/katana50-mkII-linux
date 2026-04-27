@@ -22,7 +22,7 @@
                 <ControlTemplate>
                     <Border Name="Root"
                             Background="#2A2E35"
-                            CornerRadius="8"
+                            CornerRadius="4"
                             Padding="14,7"
                             BoxShadow="0 3 6 0 #90000000, 0 1 0 0 #28FFFFFF">
                         <ContentPresenter Content="{TemplateBinding Content}"
@@ -33,7 +33,7 @@
             </Setter>
         </Style>
         <Style Selector="ToggleButton.physical:checked /template/ Border#Root">
-            <Setter Property="Background" Value="#1C1F25" />
+            <Setter Property="Background" Value="#3a3d42" />
             <Setter Property="BoxShadow" Value="inset 0 2 6 0 #55000000, inset 0 -1 2 0 #10FFFFFF" />
         </Style>
         <Style Selector="ToggleButton.physical:pointerover /template/ Border#Root">
@@ -67,7 +67,9 @@
                         </Transitions>
                     </Border.Transitions>
                     <Border.Effect>
-                        <DropShadowEffect BlurRadius="2"
+                        <DropShadowEffect BlurRadius="20"
+                                          OffsetX="0"
+                                          OffsetY="0"
                                           Opacity="{Binding #Root.IsChecked}"
                                           Color="#00e676" />
                     </Border.Effect>

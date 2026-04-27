@@ -20,7 +20,7 @@ public static class KatanaPalette
     /// <summary> Brand accent ───────────────────────────────────────────────────────── </summary>
     public static readonly Color Primary = Color.Parse("#57984F"); // Main amber
 
-    public static readonly Color PrimaryLit = Color.Parse("#57984F"); // Lit / active state
+    public static readonly Color PrimaryLit = Color.Parse("#13678A"); // Lit / active state
 
     /// <summary> Semantic status ────────────────────────────────────────────────────── </summary>
     public static readonly Color Success = Color.Parse("#3DBF6C"); // Boost
@@ -40,7 +40,7 @@ public static class KatanaPalette
     public static readonly Color BorderLight = Color.Parse("#565B64"); // Highlight stroke
 
     /// <summary> Knob-specific (not exposed in AXAML palette) ───────────────────────── </summary>
-    public static readonly Color KnobBg = Color.Parse("#D9D3C1"); // Knob face fill
+    public static readonly Color KnobBg = Color.Parse("#767676"); // Knob face fill
 
     public static readonly Color KnobShadow = Color.FromArgb(0x28, 0, 0, 0);
 

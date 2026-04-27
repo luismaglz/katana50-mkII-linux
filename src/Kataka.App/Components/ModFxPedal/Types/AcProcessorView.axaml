@@ -10,41 +10,63 @@
              x:Class="Kataka.App.Views.ModsFx.AcProcessorView"
              x:DataType="vm:ModFxPedalViewModel"
              x:CompileBindings="False">
+    <UserControl.Styles>
+        <Style Selector="controls|RotaryKnobV2">
+            <Setter Property="LabelBrush" Value="{Binding KnobLabelBrush}" />
+            <Setter Property="ValueBrush" Value="{Binding KnobValueBrush}" />
+            <Setter Property="AccentColor" Value="{Binding KnobAccentColor}" />
+        </Style>
+    </UserControl.Styles>
+
     <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnobV2 Scale="0.75" Label="TYPE"
                                    Minimum="0" Maximum="3"
                                    Value="{Binding AcProcessorType}"
-                                   LabelFontSize="16" ValueFontSize="14" />
+                                   LabelFontSize="16" ValueFontSize="14"
+                                   LabelBrush="{StaticResource BgContrastBrush}"
+                                   ValueBrush="{StaticResource BgContrastBrush}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnobV2 Scale="0.75" Label="LEVEL"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding AcProcessorLevel}"
-                                   LabelFontSize="16" ValueFontSize="14" />
+                                   LabelFontSize="16" ValueFontSize="14"
+                                   LabelBrush="{StaticResource BgContrastBrush}"
+                                   ValueBrush="{StaticResource BgContrastBrush}" />
             <controls:RotaryKnobV2 Scale="0.75" Label="PRESENCE"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding AcProcessorPresence}"
-                                   LabelFontSize="16" ValueFontSize="14" />
+                                   LabelFontSize="16" ValueFontSize="14"
+                                   LabelBrush="{StaticResource BgContrastBrush}"
+                                   ValueBrush="{StaticResource BgContrastBrush}" />
             <controls:RotaryKnobV2 Scale="0.75" Label="BASS"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding AcProcessorBass}"
-                                   LabelFontSize="16" ValueFontSize="14" />
+                                   LabelFontSize="16" ValueFontSize="14"
+                                   LabelBrush="{StaticResource BgContrastBrush}"
+                                   ValueBrush="{StaticResource BgContrastBrush}" />
 
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <controls:RotaryKnobV2 Scale="0.75" Label="MID"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding AcProcessorMid}"
-                                   LabelFontSize="16" ValueFontSize="14" />
+                                   LabelFontSize="16" ValueFontSize="14"
+                                   LabelBrush="{StaticResource BgContrastBrush}"
+                                   ValueBrush="{StaticResource BgContrastBrush}" />
             <controls:RotaryKnobV2 Scale="0.75" Label="MID FREQ"
                                    Minimum="0" Maximum="27"
                                    Value="{Binding AcProcessorMidFreq}"
-                                   LabelFontSize="16" ValueFontSize="14" />
+                                   LabelFontSize="16" ValueFontSize="14"
+                                   LabelBrush="{StaticResource BgContrastBrush}"
+                                   ValueBrush="{StaticResource BgContrastBrush}" />
             <controls:RotaryKnobV2 Scale="0.75" Label="TREBLE"
                                    Minimum="0" Maximum="100"
                                    Value="{Binding AcProcessorTreble}"
-                                   LabelFontSize="16" ValueFontSize="14" />
+                                   LabelFontSize="16" ValueFontSize="14"
+                                   LabelBrush="{StaticResource BgContrastBrush}"
+                                   ValueBrush="{StaticResource BgContrastBrush}" />
         </StackPanel>
     </StackPanel>
 </UserControl>
