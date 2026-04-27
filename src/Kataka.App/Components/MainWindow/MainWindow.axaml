@@ -35,7 +35,7 @@
                             <views:GlobalEqView DataContext="{Binding GlobalEq}" Grid.Column="1" />
                         </Grid>
 
-                        <views:PedalboardMiniMap Grid.Row="1" DataContext="{Binding PedalboardMiniMap}" />
+                        <!-- <views:PedalboardMiniMap Grid.Row="1" DataContext="{Binding PedalboardMiniMap}" /> -->
                         <views:PedalboardView Grid.Row="2" DataContext="{Binding AmpEditor}" />
 
                     </Grid>
