@@ -4,57 +4,49 @@ A Linux desktop editor for the **Boss Katana 50 MkII** guitar amplifier, written
 
 ![Kataka screenshot](screenshot.png)
 
-> **Work in progress.** Some functionality is still missing or untested. Use at your own risk.
+> **Work in progress.** Some things are missing, some things are untested. Use at your own risk.
 
-> Yes, the name is a typo — it should be "Katana". By the time I noticed, it had grown on me, so I left it.
+> Yes, the name is a typo. It should be "Katana". I noticed too late and it had already grown on me, so here we are.
 
 ---
 
 ## What it does
 
-Kataka connects to your Katana 50 MkII over MIDI (USB) and gives you a graphical front panel to:
+Connects to your Katana 50 MkII over USB/MIDI and lets you edit your amp from a desktop UI — channels, effects chain (Booster, Mod, FX, Delay, Reverb, EQ, Noise Suppressor, Preamp), real-time knob feedback, and patch save/load as `.tsl` files (same format Boss Tone Studio uses).
 
-- Browse and select amp channels (Panel, A1–A4, B1–B4)
-- Edit effects in the signal chain — Booster, Mod, FX, Delay, Reverb, EQ, Noise Suppressor, and Preamp
-- See live parameter values reflected as you turn knobs on the amp
-- Save and load patches as `.tsl` files (compatible with Boss Tone Studio format)
-
-All edits are sent to the amp in real time using Roland SysEx DT1/RQ1 messages.
+All edits go to the amp live via Roland SysEx.
 
 ---
 
 ## Getting started
 
-When the app launches, it will not be connected to the amp automatically. Use the **Scan** button to discover available MIDI ports, then select your Katana to connect. The UI will populate with the amp's current state once connected.
+When the app opens it won't connect automatically. Hit **Scan** to find your MIDI ports, pick your Katana, and connect. Once connected the UI pulls the current state from the amp.
+
+You can grab a pre-built binary from the [Releases](../../releases) page — no .NET install needed, it's self-contained.
 
 ---
 
-## Platform and compatibility
+## Compatibility
 
-Tested exclusively on **Fedora Linux** with a **Boss Katana 50 MkII**. It likely won't work with other Katana models or variants since I have no way to test on different hardware — the SysEx address maps are model-specific.
-
-| Platform | Status |
-|----------|--------|
-| Linux    | Primary target — tested on Fedora |
-| Windows / macOS | Not supported |
+I built and tested this exclusively on **Fedora Linux** with my **Boss Katana 50 MkII**. That's the only hardware and OS I can vouch for. Other Katana models probably won't work — the SysEx address maps are specific to the 50 MkII and I have no way to test anything else.
 
 ---
 
-## Why not just use Boss Tone Studio?
+## Why not just run Boss Tone Studio in Docker?
 
-I know Boss Tone Studio can be run in a Docker container on Linux. I wanted to take a crack at building a native Linux implementation. This is my weekend project.
+I know that's an option. I wanted to take a crack at a native Linux implementation. This is my weekend project.
 
 ---
 
 ## Requirements
 
-- [.NET 10 runtime](https://dotnet.microsoft.com/download) (or SDK if building from source)
 - Boss Katana 50 MkII connected via USB
-- `amidi` available (`alsa-utils` package)
+- Linux with `amidi` installed (`alsa-utils`)
+- [.NET 10](https://dotnet.microsoft.com/download) (only if building from source — the release binary is self-contained)
 
 ---
 
-## Building and running
+## Building from source
 
 ```bash
 git clone <repo-url>
@@ -62,26 +54,28 @@ cd katana50-mkII-linux
 dotnet run --project src/Kataka.App/Kataka.App.csproj
 ```
 
-For hot reload during development:
-
-```bash
-dotnet watch run --project src/Kataka.App/Kataka.App.csproj
-```
-
 ---
 
 ## Contributing
 
-Contributions are welcome! If you have a Katana 50 MkII and want to help fill in missing parameters, fix bugs, or improve the UI, feel free to open a PR.
+Feel free to open a PR. If you have a Katana 50 MkII and want to help fill in missing parameters, fix something broken, or clean up the UI — all welcome.
 
-This is my first substantial Avalonia project — the UI and AXAML side is not my forte, so improvements there are especially welcome.
+This is my first real Avalonia project. The C# and architecture side I'm comfortable with, the AXAML/UI side not so much. If you spot something painful in the views, go for it.
 
-A note on AI: I used AI tools to help with boilerplate and implementation details, but the architecture, data flow design, MVVM patterns, UI layout, pedalboard model, signal chain ordering, and overall direction are mine. Every pattern in this codebase — how amp state is mirrored, how writes are routed, how the pedalboard is structured — was designed and driven by me. AI was a productivity tool for the parts that didn't need creative input, not a co-author.
+On AI: I used it heavily for boilerplate and implementation details, but the architecture, data flow, MVVM patterns, pedalboard model, signal chain design, and overall direction are mine. I drove every decision in this codebase — AI was a tool, not a collaborator.
+
+I haven't done it yet, but if someone wants to pull the infrastructure layer out into a reusable package — so it could be used with other amp models — I'm open to it. Same goes for adding support for other Katana models and re-architecting as needed. This is a pet project, I'm not precious about any of it.
+
+---
+
+## Attributions
+
+I've done my best to credit all icons and assets — see the [Attributions](Attributions) file. If I missed something it wasn't intentional, open an issue or PR and I'll fix it.
 
 ---
 
 ## License
 
-Kataka is free software licensed under the [GNU General Public License v3.0](LICENSE).
+[GNU General Public License v3.0](LICENSE)
 
 > Boss and Katana are trademarks of Roland Corporation. This project is not affiliated with or endorsed by Roland/Boss.
