@@ -4,10 +4,6 @@ namespace Kataka.App.Controls;
 
 public static class ColorUtils
 {
-    // Rec. 601 perceived luminance — weights RGB by how sensitive human eyes are to each channel.
-    public static float PerceivedLuminance(Color c) =>
-        (0.299f * c.R + 0.587f * c.G + 0.114f * c.B) / 255f;
-
     // Returns pure black or white — whichever is more readable on the given background.
     public static Color GetBestContrast(Color bg)
     {
