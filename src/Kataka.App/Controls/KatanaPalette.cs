@@ -20,7 +20,7 @@ public static class KatanaPalette
     /// <summary> Brand accent ───────────────────────────────────────────────────────── </summary>
     public static readonly Color Primary = Color.Parse("#57984F"); // Main amber
 
-    public static readonly Color PrimaryLit = Color.Parse("#13678A"); // Lit / active state
+    public static readonly Color PrimaryLit = Color.Parse("#fff"); // Lit / active state
 
     /// <summary> Semantic status ────────────────────────────────────────────────────── </summary>
     public static readonly Color Success = Color.Parse("#3DBF6C"); // Boost
