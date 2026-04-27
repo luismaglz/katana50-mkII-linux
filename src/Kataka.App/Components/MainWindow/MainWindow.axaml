@@ -23,7 +23,7 @@
             <views:DeviceStatusView Grid.Column="1" />
             <views:ChannelStripView Grid.Column="2" />
         </Grid>
-        <Grid Grid.Row="1" ColumnDefinitions="*,360" ColumnSpacing="18">
+        <Grid Grid.Row="1" ColumnDefinitions="*" ColumnSpacing="18">
             <ScrollViewer Grid.Column="0"
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto">
@@ -42,7 +42,7 @@
                 </Border>
             </ScrollViewer>
 
-            <views:DiagnosticsView Grid.Column="1" DataContext="{Binding Diagnostics}" />
+            <!-- <views:DiagnosticsView Grid.Column="1" DataContext="{Binding Diagnostics}" /> -->
         </Grid>
 
     </Grid>
