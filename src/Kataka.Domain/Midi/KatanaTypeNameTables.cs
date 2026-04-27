@@ -133,22 +133,4 @@ public static class KatanaTypeNameTables
             [4] = "7STRING WAH",
             [5] = "RESO WAH"
         };
-
-    // Source: BTS pedalfx-type-select-box first three entries (pedal expression types). Max 2.
-    /// <summary>Auto-generated: static IReadOnlyDictionary<byte, string> PedalFxTypes { get; } =</summary>
-    public static IReadOnlyDictionary<byte, string> PedalFxTypes { get; } =
-        new Dictionary<byte, string> { [0] = "PEDAL WAH", [1] = "PEDAL BEND", [2] = "WAH 95E" };
-
-    /// <summary>Returns the type name lookup table for a parameter key, or null if none.</summary>
-    public static IReadOnlyDictionary<byte, string>? GetTableForKey(string parameterKey) =>
-        parameterKey switch
-        {
-            "panel-booster-type" => BoosterTypes,
-            "panel-mod-type" => ModFxTypes,
-            "panel-fx-type" => ModFxTypes,
-            "panel-delay-type" => DelayTypes,
-            "panel-delay2-type" => DelayTypes,
-            "panel-reverb-type" => ReverbTypes,
-            _ => null
-        };
 }
