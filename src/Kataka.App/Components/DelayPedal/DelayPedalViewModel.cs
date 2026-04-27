@@ -63,8 +63,7 @@ public class DelayPedalViewModel : PedalViewModel
             _modSw = s.ModSw;
             HasVariation = true;
         }
-
-        if (PedalPosition.Delay2 == slot)
+        else if (PedalPosition.Delay2 == slot)
         {
             var s = katanaState.Delay2Pedal;
             _enabledState = s.EnabledState;
@@ -84,6 +83,10 @@ public class DelayPedalViewModel : PedalViewModel
             _delayPhase = s.DelayPhase;
             _modSw = s.ModSw;
             HasVariation = false;
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException(nameof(slot), slot, "DelayPedalViewModel only accepts Delay or Delay2 slots.");
         }
 
         _enabledState.ValueChanged += () => this.RaisePropertyChanged(nameof(IsEnabled));
