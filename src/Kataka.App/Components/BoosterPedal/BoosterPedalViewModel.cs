@@ -2,7 +2,6 @@ using Avalonia.Media;
 
 using Kataka.App.Components.BoosterPedal;
 using Kataka.App.KatanaState;
-
 using Kataka.Domain.Midi;
 using Kataka.Domain.Models;
 

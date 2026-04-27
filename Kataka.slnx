@@ -1,10 +1,10 @@
 <Solution>
     <Folder Name="/src/">
-        <Project Path="src/Kataka.App/Kataka.App.csproj" />
-        <Project Path="src/Kataka.Domain/Kataka.Domain.csproj" />
-        <Project Path="src/Kataka.Infrastructure/Kataka.Infrastructure.csproj" />
+        <Project Path="src/Kataka.App/Kataka.App.csproj"/>
+        <Project Path="src/Kataka.Domain/Kataka.Domain.csproj"/>
+        <Project Path="src/Kataka.Infrastructure/Kataka.Infrastructure.csproj"/>
     </Folder>
     <Folder Name="/tests/">
-        <Project Path="tests/Kataka.Tests/Kataka.Tests.csproj" />
+        <Project Path="tests/Kataka.Tests/Kataka.Tests.csproj"/>
     </Folder>
 </Solution>

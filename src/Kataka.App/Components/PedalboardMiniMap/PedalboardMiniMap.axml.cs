@@ -4,5 +4,8 @@ namespace Kataka.App.Views;
 
 public partial class PedalboardMiniMap : UserControl
 {
-    public PedalboardMiniMap() => InitializeComponent();
+    public PedalboardMiniMap()
+    {
+        InitializeComponent();
+    }
 }

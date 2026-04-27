@@ -12,16 +12,16 @@ public static class Utilities
         // Roland SysEx addresses use 4 bytes where each byte is 7-bit (0x00–0x7F).
         // Decode to a 28-bit integer, add offset, then re-encode.
         var b28 = ((baseAddr[0] & 0x7F) << 21)
-                | ((baseAddr[1] & 0x7F) << 14)
-                | ((baseAddr[2] & 0x7F) << 7)
-                | (baseAddr[3] & 0x7F);
+                  | ((baseAddr[1] & 0x7F) << 14)
+                  | ((baseAddr[2] & 0x7F) << 7)
+                  | (baseAddr[3] & 0x7F);
         b28 += offset;
         return
         [
             (byte)((b28 >> 21) & 0x7F),
             (byte)((b28 >> 14) & 0x7F),
-            (byte)((b28 >> 7)  & 0x7F),
-            (byte) (b28        & 0x7F)
+            (byte)((b28 >> 7) & 0x7F),
+            (byte)(b28 & 0x7F)
         ];
     }
 

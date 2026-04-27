@@ -16,11 +16,36 @@ namespace Kataka.App.Controls;
 public sealed class PedalCardBorder : Decorator
 {
     private static readonly BoxShadows DropShadow = new(
-        new BoxShadow { OffsetX = 31, OffsetY = 15, Blur = 108, Spread = 0, Color = Color.FromArgb(110, 0, 0, 0) });
+        new BoxShadow
+        {
+            OffsetX = 31,
+            OffsetY = 15,
+            Blur = 108,
+            Spread = 0,
+            Color = Color.FromArgb(110, 0, 0, 0)
+        });
 
     private static readonly BoxShadows InsetShadows = new(
-        new BoxShadow { OffsetX = 0, OffsetY = 0, Blur = 10, Spread = 2, IsInset = true, Color = Color.FromArgb(120, 255, 255, 255) },
-        [new BoxShadow { OffsetX = 0, OffsetY = 0, Blur = 10, Spread = 2, IsInset = true, Color = Color.FromArgb(120, 0, 0, 0) }]);
+        new BoxShadow
+        {
+            OffsetX = 0,
+            OffsetY = 0,
+            Blur = 10,
+            Spread = 2,
+            IsInset = true,
+            Color = Color.FromArgb(120, 255, 255, 255)
+        },
+        [
+            new BoxShadow
+            {
+                OffsetX = 0,
+                OffsetY = 0,
+                Blur = 10,
+                Spread = 2,
+                IsInset = true,
+                Color = Color.FromArgb(120, 0, 0, 0)
+            }
+        ]);
 
     // Lazy-loaded so startup cost is deferred; shared across all instances.
     private static readonly Lazy<Bitmap?> TextureBitmap = new(LoadTexture);
@@ -66,7 +91,7 @@ public sealed class PedalCardBorder : Decorator
         var geo = new StreamGeometry();
         using (var ctx = geo.Open())
         {
-            ctx.BeginFigure(new Point(r, 0), true);
+            ctx.BeginFigure(new Point(r, 0));
             ctx.LineTo(new Point(w - r, 0));
             ctx.ArcTo(new Point(w, r), new Size(r, r), 0, false, SweepDirection.Clockwise);
             ctx.LineTo(new Point(w, h - r));
@@ -76,6 +101,7 @@ public sealed class PedalCardBorder : Decorator
             ctx.LineTo(new Point(0, r));
             ctx.ArcTo(new Point(r, 0), new Size(r, r), 0, false, SweepDirection.Clockwise);
         }
+
         Clip = geo;
 
         return result;
@@ -101,7 +127,9 @@ public sealed class PedalCardBorder : Decorator
             var texture = TextureBitmap.Value;
             if (texture is not null)
                 using (context.PushOpacity(0.2))
+                {
                     context.DrawImage(texture, bounds);
+                }
         }
     }
 

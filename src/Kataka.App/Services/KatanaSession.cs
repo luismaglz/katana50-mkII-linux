@@ -91,7 +91,7 @@ public sealed class KatanaSession(IMidiTransport midiTransport) : IKatanaSession
         return channel;
     }
 
-    /// <summary>Returns the raw channel byte from the amp without mapping to <see cref="KatanaPanelChannel"/>.</summary>
+    /// <summary>Returns the raw channel byte from the amp without mapping to <see cref="KatanaPanelChannel" />.</summary>
     public async Task<byte?> ReadCurrentChannelByteAsync(CancellationToken cancellationToken = default)
     {
         var request = RolandSysExBuilder.BuildDataRequest1(0x00, [0x00, 0x00, 0x00, 0x33], CurrentChannelAddress,

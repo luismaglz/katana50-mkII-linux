@@ -14,8 +14,10 @@ public sealed class ObservableLoggerProvider : ILoggerProvider
     private readonly IConfigurationSection? _logLevelSection;
     private readonly Subject<string> _subject = new();
 
-    public ObservableLoggerProvider(IConfiguration? config = null) =>
+    public ObservableLoggerProvider(IConfiguration? config = null)
+    {
         _logLevelSection = config?.GetSection("Logging:LogLevel");
+    }
 
     public IObservable<string> LogMessages => _subject;
 

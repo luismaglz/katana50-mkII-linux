@@ -86,7 +86,8 @@ public class DelayPedalViewModel : PedalViewModel
         }
         else
         {
-            throw new ArgumentOutOfRangeException(nameof(slot), slot, "DelayPedalViewModel only accepts Delay or Delay2 slots.");
+            throw new ArgumentOutOfRangeException(nameof(slot), slot,
+                "DelayPedalViewModel only accepts Delay or Delay2 slots.");
         }
 
         _enabledState.ValueChanged += () => this.RaisePropertyChanged(nameof(IsEnabled));

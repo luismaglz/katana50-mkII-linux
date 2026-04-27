@@ -4,5 +4,8 @@ namespace Kataka.App.Views;
 
 public partial class ChannelSelectionView : UserControl
 {
-    public ChannelSelectionView() => InitializeComponent();
+    public ChannelSelectionView()
+    {
+        InitializeComponent();
+    }
 }

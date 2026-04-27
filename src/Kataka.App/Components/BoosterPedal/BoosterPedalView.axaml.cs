@@ -4,5 +4,8 @@ namespace Kataka.App.Views;
 
 public partial class BoosterPedalView : UserControl
 {
-    public BoosterPedalView() => InitializeComponent();
+    public BoosterPedalView()
+    {
+        InitializeComponent();
+    }
 }

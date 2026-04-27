@@ -4,5 +4,8 @@ namespace Kataka.App.Views.ModsFx;
 
 public partial class AcProcessorView : UserControl
 {
-    public AcProcessorView() => InitializeComponent();
+    public AcProcessorView()
+    {
+        InitializeComponent();
+    }
 }

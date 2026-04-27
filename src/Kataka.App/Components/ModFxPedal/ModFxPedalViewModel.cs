@@ -17,6 +17,39 @@ public class ModFxPedalViewModel : PedalViewModel
     private static readonly IReadOnlyDictionary<string, byte> ReverseTypeTable =
         TypeTable.ToDictionary(kvp => kvp.Value, kvp => kvp.Key, StringComparer.OrdinalIgnoreCase);
 
+    /// <summary> PHASER params ───────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] PhaserTypeOptionsList = ["4STAGE", "8STAGE", "12STAGE", "BiPHASE"];
+
+    /// <summary> RING MOD params ─────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] RingModModeOptionsList = ["NORMAL", "INTELLIGENT"];
+
+    /// <summary> COMP params ─────────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] CompTypeOptionsList =
+        ["BOSS COMP", "HI-BAND", "LIGHT", "D-COMP", "ORANGE", "FAT", "MILD"];
+
+    /// <summary> LIMITER params ──────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] LimiterTypeOptionsList = ["BOSS LIMITER", "RACK 160D", "VTG RACK U"];
+
+    /// <summary> PEDAL WAH params ────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] PedalWahTypeOptionsList =
+        ["CRY WAH", "VO WAH", "FAT WAH", "LIGHT WAH", "7STRING WAH", "RESO WAH"];
+
+    /// <summary> GUITAR SIM params ───────────────────────────────────────────────────────── </summary>
+    private static readonly string[] GuitarSimTypeOptionsList =
+        ["S->H", "H->S", "H->HF", "S->HOLLOW", "H->HOLLOW", "S->AC", "H->AC", "P->AC"];
+
+    /// <summary> WAVE SYNTH params ───────────────────────────────────────────────────────── </summary>
+    private static readonly string[] WaveSynthWaveOptionsList = ["SAW", "SQUARE"];
+
+    /// <summary> PITCH SHIFTER params ────────────────────────────────────────────────────── </summary>
+    private static readonly string[] PitchShifterVoiceOptionsList = ["1VOICE", "2VOICE"];
+
+    /// <summary> HARMONIST params ────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] HarmonistVoiceOptionsList = ["1VOICE", "2VOICE"];
+
+    /// <summary> HUMANIZER params ────────────────────────────────────────────────────────── </summary>
+    private static readonly string[] HumanizerModeOptionsList = ["PICKING", "AUTO"];
+
     private readonly AcGuitarSimState _acGuitarSim;
     private readonly AcProcessorState _acProcessor;
     private readonly AutoWahState _autoWah;
@@ -645,8 +678,6 @@ public class ModFxPedalViewModel : PedalViewModel
         set => _flanger.DirectMix.Value = value;
     }
 
-    /// <summary> PHASER params ───────────────────────────────────────────────────────────── </summary>
-    private static readonly string[] PhaserTypeOptionsList = ["4STAGE", "8STAGE", "12STAGE", "BiPHASE"];
     public IReadOnlyList<string> PhaserTypeOptions => PhaserTypeOptionsList;
 
     public int PhaserType
@@ -789,8 +820,6 @@ public class ModFxPedalViewModel : PedalViewModel
         set => _rotary.Level.Value = value;
     }
 
-    /// <summary> RING MOD params ─────────────────────────────────────────────────────────── </summary>
-    private static readonly string[] RingModModeOptionsList = ["NORMAL", "INTELLIGENT"];
     public IReadOnlyList<string> RingModModeOptions => RingModModeOptionsList;
 
     public int RingModMode
@@ -877,10 +906,6 @@ public class ModFxPedalViewModel : PedalViewModel
         set => _slicer.DirectMix.Value = value;
     }
 
-    /// <summary> COMP params ─────────────────────────────────────────────────────────────── </summary>
-    private static readonly string[] CompTypeOptionsList =
-        ["BOSS COMP", "HI-BAND", "LIGHT", "D-COMP", "ORANGE", "FAT", "MILD"];
-
     public IReadOnlyList<string> CompTypeOptions => CompTypeOptionsList;
 
     public int CompType
@@ -929,8 +954,6 @@ public class ModFxPedalViewModel : PedalViewModel
         set => _comp.Level.Value = value;
     }
 
-    /// <summary> LIMITER params ──────────────────────────────────────────────────────────── </summary>
-    private static readonly string[] LimiterTypeOptionsList = ["BOSS LIMITER", "RACK 160D", "VTG RACK U"];
     public IReadOnlyList<string> LimiterTypeOptions => LimiterTypeOptionsList;
 
     public int LimiterType
@@ -1065,9 +1088,6 @@ public class ModFxPedalViewModel : PedalViewModel
         set => _autoWah.EffectLevel.Value = value;
     }
 
-    /// <summary> PEDAL WAH params ────────────────────────────────────────────────────────── </summary>
-    private static readonly string[] PedalWahTypeOptionsList =
-        ["CRY WAH", "VO WAH", "FAT WAH", "LIGHT WAH", "7STRING WAH", "RESO WAH"];
     public IReadOnlyList<string> PedalWahTypeOptions => PedalWahTypeOptionsList;
 
     public int PedalWahType
@@ -1078,7 +1098,9 @@ public class ModFxPedalViewModel : PedalViewModel
 
     public string? PedalWahTypeOption
     {
-        get => _pedalWah.Type.Value < PedalWahTypeOptionsList.Length ? PedalWahTypeOptionsList[_pedalWah.Type.Value] : null;
+        get => _pedalWah.Type.Value < PedalWahTypeOptionsList.Length
+            ? PedalWahTypeOptionsList[_pedalWah.Type.Value]
+            : null;
         set
         {
             var idx = value is not null ? Array.IndexOf(PedalWahTypeOptionsList, value) : -1;
@@ -1250,9 +1272,6 @@ public class ModFxPedalViewModel : PedalViewModel
         set => _parametricEq.Level.Value = value;
     }
 
-    /// <summary> GUITAR SIM params ───────────────────────────────────────────────────────── </summary>
-    private static readonly string[] GuitarSimTypeOptionsList =
-        ["S->H", "H->S", "H->HF", "S->HOLLOW", "H->HOLLOW", "S->AC", "H->AC", "P->AC"];
     public IReadOnlyList<string> GuitarSimTypeOptions => GuitarSimTypeOptionsList;
 
     public int GuitarSimType
@@ -1263,7 +1282,9 @@ public class ModFxPedalViewModel : PedalViewModel
 
     public string? GuitarSimTypeOption
     {
-        get => _guitarSim.Type.Value < GuitarSimTypeOptionsList.Length ? GuitarSimTypeOptionsList[_guitarSim.Type.Value] : null;
+        get => _guitarSim.Type.Value < GuitarSimTypeOptionsList.Length
+            ? GuitarSimTypeOptionsList[_guitarSim.Type.Value]
+            : null;
         set
         {
             var idx = value is not null ? Array.IndexOf(GuitarSimTypeOptionsList, value) : -1;
@@ -1363,8 +1384,6 @@ public class ModFxPedalViewModel : PedalViewModel
         set => _acProcessor.Level.Value = value;
     }
 
-    /// <summary> WAVE SYNTH params ───────────────────────────────────────────────────────── </summary>
-    private static readonly string[] WaveSynthWaveOptionsList = ["SAW", "SQUARE"];
     public IReadOnlyList<string> WaveSynthWaveOptions => WaveSynthWaveOptionsList;
 
     public int WaveSynthWave
@@ -1375,7 +1394,9 @@ public class ModFxPedalViewModel : PedalViewModel
 
     public string? WaveSynthWaveOption
     {
-        get => _waveSynth.Wave.Value < WaveSynthWaveOptionsList.Length ? WaveSynthWaveOptionsList[_waveSynth.Wave.Value] : null;
+        get => _waveSynth.Wave.Value < WaveSynthWaveOptionsList.Length
+            ? WaveSynthWaveOptionsList[_waveSynth.Wave.Value]
+            : null;
         set
         {
             var idx = value is not null ? Array.IndexOf(WaveSynthWaveOptionsList, value) : -1;
@@ -1463,9 +1484,6 @@ public class ModFxPedalViewModel : PedalViewModel
         set => _heavyOctave.DirectMix.Value = value;
     }
 
-    /// <summary> PITCH SHIFTER params ────────────────────────────────────────────────────── </summary>
-    private static readonly string[] PitchShifterVoiceOptionsList = ["1VOICE", "2VOICE"];
-
     public IReadOnlyList<string> PitchShifterVoiceOptions => PitchShifterVoiceOptionsList;
 
     public int PitchShifterVoice
@@ -1546,8 +1564,6 @@ public class ModFxPedalViewModel : PedalViewModel
         set => _pitchShifter.DirectMix.Value = value;
     }
 
-    /// <summary> HARMONIST params ────────────────────────────────────────────────────────── </summary>
-    private static readonly string[] HarmonistVoiceOptionsList = ["1VOICE", "2VOICE"];
     public IReadOnlyList<string> HarmonistVoiceOptions => HarmonistVoiceOptionsList;
 
     public int HarmonistVoice
@@ -1558,7 +1574,9 @@ public class ModFxPedalViewModel : PedalViewModel
 
     public string? HarmonistVoiceOption
     {
-        get => _harmonist.Voice.Value < HarmonistVoiceOptionsList.Length ? HarmonistVoiceOptionsList[_harmonist.Voice.Value] : null;
+        get => _harmonist.Voice.Value < HarmonistVoiceOptionsList.Length
+            ? HarmonistVoiceOptionsList[_harmonist.Voice.Value]
+            : null;
         set
         {
             var idx = value is not null ? Array.IndexOf(HarmonistVoiceOptionsList, value) : -1;
@@ -1602,8 +1620,6 @@ public class ModFxPedalViewModel : PedalViewModel
         set => _harmonist.DirectMix.Value = value;
     }
 
-    /// <summary> HUMANIZER params ────────────────────────────────────────────────────────── </summary>
-    private static readonly string[] HumanizerModeOptionsList = ["PICKING", "AUTO"];
     public IReadOnlyList<string> HumanizerModeOptions => HumanizerModeOptionsList;
 
     public int HumanizerMode
@@ -1614,7 +1630,9 @@ public class ModFxPedalViewModel : PedalViewModel
 
     public string? HumanizerModeOption
     {
-        get => _humanizer.Mode.Value < HumanizerModeOptionsList.Length ? HumanizerModeOptionsList[_humanizer.Mode.Value] : null;
+        get => _humanizer.Mode.Value < HumanizerModeOptionsList.Length
+            ? HumanizerModeOptionsList[_humanizer.Mode.Value]
+            : null;
         set
         {
             var idx = value is not null ? Array.IndexOf(HumanizerModeOptionsList, value) : -1;

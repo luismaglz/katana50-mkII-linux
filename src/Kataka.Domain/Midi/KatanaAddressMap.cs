@@ -58,8 +58,18 @@ public static class KatanaAddressMap
         ComputeAddress(UserPatch6, PatchBlocks.PatchName, 0),
         ComputeAddress(UserPatch7, PatchBlocks.PatchName, 0),
         ComputeAddress(UserPatch8, PatchBlocks.PatchName, 0),
-        ComputeAddress(UserPatch9, PatchBlocks.PatchName, 0),
+        ComputeAddress(UserPatch9, PatchBlocks.PatchName, 0)
     ];
+
+    /// <summary> Address computation helper ────────────────────────────────────────────── </summary>
+    /// <summary>
+    ///     Computes the 4-byte Roland SysEx address from the three address components.
+    /// </summary>
+    public static byte[] ComputeAddress(uint baseArea, uint blockOffset, uint paramOffset)
+    {
+        var abs = baseArea + blockOffset + paramOffset;
+        return [(byte)(abs >> 24), (byte)(abs >> 16), (byte)(abs >> 8), (byte)abs];
+    }
 
     /// <summary> Command addresses (0x7F…) ────────────────────────────────────────────── </summary>
     public static class Commands
@@ -71,16 +81,6 @@ public static class KatanaAddressMap
         ///     additional raw state blocks at 0x60000000 that corrupt the PatchName display.
         /// </summary>
         public static readonly byte[] EditorCommunicationMode = [0x7F, 0x00, 0x00, 0x01];
-    }
-
-    /// <summary> Address computation helper ────────────────────────────────────────────── </summary>
-    /// <summary>
-    ///     Computes the 4-byte Roland SysEx address from the three address components.
-    /// </summary>
-    public static byte[] ComputeAddress(uint baseArea, uint blockOffset, uint paramOffset)
-    {
-        var abs = baseArea + blockOffset + paramOffset;
-        return [(byte)(abs >> 24), (byte)(abs >> 16), (byte)(abs >> 8), (byte)abs];
     }
 
     /// <summary> System block offsets ──────────────────────────────────────────────────── </summary>

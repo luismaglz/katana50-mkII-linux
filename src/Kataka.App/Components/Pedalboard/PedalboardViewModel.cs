@@ -16,18 +16,18 @@ namespace Kataka.App.Components.Pedalboard;
 
 public class PedalboardViewModel : ViewModelBase
 {
-    private readonly IKatanaState _katanaState;
-    private readonly List<PedalboardPosition[]> _chains = [];
-
-    private readonly PedalboardInput _inputHardware = new("white", LoadBitmap("electric-guitar.png"));
-    private readonly PedalboardOutput _outputHardware = new("white", LoadBitmap("speakers.png"));
     private readonly PedalboardAmp _ampHardware = new("white", LoadBitmap("amplifier.png"));
 
     private readonly PedalboardPedal<BoosterPedalViewModel> _boosterPedal;
-    private readonly PedalboardPedal<ModFxPedalViewModel> _modPedal;
-    private readonly PedalboardPedal<ModFxPedalViewModel> _fxPedal;
+    private readonly List<PedalboardPosition[]> _chains = [];
     private readonly PedalboardPedal<DelayPedalViewModel> _delayPedal;
     private readonly PedalboardPedal<DelayPedalViewModel> _delayPedal2;
+    private readonly PedalboardPedal<ModFxPedalViewModel> _fxPedal;
+
+    private readonly PedalboardInput _inputHardware = new("white", LoadBitmap("electric-guitar.png"));
+    private readonly IKatanaState _katanaState;
+    private readonly PedalboardPedal<ModFxPedalViewModel> _modPedal;
+    private readonly PedalboardOutput _outputHardware = new("white", LoadBitmap("speakers.png"));
     private readonly PedalboardPedal<ReverbPedalViewModel> _reverbPedal;
 
     public PedalboardViewModel(IKatanaState katanaState)
@@ -35,19 +35,46 @@ public class PedalboardViewModel : ViewModelBase
         _katanaState = katanaState;
 
         _boosterPedal = new PedalboardPedal<BoosterPedalViewModel>(new BoosterPedalViewModel(katanaState), "gold");
-        _modPedal = new PedalboardPedal<ModFxPedalViewModel>(new ModFxPedalViewModel(PedalPosition.Mod, katanaState), "blue");
-        _fxPedal = new PedalboardPedal<ModFxPedalViewModel>(new ModFxPedalViewModel(PedalPosition.Fx, katanaState), "purple");
-        _delayPedal = new PedalboardPedal<DelayPedalViewModel>(new DelayPedalViewModel(PedalPosition.Delay, katanaState), "lightgray");
-        _delayPedal2 = new PedalboardPedal<DelayPedalViewModel>(new DelayPedalViewModel(PedalPosition.Delay2, katanaState), "lightgray");
+        _modPedal = new PedalboardPedal<ModFxPedalViewModel>(new ModFxPedalViewModel(PedalPosition.Mod, katanaState),
+            "blue");
+        _fxPedal = new PedalboardPedal<ModFxPedalViewModel>(new ModFxPedalViewModel(PedalPosition.Fx, katanaState),
+            "purple");
+        _delayPedal =
+            new PedalboardPedal<DelayPedalViewModel>(new DelayPedalViewModel(PedalPosition.Delay, katanaState),
+                "lightgray");
+        _delayPedal2 =
+            new PedalboardPedal<DelayPedalViewModel>(new DelayPedalViewModel(PedalPosition.Delay2, katanaState),
+                "lightgray");
         _reverbPedal = new PedalboardPedal<ReverbPedalViewModel>(new ReverbPedalViewModel(katanaState), "cyan");
 
-        _chains.Add([_inputHardware, _boosterPedal, _ampHardware, _modPedal, _fxPedal, _delayPedal, _delayPedal2, _reverbPedal, _outputHardware]);
-        _chains.Add([_inputHardware, _boosterPedal, _modPedal, _ampHardware, _fxPedal, _delayPedal, _delayPedal2, _reverbPedal, _outputHardware]);
-        _chains.Add([_inputHardware, _boosterPedal, _modPedal, _fxPedal, _ampHardware, _delayPedal, _delayPedal2, _reverbPedal, _outputHardware]);
-        _chains.Add([_inputHardware, _boosterPedal, _modPedal, _fxPedal, _delayPedal, _ampHardware, _delayPedal2, _reverbPedal, _outputHardware]);
-        _chains.Add([_inputHardware, _modPedal, _boosterPedal, _ampHardware, _fxPedal, _delayPedal, _delayPedal2, _reverbPedal, _outputHardware]);
-        _chains.Add([_inputHardware, _modPedal, _boosterPedal, _fxPedal, _ampHardware, _delayPedal, _delayPedal2, _reverbPedal, _outputHardware]);
-        _chains.Add([_inputHardware, _modPedal, _boosterPedal, _fxPedal, _delayPedal, _ampHardware, _delayPedal2, _reverbPedal, _outputHardware]);
+        _chains.Add([
+            _inputHardware, _boosterPedal, _ampHardware, _modPedal, _fxPedal, _delayPedal, _delayPedal2, _reverbPedal,
+            _outputHardware
+        ]);
+        _chains.Add([
+            _inputHardware, _boosterPedal, _modPedal, _ampHardware, _fxPedal, _delayPedal, _delayPedal2, _reverbPedal,
+            _outputHardware
+        ]);
+        _chains.Add([
+            _inputHardware, _boosterPedal, _modPedal, _fxPedal, _ampHardware, _delayPedal, _delayPedal2, _reverbPedal,
+            _outputHardware
+        ]);
+        _chains.Add([
+            _inputHardware, _boosterPedal, _modPedal, _fxPedal, _delayPedal, _ampHardware, _delayPedal2, _reverbPedal,
+            _outputHardware
+        ]);
+        _chains.Add([
+            _inputHardware, _modPedal, _boosterPedal, _ampHardware, _fxPedal, _delayPedal, _delayPedal2, _reverbPedal,
+            _outputHardware
+        ]);
+        _chains.Add([
+            _inputHardware, _modPedal, _boosterPedal, _fxPedal, _ampHardware, _delayPedal, _delayPedal2, _reverbPedal,
+            _outputHardware
+        ]);
+        _chains.Add([
+            _inputHardware, _modPedal, _boosterPedal, _fxPedal, _delayPedal, _ampHardware, _delayPedal2, _reverbPedal,
+            _outputHardware
+        ]);
 
         _katanaState.PedalChain.ValueChanged += () => UpdateChain(_katanaState.PedalChain.Value);
         UpdateChain(_katanaState.PedalChain.Value);

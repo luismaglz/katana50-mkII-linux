@@ -4,5 +4,8 @@ namespace Kataka.App.Views.ModsFx;
 
 public partial class AutoWahView : UserControl
 {
-    public AutoWahView() => InitializeComponent();
+    public AutoWahView()
+    {
+        InitializeComponent();
+    }
 }

@@ -49,7 +49,7 @@ public partial class KatanaState : IKatanaState
             if (!values.TryGetValue(addr, out var b0)) continue;
             var lsbKey = Utilities.AddressToKey(Utilities.AddressOffset(state.Parameter.Address, 1));
             if (!values.TryGetValue(lsbKey, out var b1)) continue;
-            SetState(addr, new byte[] { b0, b1 });
+            SetState(addr, new[] { b0, b1 });
             consumed.Add(addr);
             consumed.Add(lsbKey);
         }

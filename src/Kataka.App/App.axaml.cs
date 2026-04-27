@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
@@ -8,7 +9,7 @@ using Kataka.App.Views;
 
 namespace Kataka.App;
 
-public class App : Avalonia.Application
+public class App : Application
 {
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 

@@ -19,7 +19,10 @@ public sealed class SmallImageRotaryKnob : RotaryKnobBase
 
     private static readonly SolidColorBrush KnobShadowBrush = KatanaPalette.KnobShadowBrush;
 
-    static SmallImageRotaryKnob() => AffectsRender<SmallImageRotaryKnob>(KnobBackgroundBrushProperty);
+    static SmallImageRotaryKnob()
+    {
+        AffectsRender<SmallImageRotaryKnob>(KnobBackgroundBrushProperty);
+    }
 
     public IBrush KnobBackgroundBrush
     {

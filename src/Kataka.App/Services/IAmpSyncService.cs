@@ -1,5 +1,3 @@
-using Kataka.Domain.Midi;
-
 namespace Kataka.App.Services;
 
 public interface IAmpSyncService
