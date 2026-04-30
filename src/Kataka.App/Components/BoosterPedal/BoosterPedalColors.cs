@@ -15,15 +15,18 @@ public static class BoosterPedalColors
 {
     public static readonly IBrush Boost = Gradient("#302e2a", "#1e1c18");
     public static readonly IBrush Overdrive = Gradient("#1e3222", "#111e14");
-    public static readonly IBrush Blues = Gradient("#1a2c3e", "#111c28");
     public static readonly IBrush Distortion = Gradient("#342216", "#20140c");
     public static readonly IBrush Fuzz = Gradient("#201e2c", "#141218");
+
+    public static readonly IBrush BluesDriver = Solid("#11578c");
+    public static readonly IBrush CentaOD = Solid("#e3b25c");
 
     public static IBrush GetBackgroundBrush(string? typeName) => typeName switch
     {
         "MID BOOST" or "CLEAN BOOST" or "TREBLE BOOST" => Boost,
         "CRUNCH OD" or "NATURAL OD" or "WARM OD" or "OVERDRIVE" or "T-SCREAM" or "TURBO OD" => Overdrive,
-        "BLUES DRIVE" or "CENTA OD" => Blues,
+        "BLUES DRIVE" => BluesDriver,
+        "CENTA OD" => CentaOD,
         "FAT DS" or "DISTORTION" or "RAT" or "GUV DS" or "DST+" => Distortion,
         "METAL DS" or "OCT FUZZ" or "METAL ZONE" or "'60S FUZZ" or "MUFF FUZZ" or "HM-2" or "METAL CORE" => Fuzz,
         _ => Overdrive
@@ -36,4 +39,6 @@ public static class BoosterPedalColors
             EndPoint = new RelativePoint(0, 1, RelativeUnit.Relative),
             GradientStops = { new GradientStop(Color.Parse(top), 0), new GradientStop(Color.Parse(bottom), 1) }
         };
+
+    private static IBrush Solid(string hex) => new SolidColorBrush(Color.Parse(hex));
 }
