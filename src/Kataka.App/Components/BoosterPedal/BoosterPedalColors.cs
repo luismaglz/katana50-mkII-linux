@@ -15,11 +15,6 @@ namespace Kataka.App.Components.BoosterPedal;
 /// </summary>
 public static class BoosterPedalColors
 {
-    public static readonly IBrush Overdrive = Gradient("#1e3222", "#111e14");
-    public static readonly IBrush Distortion = Gradient("#342216", "#20140c");
-    public static readonly IBrush Fuzz = Gradient("#201e2c", "#141218");
-
-
     public static readonly IBrush Boost = Solid("#cdcfce");
     public static readonly IBrush BluesDriver = Solid("#11578c");
     public static readonly IBrush CentaOD = Solid("#e3b25c");
@@ -27,6 +22,13 @@ public static class BoosterPedalColors
     public static readonly IBrush FatDS = Solid("#2a2a2a");
     public static readonly IBrush GuvDS = Solid("#0d0d0d");
     public static readonly IBrush HM2 = Solid("#181c1f");
+    public static readonly IBrush MetalZone = Solid("#4b5054");
+    public static readonly IBrush MuffFuzz = Solid("#d21f23");
+    public static readonly IBrush OctFuzz = Solid("#466296");
+    public static readonly IBrush Overdrive = Solid("#fbc902");
+    public static readonly IBrush Rat = Solid("#222222");
+    public static readonly IBrush TSCREAM = Solid("#00a875");
+    public static readonly IBrush TURBOOD = Solid("#fcde40");
 
     public static readonly IBrush MetalCore = CreateOrganicNoise(500, 800);
 
@@ -35,13 +37,20 @@ public static class BoosterPedalColors
         return typeName switch
         {
             "MID BOOST" or "CLEAN BOOST" or "TREBLE BOOST" => Boost,
-            "CRUNCH OD" or "NATURAL OD" or "WARM OD" or "OVERDRIVE" or "T-SCREAM" or "TURBO OD" => Overdrive,
+            "CRUNCH OD" or "NATURAL OD" or "WARM OD" => Boost,
+            "OVERDRIVE" => Overdrive,
+            "T-SCREAM" => TSCREAM,
+            "TURBO OD" => TURBOOD,
             "BLUES DRIVE" => BluesDriver,
             "CENTA OD" => CentaOD,
             "FAT DS" => FatDS,
-            "DISTORTION" or "RAT" or "GUV DS" => GuvDS,
+            "DISTORTION" or "RAT" => Rat,
+            "GUV DS" => GuvDS,
             "DST+" => DSTP,
-            "METAL DS" or "OCT FUZZ" or "METAL ZONE" or "'60S FUZZ" or "MUFF FUZZ" or "HM-2" => HM2,
+            "METAL DS" or "OCT FUZZ" => OctFuzz,
+            "60S FUZZ" or "MUFF FUZZ" => MuffFuzz,
+            "HM-2" => HM2,
+            "METAL ZONE" => MetalZone,
             "METAL CORE" => MetalCore,
             _ => Overdrive
         };
