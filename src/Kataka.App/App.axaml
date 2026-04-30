@@ -148,5 +148,103 @@
             <Setter Property="BorderBrush" Value="{StaticResource PrimaryLitBrush}" />
         </Style>
 
+        <!-- ── ComboBox: pedal type picker ─────────────────────────────────── -->
+        <Style Selector="ComboBox.pedal-type-picker">
+            <Setter Property="Background" Value="{StaticResource BgElevatedBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Foreground" Value="{StaticResource TextMainBrush}" />
+            <Setter Property="MinHeight" Value="34" />
+            <Setter Property="Padding" Value="10,0,4,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="MaxDropDownHeight" Value="280" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Panel>
+                        <Border Name="Background"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                MinHeight="{TemplateBinding MinHeight}">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <ContentPresenter Name="ContentPresenter"
+                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  Foreground="{TemplateBinding Foreground}"
+                                                  FontSize="{TemplateBinding FontSize}" />
+                                <Path Grid.Column="1"
+                                      Data="M0,0 L5,5 L10,0"
+                                      Stroke="{StaticResource PrimaryBrush}"
+                                      StrokeThickness="1.5"
+                                      Fill="Transparent"
+                                      Width="10" Height="6"
+                                      Stretch="Uniform"
+                                      VerticalAlignment="Center"
+                                      Margin="4,0,10,0"
+                                      IsHitTestVisible="False" />
+                            </Grid>
+                        </Border>
+                        <Popup Name="PART_Popup"
+                               IsLightDismissEnabled="True"
+                               IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                               MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                               PlacementTarget="{TemplateBinding}"
+                               Placement="BottomEdgeAlignedLeft"
+                               WindowManagerAddShadowHint="False">
+                            <Border Name="PopupBorder"
+                                    Background="{StaticResource BgElevatedBrush}"
+                                    BorderBrush="{StaticResource BorderLightBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="3">
+                                <ScrollViewer>
+                                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                                    ItemsPanel="{TemplateBinding ItemsPanel}" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Panel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="ComboBox.pedal-type-picker:pointerover /template/ Border#Background">
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
+        </Style>
+
+        <Style Selector="ComboBox.pedal-type-picker:focus /template/ Border#Background">
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryLitBrush}" />
+        </Style>
+
+        <Style Selector="ComboBox.pedal-type-picker[IsDropDownOpen=True] /template/ Border#Background">
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryLitBrush}" />
+        </Style>
+
+        <Style Selector="ComboBox.pedal-type-picker ComboBoxItem">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource TextMainBrush}" />
+            <Setter Property="Padding" Value="10,7" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+
+        <Style Selector="ComboBox.pedal-type-picker ComboBoxItem:pointerover">
+            <Setter Property="Background" Value="{StaticResource BgContrastBrush}" />
+        </Style>
+
+        <Style Selector="ComboBox.pedal-type-picker ComboBoxItem:selected">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource BgBaseBrush}" />
+        </Style>
+
+        <Style Selector="ComboBox.pedal-type-picker ComboBoxItem:selected:pointerover">
+            <Setter Property="Background" Value="{StaticResource PrimaryLitBrush}" />
+        </Style>
+
     </Application.Styles>
 </Application>
