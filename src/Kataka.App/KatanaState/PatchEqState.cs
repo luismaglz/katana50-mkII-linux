@@ -33,10 +33,12 @@ public class PatchEqState
 
     public AmpControlState Sw;
     public AmpControlState Type;
+    public AmpControlState? Position;
 
     public PatchEqState(bool isEq2 = false)
     {
         Sw = new AmpControlState(isEq2 ? KatanaMkIIParameterCatalog.PatchEq2Sw : KatanaMkIIParameterCatalog.PatchEq1Sw);
+        if (isEq2) Position = new AmpControlState(KatanaMkIIParameterCatalog.PatchEq2Position);
         Type = new AmpControlState(isEq2
             ? KatanaMkIIParameterCatalog.PatchEq2Type
             : KatanaMkIIParameterCatalog.PatchEq1Type);

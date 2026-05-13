@@ -29,7 +29,7 @@
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto">
                 <Border Classes="amp-shell" Padding="24">
-                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="18">
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="18">
 
                         <Grid ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="14">
                             <views:AmpControlsView DataContext="{Binding AmpEditor}" />
@@ -37,8 +37,13 @@
                             <views:NoiseSuppressorView DataContext="{Binding NoiseSuppressor}" Grid.Column="2" />
                         </Grid>
 
-                        <!-- <views:PedalboardMiniMap Grid.Row="1" DataContext="{Binding PedalboardMiniMap}" /> -->
-                        <views:PedalboardView Grid.Row="2" DataContext="{Binding AmpEditor}" />
+                        <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto" ColumnSpacing="14">
+                            <views:PatchEqView DataContext="{Binding PatchEq}" Grid.Column="0" />
+                            <views:SendReturnView DataContext="{Binding SendReturn}" Grid.Column="1" />
+                        </Grid>
+
+                        <!-- <views:PedalboardMiniMap Grid.Row="2" DataContext="{Binding PedalboardMiniMap}" /> -->
+                        <views:PedalboardView Grid.Row="3" DataContext="{Binding AmpEditor}" />
 
                     </Grid>
                 </Border>

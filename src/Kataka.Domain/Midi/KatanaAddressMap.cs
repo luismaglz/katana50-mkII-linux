@@ -623,6 +623,12 @@ public static class KatanaAddressMap
         /// <summary>Parameter offset constant 'FootVolume' from address_map.js.</summary>
         public const uint FootVolume = 0x21;
 
+        // Send/Return
+        public const uint SendReturnSw = 0x22;          // PRM_SEND_RETURN_SW
+        public const uint SendReturnMode = 0x23;         // PRM_SEND_RETURN_MODE
+        public const uint SendReturnSendLevel = 0x24;    // PRM_SEND_RETURN_SEND_LEVEL
+        public const uint SendReturnReturnLevel = 0x25;  // PRM_SEND_RETURN_RETURN_LEVEL
+
         // Noise Suppressor 1 (NS1)
         /// <summary>Parameter offset constant 'Ns1Sw' from address_map.js (PRM_NS1_SW).</summary>
         public const uint Ns1Sw = 0x26;
@@ -646,6 +652,9 @@ public static class KatanaAddressMap
 
         /// <summary>Parameter offset constant 'ContourSelect' from address_map.js.</summary>
         public const uint ContourSelect = 0x57;
+
+        // EQ2 position (PRM_POSITION_EQ2)
+        public const uint Eq2Position = 0x59;
     }
 
     /// <summary> Patch2 parameter offsets (prm_prop_patch_2) ───────────────────────────── </summary>

@@ -2,27 +2,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Kataka.App.ViewModels"
              xmlns:controls="using:Kataka.App.Controls"
-             x:Class="Kataka.App.Views.GlobalEqView"
-             x:DataType="vm:GlobalEqViewModel"
+             x:Class="Kataka.App.Views.PatchEqView"
+             x:DataType="vm:PatchEqViewModel"
              x:CompileBindings="False">
 
     <StackPanel Spacing="8">
 
-        <!-- ── Header: on/off · bank select · type · position ─────────────── -->
+        <!-- ── Header: on/off · type · position ──────────────────────────── -->
         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
             <CheckBox Content="EQ On" IsChecked="{Binding IsOn}" />
 
-            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                <TextBlock Text="BANK" VerticalAlignment="Center" FontSize="11"
-                           Foreground="{StaticResource TextMutedBrush}" />
-                <ComboBox SelectedIndex="{Binding Select.Value}" Width="90">
-                    <ComboBoxItem Content="Bank 1" />
-                    <ComboBoxItem Content="Bank 2" />
-                    <ComboBoxItem Content="Bank 3" />
-                </ComboBox>
-            </StackPanel>
-
-            <ComboBox SelectedIndex="{Binding ActiveBank.Type.Value}" Width="130">
+            <ComboBox SelectedIndex="{Binding Type.Value}" Width="130">
                 <ComboBoxItem Content="Parametric EQ" />
                 <ComboBoxItem Content="Graphic EQ" />
             </ComboBox>
@@ -31,91 +21,89 @@
                 <TextBlock Text="POSITION" VerticalAlignment="Center" FontSize="11"
                            Foreground="{StaticResource TextMutedBrush}" />
                 <ComboBox Classes="pedal-type-picker"
-                          SelectedIndex="{Binding ActiveBank.Position.Value}"
-                          Width="110">
+                          SelectedIndex="{Binding Position.Value}"
+                          Width="100">
                     <ComboBoxItem Content="PREAMP" />
                     <ComboBoxItem Content="LOOP" />
-                    <ComboBoxItem Content="MASTER" />
-                    <ComboBoxItem Content="OUTPUT" />
                 </ComboBox>
             </StackPanel>
         </StackPanel>
 
         <!-- ── Parametric EQ ─────────────────────────────────────────────── -->
-        <StackPanel Spacing="4" IsVisible="{Binding ActiveBank.IsParametric}">
+        <StackPanel Spacing="4" IsVisible="{Binding IsParametric}">
 
             <!-- Row 1: gain knobs -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
                 <controls:RotaryKnobV2 Label="LOW" Scale="0.75" LabelFontSize="11"
                                        Minimum="0" Maximum="40"
                                        DisplayMinimum="-20" DisplayMaximum="20"
-                                       Value="{Binding ActiveBank.LowGain.Value}" />
+                                       Value="{Binding LowGain.Value}" />
                 <controls:RotaryKnobV2 Label="LO-MID" Scale="0.75" LabelFontSize="11"
                                        Minimum="0" Maximum="40"
                                        DisplayMinimum="-20" DisplayMaximum="20"
-                                       Value="{Binding ActiveBank.LowMidGain.Value}" />
+                                       Value="{Binding LowMidGain.Value}" />
                 <controls:RotaryKnobV2 Label="HI-MID" Scale="0.75" LabelFontSize="11"
                                        Minimum="0" Maximum="40"
                                        DisplayMinimum="-20" DisplayMaximum="20"
-                                       Value="{Binding ActiveBank.HiMidGain.Value}" />
+                                       Value="{Binding HiMidGain.Value}" />
                 <controls:RotaryKnobV2 Label="HIGH" Scale="0.75" LabelFontSize="11"
                                        Minimum="0" Maximum="40"
                                        DisplayMinimum="-20" DisplayMaximum="20"
-                                       Value="{Binding ActiveBank.HighGain.Value}" />
+                                       Value="{Binding HighGain.Value}" />
                 <controls:RotaryKnobV2 Label="LEVEL" Scale="0.75" LabelFontSize="11"
                                        Minimum="0" Maximum="40"
                                        DisplayMinimum="-20" DisplayMaximum="20"
-                                       Value="{Binding ActiveBank.Level.Value}" />
+                                       Value="{Binding Level.Value}" />
             </StackPanel>
 
             <!-- Row 2: cut / freq / Q stepped knobs -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
                 <controls:SteppedKnobV2 Label="LOW CUT" Scale="0.75" LabelFontSize="11"
                                         Steps="{x:Static vm:FrequencySteps.LowCut18}"
-                                        Value="{Binding ActiveBank.LowCut.Value}" />
+                                        Value="{Binding LowCut.Value}" />
                 <controls:SteppedKnobV2 Label="LOMID FREQ" Scale="0.75" LabelFontSize="11"
                                         Steps="{x:Static vm:FrequencySteps.MidFreq28}"
-                                        Value="{Binding ActiveBank.LowMidFreq.Value}" />
+                                        Value="{Binding LowMidFreq.Value}" />
                 <controls:SteppedKnobV2 Label="LOMID Q" Scale="0.75" LabelFontSize="11"
                                         Steps="{x:Static vm:FrequencySteps.Q6}"
-                                        Value="{Binding ActiveBank.LowMidQ.Value}" />
+                                        Value="{Binding LowMidQ.Value}" />
                 <controls:SteppedKnobV2 Label="HIMID FREQ" Scale="0.75" LabelFontSize="11"
                                         Steps="{x:Static vm:FrequencySteps.MidFreq28}"
-                                        Value="{Binding ActiveBank.HiMidFreq.Value}" />
+                                        Value="{Binding HiMidFreq.Value}" />
                 <controls:SteppedKnobV2 Label="HIMID Q" Scale="0.75" LabelFontSize="11"
                                         Steps="{x:Static vm:FrequencySteps.Q6}"
-                                        Value="{Binding ActiveBank.HiMidQ.Value}" />
+                                        Value="{Binding HiMidQ.Value}" />
                 <controls:SteppedKnobV2 Label="HIGH CUT" Scale="0.75" LabelFontSize="11"
                                         Steps="{x:Static vm:FrequencySteps.HighCut15}"
-                                        Value="{Binding ActiveBank.HighCut.Value}" />
+                                        Value="{Binding HighCut.Value}" />
             </StackPanel>
 
         </StackPanel>
 
         <!-- ── Graphic EQ ────────────────────────────────────────────────── -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="2"
-                    IsVisible="{Binding ActiveBank.IsGraphic}">
-            <controls:EqBandSlider Label="31" Minimum="0" Maximum="40" Value="{Binding ActiveBank.Geq31Hz.Value}"
+                    IsVisible="{Binding IsGraphic}">
+            <controls:EqBandSlider Label="31" Minimum="0" Maximum="48" Value="{Binding Geq31Hz.Value}"
                                    Scale="0.9" />
-            <controls:EqBandSlider Label="62" Minimum="0" Maximum="40" Value="{Binding ActiveBank.Geq62Hz.Value}"
+            <controls:EqBandSlider Label="62" Minimum="0" Maximum="48" Value="{Binding Geq62Hz.Value}"
                                    Scale="0.9" />
-            <controls:EqBandSlider Label="125" Minimum="0" Maximum="40" Value="{Binding ActiveBank.Geq125Hz.Value}"
+            <controls:EqBandSlider Label="125" Minimum="0" Maximum="48" Value="{Binding Geq125Hz.Value}"
                                    Scale="0.9" />
-            <controls:EqBandSlider Label="250" Minimum="0" Maximum="40" Value="{Binding ActiveBank.Geq250Hz.Value}"
+            <controls:EqBandSlider Label="250" Minimum="0" Maximum="48" Value="{Binding Geq250Hz.Value}"
                                    Scale="0.9" />
-            <controls:EqBandSlider Label="500" Minimum="0" Maximum="40" Value="{Binding ActiveBank.Geq500Hz.Value}"
+            <controls:EqBandSlider Label="500" Minimum="0" Maximum="48" Value="{Binding Geq500Hz.Value}"
                                    Scale="0.9" />
-            <controls:EqBandSlider Label="1k" Minimum="0" Maximum="40" Value="{Binding ActiveBank.Geq1kHz.Value}"
+            <controls:EqBandSlider Label="1k" Minimum="0" Maximum="48" Value="{Binding Geq1kHz.Value}"
                                    Scale="0.9" />
-            <controls:EqBandSlider Label="2k" Minimum="0" Maximum="40" Value="{Binding ActiveBank.Geq2kHz.Value}"
+            <controls:EqBandSlider Label="2k" Minimum="0" Maximum="48" Value="{Binding Geq2kHz.Value}"
                                    Scale="0.9" />
-            <controls:EqBandSlider Label="4k" Minimum="0" Maximum="40" Value="{Binding ActiveBank.Geq4kHz.Value}"
+            <controls:EqBandSlider Label="4k" Minimum="0" Maximum="48" Value="{Binding Geq4kHz.Value}"
                                    Scale="0.9" />
-            <controls:EqBandSlider Label="8k" Minimum="0" Maximum="40" Value="{Binding ActiveBank.Geq8kHz.Value}"
+            <controls:EqBandSlider Label="8k" Minimum="0" Maximum="48" Value="{Binding Geq8kHz.Value}"
                                    Scale="0.9" />
-            <controls:EqBandSlider Label="16k" Minimum="0" Maximum="40" Value="{Binding ActiveBank.Geq16kHz.Value}"
+            <controls:EqBandSlider Label="16k" Minimum="0" Maximum="48" Value="{Binding Geq16kHz.Value}"
                                    Scale="0.9" />
-            <controls:EqBandSlider Label="LVL" Minimum="0" Maximum="40" Value="{Binding ActiveBank.GeqLevel.Value}"
+            <controls:EqBandSlider Label="LVL" Minimum="0" Maximum="48" Value="{Binding GeqLevel.Value}"
                                    Scale="0.9" />
         </StackPanel>
 
