@@ -63,14 +63,10 @@ public class ChannelSelectionViewModel : ViewModelBase
         UpdatePatchName();
     }
 
-    // Channel byte is 1-based UserPatch slot index (PANEL=0 has no stored name).
     private void UpdatePatchName()
     {
         var channel = _katanaState.CurrentChannel.Value;
-        var slotIndex = channel - 1;
-        CurrentPatchName = slotIndex >= 0 && _katanaState.UserPatchNames.TryGetValue(slotIndex, out var name)
-            ? name
-            : string.Empty;
+        CurrentPatchName = _katanaState.UserPatchNames.TryGetValue(channel, out var name) ? name : string.Empty;
     }
 
     private sealed class SelectChannelCommand(ChannelSelectionViewModel vm) : ICommand

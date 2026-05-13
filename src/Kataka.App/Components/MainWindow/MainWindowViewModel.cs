@@ -23,8 +23,8 @@ public class MainWindowViewModel : ViewModelBase
         MidiConnection = new MidiConnectionViewModel(katanaSession, ampSyncService, AppendStatus,
             loggerFactory.CreateLogger<MidiConnectionViewModel>());
         Diagnostics = new DiagnosticsViewModel(ampSyncService, loggerProvider, () => MidiConnection.IsConnected);
-        Patch = new PatchViewModel(katanaSession, ampSyncService, () => MidiConnection.IsConnected, AppendStatus,
-            loggerFactory.CreateLogger<PatchViewModel>());
+        Patch = new PatchViewModel(katanaSession, katanaState, ampSyncService, () => MidiConnection.IsConnected,
+            AppendStatus, loggerFactory.CreateLogger<PatchViewModel>());
         AmpEditor = new AmpEditorViewModel(katanaState);
         GlobalEq = new GlobalEqViewModel(katanaState);
         NoiseSuppressor = new NoiseSuppressorViewModel(katanaState);
