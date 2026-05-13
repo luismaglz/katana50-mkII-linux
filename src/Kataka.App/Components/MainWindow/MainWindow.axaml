@@ -37,9 +37,10 @@
                             <views:NoiseSuppressorView DataContext="{Binding NoiseSuppressor}" Grid.Column="2" />
                         </Grid>
 
-                        <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto" ColumnSpacing="14">
+                        <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="14">
                             <views:PatchEqView DataContext="{Binding PatchEq}" Grid.Column="0" />
                             <views:SendReturnView DataContext="{Binding SendReturn}" Grid.Column="1" />
+                            <views:SoloView DataContext="{Binding Solo}" Grid.Column="2" />
                         </Grid>
 
                         <!-- <views:PedalboardMiniMap Grid.Row="2" DataContext="{Binding PedalboardMiniMap}" /> -->

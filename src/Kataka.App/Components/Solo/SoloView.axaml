@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kataka.App.ViewModels"
+             xmlns:controls="using:Kataka.App.Controls"
+             x:Class="Kataka.App.Views.SoloView"
+             x:DataType="vm:SoloViewModel"
+             x:CompileBindings="False">
+
+    <Border Classes="panel-section" Padding="12,10">
+        <StackPanel Spacing="8">
+
+            <!-- ── Header: on/off + level ─────────────────────────────────── -->
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <TextBlock Text="SOLO"
+                           FontSize="10"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           VerticalAlignment="Center" />
+                <ToggleButton Classes="effect-button"
+                              Content="ON"
+                              Width="52"
+                              IsChecked="{Binding IsEnabled}" />
+                <controls:RotaryKnobV2 Label="LEVEL"
+                                       Scale="0.65"
+                                       LabelFontSize="11"
+                                       ValueFontSize="11"
+                                       Minimum="0" Maximum="100"
+                                       Value="{Binding Level.Value}" />
+            </StackPanel>
+
+            <!-- ── Solo EQ ────────────────────────────────────────────────── -->
+            <StackPanel Spacing="6">
+
+                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <TextBlock Text="EQ"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               VerticalAlignment="Center" />
+                    <ToggleButton Classes="effect-button"
+                                  Content="ON"
+                                  Width="44"
+                                  IsChecked="{Binding IsEqOn}" />
+                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <TextBlock Text="POS" VerticalAlignment="Center" FontSize="11"
+                                   Foreground="{StaticResource TextMutedBrush}" />
+                        <ComboBox Classes="pedal-type-picker"
+                                  SelectedIndex="{Binding EqPosition.Value}"
+                                  Width="80">
+                            <ComboBoxItem Content="PRE" />
+                            <ComboBoxItem Content="POST" />
+                        </ComboBox>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Gain knobs -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
+                    <controls:RotaryKnobV2 Label="LOW" Scale="0.65" LabelFontSize="11"
+                                           Minimum="0" Maximum="48"
+                                           DisplayMinimum="-24" DisplayMaximum="24"
+                                           Value="{Binding EqLowGain.Value}" />
+                    <controls:RotaryKnobV2 Label="MID" Scale="0.65" LabelFontSize="11"
+                                           Minimum="0" Maximum="48"
+                                           DisplayMinimum="-24" DisplayMaximum="24"
+                                           Value="{Binding EqMidGain.Value}" />
+                    <controls:RotaryKnobV2 Label="HIGH" Scale="0.65" LabelFontSize="11"
+                                           Minimum="0" Maximum="48"
+                                           DisplayMinimum="-24" DisplayMaximum="24"
+                                           Value="{Binding EqHighGain.Value}" />
+                    <controls:RotaryKnobV2 Label="LEVEL" Scale="0.65" LabelFontSize="11"
+                                           Minimum="0" Maximum="48"
+                                           DisplayMinimum="-24" DisplayMaximum="24"
+                                           Value="{Binding EqLevel.Value}" />
+                </StackPanel>
+
+                <!-- Freq / Q / Cut stepped knobs -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
+                    <controls:SteppedKnobV2 Label="LOW CUT" Scale="0.65" LabelFontSize="11"
+                                            Steps="{x:Static vm:FrequencySteps.LowCut18}"
+                                            Value="{Binding EqLowCut.Value}" />
+                    <controls:SteppedKnobV2 Label="MID FREQ" Scale="0.65" LabelFontSize="11"
+                                            Steps="{x:Static vm:FrequencySteps.MidFreq28}"
+                                            Value="{Binding EqMidFreq.Value}" />
+                    <controls:SteppedKnobV2 Label="MID Q" Scale="0.65" LabelFontSize="11"
+                                            Steps="{x:Static vm:FrequencySteps.Q6}"
+                                            Value="{Binding EqMidQ.Value}" />
+                    <controls:SteppedKnobV2 Label="HIGH CUT" Scale="0.65" LabelFontSize="11"
+                                            Steps="{x:Static vm:FrequencySteps.HighCut15}"
+                                            Value="{Binding EqHighCut.Value}" />
+                </StackPanel>
+
+            </StackPanel>
+
+        </StackPanel>
+    </Border>
+
+</UserControl>

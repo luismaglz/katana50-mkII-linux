@@ -30,6 +30,7 @@ public class MainWindowViewModel : ViewModelBase
         NoiseSuppressor = new NoiseSuppressorViewModel(katanaState);
         PatchEq = new PatchEqViewModel(katanaState);
         SendReturn = new SendReturnViewModel(katanaState);
+        Solo = new SoloViewModel(katanaState);
         PedalboardMiniMap = new PedalboardMiniMapViewModel(katanaState);
         PatchLibrary = new PatchLibraryViewModel(patchLibraryService,
             loggerFactory.CreateLogger<PatchLibraryViewModel>());
@@ -52,6 +53,7 @@ public class MainWindowViewModel : ViewModelBase
     public NoiseSuppressorViewModel NoiseSuppressor { get; }
     public PatchEqViewModel PatchEq { get; }
     public SendReturnViewModel SendReturn { get; }
+    public SoloViewModel Solo { get; }
     public PaletteEditorViewModel PaletteEditor { get; } = new();
 
     [Reactive] public string StatusMessage { get; set; } = "Ready to scan for MIDI devices.";
