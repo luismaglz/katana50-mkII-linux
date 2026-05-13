@@ -54,7 +54,6 @@ public class BoosterPedalViewModel : PedalViewModel
     /// <summary> View-only properties ────────────────────────────────────────────────────── </summary>
     public IReadOnlyList<string> TypeOptions { get; }
 
-    public bool HasTypeOptions => TypeOptions.Count > 0;
     public IBrush VariationBrush => GetVariationBrush(Variation);
 
     public override IBrush CardBackgroundBrush => BoosterPedalColors.GetBackgroundBrush(SelectedTypeOption);

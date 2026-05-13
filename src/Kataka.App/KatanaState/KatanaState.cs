@@ -19,6 +19,7 @@ public partial class KatanaState : IKatanaState
         RegisterChannelMode();
         RegisterPedals();
         RegisterGlobalEq();
+        RegisterNoiseSuppressor();
     }
 
     public IReadOnlyDictionary<string, AmpControlState> GetAmpControlsByKey() =>
@@ -111,6 +112,7 @@ public partial class KatanaState : IKatanaState
     partial void RegisterChannelMode();
     partial void RegisterPedals();
     partial void RegisterGlobalEq();
+    partial void RegisterNoiseSuppressor();
 
     private void RegisterAll(object obj)
     {

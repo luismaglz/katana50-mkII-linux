@@ -623,6 +623,16 @@ public static class KatanaAddressMap
         /// <summary>Parameter offset constant 'FootVolume' from address_map.js.</summary>
         public const uint FootVolume = 0x21;
 
+        // Noise Suppressor 1 (NS1)
+        /// <summary>Parameter offset constant 'Ns1Sw' from address_map.js (PRM_NS1_SW).</summary>
+        public const uint Ns1Sw = 0x26;
+
+        /// <summary>Parameter offset constant 'Ns1Threshold' from address_map.js (PRM_NS1_THRESHOLD).</summary>
+        public const uint Ns1Threshold = 0x27;
+
+        /// <summary>Parameter offset constant 'Ns1Release' from address_map.js (PRM_NS1_RELEASE).</summary>
+        public const uint Ns1Release = 0x28;
+
         // Solo
         /// <summary>Parameter offset constant 'SoloSw' from address_map.js.</summary>
         public const uint SoloSw = 0x54;

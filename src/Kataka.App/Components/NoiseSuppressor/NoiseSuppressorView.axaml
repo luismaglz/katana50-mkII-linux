@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kataka.App.ViewModels"
+             xmlns:dvm="using:Kataka.App.ViewModels.Design"
+             xmlns:controls="using:Kataka.App.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="200"
+             d:DesignHeight="120"
+             d:DataContext="{x:Static dvm:DesignNoiseSuppressorViewModel.Instance}"
+             x:Class="Kataka.App.Views.NoiseSuppressorView"
+             x:DataType="vm:NoiseSuppressorViewModel"
+             x:CompileBindings="False">
+
+    <Border Classes="panel-section" Padding="12,10">
+        <StackPanel Spacing="8">
+
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <TextBlock Text="NOISE SUPPRESSOR"
+                           FontSize="10"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           VerticalAlignment="Center" />
+                <ToggleButton Classes="effect-button"
+                              Content="ON"
+                              Width="52"
+                              IsChecked="{Binding IsEnabled}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <controls:RotaryKnobV2 Label="THRESHOLD"
+                                       Scale="0.65"
+                                       LabelFontSize="13"
+                                       ValueFontSize="12"
+                                       Minimum="0" Maximum="100"
+                                       Value="{Binding Threshold.Value}" />
+                <controls:RotaryKnobV2 Label="RELEASE"
+                                       Scale="0.65"
+                                       LabelFontSize="13"
+                                       ValueFontSize="12"
+                                       Minimum="0" Maximum="100"
+                                       Value="{Binding Release.Value}" />
+            </StackPanel>
+
+        </StackPanel>
+    </Border>
+
+</UserControl>

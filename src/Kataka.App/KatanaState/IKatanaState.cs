@@ -35,6 +35,8 @@ public interface IKatanaState
     ReverbPedalState ReverbPedal { get; }
     HardwarePedalState HardwarePedal { get; }
 
+    NoiseSuppressorState NoiseSuppressor { get; }
+
     /// <summary> Ver200+ features ───────────────────────────────────────────────────────── </summary>
     SoloEqState SoloEq { get; }
 

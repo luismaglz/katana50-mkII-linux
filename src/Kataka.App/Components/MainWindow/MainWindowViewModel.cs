@@ -27,6 +27,7 @@ public class MainWindowViewModel : ViewModelBase
             loggerFactory.CreateLogger<PatchViewModel>());
         AmpEditor = new AmpEditorViewModel(katanaState);
         GlobalEq = new GlobalEqViewModel(katanaState);
+        NoiseSuppressor = new NoiseSuppressorViewModel(katanaState);
         PedalboardMiniMap = new PedalboardMiniMapViewModel(katanaState);
         PatchLibrary = new PatchLibraryViewModel(patchLibraryService,
             loggerFactory.CreateLogger<PatchLibraryViewModel>());
@@ -46,6 +47,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public PedalboardMiniMapViewModel PedalboardMiniMap { get; }
     public GlobalEqViewModel GlobalEq { get; }
+    public NoiseSuppressorViewModel NoiseSuppressor { get; }
     public PaletteEditorViewModel PaletteEditor { get; } = new();
 
     [Reactive] public string StatusMessage { get; set; } = "Ready to scan for MIDI devices.";
