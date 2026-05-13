@@ -29,20 +29,31 @@ public abstract class PedalViewModel : ViewModelBase
         Definition = definition;
     }
 
-    public virtual IBrush CardBackgroundBrush => DefaultCardBackground;
+    public virtual PedalColorScheme ColorScheme => default;
+
+    public IBrush CardBackgroundBrush => ColorScheme.Background ?? DefaultCardBackground;
 
     // Extracts a representative solid Color from any brush for color math.
-    protected Color CardBgColor => CardBackgroundBrush switch
+    private Color CardBgColor => CardBackgroundBrush switch
     {
         SolidColorBrush s => s.Color,
         LinearGradientBrush g when g.GradientStops.Count > 0 => g.GradientStops[0].Color,
         _ => Color.Parse("#2E3138")
     };
 
-    public virtual IBrush CardTextBrush => new SolidColorBrush(ColorUtils.GetBestContrast(CardBgColor));
-    public virtual IBrush KnobLabelBrush => new SolidColorBrush(ColorUtils.DeriveLabel(CardBgColor));
-    public virtual IBrush KnobValueBrush => new SolidColorBrush(ColorUtils.DeriveValue(CardBgColor));
-    public virtual Color KnobAccentColor => ColorUtils.DeriveAccent(CardBgColor);
+    public IBrush CardTextBrush => ColorScheme.ForegroundColor.HasValue
+        ? new SolidColorBrush(ColorScheme.ForegroundColor.Value)
+        : new SolidColorBrush(ColorUtils.GetBestContrast(CardBgColor));
+
+    public IBrush KnobLabelBrush => ColorScheme.ForegroundColor.HasValue
+        ? new SolidColorBrush(ColorScheme.ForegroundColor.Value)
+        : new SolidColorBrush(ColorUtils.DeriveLabel(CardBgColor));
+
+    public IBrush KnobValueBrush => ColorScheme.ForegroundColor.HasValue
+        ? new SolidColorBrush(ColorScheme.ForegroundColor.Value)
+        : new SolidColorBrush(ColorUtils.DeriveValue(CardBgColor));
+
+    public Color KnobAccentColor => ColorScheme.AccentColor ?? ColorUtils.DeriveAccent(CardBgColor);
 
     public KatanaPanelEffectDefinition Definition { get; }
 

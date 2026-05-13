@@ -39,32 +39,32 @@ public static class ModFxPedalColors
     public static readonly IBrush AcGuitarSim = Solid("#D2B48C"); // AC.GUITAR SIM
     public static readonly IBrush AcProcessor = Solid("#BC8F8F"); // AC.PROCESSOR
 
-    public static IBrush GetBackgroundBrush(string? typeName) => typeName switch
+    public static PedalColorScheme GetColorScheme(string? typeName) => typeName switch
     {
-        "CHORUS" or "DC-30" => Chorus,
-        "FLANGER" or "FLANGER 117E" => Flanger,
-        "PHASER" or "PHASER 90E" => Phaser,
-        "UNI-V" => UniV,
-        "TREMOLO" => Tremolo,
-        "VIBRATO" => Vibrato,
-        "ROTARY" => Rotary,
-        "SLICER" => Slicer,
-        "COMP" => Comp,
-        "LIMITER" => Limiter,
-        "GRAPHIC EQ" or "PARAMETRIC EQ" => Eq,
-        "SLOW GEAR" => SlowGear,
-        "T.WAH" or "AUTO WAH" => TouchWah,
-        "PEDAL WAH" or "WAH 95E" => PedalWah,
-        "HUMANIZER" => Humanizer,
-        "PITCH SHIFTER" or "PEDAL BEND" => PitchShifter,
-        "HARMONIST" => Harmonist,
-        "OCTAVE" or "HEAVY OCTAVE" => Octave,
-        "WAVE SYNTH" => WaveSynth,
-        "RING MOD" => RingMod,
-        "GUITAR SIM" => GuitarSim,
-        "AC.GUITAR SIM" => AcGuitarSim,
-        "AC.PROCESSOR" => AcProcessor,
-        _ => PedalViewModel.DefaultCardBackground
+        "CHORUS" or "DC-30" => new(Chorus),
+        "FLANGER" or "FLANGER 117E" => new(Flanger),
+        "PHASER" or "PHASER 90E" => new(Phaser),
+        "UNI-V" => new(UniV),
+        "TREMOLO" => new(Tremolo),
+        "VIBRATO" => new(Vibrato),
+        "ROTARY" => new(Rotary),
+        "SLICER" => new(Slicer),
+        "COMP" => new(Comp),
+        "LIMITER" => new(Limiter),
+        "GRAPHIC EQ" or "PARAMETRIC EQ" => new(Eq),
+        "SLOW GEAR" => new(SlowGear),
+        "T.WAH" or "AUTO WAH" => new(TouchWah),
+        "PEDAL WAH" or "WAH 95E" => new(PedalWah),
+        "HUMANIZER" => new(Humanizer),
+        "PITCH SHIFTER" or "PEDAL BEND" => new(PitchShifter),
+        "HARMONIST" => new(Harmonist),
+        "OCTAVE" or "HEAVY OCTAVE" => new(Octave),
+        "WAVE SYNTH" => new(WaveSynth),
+        "RING MOD" => new(RingMod),
+        "GUITAR SIM" => new(GuitarSim),
+        "AC.GUITAR SIM" => new(AcGuitarSim),
+        "AC.PROCESSOR" => new(AcProcessor),
+        _ => default
     };
 
     private static IBrush Solid(string hex) => new SolidColorBrush(Color.Parse(hex));

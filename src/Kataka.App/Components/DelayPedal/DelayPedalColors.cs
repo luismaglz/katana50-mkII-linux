@@ -1,5 +1,7 @@
 using Avalonia.Media;
 
+using Kataka.App.ViewModels;
+
 namespace Kataka.App.Components.DelayPedal;
 
 public static class DelayPedalColors
@@ -12,16 +14,16 @@ public static class DelayPedalColors
     public static readonly IBrush Modulate = Solid("#0e2418");
     public static readonly IBrush Sde3000 = Solid("#181e2a");
 
-    public static IBrush GetBackgroundBrush(string? typeName) => typeName switch
+    public static PedalColorScheme GetColorScheme(string? typeName) => typeName switch
     {
-        "DIGITAL" or "STEREO" => Digital,
-        "PAN" => Pan,
-        "REVERSE" => Reverse,
-        "ANALOG" => Analog,
-        "TAPE ECHO" => TapeEcho,
-        "MODULATE" => Modulate,
-        "SDE-3000" => Sde3000,
-        _ => Digital
+        "DIGITAL" or "STEREO" => new(Digital),
+        "PAN" => new(Pan),
+        "REVERSE" => new(Reverse),
+        "ANALOG" => new(Analog),
+        "TAPE ECHO" => new(TapeEcho),
+        "MODULATE" => new(Modulate),
+        "SDE-3000" => new(Sde3000),
+        _ => new(Digital)
     };
 
     private static IBrush Solid(string hex) => new SolidColorBrush(Color.Parse(hex));

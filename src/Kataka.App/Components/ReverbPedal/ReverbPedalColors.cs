@@ -1,5 +1,7 @@
 using Avalonia.Media;
 
+using Kataka.App.ViewModels;
+
 namespace Kataka.App.Components.ReverbPedal;
 
 public static class ReverbPedalColors
@@ -10,14 +12,14 @@ public static class ReverbPedalColors
     public static readonly IBrush Spring = Solid("#0e2020");
     public static readonly IBrush Modulate = Solid("#1c1428");
 
-    public static IBrush GetBackgroundBrush(string? typeName) => typeName switch
+    public static PedalColorScheme GetColorScheme(string? typeName) => typeName switch
     {
-        "ROOM" => Room,
-        "HALL" => Hall,
-        "PLATE" => Plate,
-        "SPRING" => Spring,
-        "MODULATE" => Modulate,
-        _ => Hall
+        "ROOM" => new(Room),
+        "HALL" => new(Hall),
+        "PLATE" => new(Plate),
+        "SPRING" => new(Spring),
+        "MODULATE" => new(Modulate),
+        _ => new(Hall)
     };
 
     private static IBrush Solid(string hex) => new SolidColorBrush(Color.Parse(hex));

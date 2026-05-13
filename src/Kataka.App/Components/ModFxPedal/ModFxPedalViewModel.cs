@@ -188,6 +188,7 @@ public class ModFxPedalViewModel : PedalViewModel
             _selectedTypeOption = TypeTable.TryGetValue((byte)idx, out var name) ? name : null;
             this.RaisePropertyChanged(nameof(SelectedTypeOption));
             this.RaisePropertyChanged(nameof(TypeCaption));
+            this.RaisePropertyChanged(nameof(ColorScheme));
             this.RaisePropertyChanged(nameof(CardBackgroundBrush));
             this.RaisePropertyChanged(nameof(CardTextBrush));
             this.RaisePropertyChanged(nameof(KnobLabelBrush));
@@ -536,8 +537,8 @@ public class ModFxPedalViewModel : PedalViewModel
     public bool IsTypePedalBend => SelectedTypeIndex == 40;
 
     /// <summary> PedalViewModel abstract overrides ──────────────────────────────────────── </summary>
-    public override IBrush CardBackgroundBrush =>
-        ModFxPedalColors.GetBackgroundBrush(SelectedTypeOption);
+    public override PedalColorScheme ColorScheme =>
+        ModFxPedalColors.GetColorScheme(SelectedTypeOption);
 
     public override bool IsEnabled
     {

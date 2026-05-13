@@ -3,6 +3,8 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 
+using Kataka.App.ViewModels;
+
 namespace Kataka.App.Components.BoosterPedal;
 
 /// <summary>
@@ -32,29 +34,26 @@ public static class BoosterPedalColors
 
     public static readonly IBrush MetalCore = CreateOrganicNoise(500, 800);
 
-    public static IBrush GetBackgroundBrush(string? typeName)
+    public static PedalColorScheme GetColorScheme(string? typeName) => typeName switch
     {
-        return typeName switch
-        {
-            "MID BOOST" or "CLEAN BOOST" or "TREBLE BOOST" => Boost,
-            "CRUNCH OD" or "NATURAL OD" or "WARM OD" => Boost,
-            "OVERDRIVE" => Overdrive,
-            "T-SCREAM" => TSCREAM,
-            "TURBO OD" => TURBOOD,
-            "BLUES DRIVE" => BluesDriver,
-            "CENTA OD" => CentaOD,
-            "FAT DS" => FatDS,
-            "DISTORTION" or "RAT" => Rat,
-            "GUV DS" => GuvDS,
-            "DST+" => DSTP,
-            "METAL DS" or "OCT FUZZ" => OctFuzz,
-            "60S FUZZ" or "MUFF FUZZ" => MuffFuzz,
-            "HM-2" => HM2,
-            "METAL ZONE" => MetalZone,
-            "METAL CORE" => MetalCore,
-            _ => Overdrive
-        };
-    }
+        "MID BOOST" or "CLEAN BOOST" or "TREBLE BOOST" => new(Boost),
+        "CRUNCH OD" or "NATURAL OD" or "WARM OD" => new(Boost),
+        "OVERDRIVE" => new(Overdrive),
+        "T-SCREAM" => new(TSCREAM),
+        "TURBO OD" => new(TURBOOD),
+        "BLUES DRIVE" => new(BluesDriver, Color.Parse("#fec015")),
+        "CENTA OD" => new(CentaOD),
+        "FAT DS" => new(FatDS),
+        "DISTORTION" or "RAT" => new(Rat),
+        "GUV DS" => new(GuvDS),
+        "DST+" => new(DSTP),
+        "METAL DS" or "OCT FUZZ" => new(OctFuzz),
+        "60S FUZZ" or "MUFF FUZZ" => new(MuffFuzz),
+        "HM-2" => new(HM2),
+        "METAL ZONE" => new(MetalZone),
+        "METAL CORE" => new(MetalCore),
+        _ => new(Overdrive)
+    };
 
     private static IBrush Gradient(string top, string bottom)
     {

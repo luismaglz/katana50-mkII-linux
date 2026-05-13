@@ -31,6 +31,7 @@ public class BoosterPedalViewModel : PedalViewModel
         {
             this.RaisePropertyChanged(nameof(SelectedTypeOption));
             this.RaisePropertyChanged(nameof(TypeCaption));
+            this.RaisePropertyChanged(nameof(ColorScheme));
             this.RaisePropertyChanged(nameof(CardBackgroundBrush));
             this.RaisePropertyChanged(nameof(CardTextBrush));
             this.RaisePropertyChanged(nameof(KnobLabelBrush));
@@ -56,7 +57,7 @@ public class BoosterPedalViewModel : PedalViewModel
 
     public IBrush VariationBrush => GetVariationBrush(Variation);
 
-    public override IBrush CardBackgroundBrush => BoosterPedalColors.GetBackgroundBrush(SelectedTypeOption);
+    public override PedalColorScheme ColorScheme => BoosterPedalColors.GetColorScheme(SelectedTypeOption);
 
 
     public override bool IsEnabled
