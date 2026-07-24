@@ -9,4 +9,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" />
+  </ItemGroup>
+
 </Project>
